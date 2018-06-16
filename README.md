@@ -4,6 +4,8 @@ Allow you to launch Angular schematics commands from:
 - files Explorer (right-click on any file or directory)
 - Command Palette.
 
+Just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
+
 ## Angular onsite training
 
 The author of this library organizes Angular courses (based in Paris, France, but open to travel).
@@ -12,7 +14,7 @@ and [course details here](https://formationjavascript.com/formation-angular/) (i
 
 ## Requirements
 
-This extension is only enabled inside an Angular >=6 project, ie. with an `angular.json` file.
+This extension requires VS Code >= 1.24 and is only enabled inside an Angular >=6 project, ie. with an `angular.json` file.
 
 ## Work in progress
 
