@@ -1,7 +1,7 @@
 # Change Log
-All notable changes to the "angular-schematics" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.0-beta.0] - 2018-06-16
 
-## [Unreleased]
-- Initial release
+### Features
+- Command in Palette and Explorer context menu to generate a simple component.
+- Command in Palette and Explorer context menu to generate a simple service.
