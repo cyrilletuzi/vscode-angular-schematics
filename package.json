@@ -1,15 +1,39 @@
 {
+    "version": "1.0.0-beta.0",
     "name": "angular-schematics",
-    "displayName": "angular-schematics",
-    "description": "Launch Angular schematics commands from files Explorer.",
-    "version": "0.0.1",
-    "publisher": "cyrilletuzi",
-    "engines": {
-        "vscode": "^1.24.0"
-    },
+    "displayName": "Angular Schematics",
+    "description": "Launch Angular schematics commands from files Explorer or Command Palette.",
+    "keywords": [
+        "angular",
+        "schematics",
+        "angular schematics"
+    ],
     "categories": [
         "Other"
     ],
+    "publisher": "cyrilletuzi",
+    "author": {
+        "name": "cyrilletuzi",
+        "url": "https://www.cyrilletuzi.com/en/web/"
+    },
+    "contributors": [
+        {
+            "name": "cyrilletuzi",
+            "url": "https://www.cyrilletuzi.com/en/web/"
+        }
+    ],
+    "homepage": "https://github.com/cyrilletuzi/vscode-angular-schematics/",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cyrilletuzi/vscode-angular-schematics/"
+    },
+    "bugs": {
+        "url": "https://github.com/cyrilletuzi/vscode-angular-schematics/issues"
+    },
+    "qna": false,
+    "engines": {
+        "vscode": "^1.24.0"
+    },
     "activationEvents": [
         "workspaceContains:**/angular.json"
     ],
@@ -17,10 +41,26 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "extension.generateComponent",
+                "title": "Angular: Generate a component"
+            },
+            {
+                "command": "extension.generateService",
+                "title": "Angular: Generate a service"
             }
-        ]
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "extension.generateComponent",
+                    "group": "angularschematics@1"
+                },
+                {
+                    "command": "extension.generateService",
+                    "group": "angularschematics@2"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
