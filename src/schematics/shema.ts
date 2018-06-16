@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { Utils } from './utils';
-import { Collection } from './collection';
+import { Collection, CollectionData } from './collection';
 
 export interface SchemaDataOptionDetails {
     type: 'string' | 'boolean';
@@ -39,18 +38,10 @@ export class Schema {
 
     async load(): Promise<void> {
 
-        if (!vscode.workspace.rootPath || !this.collection.data) {
-            return;
-        }
-
-        const schemaPath = path.join(
-            vscode.workspace.rootPath,
-            'node_modules',
+        this.data = await Utils.getSchemaFromNodeModules<SchemaData>(
             this.collection.name,
-            this.collection.data.schematics[this.name].schema.replace('./', '')
+            (this.collection.data as CollectionData).schematics[this.name].schema.replace('./', '')
         );
-
-        this.data = await Utils.parseJSONFile<SchemaData>(schemaPath);
 
         if (this.data) {
 

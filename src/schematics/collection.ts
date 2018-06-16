@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { Utils } from './utils';
 import { Schema } from './shema';
@@ -25,13 +24,7 @@ export class Collection {
 
     async load(): Promise<void> {
 
-        if (!vscode.workspace.rootPath) {
-            return;
-        }
-
-        const collectionPath = path.join(vscode.workspace.rootPath, 'node_modules', this.name, 'collection.json');
-
-        this.data = await Utils.parseJSONFile<CollectionData>(collectionPath);
+        this.data = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, 'collection.json');
 
     }
 

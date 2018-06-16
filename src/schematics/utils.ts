@@ -1,7 +1,32 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as path from 'path';
 
 export class Utils {
+
+    static getSchemaFromNodeModules<T = any>(packageName: string, filePath: string): Promise<T | null> {
+
+        return Utils.parseJSONFile<T>(Utils.getNodeModulesPath(packageName, filePath));
+
+    }
+
+    static getWorkspaceRootPath(): string {
+
+        if (vscode.workspace.workspaceFolders) {
+
+            return path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
+
+        }
+
+        return '';
+
+    }
+
+    static getNodeModulesPath(packageName: string, filePath: string) {
+
+        return path.join(Utils.getWorkspaceRootPath(), 'node_modules', packageName, filePath);
+
+    }
 
     /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static readFileAsync(path: string): Promise<string> {
