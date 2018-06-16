@@ -2,7 +2,7 @@
     "version": "1.0.0-beta.0",
     "name": "angular-schematics",
     "displayName": "Angular Schematics",
-    "description": "Launch Angular schematics commands from files Explorer or Command Palette.",
+    "description": "Allow you to launch Angular schematics commands from files Explorer or Command Palette.",
     "keywords": [
         "angular",
         "schematics",
