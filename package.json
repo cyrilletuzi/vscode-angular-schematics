@@ -2,7 +2,7 @@
     "version": "0.0.1",
     "name": "angular-schematics",
     "displayName": "Angular Schematics",
-    "description": "Allow you to launch Angular schematics commands from files Explorer or Command Palette.",
+    "description": "Angular schematics commands from files Explorer or Command Palette.",
     "keywords": [
         "angular",
         "schematics",
@@ -11,6 +11,7 @@
     "categories": [
         "Other"
     ],
+    "icon": "icon-angular.png",
     "publisher": "cyrilletuzi",
     "author": {
         "name": "cyrilletuzi",
