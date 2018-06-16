@@ -13,12 +13,12 @@ and [course details here](https://formationjavascript.com/formation-angular/) (i
 Just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
 
 Then, from:
-- files Explorer (right-click on any file or directory),
+- files Explorer context menu (right-click on any file or directory),
 - or from Command Palette,
 
 choose an "Angular: Generate..." command and just fill the requested options.
 
-If you're launching the command from the files Explorer,
+If you're launching the command from the files Explorer context menu,
 the destination path will be automatically configured to the directory you just right-cliked.
 
 ## Requirements
