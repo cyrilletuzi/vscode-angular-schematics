@@ -21,19 +21,21 @@ choose an "Angular: Generate..." command and just fill the requested options.
 If you're launching the command from the files Explorer context menu,
 the destination path will be automatically configured to the directory you just right-cliked.
 
+If you use special options everytime, be sure to use the
+[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
+to save your default values and save time.
+
 ## Requirements
 
 This extension requires VS Code >= 1.24 and is only enabled inside an Angular CLI >=6 project
 (ie. with an `angular.json` file and with `@angular/cli` installed globally).
 
-## Work in progress
+## To do
 
-This extension is working but in an early stage. Currently, you can only generate a simple component or service, without special options.
-More schematics commands are on their way.
+- Allow generation from all schematics (not just the CLI official ones).
+- Localization.
 
-If you use special options everytime, be sure to use the
-[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
-to save your default values.
+Contributions welcomed.
 
 ## Release Notes
 
