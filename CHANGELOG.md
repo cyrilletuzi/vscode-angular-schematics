@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0-beta.0] - 2018-06-16
+## [0.0.1] - 2018-06-16
 
 ### Features
 - Command in Palette and Explorer context menu to generate a simple component.
