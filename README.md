@@ -1,10 +1,6 @@
 # Angular schematics extension for Visual Studio Code
 
-Allow you to launch Angular schematics commands from:
-- files Explorer (right-click on any file or directory)
-- Command Palette.
-
-Just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
+Allow you to launch Angular schematics commands from files Explorer (right-click) or Command Palette.
 
 ## Angular onsite training
 
@@ -12,9 +8,23 @@ The author of this library organizes Angular courses (based in Paris, France, bu
 You can find [my bio here](https://www.cyrilletuzi.com/en/web/) (in English)
 and [course details here](https://formationjavascript.com/formation-angular/) (in French).
 
+## Getting started
+
+Just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
+
+Then, from:
+- files Explorer (right-click on any file or directory),
+- or from Command Palette,
+
+choose an "Angular: Generate..." command and just fill the requested options.
+
+If you're launching the command from the files Explorer,
+the destination path will be automatically configured to the directory you just right-cliked.
+
 ## Requirements
 
-This extension requires VS Code >= 1.24 and is only enabled inside an Angular >=6 project, ie. with an `angular.json` file.
+This extension requires VS Code >= 1.24 and is only enabled inside an Angular CLI >=6 project
+(ie. with an `angular.json` file and with `@angular/cli` installed globally).
 
 ## Work in progress
 
