@@ -1,5 +1,5 @@
 {
-    "version": "0.2.6",
+    "version": "0.3.0",
     "name": "angular-schematics",
     "displayName": "Angular Schematics",
     "description": "Angular schematics commands from files Explorer or Command Palette.",
@@ -81,7 +81,7 @@
                     "ngschematics.schematics": {
                         "type": "array",
                         "items": {
-                            "type":"string"
+                            "type": "string"
                         },
                         "default": [],
                         "description": "Add other schematics (for example: \"@angular/material\")"
