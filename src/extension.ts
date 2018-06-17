@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
         const schemaName = 'component';
 
-        generate.add(schemaName);
+        generate.addSchema(schemaName);
 
         const schema = collection.createSchema(schemaName);
 
@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext): void {
             return;
         }
 
-        generate.addPathAndName(defaultOption);
+        generate.addDefaultOption(defaultOption);
 
         Utils.launchCommandInTerminal(generate.command);
 
@@ -45,7 +45,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
         const schemaName = 'service';
 
-        generate.add(schemaName);
+        generate.addSchema(schemaName);
 
         const schema = collection.createSchema(schemaName);
 
@@ -55,7 +55,7 @@ export function activate(context: vscode.ExtensionContext): void {
             return;
         }
 
-        generate.addPathAndName(defaultOption);
+        generate.addDefaultOption(defaultOption);
 
         Utils.launchCommandInTerminal(generate.command);
 
@@ -79,7 +79,7 @@ export function activate(context: vscode.ExtensionContext): void {
             return;
         }
 
-        generate.add(schemaName);
+        generate.addSchema(schemaName);
 
         const schema = collection.createSchema(schemaName);
 
@@ -97,11 +97,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 return;
             }
 
-            if (schema.hasPath()) {
-                generate.addPathAndName(defaultOption);
-            } else {
-                generate.add(defaultOption);
-            }
+            generate.addDefaultOption(defaultOption, schema.hasPath());
 
         }
 
@@ -113,7 +109,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
             const filledOptions = await schema.askOptions(selectedOptions);
 
-            generate.add(...filledOptions);
+            filledOptions.forEach((option, optionName) => {
+                generate.add(optionName, option);
+            });
 
         }
 

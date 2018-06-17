@@ -5,53 +5,58 @@ export interface ExplorerMenuContext {
 export class Generate {
 
     get command(): string {
-        return this.commandArgs.join(' ');
+
+        let optionsArgs: string[] = [];
+        this.options.forEach((optionValue, optionName) => {
+            optionsArgs.push(`--${optionName} ${optionValue}`);
+        });
+
+        const commandArgs = [this.base, this.schema, this.defaultOption, ...optionsArgs];
+        return commandArgs.join(' ');
+
     }
-    protected commandArgs: string[] = ['ng generate'];
+    protected base = 'ng generate';
+    protected schema = '';
     protected path = '';
     protected project = '';
+    protected defaultOption = '';
+    protected options = new Map<string, string>();
 
     constructor(context?: ExplorerMenuContext) {
 
-        this.path = this.getCommandPath(context);
-        this.project = this.getProject(context);
-
-    }
-
-    add(...args: string[]): void {
-
-        this.commandArgs.push(...args);
-
-    }
-
-    addPathAndName(name: string): void {
-
-        this.add(`${this.path}${name}`);
-
-        if (this.project) {
-
-            this.add(`--project ${this.project}`);
-
-        }
-
-    }
-
-    protected getContextPath(context?: ExplorerMenuContext): string {
-
         /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
-        if ((typeof context === 'object') && ('path' in context)) {
+        const contextPath = (typeof context === 'object') && ('path' in context) ? context.path : '';
 
-            return context.path;
-
-        }
-
-        return '';
+        this.path = this.getCommandPath(contextPath);
+        this.project = this.getProject(contextPath);
 
     }
 
-    protected getProject(context?: ExplorerMenuContext): string {
+    addSchema(name: string): void {
 
-        const contextPath = this.getContextPath(context);
+        this.schema = name;
+
+    }
+
+    addDefaultOption(value: string, withPath = true): void {
+
+        this.defaultOption = withPath ? `${this.path}${value}` : value;
+
+        if (withPath && this.project) {
+
+            this.add('project', this.project);
+
+        }
+
+    }
+
+    add(optionName: string, optionValue: string): void {
+
+        this.options.set(optionName, optionValue);
+
+    }
+
+    protected getProject(contextPath = ''): string {
 
         const projectMatches = contextPath.match(/projects\/([^\/]+)\/[^\/]+\/app/);
 
@@ -65,9 +70,7 @@ export class Generate {
 
     }
 
-    protected getCommandPath(context?: ExplorerMenuContext): string {
-
-        const contextPath = this.getContextPath(context);
+    protected getCommandPath(contextPath = ''): string {
 
         if (contextPath.match(/[^\/]+\/app\//)) {
 

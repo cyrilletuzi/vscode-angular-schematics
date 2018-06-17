@@ -52,7 +52,7 @@ export class Schema {
     }
 
     getOptionsNames(): string[] {
-        return this.options ? Object.keys(this.options) : [];
+        return this.options ? Object.keys(this.options).sort() : [];
     }
 
     hasDefaultOption(): boolean {
@@ -127,9 +127,9 @@ export class Schema {
 
     }
 
-    async askOptions(options: SchemaDataOptions): Promise<string[]> {
+    async askOptions(options: SchemaDataOptions): Promise<Map<string, string>> {
 
-        const optionsArg = [];
+        const optionsMap = new Map();
     
         for (let optionName in options) {
     
@@ -157,12 +157,12 @@ export class Schema {
             }
     
             if (choice) {
-                optionsArg.push(`--${optionName} ${choice}`);
+                optionsMap.set(optionName, choice);
             }
     
         }
     
-        return optionsArg;
+        return optionsMap;
     
     }
 

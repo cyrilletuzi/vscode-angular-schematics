@@ -41,7 +41,8 @@ export class Collection {
         }
 
         return Object.keys(this.data.schematics)
-            .filter((schema) => !(this.data as CollectionData).schematics[schema].hidden);
+            .filter((schema) => !(this.data as CollectionData).schematics[schema].hidden)
+            .sort();
     
     }
 
