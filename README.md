@@ -2,6 +2,12 @@
 
 Allow you to launch Angular schematics commands from files Explorer (right-click) or Command Palette.
 
+## Why?
+
+- Save time
+- No more typo errors
+- No more chaotic search in the CLI wiki, all options available will be proposed
+
 ## Angular onsite training
 
 The author of this library organizes Angular courses (based in Paris, France, but open to travel).
