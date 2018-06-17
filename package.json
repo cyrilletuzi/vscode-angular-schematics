@@ -59,15 +59,18 @@
             "explorer/context": [
                 {
                     "command": "ngschematics.generateComponent",
-                    "group": "angularschematics@1"
+                    "group": "angularschematics@1",
+                    "when": "workspaceContains:**/angular.json"
                 },
                 {
                     "command": "ngschematics.generateService",
-                    "group": "angularschematics@2"
+                    "group": "angularschematics@2",
+                    "when": "workspaceContains:**/angular.json"
                 },
                 {
                     "command": "ngschematics.generate",
-                    "group": "angularschematics@3"
+                    "group": "angularschematics@3",
+                    "when": "workspaceContains:**/angular.json"
                 }
             ]
         }
