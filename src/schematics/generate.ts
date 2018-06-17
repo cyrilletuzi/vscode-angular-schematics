@@ -1,4 +1,5 @@
 import { Utils } from './utils';
+import { Schematics } from './schematics';
 
 export class Generate {
 
@@ -9,15 +10,14 @@ export class Generate {
             optionsArgs.push(`--${optionName} ${optionValue}`);
         });
 
-        const collection = (this.collection !== Generate.defaultCollection) ? `${this.collection}:` : '';
+        const collection = (this.collection !== Schematics.defaultCollection) ? `${this.collection}:` : '';
 
         const commandArgs = [this.base, `${collection}${this.schema}`, this.defaultOption, ...optionsArgs];
         return commandArgs.join(' ');
 
     }
-    static defaultCollection = '@schematics/angular';
     protected base = 'ng generate';
-    protected collection = Generate.defaultCollection;
+    protected collection = Schematics.defaultCollection;
     protected schema = '';
     protected path = '';
     protected project = '';

@@ -32,10 +32,17 @@ This extension requires VS Code >= 1.24 and is only enabled inside an Angular CL
 
 ### Other schematics
 
-By default, only Angular CLI commands are available (scanning all `node_modules` to find all potential schematics would be too slow).
+By default, this extension supports (if they are installed):
+- `@schematics/angular` (official Angular CLI commands)
+- `@angular/material`
+- `@ngrx/schematics`
+
+Scanning all packages to find all potential schematics would be too slow.
 If you want to use other schematics, just add their package name in `ngschematics.schematics` in your VS Code preferences.
 
 For example: `"ngschematics.schematics": ["@angular/material"]`
+
+If you are a library author, feel free to open an issue to ask for your schematics to be added in the default list.
 
 ### Keyboard shortcuts
 
@@ -44,10 +51,10 @@ You can add keyboard shortcuts to the following actions:
 - `ngschematics.generateService`
 - `ngschematics.generate`
 
-### Custom default options
+### Default options
 
 [`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
-already allows to save custom default options for schematics commands.
+already allows to save default options for schematics commands.
 
 ## Release Notes
 

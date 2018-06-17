@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.4.0] - 2018-06-17
+
+### Features
+- Support `@angular/material` and `@ngrx/schematics` by default.
+
 ## [0.3.0] - 2018-06-17
 
 ### Features

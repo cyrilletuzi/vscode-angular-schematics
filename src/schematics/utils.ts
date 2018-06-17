@@ -42,9 +42,9 @@ export class Utils {
 
     }
 
-    static getNodeModulesPath(packageName: string, filePath: string) {
+    static getNodeModulesPath(...paths: string[]) {
 
-        return path.join(Utils.getWorkspaceRootPath(), 'node_modules', packageName, filePath);
+        return path.join(Utils.getWorkspaceRootPath(), 'node_modules', ...paths);
 
     }
 
@@ -60,6 +60,21 @@ export class Utils {
                 } else {
                     resolve(data);
                 }
+    
+            });
+    
+        });
+    
+    }
+
+    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
+    static existsAsync(path: string): Promise<boolean> {
+
+        return new Promise((resolve) => {
+    
+            fs.exists(path, (exists) => {
+    
+                resolve(exists);
     
             });
     
