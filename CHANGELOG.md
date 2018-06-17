@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.2.0] - 2018-06-17
+
+### Features
+- Support multi-projects workspace.
+
 ## [0.1.0] - 2018-06-16
 
 ### Features
