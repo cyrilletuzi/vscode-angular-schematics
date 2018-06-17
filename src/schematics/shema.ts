@@ -145,18 +145,18 @@ export class Schema {
     
                 /** @todo Put default value last in choices */
                 /** @todo Take user defaults in angular.json into account in ordering */
-                choice = await this.askEnumOption(optionName, option.enum);
-    
-            } else if (option.type === 'string') {
-    
-                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt: option.description });
+                choice = await this.askEnumOption(optionName, option.enum, option.description);
     
             } else if (option.type === 'boolean') {
     
                 /** @todo Take user defaults in angular.json into account in ordering */
                 const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
     
-                choice = await this.askEnumOption(optionName, choices);
+                choice = await this.askEnumOption(optionName, choices, option.description);
+    
+            } else {
+    
+                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt: option.description });
     
             }
     
@@ -170,9 +170,9 @@ export class Schema {
     
     }
 
-    protected async askEnumOption(optionName: string, choices: string[]) {
+    protected async askEnumOption(optionName: string, choices: string[], placeholder = '') {
 
-        return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}` });
+        return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}` });
 
     }
 
