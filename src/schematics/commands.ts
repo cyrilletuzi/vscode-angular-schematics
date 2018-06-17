@@ -97,7 +97,10 @@ export class Commands {
 
         }
 
-        const selectedOptionsNames = await vscode.window.showQuickPick(schema.getOptionsNames(), { canPickMany: true });
+        const selectedOptionsNames = await vscode.window.showQuickPick(schema.getOptionsNames(), {
+            canPickMany: true,
+            placeHolder: `Do you need some options?`
+        });
 
         if (selectedOptionsNames) {
 
