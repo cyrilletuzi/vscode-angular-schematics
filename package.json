@@ -12,6 +12,7 @@
         "Other"
     ],
     "icon": "icon-angular.png",
+    "license": "MIT",
     "publisher": "cyrilletuzi",
     "author": {
         "name": "cyrilletuzi",
@@ -42,30 +43,30 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.generateComponent",
+                "command": "ngschematics.generateComponent",
                 "title": "Angular: Generate a component"
             },
             {
-                "command": "extension.generateService",
+                "command": "ngschematics.generateService",
                 "title": "Angular: Generate a service"
             },
             {
-                "command": "extension.generate",
+                "command": "ngschematics.generate",
                 "title": "Angular: Generate..."
             }
         ],
         "menus": {
             "explorer/context": [
                 {
-                    "command": "extension.generateComponent",
+                    "command": "ngschematics.generateComponent",
                     "group": "angularschematics@1"
                 },
                 {
-                    "command": "extension.generateService",
+                    "command": "ngschematics.generateService",
                     "group": "angularschematics@2"
                 },
                 {
-                    "command": "extension.generate",
+                    "command": "ngschematics.generate",
                     "group": "angularschematics@3"
                 }
             ]

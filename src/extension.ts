@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    const generateComponentCommand = vscode.commands.registerCommand('extension.generateComponent', async (context) => {
+    const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context) => {
         
         const generate = new Generate(context);
 
@@ -37,7 +37,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     });
 
-    const generateServiceCommand = vscode.commands.registerCommand('extension.generateService', async (context) => {
+    const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context) => {
 
         const generate = new Generate(context);
 
@@ -61,7 +61,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     });
 
-    const generateCommand = vscode.commands.registerCommand('extension.generate', async (context) => {
+    const generateCommand = vscode.commands.registerCommand('ngschematics.generate', async (context) => {
 
         const generate = new Generate(context);
 
