@@ -1,7 +1,3 @@
-export interface ExplorerMenuContext {
-    path: string;
-}
-
 export class Generate {
 
     get command(): string {
@@ -22,10 +18,7 @@ export class Generate {
     protected defaultOption = '';
     protected options = new Map<string, string>();
 
-    constructor(context?: ExplorerMenuContext) {
-
-        /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
-        const contextPath = (typeof context === 'object') && (context !== null) && ('path' in context) ? context.path : '';
+    constructor(contextPath = '') {
 
         this.path = this.getCommandPath(contextPath);
         this.project = this.getProject(contextPath);

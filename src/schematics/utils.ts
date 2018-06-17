@@ -71,16 +71,4 @@ export class Utils {
     
     }
 
-    static launchCommandInTerminal(command: string) {
-
-        const terminal = vscode.window.createTerminal();
-    
-        /** @todo remove --skipImport */
-        terminal.sendText(command);
-    
-        /** @todo Investigate (launching this now cancel the command as it takes time) */
-        // terminal.dispose();
-    
-    }
-
 }
