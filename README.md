@@ -40,3 +40,7 @@ Contributions welcomed.
 ## Release Notes
 
 [Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/CHANGELOG.md).
+
+## License
+
+MIT
