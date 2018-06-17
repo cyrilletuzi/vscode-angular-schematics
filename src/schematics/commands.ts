@@ -92,8 +92,6 @@ export class Commands {
 
         }
 
-        console.log(generate.command);
-
         Commands.launchCommandInTerminal(generate.command);
 
     }
