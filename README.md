@@ -21,14 +21,26 @@ choose an "Angular: Generate..." command and just fill the requested options.
 If you're launching the command from the files Explorer context menu,
 the destination path will be automatically configured to the directory you just right-cliked.
 
-If you use special options everytime, be sure to use the
-[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
-to save your default values and save time.
-
 ## Requirements
 
-This extension requires VS Code >= 1.24 and is only enabled inside an Angular CLI >=6 project
-(ie. with an `angular.json` file and with `@angular/cli` installed globally).
+This extension requires VS Code >= 1.24 and is only enabled inside an Angular CLI >=6 project, ie.:
+- with `@angular/cli` >= 6 installed globally,
+- with an `angular.json` file in workspace (automatically done by the CLI),
+- with `@schematics/angular` installed locally in your project (automatically done by the CLI).
+
+## Other features
+
+### Keyboard shortcuts
+
+You can bind keyboard shortcuts to the following actions:
+- `ngschematics.generateComponent`
+- `ngschematics.generateService`
+- `ngschematics.generate`
+
+### Custom default options
+
+[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
+already allows to save custom default options for schematics commands.
 
 ## To do
 
