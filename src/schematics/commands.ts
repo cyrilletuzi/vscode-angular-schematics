@@ -101,11 +101,11 @@ export class Commands {
     static launchCommandInTerminal(command: string) {
 
         const terminal = vscode.window.createTerminal();
+
+        /* Show terminal so the user can see if the command fails */
+        terminal.show();
     
         terminal.sendText(command);
-    
-        /** @todo Investigate (launching this now cancel the command as it takes time) */
-        // terminal.dispose();
     
     }
 
