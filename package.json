@@ -73,7 +73,22 @@
                     "when": "inAngularProject"
                 }
             ]
-        }
+        },
+        "configuration": [
+            {
+                "title": "Angular schematics configuration",
+                "properties": {
+                    "ngschematics.schematics": {
+                        "type": "array",
+                        "items": {
+                            "type":"string"
+                        },
+                        "default": [],
+                        "description": "Add other schematics (for example: \"@angular/material\")"
+                    }
+                }
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -88,5 +103,9 @@
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "@types/json5": "0.0.29",
+        "json5": "^1.0.1"
     }
 }

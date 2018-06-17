@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.3.0] - 2018-06-17
+
+### Features
+- Support all other schematics via `ngschematics.schematics` setting.
+
 ## [0.2.0] - 2018-06-17
 
 ### Features

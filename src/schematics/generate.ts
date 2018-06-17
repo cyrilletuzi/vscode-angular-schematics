@@ -1,3 +1,5 @@
+import { Utils } from './utils';
+
 export class Generate {
 
     get command(): string {
@@ -7,11 +9,15 @@ export class Generate {
             optionsArgs.push(`--${optionName} ${optionValue}`);
         });
 
-        const commandArgs = [this.base, this.schema, this.defaultOption, ...optionsArgs];
+        const collection = (this.collection !== Generate.defaultCollection) ? `${this.collection}:` : '';
+
+        const commandArgs = [this.base, `${collection}${this.schema}`, this.defaultOption, ...optionsArgs];
         return commandArgs.join(' ');
 
     }
+    static defaultCollection = '@schematics/angular';
     protected base = 'ng generate';
+    protected collection = Generate.defaultCollection;
     protected schema = '';
     protected path = '';
     protected project = '';
@@ -22,6 +28,12 @@ export class Generate {
 
         this.path = this.getCommandPath(contextPath);
         this.project = this.getProject(contextPath);
+
+    }
+
+    addCollection(name: string): void {
+
+        this.collection = name;
 
     }
 
@@ -67,13 +79,12 @@ export class Generate {
 
         if (contextPath.match(/[^\/]+\/app\//)) {
 
-            /* Normalize Windows path into Linux format */
-            const normalizedPath = contextPath.replace(/\\\\/, '/').split('/app/')[1];
+            const normalizedPath = Utils.normalizePath(contextPath).split('/app/')[1];
     
             if (normalizedPath.includes('.')) {
     
                 /* If filename, delete filename by removing everything after the last "/" */
-                return normalizedPath.replace(/[^\/]*$/, '');
+                return Utils.getDirectoryFromFilename(normalizedPath);
     
             } else {
     

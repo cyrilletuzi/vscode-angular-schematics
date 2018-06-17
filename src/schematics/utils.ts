@@ -1,8 +1,28 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as JSON5 from 'json5';
 
 export class Utils {
+
+    static normalizePath(path: string): string {
+
+        /* Normalize Windows path into Linux format */
+        return path.replace(/\\\\/, '/');
+
+    }
+
+    static pathTrimRelative(path: string): string {
+
+        return path.replace('./', '');
+
+    }
+
+    static getDirectoryFromFilename(filename: string): string {
+
+        return filename.replace(/[^\/]*$/, '');
+
+    }
 
     static getSchemaFromNodeModules<T = any>(packageName: string, filePath: string): Promise<T | null> {
 
@@ -55,7 +75,7 @@ export class Utils {
             
             const data = await Utils.readFileAsync(path);
     
-            json = JSON.parse(data) as T;
+            json = JSON5.parse(data) as T;
     
         } catch (error) {
     

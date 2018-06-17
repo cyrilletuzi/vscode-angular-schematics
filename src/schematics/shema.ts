@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { Utils } from './utils';
 import { Collection, CollectionData } from './collection';
@@ -28,6 +29,7 @@ export class Schema {
 
     collection: Collection;
     name: string;
+    path = '';
     data: SchemaData | null = null;
     options: SchemaDataOptions | null = null;
 
@@ -38,10 +40,12 @@ export class Schema {
 
     async load(): Promise<void> {
 
-        this.data = await Utils.getSchemaFromNodeModules<SchemaData>(
-            this.collection.name,
-            (this.collection.data as CollectionData).schematics[this.name].schema.replace('./', '')
+        this.path = path.join(
+            Utils.getDirectoryFromFilename(this.collection.path),
+            Utils.pathTrimRelative((this.collection.data as CollectionData).schematics[this.name].schema)
         );
+
+        this.data = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
 
         if (this.data) {
 

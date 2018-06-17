@@ -20,9 +20,9 @@ export class Commands {
 
         const generate = new Generate(Commands.getContextPath(context));
 
-        const collection = new Collection('@schematics/angular');
-
         generate.addSchema(schemaName);
+
+        const collection = new Collection(Generate.defaultCollection);
 
         const schema = collection.createSchema(schemaName);
 
@@ -42,7 +42,26 @@ export class Commands {
 
         const generate = new Generate(Commands.getContextPath(context));
 
-        const collection = new Collection('@schematics/angular');
+        const collectionsNames: string[] = [Generate.defaultCollection];
+
+        const userConfiguration: { schematics?: string[]; } | undefined = vscode.workspace.getConfiguration().get('ngschematics');
+
+        if (userConfiguration && userConfiguration.schematics) {
+
+            collectionsNames.push(...userConfiguration.schematics);
+
+        }
+
+        const collectionName = (collectionsNames.length === 1) ? collectionsNames[0] : 
+            await vscode.window.showQuickPick(collectionsNames, {  placeHolder: `From which shematics collection?` });
+
+        if (!collectionName) {
+            return;
+        }
+
+        generate.addCollection(collectionName);
+
+        const collection = new Collection(collectionName);
 
         await collection.load();
 
