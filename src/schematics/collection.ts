@@ -22,6 +22,7 @@ export class Collection {
     name: string;
     path = '';
     data: CollectionData | null = null;
+    static cache = new Map<string, CollectionData>();
 
     constructor(name: string) {
         this.name = name;
@@ -29,15 +30,25 @@ export class Collection {
 
     async load(): Promise<void> {
 
-        const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.name, 'package.json');
+        const cachedCollection = Collection.cache.get(this.name);
 
-        if (!collectionPackage || !collectionPackage.schematics) {
-            return;
+        if (cachedCollection) {
+
+            this.data = cachedCollection;
+
+        } else {
+
+            const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.name, 'package.json');
+
+            if (!collectionPackage || !collectionPackage.schematics) {
+                return;
+            }
+
+            this.path = Utils.pathTrimRelative(collectionPackage.schematics);
+
+            this.data = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, this.path);
+
         }
-
-        this.path = Utils.pathTrimRelative(collectionPackage.schematics);
-
-        this.data = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, this.path);
 
     }
 

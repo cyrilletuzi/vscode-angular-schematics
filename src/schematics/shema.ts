@@ -32,6 +32,7 @@ export class Schema {
     path = '';
     data: SchemaData | null = null;
     options: SchemaDataOptions | null = null;
+    static cache = new Map<string, SchemaData>();
 
     constructor(name: string, collection: Collection) {
         this.name = name;
@@ -40,12 +41,22 @@ export class Schema {
 
     async load(): Promise<void> {
 
-        this.path = path.join(
-            Utils.getDirectoryFromFilename(this.collection.path),
-            Utils.pathTrimRelative((this.collection.data as CollectionData).schematics[this.name].schema)
-        );
+        const cachedSchema = Schema.cache.get(this.name);
 
-        this.data = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
+        if (cachedSchema) {
+
+            this.data = cachedSchema;
+
+        } else {
+
+            this.path = path.join(
+                Utils.getDirectoryFromFilename(this.collection.path),
+                Utils.pathTrimRelative((this.collection.data as CollectionData).schematics[this.name].schema)
+            );
+
+            this.data = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
+
+        }
 
         if (this.data) {
 

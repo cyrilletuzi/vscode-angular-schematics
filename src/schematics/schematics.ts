@@ -9,19 +9,13 @@ interface SettingSchematics {
 export class Schematics {
 
     static defaultCollection = '@schematics/angular';
-    commonCollections: string[] = [
+    static commonCollections: string[] = [
         '@angular/material',
         '@ngrx/schematics'
     ];
-    collections: Set<string> = new Set([Schematics.defaultCollection]);
+    static collections: Set<string> = new Set([Schematics.defaultCollection]);
 
-    constructor() {
-
-        this.commonCollections.filter(() => {});
-
-    }
-
-    async load() {
+    static async load() {
 
         const collectionsNames: string[] = [...this.commonCollections];
 
@@ -33,23 +27,35 @@ export class Schematics {
 
         }
 
+        const existingCollections: string[] = [];
+
         for (let collectionName of collectionsNames) {
 
-            const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(collectionName));
+            if (this.collections.has(collectionName)) {
 
-            if (collectionExists) {
-                this.collections.add(collectionName);
+                existingCollections.push(collectionName);
+
+            } else {
+
+                const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(collectionName));
+
+                if (collectionExists) {
+                    existingCollections.push(collectionName);
+                }
+
             }
 
         }
 
+        this.collections = new Set([this.defaultCollection, ...existingCollections]);
+
     }
 
-    async askSchematic(): Promise<string | undefined> {
+    static async askSchematic(): Promise<string | undefined> {
 
         if  (this.collections.size === 1) {
 
-            return Schematics.defaultCollection;
+            return this.defaultCollection;
 
         } else {
 

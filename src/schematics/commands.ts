@@ -52,13 +52,11 @@ export class Commands {
 
     static async generate(context?: ExplorerMenuContext) {
 
+        await Schematics.load();
+
         const generate = new Generate(this.getContextPath(context));
 
-        const schematics = new Schematics();
-
-        await schematics.load();
-
-        const collectionName = await schematics.askSchematic();
+        const collectionName = await Schematics.askSchematic();
 
         if (!collectionName) {
             return;
