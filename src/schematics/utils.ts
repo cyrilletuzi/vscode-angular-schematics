@@ -92,15 +92,7 @@ export class Utils {
     
             json = JSON5.parse(data) as T;
     
-        } catch (error) {
-    
-            /** 
-             * @todo Change message when other schematics will be supported 
-             * @todo Localization
-             */
-            vscode.window.showErrorMessage(`Can't read Angular schematics. @schematics/angular must be installed.`);
-    
-        }
+        } catch (error) {}
     
         return json;
     

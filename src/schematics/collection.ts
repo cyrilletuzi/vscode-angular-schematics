@@ -70,9 +70,8 @@ export class Collection {
     
     }
 
-    async askSchema(schemasNames?: string[]) {
+    async askSchema(schemasNames?: string[]): Promise<string | undefined> {
 
-        /** @todo Localization */
         return vscode.window.showQuickPick(schemasNames || this.getSchemasNames(), { placeHolder: `What do you want to generate?` });
 
     }

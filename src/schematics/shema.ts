@@ -134,10 +134,7 @@ export class Schema {
 
     async askDefaultOption(): Promise<string | undefined> {
 
-        /**
-         * @todo Investigate if there could be other default option than name
-         * @todo Localization
-         */
+        /** @todo Investigate if there could be other default option than name */
         return vscode.window.showInputBox({ prompt: `Name or pathname?` });
 
     }
