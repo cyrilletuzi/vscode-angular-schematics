@@ -48,13 +48,13 @@ export class Generate {
 
         if (withPath && this.project) {
 
-            this.add('project', this.project);
+            this.addOption('project', this.project);
 
         }
 
     }
 
-    add(optionName: string, optionValue: string): void {
+    addOption(optionName: string, optionValue: string): void {
 
         this.options.set(optionName, optionValue);
 

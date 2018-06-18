@@ -131,7 +131,18 @@ export class Schema {
 
     }
 
-    async askOptions(options: SchemaDataOptions): Promise<Map<string, string>> {
+    async askOptions(): Promise<string[] | undefined> {
+
+        return vscode.window.showQuickPick(this.getOptionsNames(), {
+            canPickMany: true,
+            placeHolder: `Do you need some options?`
+        });
+
+    }
+
+    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string>> {
+
+        const options = this.filterSelectedOptions(optionsNames);
 
         const optionsMap = new Map();
     

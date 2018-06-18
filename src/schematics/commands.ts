@@ -102,19 +102,14 @@ export class Commands {
 
         }
 
-        const selectedOptionsNames = await vscode.window.showQuickPick(schema.getOptionsNames(), {
-            canPickMany: true,
-            placeHolder: `Do you need some options?`
-        });
+        const selectedOptionsNames = await schema.askOptions();
 
         if (selectedOptionsNames) {
 
-            const selectedOptions = schema.filterSelectedOptions(selectedOptionsNames);
-
-            const filledOptions = await schema.askOptions(selectedOptions);
+            const filledOptions = await schema.askOptionsValues(selectedOptionsNames);
 
             filledOptions.forEach((option, optionName) => {
-                generate.add(optionName, option);
+                generate.addOption(optionName, option);
             });
 
         }
