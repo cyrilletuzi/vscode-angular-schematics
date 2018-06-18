@@ -5,18 +5,15 @@ export class Generate {
 
     get command(): string {
 
-        let optionsArgs: string[] = [];
-        this.options.forEach((optionValue, optionName) => {
-            optionsArgs.push(`--${optionName} ${optionValue}`);
-        });
-
-        const collection = (this.collection !== Schematics.defaultCollection) ? `${this.collection}:` : '';
-
-        const commandArgs = [this.base, `${collection}${this.schema}`, this.defaultOption, ...optionsArgs];
-        return commandArgs.join(' ');
+        return [
+            this.base,
+            this.formatCollectionAndSchema(),
+            this.defaultOption,
+            ...this.formatOptionsForCommand()
+        ].join(' ');
 
     }
-    protected base = 'ng generate';
+    protected base = 'ng g';
     protected collection = Schematics.defaultCollection;
     protected schema = '';
     protected path = '';
@@ -97,6 +94,24 @@ export class Generate {
     
         return '';
     
+    }
+
+    protected formatOptionsForCommand(): string[] {
+
+        return Array.from(this.options.entries())
+            .map((option) => (option[1] === 'true') ?
+                `--${option[0]}` :
+                `--${option[0]} ${option[1]}`
+            );
+
+    }
+
+    protected formatCollectionAndSchema(): string {
+
+        return (this.collection !== Schematics.defaultCollection) ?
+            `${this.collection}:${this.schema}` :
+            this.schema;
+
     }
 
 }
