@@ -10,6 +10,17 @@ interface ExplorerMenuContext {
 
 export class Commands {
 
+    protected static get terminal(): vscode.Terminal {
+
+        if (!this._terminal) {
+            this._terminal = vscode.window.createTerminal({ name: 'ng generate' });
+        }
+
+        return this._terminal;
+
+    }
+    protected static _terminal: vscode.Terminal | null = null;
+
     static getContextPath(context?: ExplorerMenuContext) {
 
         /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
@@ -19,7 +30,7 @@ export class Commands {
 
     static async generateSimple(schemaName: string, context?: ExplorerMenuContext) {
 
-        const generate = new Generate(Commands.getContextPath(context));
+        const generate = new Generate(this.getContextPath(context));
 
         generate.addSchema(schemaName);
 
@@ -35,13 +46,13 @@ export class Commands {
 
         generate.addDefaultOption(defaultOption);
 
-        Commands.launchCommandInTerminal(generate.command);
+        this.launchCommandInTerminal(generate.command);
 
     }
 
     static async generate(context?: ExplorerMenuContext) {
 
-        const generate = new Generate(Commands.getContextPath(context));
+        const generate = new Generate(this.getContextPath(context));
 
         const schematics = new Schematics();
 
@@ -108,18 +119,22 @@ export class Commands {
 
         }
 
-        Commands.launchCommandInTerminal(generate.command);
+        const confirm = await generate.askConfirmation();
+
+        if (confirm) {
+
+            this.launchCommandInTerminal(generate.command);
+
+        }
 
     }
 
     static launchCommandInTerminal(command: string) {
 
-        const terminal = vscode.window.createTerminal();
-
         /* Show terminal so the user can see if the command fails */
-        terminal.show();
+        this.terminal.show();
     
-        terminal.sendText(command);
+        this.terminal.sendText(command);
     
     }
 

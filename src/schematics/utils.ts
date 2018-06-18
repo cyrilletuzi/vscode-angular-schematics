@@ -26,7 +26,7 @@ export class Utils {
 
     static getSchemaFromNodeModules<T = any>(packageName: string, filePath: string): Promise<T | null> {
 
-        return Utils.parseJSONFile<T>(Utils.getNodeModulesPath(packageName, filePath));
+        return this.parseJSONFile<T>(this.getNodeModulesPath(packageName, filePath));
 
     }
 
@@ -44,7 +44,7 @@ export class Utils {
 
     static getNodeModulesPath(...paths: string[]) {
 
-        return path.join(Utils.getWorkspaceRootPath(), 'node_modules', ...paths);
+        return path.join(this.getWorkspaceRootPath(), 'node_modules', ...paths);
 
     }
 
@@ -88,7 +88,7 @@ export class Utils {
     
         try {
             
-            const data = await Utils.readFileAsync(path);
+            const data = await this.readFileAsync(path);
     
             json = JSON5.parse(data) as T;
     

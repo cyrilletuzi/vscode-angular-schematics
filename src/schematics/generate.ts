@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 import { Utils } from './utils';
 import { Schematics } from './schematics';
 
@@ -55,6 +57,17 @@ export class Generate {
     add(optionName: string, optionValue: string): void {
 
         this.options.set(optionName, optionValue);
+
+    }
+
+    async askConfirmation(): Promise<boolean> {
+
+        const confirmationText = `Confirm`;
+        const cancellationText = `Cancel`;
+
+        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], { placeHolder: this.command });
+
+        return (choice === confirmationText) ? true : false;
 
     }
 
