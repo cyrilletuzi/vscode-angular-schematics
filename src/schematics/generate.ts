@@ -5,6 +5,8 @@ import { Schematics } from './schematics';
 
 export class Generate {
 
+    path = '';
+    project = '';
     get command(): string {
 
         return [
@@ -18,8 +20,6 @@ export class Generate {
     protected base = 'ng g';
     protected collection = Schematics.defaultCollection;
     protected schema = '';
-    protected path = '';
-    protected project = '';
     protected defaultOption = '';
     protected options = new Map<string, string>();
 

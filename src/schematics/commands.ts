@@ -41,7 +41,7 @@ export class Commands {
 
         const schema = collection.createSchema(schemaName);
 
-        const defaultOption = await schema.askDefaultOption();
+        const defaultOption = await schema.askDefaultOption(generate.path, generate.project);
 
         if (!defaultOption) {
             return;
@@ -89,7 +89,7 @@ export class Commands {
 
         if (schema.hasDefaultOption()) {
 
-            const defaultOption = await schema.askDefaultOption();
+            const defaultOption = await schema.askDefaultOption(generate.path, generate.project);
 
             if (!defaultOption) {
                 return;

@@ -91,10 +91,12 @@ export class Schema {
     
     }
 
-    async askDefaultOption(): Promise<string | undefined> {
+    async askDefaultOption(contextPath = '', project = ''): Promise<string | undefined> {
 
         /** @todo Investigate if there could be other default option than name */
-        return vscode.window.showInputBox({ prompt: `Name or pathname?` });
+        return vscode.window.showInputBox({
+            prompt: `Name or pathname${contextPath ? ` relative to ${contextPath}` : ''}${project ? ` in project ${project}` : ''}?`
+        });
 
     }
 
