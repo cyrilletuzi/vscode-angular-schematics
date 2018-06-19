@@ -10,20 +10,6 @@ interface ExplorerMenuContext {
 
 export class Commands {
 
-    /** Do not use for now */
-    protected static get terminal(): vscode.Terminal {
-
-        /** @todo Find a way to know if the terminal has been destroyed,
-         * and reuse the old one if still present */
-        if (!this._terminal) {
-            this._terminal = vscode.window.createTerminal({ name: 'ng generate' });
-        }
-
-        return this._terminal;
-
-    }
-    protected static _terminal: vscode.Terminal | null = null;
-
     static getContextPath(context?: ExplorerMenuContext) {
 
         /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
@@ -115,13 +101,13 @@ export class Commands {
 
         if (confirm) {
 
-            this.launchCommandInTerminal(generate.command);
+            await this.launchCommandInTerminal(generate.command);
 
         }
 
     }
 
-    static launchCommandInTerminal(command: string) {
+    static async launchCommandInTerminal(command: string) {
 
         const terminal = vscode.window.createTerminal({ name: 'ng generate' });
 
@@ -129,6 +115,15 @@ export class Commands {
         terminal.show();
     
         terminal.sendText(command);
+
+        const choice = await vscode.window.showQuickPick([{
+            label: 'Click here to close the terminal',
+            description: `Be sure to check the command has finished without errors`
+        }], { ignoreFocusOut: true });
+
+        if (choice) {
+            terminal.dispose();
+        }
     
     }
 
