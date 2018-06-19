@@ -10,8 +10,11 @@ interface ExplorerMenuContext {
 
 export class Commands {
 
+    /** Do not use for now */
     protected static get terminal(): vscode.Terminal {
 
+        /** @todo Find a way to know if the terminal has been destroyed,
+         * and reuse the old one if still present */
         if (!this._terminal) {
             this._terminal = vscode.window.createTerminal({ name: 'ng generate' });
         }
@@ -124,10 +127,12 @@ export class Commands {
 
     static launchCommandInTerminal(command: string) {
 
+        const terminal = vscode.window.createTerminal({ name: 'ng generate' });
+
         /* Show terminal so the user can see if the command fails */
-        this.terminal.show();
+        terminal.show();
     
-        this.terminal.sendText(command);
+        terminal.sendText(command);
     
     }
 
