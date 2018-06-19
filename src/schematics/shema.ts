@@ -2,26 +2,26 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Utils } from './utils';
-import { Collection, CollectionData } from './collection';
+import { Collection, CollectionDataSchema } from './collection';
 
-export interface SchemaDataOptionDetails {
+export interface SchemaDataDefaultOption {
+    $source: 'argv' | 'projectName';
+    index?: number;
+}
+
+export interface SchemaDataOptions {
     type: 'string' | 'boolean';
     description: string;
     enum?: string[];
     visible?: boolean;
     default?: string | boolean;
-    $default?: {
-        $source: 'argv' | 'projectName';
-        index?: number;
-    };
-}
-
-export interface SchemaDataOptions {
-    [key: string]: SchemaDataOptionDetails;
+    $default?: SchemaDataDefaultOption;
 }
 
 export interface SchemaData {
-    properties: SchemaDataOptions;
+    properties: {
+        [key: string]: SchemaDataOptions;
+    };
     required?: string[];
 }
 
@@ -30,8 +30,11 @@ export class Schema {
     collection: Collection;
     name: string;
     path = '';
-    data: SchemaData | null = null;
-    options: SchemaDataOptions | null = null;
+    requiredOptions: string[] = [];
+    options = new Map<string, SchemaDataOptions>();
+    get optionsNames(): string[] {
+        return Array.from(this.options.keys()).sort();
+    }
     static cache = new Map<string, SchemaData>();
 
     constructor(name: string, collection: Collection) {
@@ -39,55 +42,43 @@ export class Schema {
         this.collection = collection;
     }
 
-    async load(): Promise<void> {
+    async load(): Promise<boolean> {
+
+        let schema: SchemaData | null = null;
 
         const cachedSchema = Schema.cache.get(this.name);
 
         if (cachedSchema) {
 
-            this.data = cachedSchema;
+            schema = cachedSchema;
 
         } else {
 
             this.path = path.join(
                 Utils.getDirectoryFromFilename(this.collection.path),
-                Utils.pathTrimRelative((this.collection.data as CollectionData).schematics[this.name].schema)
+                Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
             );
 
-            this.data = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
+            schema = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
 
         }
 
-        if (this.data) {
-
-            this.options = this.data.properties;
-
+        if (schema) {
+            this.initOptionsMap(schema);
+            this.requiredOptions = schema.required || [];
+            return true;
         }
 
-    }
+        return false;
 
-    getOptionsNames(): string[] {
-        return this.options ? Object.keys(this.options).sort() : [];
     }
 
     hasDefaultOption(): boolean {
 
-        if (this.options) {
-
-            for (let optionName in this.options) {
-
-                const option = this.options[optionName];
-
-                if (
-                    (option.$default !== undefined)
-                    && (option.$default.$source === 'argv')
-                    && (option.$default.index === 0)
-                ) {
-                    return true;
-                }
-
+        for (let option of this.options.values()) {
+            if (option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)) {
+                return true;
             }
-
         }
 
         return false;
@@ -96,40 +87,8 @@ export class Schema {
 
     hasPath(): boolean {
 
-        return this.options ? (this.getOptionsNames().indexOf('path') !== -1) : false;
+        return this.options.has('path');
     
-    }
-
-    filterSelectedOptions(selectedOptionsNames: string[]): SchemaDataOptions {
-
-        const selectedOptions: SchemaDataOptions = {};
-
-        if (this.data && this.options) {
-
-            for (let selectedOptionName of selectedOptionsNames) {
-
-                selectedOptions[selectedOptionName] = this.options[selectedOptionName];
-
-            }
-
-            if (this.data.required) {
-
-                for (let requiredOptionName of this.data.required) {
-
-                    if (!(requiredOptionName in selectedOptions)) {
-
-                        selectedOptions[requiredOptionName] = this.options[requiredOptionName];
-
-                    }
-
-                }
-
-            } 
-
-        }
-
-        return selectedOptions;
-
     }
 
     async askDefaultOption(): Promise<string | undefined> {
@@ -139,12 +98,28 @@ export class Schema {
 
     }
 
-    async askOptions(): Promise<string[] | undefined> {
+    async askOptions(): Promise<string[]> {
 
-        return vscode.window.showQuickPick(this.getOptionsNames(), {
+        const choices: vscode.QuickPickItem[] = [];
+
+        this.options.forEach((option, optionName) => {
+
+            if (option.visible !== false) {
+
+                choices.push({ label: optionName, description: option.description });
+
+            }
+
+        });
+
+        const sortedChoices = choices.sort((a, b) => a.label.localeCompare(b.label));
+
+        const selectedOptions = await vscode.window.showQuickPick(sortedChoices, {
             canPickMany: true,
             placeHolder: `Do you need some options?`
-        });
+        }) || [];
+
+        return selectedOptions.map((selectedOption) => selectedOption.label);
 
     }
 
@@ -152,11 +127,9 @@ export class Schema {
 
         const options = this.filterSelectedOptions(optionsNames);
 
-        const optionsMap = new Map();
+        const filledOptions = new Map();
     
-        for (let optionName in options) {
-    
-            const option = options[optionName];
+        for (let [optionName, option] of options) {
 
             let choice: string | undefined = '';
     
@@ -180,18 +153,51 @@ export class Schema {
             }
     
             if (choice) {
-                optionsMap.set(optionName, choice);
+                filledOptions.set(optionName, choice);
             }
-    
+
         }
     
-        return optionsMap;
+        return filledOptions;
     
     }
 
     protected async askEnumOption(optionName: string, choices: string[], placeholder = '') {
 
         return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}` });
+
+    }
+
+    protected initOptionsMap(schema: SchemaData): void {
+
+        for (let optionName in schema.properties) {
+
+            if (schema.properties.hasOwnProperty(optionName)) {
+
+                this.options.set(optionName, schema.properties[optionName]);
+
+            }
+
+        }
+
+    }
+
+    protected filterSelectedOptions(selectedOptionsNames: string[]): Map<string, SchemaDataOptions> {
+
+        const selectedOptions = new Map<string, SchemaDataOptions>();
+
+        selectedOptionsNames.forEach((selectedOptionName) => {
+            const option = this.options.get(selectedOptionName);
+            if (option) {
+                selectedOptions.set(selectedOptionName, option);
+            }
+        });
+
+        this.requiredOptions.forEach((requiredOptionName) => {
+            selectedOptions.set(requiredOptionName, this.options.get(requiredOptionName) as SchemaDataOptions);
+        });
+
+        return selectedOptions;
 
     }
 

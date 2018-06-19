@@ -7,13 +7,15 @@ interface PackageJSON {
     schematics?: string;
 }
 
+export interface CollectionDataSchema {
+    schema: string;
+    description: string;
+    hidden?: boolean;
+}
+
 export interface CollectionData {
     schematics: {
-        [key: string]: {
-            schema: string;
-            description: string;
-            hidden?: boolean;
-        };
+        [key: string]: CollectionDataSchema;
     };
 }
 
@@ -21,58 +23,82 @@ export class Collection {
 
     name: string;
     path = '';
-    data: CollectionData | null = null;
+    schemas = new Map<string, CollectionDataSchema>();
+    get schemasNames(): string[] {
+        return Array.from(this.schemas.keys()).sort();
+    }
     static cache = new Map<string, CollectionData>();
 
     constructor(name: string) {
         this.name = name;
     }
 
-    async load(): Promise<void> {
+    async load(): Promise<boolean> {
+
+        let collection: CollectionData | null = null;
 
         const cachedCollection = Collection.cache.get(this.name);
 
         if (cachedCollection) {
 
-            this.data = cachedCollection;
+            collection = cachedCollection;
 
         } else {
 
             const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.name, 'package.json');
 
             if (!collectionPackage || !collectionPackage.schematics) {
-                return;
+                return false;
             }
 
             this.path = Utils.pathTrimRelative(collectionPackage.schematics);
 
-            this.data = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, this.path);
+            collection = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, this.path);
 
         }
 
+        if (collection) {
+            this.initSchemasMap(collection);
+            return true;
+        }
+        
+        return false;
+
     }
 
-    createSchema(name: string) {
+    createSchema(name: string): Schema {
 
         return new Schema(name, this);
 
     }
 
-    getSchemasNames(): string[] {
+    async askSchema(): Promise<string | null> {
 
-        if (!this.data) {
-            return [];
-        }
+        const choices: vscode.QuickPickItem[] = this.schemasNames
+            .map((schemaName) => ({
+                label: schemaName,
+                description: (this.schemas.get(schemaName) as CollectionDataSchema).description
+            }));
 
-        return Object.keys(this.data.schematics)
-            .filter((schema) => !(this.data as CollectionData).schematics[schema].hidden && (schema !== 'ng-add'))
-            .sort();
-    
+        const choice = await vscode.window.showQuickPick(choices, { placeHolder: `What do you want to generate?` });
+
+        return choice ? choice.label : null;
+
     }
 
-    async askSchema(schemasNames?: string[]): Promise<string | undefined> {
+    protected initSchemasMap(collection: CollectionData): void {
 
-        return vscode.window.showQuickPick(schemasNames || this.getSchemasNames(), { placeHolder: `What do you want to generate?` });
+        for (let schemaName in collection.schematics) {
+
+            if (collection.schematics.hasOwnProperty(schemaName)
+                && !collection.schematics[schemaName].hidden
+                && (schemaName !== 'ng-add')) {
+
+                this.schemas.set(schemaName, collection.schematics[schemaName]);
+
+            }
+
+        }
 
     }
 

@@ -69,9 +69,7 @@ export class Commands {
 
         const collection = new Collection(collectionName);
 
-        await collection.load();
-
-        if (!collection.data) {
+        if (!await collection.load()) {
             return;
         }
 
@@ -85,9 +83,7 @@ export class Commands {
 
         const schema = collection.createSchema(schemaName);
 
-        await schema.load();
-
-        if (!schema.data) {
+        if (!await schema.load()) {
             return;
         }
 
