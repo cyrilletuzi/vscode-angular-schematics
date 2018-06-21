@@ -31,6 +31,7 @@ export class Utils {
 
     }
 
+    /** @todo Verify if it works in multi-workspaces */
     static getWorkspaceRootPath(): string {
 
         if (vscode.workspace.workspaceFolders) {
@@ -88,6 +89,7 @@ export class Utils {
 
         return new Promise((resolve, reject) => {
     
+            /** @todo Verify if it works in multi-workspaces */
             childProcess.exec(command, { cwd: vscode.workspace.rootPath }, (error, stdout, stderr) => {
     
                 if (error) {
