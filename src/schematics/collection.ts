@@ -33,7 +33,7 @@ export class Collection {
         this.name = name;
     }
 
-    async load(): Promise<boolean> {
+    async load(cwd: string): Promise<boolean> {
 
         let collection: CollectionData | null = null;
 
@@ -45,7 +45,7 @@ export class Collection {
 
         } else {
 
-            const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.name, 'package.json');
+            const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
 
             if (!collectionPackage || !collectionPackage.schematics) {
                 return false;
@@ -53,7 +53,7 @@ export class Collection {
 
             this.path = Utils.pathTrimRelative(collectionPackage.schematics);
 
-            collection = await Utils.getSchemaFromNodeModules<CollectionData>(this.name, this.path);
+            collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
 
         }
 

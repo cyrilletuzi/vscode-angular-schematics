@@ -25,28 +25,15 @@ export class Utils {
 
     }
 
-    static getSchemaFromNodeModules<T = any>(packageName: string, filePath: string): Promise<T | null> {
+    static getSchemaFromNodeModules<T = any>(cwd: string, packageName: string, filePath: string): Promise<T | null> {
 
-        return this.parseJSONFile<T>(this.getNodeModulesPath(packageName, filePath));
-
-    }
-
-    /** @todo Verify if it works in multi-workspaces */
-    static getWorkspaceRootPath(): string {
-
-        if (vscode.workspace.workspaceFolders) {
-
-            return path.join(vscode.workspace.workspaceFolders[0].uri.fsPath);
-
-        }
-
-        return '';
+        return this.parseJSONFile<T>(this.getNodeModulesPath(cwd, packageName, filePath));
 
     }
 
-    static getNodeModulesPath(...paths: string[]) {
+    static getNodeModulesPath(cwd: string, ...paths: string[]) {
 
-        return path.join(this.getWorkspaceRootPath(), 'node_modules', ...paths);
+        return path.join(cwd, 'node_modules', ...paths);
 
     }
 
@@ -85,12 +72,11 @@ export class Utils {
     }
 
     /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
-    static execAsync(command: string): Promise<string> {
+    static execAsync(command: string, cwd?: string): Promise<string> {
 
         return new Promise((resolve, reject) => {
     
-            /** @todo Verify if it works in multi-workspaces */
-            childProcess.exec(command, { cwd: vscode.workspace.rootPath }, (error, stdout, stderr) => {
+            childProcess.exec(command, { cwd }, (error, stdout, stderr) => {
     
                 if (error) {
                     reject([stdout, stderr]);

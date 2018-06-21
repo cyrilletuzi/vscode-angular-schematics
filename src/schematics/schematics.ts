@@ -15,7 +15,7 @@ export class Schematics {
     ];
     static collections: Set<string> = new Set([Schematics.defaultCollection]);
 
-    static async load() {
+    static async load(cwd: string) {
 
         const collectionsNames: string[] = [...this.commonCollections];
 
@@ -37,7 +37,7 @@ export class Schematics {
 
             } else {
 
-                const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(collectionName));
+                const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
 
                 if (collectionExists) {
                     existingCollections.push(collectionName);

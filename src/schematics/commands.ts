@@ -6,20 +6,36 @@ import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { Output } from './output';
 
-interface ExplorerMenuContext {
+export interface ExplorerMenuContext {
     path: string;
 }
 
 export class Commands {
 
-    static getContextPath(context?: ExplorerMenuContext) {
+    static getContextPath(context?: ExplorerMenuContext): string {
 
         /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
         return (typeof context === 'object') && (context !== null) && ('path' in context) ? context.path : '';
 
     }
 
+    static async getWorkspaceFolderPath(path = ''): Promise<string> {
+
+        const workspaceFolder = path ?
+            vscode.workspace.getWorkspaceFolder(vscode.Uri.file(path)) :
+            await vscode.window.showWorkspaceFolderPick();
+
+        return workspaceFolder ? workspaceFolder.uri.fsPath : '';
+
+    }
+
     static async generateSimple(schemaName: string, context?: ExplorerMenuContext) {
+
+        const workspaceFolderPath = await this.getWorkspaceFolderPath(this.getContextPath(context));
+
+        if (!workspaceFolderPath) {
+            return;
+        }
 
         const generate = new Generate(this.getContextPath(context));
 
@@ -37,13 +53,19 @@ export class Commands {
 
         generate.addDefaultOption(defaultOption);
 
-        this.launchCommand(generate.command);
+        this.launchCommand(generate.command, workspaceFolderPath);
 
     }
 
     static async generate(context?: ExplorerMenuContext) {
 
-        await Schematics.load();
+        const workspaceFolderPath = await this.getWorkspaceFolderPath(this.getContextPath(context));
+
+        if (!workspaceFolderPath) {
+            return;
+        }
+
+        await Schematics.load(workspaceFolderPath);
 
         const generate = new Generate(this.getContextPath(context));
 
@@ -57,7 +79,7 @@ export class Commands {
 
         const collection = new Collection(collectionName);
 
-        if (!await collection.load()) {
+        if (!await collection.load(workspaceFolderPath)) {
             return;
         }
 
@@ -71,7 +93,7 @@ export class Commands {
 
         const schema = collection.createSchema(schemaName);
 
-        if (!await schema.load()) {
+        if (!await schema.load(workspaceFolderPath)) {
             return;
         }
 
@@ -103,14 +125,14 @@ export class Commands {
 
         if (confirm) {
 
-            await this.launchCommand(generate.command);
+            await this.launchCommand(generate.command, workspaceFolderPath);
 
         }
 
     }
 
     /** @todo Colored output? */
-    static async launchCommand(command: string) {
+    static async launchCommand(command: string, cwd: string) {
 
         Output.channel.show();
 
@@ -118,7 +140,7 @@ export class Commands {
 
         try {
 
-            const stdout = await Utils.execAsync(command);
+            const stdout = await Utils.execAsync(command, cwd);
 
             Output.channel.appendLine(stdout);
 

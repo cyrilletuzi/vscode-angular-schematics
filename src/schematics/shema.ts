@@ -42,7 +42,7 @@ export class Schema {
         this.collection = collection;
     }
 
-    async load(): Promise<boolean> {
+    async load(cwd: string): Promise<boolean> {
 
         let schema: SchemaData | null = null;
 
@@ -59,7 +59,7 @@ export class Schema {
                 Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
             );
 
-            schema = await Utils.getSchemaFromNodeModules<SchemaData>(this.collection.name, this.path);
+            schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
 
         }
 

@@ -6,7 +6,8 @@
     "keywords": [
         "angular",
         "schematics",
-        "angular schematics"
+        "angular schematics",
+        "multi-root ready"
     ],
     "categories": [
         "Other"
