@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as childProcess from 'child_process';
 import * as JSON5 from 'json5';
 
 export class Utils {
@@ -75,6 +76,25 @@ export class Utils {
             fs.exists(path, (exists) => {
     
                 resolve(exists);
+    
+            });
+    
+        });
+    
+    }
+
+    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
+    static execAsync(command: string): Promise<string> {
+
+        return new Promise((resolve, reject) => {
+    
+            childProcess.exec(command, { cwd: vscode.workspace.rootPath }, (error, stdout, stderr) => {
+    
+                if (error) {
+                    reject([stdout, stderr]);
+                } else {
+                    resolve(stdout);
+                }
     
             });
     

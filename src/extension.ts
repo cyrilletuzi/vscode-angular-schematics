@@ -4,6 +4,7 @@
 import * as vscode from 'vscode';
 
 import { Commands } from './schematics/commands';
+import { Output } from './schematics/output';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -37,4 +38,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+
+    Output.dispose();
+
+}

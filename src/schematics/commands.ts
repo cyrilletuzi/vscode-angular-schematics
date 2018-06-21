@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import { Generate } from './generate';
 import { Collection } from './collection';
 import { Schematics } from './schematics';
+import { Utils } from './utils';
+import { Output } from './output';
 
 interface ExplorerMenuContext {
     path: string;
@@ -35,7 +37,7 @@ export class Commands {
 
         generate.addDefaultOption(defaultOption);
 
-        this.launchCommandInTerminal(generate.command);
+        this.launchCommand(generate.command);
 
     }
 
@@ -101,28 +103,34 @@ export class Commands {
 
         if (confirm) {
 
-            await this.launchCommandInTerminal(generate.command);
+            await this.launchCommand(generate.command);
 
         }
 
     }
 
-    static async launchCommandInTerminal(command: string) {
+    /** @todo Colored output? */
+    static async launchCommand(command: string) {
 
-        const terminal = vscode.window.createTerminal({ name: 'ng generate' });
+        Output.channel.show();
 
-        /* Show terminal so the user can see if the command fails */
-        terminal.show();
-    
-        terminal.sendText(command);
+        Output.channel.appendLine(command);
 
-        const choice = await vscode.window.showQuickPick([{
-            label: 'Click here to close the terminal',
-            description: `Be sure to check the command has finished without errors`
-        }], { ignoreFocusOut: true });
+        try {
 
-        if (choice) {
-            terminal.dispose();
+            const stdout = await Utils.execAsync(command);
+
+            Output.channel.appendLine(stdout);
+
+            vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
+
+        } catch (error) {
+
+            Output.channel.append(error[0]);
+            Output.channel.appendLine(error[1]);
+
+            vscode.window.showErrorMessage(`Schematics failed, see Output.`);
+
         }
     
     }
