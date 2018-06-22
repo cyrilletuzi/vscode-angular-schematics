@@ -1,6 +1,7 @@
 # Angular schematics extension for Visual Studio Code
 
-Allow you to launch Angular schematics commands from files Explorer (right-click) or Command Palette.
+[Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
+allowing you to launch Angular schematics commands from files Explorer (right-click) or Command Palette.
 
 ## Why?
 
@@ -16,7 +17,8 @@ and [course details here](https://formationjavascript.com/formation-angular/) (i
 
 ## Getting started
 
-Just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
+Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
+or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
 
 Then, from:
 - files Explorer context menu (right-click on any file or directory),
