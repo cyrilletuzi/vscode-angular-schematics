@@ -28,6 +28,10 @@ choose an "Angular: Generate..." command and just fill the requested options.
 
 If you're launching the command from the files Explorer context menu,
 the destination path will be automatically configured to the directory you just right-clicked.
+The path auto-detection only works if you stick to official CLI structure, meaning you must be in:
+- `/**/app/` (like `/src/app/`)
+- `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
+- `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
 
 ## Requirements
 

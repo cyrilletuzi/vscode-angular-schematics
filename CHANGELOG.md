@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.1] - 2018-06-22
+
+### Bug fix
+- Now auto-detect project and context path for librairies generated with `ng g library`.
+
 ## [1.0.0] - 2018-06-22
 
 ### Features

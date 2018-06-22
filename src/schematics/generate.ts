@@ -73,7 +73,9 @@ export class Generate {
 
     protected getProject(contextPath = ''): string {
 
-        const projectMatches = contextPath.match(/projects\/([^\/]+)\/[^\/]+\/app/);
+        const pathNormalized = Utils.normalizePath(contextPath);
+
+        const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
 
         if (projectMatches) {
 
@@ -87,19 +89,23 @@ export class Generate {
 
     protected getCommandPath(contextPath = ''): string {
 
-        if (contextPath.match(/[^\/]+\/app\//)) {
+        const pathNormalized = Utils.normalizePath(contextPath);
 
-            const normalizedPath = Utils.normalizePath(contextPath).split('/app/')[1];
+        const contextPathMatches = pathNormalized.match(/[^\/]+\/((?:app|lib))\//);
+
+        if (contextPathMatches) {
+
+            const splittedPath = pathNormalized.split(`/${contextPathMatches[1]}/`)[1];
     
-            if (normalizedPath.includes('.')) {
+            if (splittedPath.includes('.')) {
     
                 /* If filename, delete filename by removing everything after the last "/" */
-                return Utils.getDirectoryFromFilename(normalizedPath);
+                return Utils.getDirectoryFromFilename(splittedPath);
     
             } else {
     
                 /* If directory, add a trailing "/" */
-                return `${normalizedPath}/`;
+                return `${splittedPath}/`;
     
             }
     
