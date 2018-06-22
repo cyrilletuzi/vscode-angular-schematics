@@ -48,6 +48,8 @@ By default, this extension supports (if they are installed):
 - `@schematics/angular` (official Angular CLI commands)
 - `@angular/material`
 - `@ngrx/schematics`
+- `@nrwl/schematics`
+- `@nstudio/schematics`
 
 Scanning all packages to find all potential schematics would be too slow.
 If you want to use other schematics, just add their package name in `ngschematics.schematics` in your VS Code preferences.

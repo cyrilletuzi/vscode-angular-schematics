@@ -13,7 +13,7 @@ export class Schematics {
         '@angular/material',
         '@ngrx/schematics',
         '@nrwl/schematics',
-        '@nstudio/schematics'
+        '@nstudio/schematics',
     ];
     static collections: Set<string> = new Set([Schematics.defaultCollection]);
 
