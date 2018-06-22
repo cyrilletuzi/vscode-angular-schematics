@@ -11,7 +11,9 @@ export class Schematics {
     static defaultCollection = '@schematics/angular';
     static commonCollections: string[] = [
         '@angular/material',
-        '@ngrx/schematics'
+        '@ngrx/schematics',
+        '@nrwl/schematics',
+        '@nstudio/schematics'
     ];
     static collections: Set<string> = new Set([Schematics.defaultCollection]);
 
