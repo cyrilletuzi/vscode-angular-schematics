@@ -24,6 +24,8 @@ Then, from:
 
 choose an "Angular: Generate..." command and just fill the requested options.
 
+![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo.gif)
+
 If you're launching the command from the files Explorer context menu,
 the destination path will be automatically configured to the directory you just right-clicked.
 
