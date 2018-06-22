@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.0] - 2018-06-22
+
+### Features
+- Stable release.
+
+## [0.6.0] - 2018-06-21
+
+### Features
+- Support multi-workspaces projects.
+
 ## [0.4.0] - 2018-06-17
 
 ### Features
@@ -9,11 +19,6 @@
 
 ### Features
 - Support all other schematics via `ngschematics.schematics` setting.
-
-## [0.2.0] - 2018-06-17
-
-### Features
-- Support multi-projects workspace.
 
 ## [0.1.0] - 2018-06-16
 
