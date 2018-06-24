@@ -37,9 +37,9 @@ The path auto-detection only works if you stick to official CLI structure, meani
 
 ## Requirements
 
-This extension requires VS Code >= 1.24 and is only enabled inside an Angular CLI >=6 project, ie.:
-- with `@angular/cli` >= 6 installed globally,
-- with an `angular.json` file in workspace (automatically done by the CLI),
+This extension requires VS Code >=1.24 and is only enabled inside an Angular >=5 CLI project, ie.:
+- with `@angular/cli` >=1.7 or >=6 installed globally,
+- with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the CLI),
 - with `@schematics/angular` installed locally in your project (automatically done by the CLI).
 
 ## Other features

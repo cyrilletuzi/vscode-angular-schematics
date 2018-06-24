@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.2.0] - 2018-06-24
+
+### Feature
+- Support for Angular 5 / CLI 1.7 projects.
+
 ## [1.1.0] - 2018-06-22
 
 ### Feature

@@ -76,7 +76,8 @@ export class Schema {
     hasDefaultOption(): boolean {
 
         for (let option of this.options.values()) {
-            if (option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)) {
+            if ((option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0))
+            || (this.requiredOptions.indexOf('name') !== -1)) {
                 return true;
             }
         }
@@ -196,7 +197,9 @@ export class Schema {
         });
 
         this.requiredOptions.forEach((requiredOptionName) => {
-            selectedOptions.set(requiredOptionName, this.options.get(requiredOptionName) as SchemaDataOptions);
+            if (requiredOptionName !== 'name') {
+                selectedOptions.set(requiredOptionName, this.options.get(requiredOptionName) as SchemaDataOptions);
+            }
         });
 
         return selectedOptions;
