@@ -96,7 +96,9 @@ export class Schema {
 
         /** @todo Investigate if there could be other default option than name */
         return vscode.window.showInputBox({
-            prompt: `Name or pathname${contextPath ? ` relative to ${contextPath}` : ''}${project ? ` in project ${project}` : ''}?`
+            prompt: `Name or pathname${project ? ` in project ${project}` : ''}?`,
+            value: contextPath,
+            valueSelection: [contextPath.length, contextPath.length]
         });
 
     }

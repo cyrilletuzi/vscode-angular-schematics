@@ -44,7 +44,7 @@ export class Generate {
 
     addDefaultOption(value: string, withPath = true): void {
 
-        this.defaultOption = withPath ? `${this.path}${value}` : value;
+        this.defaultOption = value;
 
         if (withPath && this.project) {
 
