@@ -72,7 +72,7 @@ export class Collection {
 
     }
 
-    async askSchema(): Promise<string | null> {
+    async askSchema(): Promise<string | undefined> {
 
         const choices: vscode.QuickPickItem[] = this.schemasNames
             .map((schemaName) => ({
@@ -82,7 +82,7 @@ export class Collection {
 
         const choice = await vscode.window.showQuickPick(choices, { placeHolder: `What do you want to generate?` });
 
-        return choice ? choice.label : null;
+        return choice ? choice.label : undefined;
 
     }
 

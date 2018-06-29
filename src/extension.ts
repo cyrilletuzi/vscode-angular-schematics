@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 
 import { Commands } from './schematics/commands';
 import { Output } from './schematics/output';
+import { Schematics } from './schematics/schematics';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -17,13 +18,21 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // The commandId parameter must match the command field in package.json
     const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context) => {
 
-        await Commands.generateSimple('component', context);
+        await Commands.generate(context, {
+            collectionName: Schematics.defaultCollection,
+            schemaName: 'component',
+            skipOptions: true
+        });
 
     });
 
     const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context) => {
 
-        await Commands.generateSimple('service', context);
+        await Commands.generate(context, {
+            collectionName: Schematics.defaultCollection,
+            schemaName: 'service',
+            skipOptions: true
+        });
 
     });
 

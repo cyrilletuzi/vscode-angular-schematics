@@ -10,6 +10,12 @@ export interface ExplorerMenuContext {
     path: string;
 }
 
+export interface GenerateConfig {
+    collectionName?: string;
+    schemaName?: string;
+    skipOptions?: boolean;
+}
+
 export class Commands {
 
     static getContextPath(context?: ExplorerMenuContext): string {
@@ -29,7 +35,7 @@ export class Commands {
 
     }
 
-    static async generateSimple(schemaName: string, context?: ExplorerMenuContext) {
+    static async generate(context: ExplorerMenuContext, { collectionName, schemaName, skipOptions = false }: GenerateConfig = {}) {
 
         const workspaceFolderPath = await this.getWorkspaceFolderPath(this.getContextPath(context));
 
@@ -39,43 +45,19 @@ export class Commands {
 
         const generate = new Generate(this.getContextPath(context));
 
-        generate.addSchema(schemaName);
+        if (collectionName !== Schematics.defaultCollection) {
 
-        const collection = new Collection(Schematics.defaultCollection);
+            await Schematics.load(workspaceFolderPath);
 
-        const schema = collection.createSchema(schemaName);
+            collectionName = await Schematics.askSchematic();
 
-        const defaultOption = await schema.askDefaultOption(generate.path, generate.project);
+            if (!collectionName) {
+                return;
+            }
 
-        if (!defaultOption) {
-            return;
+            generate.addCollection(collectionName);
+        
         }
-
-        generate.addDefaultOption(defaultOption);
-
-        this.launchCommand(generate.command, workspaceFolderPath);
-
-    }
-
-    static async generate(context?: ExplorerMenuContext) {
-
-        const workspaceFolderPath = await this.getWorkspaceFolderPath(this.getContextPath(context));
-
-        if (!workspaceFolderPath) {
-            return;
-        }
-
-        await Schematics.load(workspaceFolderPath);
-
-        const generate = new Generate(this.getContextPath(context));
-
-        const collectionName = await Schematics.askSchematic();
-
-        if (!collectionName) {
-            return;
-        }
-
-        generate.addCollection(collectionName);
 
         const collection = new Collection(collectionName);
 
@@ -83,10 +65,14 @@ export class Commands {
             return;
         }
 
-        const schemaName = await collection.askSchema();
-
         if (!schemaName) {
-            return;
+
+            schemaName = await collection.askSchema();
+
+            if (!schemaName) {
+                return;
+            }
+
         }
 
         generate.addSchema(schemaName);
@@ -109,15 +95,19 @@ export class Commands {
 
         }
 
-        const selectedOptionsNames = await schema.askOptions();
+        if (!skipOptions) {
 
-        if (selectedOptionsNames) {
+            const selectedOptionsNames = await schema.askOptions();
 
-            const filledOptions = await schema.askOptionsValues(selectedOptionsNames);
+            if (selectedOptionsNames) {
 
-            filledOptions.forEach((option, optionName) => {
-                generate.addOption(optionName, option);
-            });
+                const filledOptions = await schema.askOptionsValues(selectedOptionsNames);
+
+                filledOptions.forEach((option, optionName) => {
+                    generate.addOption(optionName, option);
+                });
+
+            }
 
         }
 
