@@ -53,6 +53,10 @@
                 "title": "Angular: Generate a service"
             },
             {
+                "command": "ngschematics.generateModule",
+                "title": "Angular: Generate a module"
+            },
+            {
                 "command": "ngschematics.generate",
                 "title": "Angular: Generate..."
             }
@@ -70,8 +74,13 @@
                     "when": "inAngularProject"
                 },
                 {
-                    "command": "ngschematics.generate",
+                    "command": "ngschematics.generateModule",
                     "group": "angularschematics@3",
+                    "when": "inAngularProject"
+                },
+                {
+                    "command": "ngschematics.generate",
+                    "group": "angularschematics@4",
                     "when": "inAngularProject"
                 }
             ]
