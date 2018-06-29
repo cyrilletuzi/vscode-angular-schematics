@@ -1,7 +1,7 @@
 # Angular schematics extension for Visual Studio Code
 
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
-allowing you to launch Angular schematics commands from files Explorer (right-click) or Command Palette.
+allowing you to launch Angular schematics (CLI commands) from files Explorer (right-click) or Command Palette.
 
 ## Why?
 
@@ -65,6 +65,7 @@ If you are a library author, feel free to open an issue to ask for your schemati
 You can add keyboard shortcuts to the following actions:
 - `ngschematics.generateComponent`
 - `ngschematics.generateService`
+- `ngschematics.generateModule`
 - `ngschematics.generate`
 
 ### Default options

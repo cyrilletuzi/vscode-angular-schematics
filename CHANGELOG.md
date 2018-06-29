@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.3.0] - 2018-06-29
+
+### Features
+- UI to select a component type with predefined options.
+- New "Generate a module" command.
+- Better UI when auto-detecting context path.
+
 ## [1.2.0] - 2018-06-24
 
 ### Feature
