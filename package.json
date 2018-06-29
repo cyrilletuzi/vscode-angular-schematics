@@ -58,7 +58,7 @@
             },
             {
                 "command": "ngschematics.generate",
-                "title": "Angular: Generate..."
+                "title": "Angular: Generate another schematics"
             }
         ],
         "menus": {
