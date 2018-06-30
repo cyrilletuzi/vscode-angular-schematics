@@ -73,6 +73,18 @@ You can add keyboard shortcuts to the following actions:
 [`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
 already allows to save default options for schematics commands.
 
+### Component types
+
+Puzzled about the component type choice?
+
+- Exported component: components have a local scope by default, meaning they are only usable inside the module where they are declared.
+So if you want to use your component in another module (for example if you are doing a reusable UI component), you have to export it.
+[Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
+
+- Pure component (also known as a presentation component): a pure component is a component which relies only on its `@Input`s for data,
+as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data.
+Observing this difference is a good practice, [learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
+
 ## Release Notes
 
 [Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/CHANGELOG.md).
