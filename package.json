@@ -39,8 +39,8 @@
         "vscode": "^1.24.0"
     },
     "activationEvents": [
-        "workspaceContains:**/angular.json",
-        "workspaceContains:**/.angular-cli.json"
+        "workspaceContains:angular.json",
+        "workspaceContains:.angular-cli.json"
     ],
     "main": "./out/extension",
     "contributes": {

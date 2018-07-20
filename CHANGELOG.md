@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.3.1] - 2018-07-20
+
+### Bug fix
+- Only activate the extension when `angular.json` or `.angular-cli.json` are in the root directory (as it's a requirement of the CLI itself).
+
 ## [1.3.0] - 2018-06-29
 
 ### Features
