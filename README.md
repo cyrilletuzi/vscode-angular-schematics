@@ -42,6 +42,9 @@ This extension requires VS Code >=1.24 and is only enabled inside an Angular >=5
 - with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the CLI),
 - with `@schematics/angular` installed locally in your project (automatically done by the CLI).
 
+The project opened must be the root directory of the Angular project. It won't work from a parent directory,
+as the CLI itself requires to be in the Angular directory.
+
 ## Other features
 
 ### Other schematics
