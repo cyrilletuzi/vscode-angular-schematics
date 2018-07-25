@@ -8,6 +8,7 @@ allowing you to launch Angular schematics (CLI commands) from files Explorer (ri
 - Save time
 - No more typo errors
 - No more chaotic search in the CLI wiki, all options available will be proposed
+- Promote good practices for component types
 
 ## Angular onsite training
 
@@ -34,6 +35,7 @@ The path auto-detection only works if you stick to official CLI structure, meani
 - `/**/app/` (like `/src/app/`)
 - `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
 - `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
+- `/projects/**/**/**/app/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
 
 ## Requirements
 

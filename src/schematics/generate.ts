@@ -81,6 +81,16 @@ export class Generate {
 
             return projectMatches[1];
 
+        } else {
+
+            const scopedProjectMatches = pathNormalized.match(/projects\/([^\/]+\/[^\/]+)\/[^\/]+\/(?:app|lib)/);
+
+            if (scopedProjectMatches) {
+
+                return `@${scopedProjectMatches[1]}`;
+
+            }
+
         }
 
         return '';

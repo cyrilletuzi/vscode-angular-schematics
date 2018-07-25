@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.4.0] - 2018-07-25
+
+### Feature
+- Now auto-detect project and context path for scoped librairies generated with `ng g library @company/somelibrary`.
+
 ## [1.3.1] - 2018-07-20
 
 ### Bug fix
