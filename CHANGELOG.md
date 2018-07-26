@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.5.0] - 2018-07-26
+
+### Features
+- Support extended schematics.
+- If a `defaultCollection` is set in `angular.json`, it's now the first choice for quicker use.
+- Support `@ionic/angular-schematics` by default.
+
 ## [1.4.0] - 2018-07-25
 
 ### Feature

@@ -54,6 +54,7 @@ as the CLI itself requires to be in the Angular directory.
 By default, this extension supports (if they are installed):
 - `@schematics/angular` (official Angular CLI commands)
 - `@angular/material`
+- `@ionic/angular-schematics`
 - `@ngrx/schematics`
 - `@nrwl/schematics`
 - `@nstudio/schematics`
