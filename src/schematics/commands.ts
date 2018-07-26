@@ -79,7 +79,7 @@ export class Commands {
 
         generate.addSchema(schemaName);
 
-        const schema = collection.createSchema(schemaName);
+        const schema = await collection.createSchema(schemaName, workspaceFolderPath);
 
         if (!await schema.load(workspaceFolderPath)) {
             return;

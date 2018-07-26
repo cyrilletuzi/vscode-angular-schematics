@@ -11,6 +11,7 @@ export interface CollectionDataSchema {
     schema: string;
     description: string;
     hidden?: boolean;
+    extends?: string;
 }
 
 export interface CollectionData {
@@ -58,17 +59,35 @@ export class Collection {
         }
 
         if (collection) {
-            this.initSchemasMap(collection);
+
+            await this.initSchemasMap(collection, cwd);
+
+            Collection.cache.set(this.name, collection);
+
             return true;
+
         }
         
         return false;
 
     }
 
-    createSchema(name: string): Schema {
+    async createSchema(name: string, cwd: string): Promise<Schema> {
 
-        return new Schema(name, this);
+        let collection: Collection = this;
+
+        const schema = this.schemas.get(name) as CollectionDataSchema;
+
+        if (schema.extends) {
+
+            const [parentCollectionName] = schema.extends.split(':');
+
+            collection = new Collection(parentCollectionName);
+            await collection.load(cwd);
+
+        }
+
+        return new Schema(name, collection);
 
     }
 
@@ -86,7 +105,7 @@ export class Collection {
 
     }
 
-    protected initSchemasMap(collection: CollectionData): void {
+    protected async initSchemasMap(collection: CollectionData, cwd: string): Promise<void> {
 
         for (let schemaName in collection.schematics) {
 
@@ -94,7 +113,25 @@ export class Collection {
                 && !collection.schematics[schemaName].hidden
                 && (schemaName !== 'ng-add')) {
 
-                this.schemas.set(schemaName, collection.schematics[schemaName]);
+                const schema = collection.schematics[schemaName];
+
+                if (schema.extends) {
+
+                    const [parentCollectionName, parentSchemaName] = schema.extends.split(':');
+
+                    const parentCollection = new Collection(parentCollectionName);
+                    await parentCollection.load(cwd);
+
+                    const parentSchema = Object.assign({}, parentCollection.schemas.get(parentSchemaName) as CollectionDataSchema);
+                    parentSchema.extends = schema.extends;
+
+                    this.schemas.set(schemaName, parentSchema);
+
+                } else {
+
+                    this.schemas.set(schemaName, collection.schematics[schemaName]);
+
+                }
 
             }
 

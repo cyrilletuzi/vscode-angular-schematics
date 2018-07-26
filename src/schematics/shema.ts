@@ -16,6 +16,7 @@ export interface SchemaDataOptions {
     visible?: boolean;
     default?: string | boolean;
     $default?: SchemaDataDefaultOption;
+    extends?: string;
 }
 
 export interface SchemaData {
@@ -46,7 +47,7 @@ export class Schema {
 
         let schema: SchemaData | null = null;
 
-        const cachedSchema = Schema.cache.get(this.name);
+        const cachedSchema = Schema.cache.get(`${this.collection}:${this.name}`);
 
         if (cachedSchema) {
 
@@ -64,8 +65,13 @@ export class Schema {
         }
 
         if (schema) {
+
             this.initOptionsMap(schema);
+
             this.requiredOptions = schema.required || [];
+
+            Schema.cache.set(`${this.collection}:${this.name}`, schema);
+
             return true;
         }
 
