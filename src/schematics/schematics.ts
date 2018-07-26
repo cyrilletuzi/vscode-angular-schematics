@@ -11,6 +11,7 @@ export class Schematics {
     static defaultCollection = '@schematics/angular';
     static commonCollections: string[] = [
         '@angular/material',
+        '@ionic/schematics-angular',
         '@ngrx/schematics',
         '@nrwl/schematics',
         '@nstudio/schematics',
