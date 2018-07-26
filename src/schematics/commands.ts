@@ -47,7 +47,7 @@ export class Commands {
 
         const generate = new Generate(this.getContextPath(context));
 
-        if (collectionName !== Schematics.defaultCollection) {
+        if (collectionName !== Schematics.angularCollection) {
 
             await Schematics.load(workspaceFolderPath);
 
@@ -99,11 +99,11 @@ export class Commands {
 
         let filledOptions: Map<string, string> | undefined;
 
-        if (shortcutCommand && (collectionName === Schematics.defaultCollection) && (schemaName === 'component')) {
+        if (shortcutCommand && (collectionName === Schematics.angularCollection) && (schemaName === 'component')) {
 
             filledOptions = await this.askComponentOptions(schema);
 
-        } else if (shortcutCommand && (collectionName === Schematics.defaultCollection) && (schemaName === 'module')) {
+        } else if (shortcutCommand && (collectionName === Schematics.angularCollection) && (schemaName === 'module')) {
 
             filledOptions = await this.askModuleOptions(schema);
 

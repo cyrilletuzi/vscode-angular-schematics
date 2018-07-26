@@ -18,7 +18,7 @@ export class Generate {
 
     }
     protected base = 'ng g';
-    protected collection = Schematics.defaultCollection;
+    protected collection = Schematics.angularCollection;
     protected schema = '';
     protected defaultOption = '';
     protected options = new Map<string, string>();
@@ -137,7 +137,7 @@ export class Generate {
 
     protected formatCollectionAndSchema(): string {
 
-        return (this.collection !== Schematics.defaultCollection) ?
+        return (this.collection !== Schematics.angularCollection) ?
             `${this.collection}:${this.schema}` :
             this.schema;
 

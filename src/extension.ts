@@ -19,7 +19,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.defaultCollection,
+            collectionName: Schematics.angularCollection,
             schemaName: 'component'
         });
 
@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.defaultCollection,
+            collectionName: Schematics.angularCollection,
             schemaName: 'service'
         });
 
@@ -37,7 +37,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.defaultCollection,
+            collectionName: Schematics.angularCollection,
             schemaName: 'module'
         });
 
