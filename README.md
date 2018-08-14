@@ -10,6 +10,10 @@ allowing you to launch Angular schematics (CLI commands) from files Explorer (ri
 - No more chaotic search in the CLI wiki, all options available will be proposed
 - Promote good practices for component types
 
+What about other tools like the Angular Console? Well, this lib will save you more time because:
+- it's directly integrated in VS Code (no switch between 2 windows),
+- many options are prefilled (like the path and the project where you want to generate things).
+
 ## Angular onsite training
 
 The author of this library organizes Angular courses (based in Paris, France, but open to travel).
