@@ -5,6 +5,8 @@ allowing you to launch Angular schematics (CLI commands) from files Explorer (ri
 
 ## Why?
 
+Productivity!
+
 - Save time
 - No more typo errors
 - No more chaotic search in the CLI wiki, all options available will be proposed
