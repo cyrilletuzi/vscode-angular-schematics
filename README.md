@@ -39,7 +39,7 @@ The path auto-detection only works if you stick to official CLI structure, meani
 - `/**/app/` (like `/src/app/`)
 - `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
 - `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
-- `/projects/**/**/**/app/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
+- `/projects/**/**/**/lib/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
 
 ## Requirements
 
