@@ -114,7 +114,8 @@
             "angular": [
                 {
                     "id": "angular-schematics",
-                    "name": "Schematics"
+                    "name": "Schematics",
+                    "when": "inAngularProject"
                 }
             ]
         }
