@@ -100,7 +100,24 @@
                     }
                 }
             }
-        ]
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "angular",
+                    "title": "Angular",
+                    "icon": "angular.svg"
+                }
+            ]
+        },
+        "views": {
+            "angular": [
+                {
+                    "id": "angular-schematics",
+                    "name": "Schematics"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

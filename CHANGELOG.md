@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.6.0] - 2018-08-29
+
+### Features
+- Now a dedicated Angular Schematics view to see all schematics at once (can be hidden with a right-click)
+- Support [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme) icons in this view.
+- When launching commands from Palette or the new view, automatically select the default workspace if there is only one.
+
 ## [1.5.0] - 2018-07-26
 
 ### Features

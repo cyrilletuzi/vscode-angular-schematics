@@ -25,11 +25,21 @@ export class Commands {
 
     }
 
+    static getDefaultWorkspace(): vscode.WorkspaceFolder | null {
+
+        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length === 1) {
+            return vscode.workspace.workspaceFolders[0];
+        }
+
+        return null;
+
+    }
+
     static async getWorkspaceFolderPath(path = ''): Promise<string> {
 
         const workspaceFolder = path ?
             vscode.workspace.getWorkspaceFolder(vscode.Uri.file(path)) :
-            await vscode.window.showWorkspaceFolderPick();
+            (this.getDefaultWorkspace() || await vscode.window.showWorkspaceFolderPick());
 
         return workspaceFolder ? workspaceFolder.uri.fsPath : '';
 
@@ -51,10 +61,14 @@ export class Commands {
 
             await Schematics.load(workspaceFolderPath);
 
-            collectionName = await Schematics.askSchematic();
-
             if (!collectionName) {
-                return;
+
+                collectionName = await Schematics.askSchematic();
+
+                if (!collectionName) {
+                    return;
+                }
+
             }
 
             generate.addCollection(collectionName);

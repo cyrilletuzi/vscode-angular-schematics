@@ -1,7 +1,8 @@
 # Angular schematics extension for Visual Studio Code
 
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
-allowing you to launch Angular schematics (CLI commands) from files Explorer (right-click) or Command Palette.
+allowing you to launch Angular schematics (CLI commands) 
+with a Graphical User Interface, directly inside VS Code!
 
 ## Why?
 
@@ -27,21 +28,17 @@ and [course details here](https://formationjavascript.com/formation-angular/) (i
 Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
 or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
 
-Then, from:
-- files Explorer context menu (right-click on any file or directory),
-- or from Command Palette,
+Then, **you can launch Angular CLI commands from 3 places:**
+- the files Explorer context menu: **right-click on any directory or file**, then choose an "Angular: Generate..." command
+- the dedicated Angular Schematics view (icon in the Activity bar on the left)
+- or the Command Palette
 
-choose an "Angular: Generate..." command and just fill the requested options.
+And finally just fill the requested options.
 
 ![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo.gif)
 
-If you're launching the command from the files Explorer context menu,
-the destination path will be automatically configured to the directory you just right-clicked.
-The path auto-detection only works if you stick to official CLI structure, meaning you must be in:
-- `/**/app/` (like `/src/app/`)
-- `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
-- `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
-- `/projects/**/**/**/lib/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
+**The quickest way to launch your Angular CLI commands is the first, with a right-click inside the files Explorer context menu.**
+Why? Because the destination path will be automatically configured to the directory you just right-clicked.
 
 ## Requirements
 
@@ -52,6 +49,15 @@ This extension requires VS Code >=1.24 and is only enabled inside an Angular >=5
 
 The project opened must be the root directory of the Angular project. It won't work from a parent directory,
 as the CLI itself requires to be in the Angular directory.
+
+The path auto-detection only works if you stick to official CLI structure, meaning you must be in:
+- `/**/app/` (like `/src/app/`)
+- `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
+- `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
+- `/projects/**/**/**/lib/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
+
+Optionally, the icons in the Angular Schematics view will be nicer if you use
+the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
 
 ## Other features
 
