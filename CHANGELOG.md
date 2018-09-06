@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.6.1] - 2018-09-06
+
+### Bug fix
+
+- A regression in paths management due to previous performance improvements was breaking Material schematics (fixes [#13](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/13))
+
 ## [1.6.0] - 2018-08-29
 
 ### Features

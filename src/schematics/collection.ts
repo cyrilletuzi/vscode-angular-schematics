@@ -15,6 +15,7 @@ export interface CollectionDataSchema {
 }
 
 export interface CollectionData {
+    path: string;
     schematics: {
         [key: string]: CollectionDataSchema;
     };
@@ -56,9 +57,15 @@ export class Collection {
 
             collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
 
+            if (collection) {
+                collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
+            }
+
         }
 
         if (collection) {
+
+            this.path = collection.path;
 
             await this.initSchemasMap(collection, cwd);
 
