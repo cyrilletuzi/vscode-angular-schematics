@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { Generate } from './generate';
 import { Collection } from './collection';
@@ -139,14 +140,14 @@ export class Commands {
 
         if (confirm) {
 
-            await this.launchCommand(generate.command, workspaceFolderPath);
+            await this.launchCommand(generate.command, workspaceFolderPath, generate.schema, generate.defaultOption);
 
         }
 
     }
 
     /** @todo Colored output? */
-    static async launchCommand(command: string, cwd: string) {
+    static async launchCommand(command: string, cwd: string, schema: string, defaultOption: string): Promise<void> {
 
         Output.channel.show();
 
@@ -160,6 +161,10 @@ export class Commands {
 
             vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
 
+            try {
+                await this.jumpToFile(stdout, cwd, defaultOption, schema);
+            } catch (error) {}
+
         } catch (error) {
 
             Output.channel.append(error[0]);
@@ -169,6 +174,24 @@ export class Commands {
 
         }
     
+    }
+
+    static async jumpToFile(stdout: string, cwd: string, defaultOption: string, schema: string): Promise<void> {
+
+        const name = defaultOption.includes('/') ? defaultOption.substr(defaultOption.lastIndexOf('/') + 1) : defaultOption;
+
+        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.${schema})?\.ts)`);
+
+        const stdoutMatches = stdout.match(stdoutRegExp);
+
+        if (stdoutMatches) {
+
+            const document = await vscode.workspace.openTextDocument(path.join(cwd, stdoutMatches[1]));
+
+            await vscode.window.showTextDocument(document);
+
+        }
+
     }
 
     static async askOptions(schema: Schema): Promise<Map<string, string>> {

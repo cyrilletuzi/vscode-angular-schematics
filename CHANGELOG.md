@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.7.0] - 2018-09-22
+
+### Feature
+
+- When using official CLI commands, the generated file will auto open!
+
 ## [1.6.2] - 2018-09-06
 
 ### Bug fix

@@ -7,6 +7,8 @@ export class Generate {
 
     path = '';
     project = '';
+    schema = '';
+    defaultOption = '';
     get command(): string {
 
         return [
@@ -19,8 +21,6 @@ export class Generate {
     }
     protected base = 'ng g';
     protected collection = Schematics.angularCollection;
-    protected schema = '';
-    protected defaultOption = '';
     protected options = new Map<string, string>();
 
     constructor(contextPath = '') {

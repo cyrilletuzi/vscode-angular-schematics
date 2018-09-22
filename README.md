@@ -9,13 +9,14 @@ with a Graphical User Interface, directly inside VS Code!
 Productivity!
 
 - Save time
-- No more typo errors
-- No more chaotic search in the CLI wiki, all options available will be proposed
+- No more typo errors = no more mess cleaning
+- No more chaotic search in the CLI wiki, all options available will be proposed and documented
 - Promote good practices for component types
 
 What about other tools like the Angular Console? Well, this lib will save you more time because:
 - it's directly integrated in VS Code (no switch between 2 windows),
-- many options are prefilled (like the path and the project where you want to generate things).
+- many options are prefilled (like the path and the project where you want to generate things)
+- generated files will auto open!
 
 ## Angular onsite training
 
