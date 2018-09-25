@@ -15,7 +15,7 @@ Productivity!
 
 What about other tools like the Angular Console? Well, this lib will save you more time because:
 - it's directly integrated in VS Code (no switch between 2 windows),
-- many options are prefilled (like the path and the project where you want to generate things)
+- many options are prefilled (like the path and the project where you want to generate things),
 - generated files will auto open!
 
 ## Angular onsite training
@@ -43,22 +43,32 @@ Why? Because the destination path will be automatically configured to the direct
 
 ## Requirements
 
-This extension requires VS Code >=1.24 and is only enabled inside an Angular >=5 CLI project, ie.:
+### VS Code
+
+This extension requires VS Code >=1.24.
+
+### Angular CLI
+
+This extension is only enabled inside an Angular >=5 CLI project, ie.:
 - with `@angular/cli` >=1.7 or >=6 installed globally,
-- with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the CLI),
-- with `@schematics/angular` installed locally in your project (automatically done by the CLI).
+- with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the CLI).
 
 The project opened must be the root directory of the Angular project. It won't work from a parent directory,
 as the CLI itself requires to be in the Angular directory.
 
-The path auto-detection only works if you stick to official CLI structure, meaning you must be in:
+### Path automatic detection
+
+The path automatic detection only works if you stick to official CLI structure, meaning you must be in:
 - `/**/app/` (like `/src/app/`)
 - `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
 - `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
 - `/projects/**/**/**/lib/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
 
-Optionally, the icons in the Angular Schematics view will be nicer if you use
-the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
+### Custom shell
+
+If you use a custom shell (like `zsh`), and your Angular CLI installation is tied to this shell,
+it must be configured accordingly in your VS Code settings
+(`terminal.integrated.shell.osx` or `terminal.integrated.shell.windows` or `terminal.integrated.shell.linux`).
 
 ## Other features
 
@@ -92,15 +102,24 @@ You can add keyboard shortcuts to the following actions:
 [`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
 already allows to save default options for schematics commands.
 
-### Component types
+### Icons
+
+The icons in the Angular Schematics view will be nicer if you use
+the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
+
+## Component types
 
 Puzzled about the component type choice?
 
-- Exported component: components have a local scope by default, meaning they are only usable inside the module where they are declared.
+### Exported component
+
+Components have a local scope by default, meaning they are only usable inside the module where they are declared.
 So if you want to use your component in another module (for example if you are doing a reusable UI component), you have to export it.
 [Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
 
-- Pure component (also known as a presentation component): a pure component is a component which relies only on its `@Input`s for data,
+### Pure component (also known as a presentation component)
+
+A pure component is a component which relies only on its `@Input`s for data,
 as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data.
 Observing this difference is a good practice, [learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
 

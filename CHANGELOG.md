@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.8.0] - 2018-09-25
+
+### Feature
+
+- Will now work if your Angular CLI installation is tied to a custom shell (like `zsh`),
+provided that your VS Code settings are configured accordingly
+(`terminal.integrated.shell.osx` or `terminal.integrated.shell.windows` or `terminal.integrated.shell.linux`)
+(fixes [#16](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/16))
+
 ## [1.7.0] - 2018-09-22
 
 ### Feature
