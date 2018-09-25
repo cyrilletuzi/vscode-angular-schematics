@@ -11,7 +11,8 @@ osList.set('win32', 'windows');
 
 const userOs = osList.get(os.platform()) || 'linux';
 
-const userShell = vscode.workspace.getConfiguration().get(`terminal.integrated.shell.${userOs}`) as string;
+// TODO: Manage custom shell for Windows
+const userShell = (userOs === 'windows') ? undefined : vscode.workspace.getConfiguration().get(`terminal.integrated.shell.${userOs}`) as string;
 
 export class Utils {
 

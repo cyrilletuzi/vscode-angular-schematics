@@ -66,9 +66,9 @@ The path automatic detection only works if you stick to official CLI structure, 
 
 ### Custom shell
 
-If you use a custom shell (like `zsh`), and your Angular CLI installation is tied to this shell,
+On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI installation is tied it,
 it must be configured accordingly in your VS Code settings
-(`terminal.integrated.shell.osx` or `terminal.integrated.shell.windows` or `terminal.integrated.shell.linux`).
+(`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
 
 ## Other features
 
