@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.9.0] - 2018-10-13
+
+### Feature
+
+- New component type for Angular 7: Element (see README for more info)
+
 ## [1.8.1] - 2018-09-25
 
 ### Feature

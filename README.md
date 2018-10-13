@@ -123,6 +123,14 @@ A pure component is a component which relies only on its `@Input`s for data,
 as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data.
 Observing this difference is a good practice, [learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
 
+### Element component
+
+Only available in Angular >= 7.
+
+Used to create an Angular Element, i.e. a reusable native Web Component.
+Such components need to be registered in `entryComponents` and to use native `ShadowDom` viewEncapsulation.
+See [the documentation](https://angular.io/guide/elements) for more info.
+
 ## Release Notes
 
 [Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/CHANGELOG.md).

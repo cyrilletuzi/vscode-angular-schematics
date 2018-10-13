@@ -211,13 +211,29 @@ export class Commands {
 
     static async askComponentOptions(schema: Schema): Promise<Map<string, string> | undefined> {
 
+        const TYPE_CLASSIC = `Classic component`;
+        const TYPE_EXPORTED = `Exported component`;
+        const TYPE_PURE = `Pure component`;
+        const TYPE_EXPORTED_PURE = `Exported pure component`;
+        const TYPE_ELEMENT = `Element component`;
+        const TYPE_ADVANCED = `Advanced component`;
+
         const componentTypes: vscode.QuickPickItem[] = [
-            { label: `Classic component`, description: `No option` },
-            { label: `Exported component`, description: `--export (no other option)` },
-            { label: `Pure component`, description: `--changeDetection OnPush (no other option)` },
-            { label: `Exported pure component`, description: `--export --changeDetection OnPush (no other option)` },
-            { label: `Advanced component`, description: `You'll be able to choose all available options` },
+            { label: TYPE_CLASSIC, description: `No option` },
+            { label: TYPE_EXPORTED, description: `--export (no other option)` },
+            { label: TYPE_PURE, description: `--changeDetection OnPush (no other option)` },
+            { label: TYPE_EXPORTED_PURE, description: `--export --changeDetection OnPush (no other option)` },
         ];
+
+        const viewEncapsulation = schema.options.get('viewEncapsulation');
+
+        if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.indexOf('ShadowDom') !== -1)) {
+
+            componentTypes.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
+
+        }
+
+        componentTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
 
         const componentType = await vscode.window.showQuickPick(componentTypes, { placeHolder: `What type of component do you want?` });
 
@@ -229,22 +245,27 @@ export class Commands {
 
         switch (componentType.label) {
 
-            case componentTypes[1].label:
+            case TYPE_EXPORTED:
             componentOptions.set('export', 'true');
             break;
 
-            case componentTypes[2].label:
+            case TYPE_PURE:
             componentOptions.set('changeDetection', 'OnPush');
             break;
 
-            case componentTypes[3].label:
+            case TYPE_EXPORTED_PURE:
             componentOptions.set('export', 'true');
             componentOptions.set('changeDetection', 'OnPush');
+            break;
+
+            case TYPE_ELEMENT:
+            componentOptions.set('entryComponent', 'true');
+            componentOptions.set('viewEncapsulation', 'ShadowDom');
             break;
 
         }
 
-        if (componentType.label === componentTypes[4].label) {
+        if (componentType.label === TYPE_ADVANCED) {
             componentOptions = await this.askOptions(schema);
         }
 
