@@ -20,7 +20,6 @@ What about other tools like the Angular Console? Well, this lib will save you mo
 
 ## By the same author
 
-- [Angular schematics extension for VS Code](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics) (GUI for Angular CLI commands)
 - [@ngx-pwa/local-storage](https://github.com/cyrilletuzi/angular-async-local-storage): 1st Angular library for local storage
 - Library [@ngx-pwa/offline](https://github.com/cyrilletuzi/ngx-pwa-offline)
 - Popular [Angular posts on Medium](https://medium.com/@cyrilletuzi)
