@@ -1,7 +1,7 @@
 # Angular schematics extension for Visual Studio Code
 
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
-allowing you to launch Angular schematics (CLI commands) 
+allowing you to launch Angular schematics (CLI commands)
 with a Graphical User Interface, directly inside VS Code!
 
 ## Why?
@@ -79,7 +79,7 @@ it must be configured accordingly in your VS Code settings
 By default, this extension supports (if they are installed):
 - `@schematics/angular` (official Angular CLI commands)
 - `@angular/material`
-- `@ionic/angular-schematics`
+- `@ionic/angular-toolkit`
 - `@ngrx/schematics`
 - `@nrwl/schematics`
 - `@nstudio/schematics`
