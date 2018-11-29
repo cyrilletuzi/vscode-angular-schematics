@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.10.0] - 2018-10-29
+
+### Feature
+
+- Update Ionic schematics to the new package (thanks to @mhartington from Ionic team)
+
 ## [1.9.0] - 2018-10-13
 
 ### Feature
