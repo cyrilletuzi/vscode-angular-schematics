@@ -30,7 +30,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
         ['@ngrx/schematics:entity', 'ngrx-entity.svg'],
         ['@ngrx/schematics:reducer', 'ngrx-reducer.svg'],
         ['@ngrx/schematics', 'ngrx-state.svg'],
-        ['@ionic/schematics-angular', 'ionic.svg'],
+        ['@ionic/angular-toolkit', 'ionic.svg'],
     ]);
     private materialIconsExisting = new Set<string>();
     private materialIconsNotExisting = new Set<string>();
@@ -68,7 +68,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
     }
 
     async getChildren(element?: vscode.TreeItem | undefined): Promise<vscode.TreeItem[]> {
-        
+
         if (this.workspaceRoot) {
 
             if (!element) {
@@ -96,7 +96,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
                     }
 
                     return items;
-                    
+
                 }
 
             }
@@ -138,7 +138,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
             }
 
         }
-        
+
         return vscode.Uri.file(iconPath);
 
     }
