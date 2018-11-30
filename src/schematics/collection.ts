@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Schema } from './shema';
+import { Schema } from './schema';
 import { Utils } from './utils';
 
 

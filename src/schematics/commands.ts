@@ -1,12 +1,12 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-
-import { Generate } from './generate';
+import * as vscode from 'vscode';
 import { Collection } from './collection';
+import { Generate } from './generate';
+import { Output } from './output';
+import { Schema } from './schema';
 import { Schematics } from './schematics';
 import { Utils } from './utils';
-import { Output } from './output';
-import { Schema } from './shema';
+
 
 export interface ExplorerMenuContext {
     path: string;
