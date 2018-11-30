@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-
-import { Utils } from './utils';
 import { Schema } from './shema';
+import { Utils } from './utils';
+
 
 interface PackageJSON {
     schematics?: string;
@@ -16,6 +16,7 @@ export interface CollectionDataSchema {
 
 export interface CollectionData {
     path: string;
+    name: string;
     schematics: {
         [key: string]: CollectionDataSchema;
     };
@@ -47,20 +48,32 @@ export class Collection {
 
         } else {
 
-            const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
+            if (this.name.startsWith(".") && this.name.endsWith(".json")) {
+                const collectionPath = Utils.getDirectoryFromFilename(this.name);
+                const collectionJson = Utils.getFilenameFromPath(this.name);
 
-            if (!collectionPackage || !collectionPackage.schematics) {
-                return false;
+                collection = await Utils.getSchemaFromPath<CollectionData>(cwd, collectionPath, collectionJson); 
+
+                if (collection) {
+                    //this.name = collection.name;
+                    collection.path = collectionPath;
+                }
+                
+            } else {
+                const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
+
+                if (!collectionPackage || !collectionPackage.schematics) {
+                    return false;
+                }
+    
+                this.path = Utils.pathTrimRelative(collectionPackage.schematics);
+    
+                collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
+    
+                if (collection) {
+                    collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
+                }
             }
-
-            this.path = Utils.pathTrimRelative(collectionPackage.schematics);
-
-            collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
-
-            if (collection) {
-                collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
-            }
-
         }
 
         if (collection) {

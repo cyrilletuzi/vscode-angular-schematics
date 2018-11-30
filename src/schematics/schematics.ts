@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-
+import * as vscode from 'vscode';
 import { Utils } from './utils';
+
 
 interface SettingSchematics {
     schematics?: string[];
@@ -79,7 +79,7 @@ export class Schematics {
 
         } else {
 
-            return vscode.window.showQuickPick(Array.from(this.collections), { placeHolder: `From which shematics collection?` });
+            return vscode.window.showQuickPick(Array.from(this.collections), { placeHolder: `From which schematics collection?` });
 
         }
 

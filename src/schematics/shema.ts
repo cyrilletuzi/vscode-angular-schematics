@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-
-import { Utils } from './utils';
+import * as vscode from 'vscode';
 import { Collection, CollectionDataSchema } from './collection';
+import { Utils } from './utils';
+
 
 export interface SchemaDataDefaultOption {
     $source: 'argv' | 'projectName';
@@ -60,7 +60,11 @@ export class Schema {
                 Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
             );
 
-            schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
+            if (this.collection.name.startsWith(".") && this.collection.name.endsWith(".json")) {
+                schema = await Utils.getSchemaFromPath<SchemaData>(cwd, "", this.path); 
+            } else {
+                schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
+            }
 
         }
 

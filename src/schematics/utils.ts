@@ -1,9 +1,9 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as childProcess from 'child_process';
-import * as os from 'os';
+import * as fs from 'fs';
 import * as JSON5 from 'json5';
+import * as os from 'os';
+import * as path from 'path';
+import * as vscode from 'vscode';
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');
@@ -35,10 +35,18 @@ export class Utils {
 
     }
 
+    static getFilenameFromPath(p: string): string {
+        return path.basename(p);
+    }
+
     static getSchemaFromNodeModules<T = any>(cwd: string, packageName: string, filePath: string): Promise<T | null> {
 
         return this.parseJSONFile<T>(this.getNodeModulesPath(cwd, packageName, filePath));
 
+    }
+
+    static getSchemaFromPath<T = any>(cwd:string, p: string, file: string): Promise<T | null> {
+        return this.parseJSONFile<T>(path.join(cwd, p, file));
     }
 
     static getNodeModulesPath(cwd: string, ...paths: string[]) {
