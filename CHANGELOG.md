@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.11.0] - 2018-12-06
+
+### Feature
+
+- A global installation of Angular CLI is no longer needed,
+the extension will use the project's local CLI (if installed in the default directory, ie. `node_modules`).
+
 ## [1.10.0] - 2018-10-29
 
 ### Feature

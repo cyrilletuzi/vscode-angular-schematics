@@ -140,7 +140,9 @@ export class Commands {
 
         if (confirm) {
 
-            await this.launchCommand(generate.command, workspaceFolderPath, generate.schema, generate.defaultOption);
+            const command = await generate.isCliLocal(workspaceFolderPath) ? `./node_modules/.bin/${generate.command}` : generate.command;
+
+            await this.launchCommand(command, workspaceFolderPath, generate.schema, generate.defaultOption);
 
         }
 
