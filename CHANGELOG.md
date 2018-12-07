@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.11.1] - 2018-12-07
+
+### Feature
+
+- Make local CLI introduced by 1.11 work on Windows.
+
 ## [1.11.0] - 2018-12-06
 
 ### Feature
