@@ -2,7 +2,7 @@
 
 ## [1.11.1] - 2018-12-07
 
-### Feature
+### Bug fix
 
 - Make local CLI introduced by 1.11 work on Windows.
 
