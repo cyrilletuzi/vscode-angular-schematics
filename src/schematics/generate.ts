@@ -84,6 +84,12 @@ export class Generate {
 
     }
 
+    async getExecCommand(): Promise<string> {
+
+        return (await this.cliLocal) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
+
+    }
+
     protected getProject(contextPath = ''): string {
 
         const pathNormalized = Utils.normalizePath(contextPath);
