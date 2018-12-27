@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.11.3] - 2018-12-27
+
+### Dev fix
+
+- Internal update of *dev* dependencies to fix a security issue reported by npm (does *not* concern you).
+
 ## [1.11.2] - 2018-12-27
 
 ### Bug fix
