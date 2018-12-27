@@ -128,14 +128,14 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "tslint": "^5.8.0",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "tslint": "^5.12.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.26"
     },
     "dependencies": {
-        "@types/json5": "0.0.29",
-        "json5": "^1.0.1"
+        "@types/json5": "0.0.30",
+        "json5": "^2.1.0"
     }
 }
