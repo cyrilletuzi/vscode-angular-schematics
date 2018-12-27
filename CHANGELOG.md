@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.11.2] - 2018-12-27
+
+### Bug fix
+
+- Make local CLI introduced by 1.11 work.
+
 ## [1.11.1] - 2018-12-07
 
 ### Bug fix

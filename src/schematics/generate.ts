@@ -84,9 +84,9 @@ export class Generate {
 
     }
 
-    async getExecCommand(): Promise<string> {
+    async getExecCommand(cwd: string): Promise<string> {
 
-        return (await this.cliLocal) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
+        return (await this.isCliLocal(cwd)) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
 
     }
 

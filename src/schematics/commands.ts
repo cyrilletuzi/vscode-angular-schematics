@@ -155,7 +155,7 @@ export class Commands {
 
         try {
 
-            const stdout = await Utils.execAsync(await generate.getExecCommand(), cwd);
+            const stdout = await Utils.execAsync(await generate.getExecCommand(cwd), cwd);
 
             Output.channel.appendLine(stdout);
 
