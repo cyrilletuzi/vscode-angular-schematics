@@ -14,9 +14,12 @@ Productivity!
 - Promote good practices for component types
 
 What about other tools like the Angular Console? Well, this lib will save you more time because:
-- it's directly integrated in VS Code (no switch between 2 windows),
 - many options are prefilled (like the path and the project where you want to generate things),
 - generated files will auto open!
+- compared to the desktop version of the Angular Console,
+it's directly integrated in VS Code (no switch between 2 windows),
+- compared to the VS Code version of the Angular Console,
+it's a *real* integration in the editor (not just an embedded view).
 
 ## By the same author
 
