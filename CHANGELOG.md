@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.11.4] - 2019-01-12
+
+### Bug fix
+
+- Don't require options managed by Angular CLI like `project`
+(fixes [#20](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/20))
+
 ## [1.11.3] - 2018-12-27
 
 ### Dev fix
