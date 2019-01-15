@@ -5,6 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');
 osList.set('win32', 'windows');

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+
 export class Output {
 
     static _channel: vscode.OutputChannel | null = null;
