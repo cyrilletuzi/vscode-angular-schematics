@@ -36,10 +36,6 @@ export class Utils {
 
     }
 
-    static getFilenameFromPath(p: string): string {
-        return path.basename(p);
-    }
-
     static getSchemaFromNodeModules<T = any>(cwd: string, packageName: string, filePath: string): Promise<T | null> {
 
         return this.parseJSONFile<T>(this.getNodeModulesPath(cwd, packageName, filePath));

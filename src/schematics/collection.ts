@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { Schema } from './schema';
 import { Utils } from './utils';
@@ -49,8 +50,9 @@ export class Collection {
         } else {
 
             if (this.name.startsWith(".") && this.name.endsWith(".json")) {
+
                 const collectionPath = Utils.getDirectoryFromFilename(this.name);
-                const collectionJson = Utils.getFilenameFromPath(this.name);
+                const collectionJson = path.basename(this.name);
 
                 collection = await Utils.getSchemaFromPath<CollectionData>(cwd, collectionPath, collectionJson); 
 
@@ -60,6 +62,7 @@ export class Collection {
                 }
                 
             } else {
+
                 const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
 
                 if (!collectionPackage || !collectionPackage.schematics) {
@@ -73,7 +76,9 @@ export class Collection {
                 if (collection) {
                     collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
                 }
+
             }
+
         }
 
         if (collection) {
