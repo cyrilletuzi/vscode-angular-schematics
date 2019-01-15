@@ -66,9 +66,7 @@ export class Collection {
                     return false;
                 }
     
-                this.path = Utils.pathTrimRelative(collectionPackage.schematics);
-    
-                collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
+                collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, Utils.pathTrimRelative(collectionPackage.schematics));
     
                 if (collection) {
                     collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
