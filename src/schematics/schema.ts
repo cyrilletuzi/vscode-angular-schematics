@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-
-import { Utils } from './utils';
+import * as vscode from 'vscode';
 import { Collection, CollectionDataSchema } from './collection';
+import { Utils } from './utils';
+
 
 export interface SchemaDataDefaultOption {
     $source: 'argv' | 'projectName';

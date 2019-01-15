@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-
+import { Schema } from './schema';
 import { Utils } from './utils';
-import { Schema } from './shema';
+
 
 interface PackageJSON {
     schematics?: string;

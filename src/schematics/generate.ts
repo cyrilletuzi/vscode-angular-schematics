@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-
-import { Utils } from './utils';
 import { Schematics } from './schematics';
+import { Utils } from './utils';
+
 
 export class Generate {
 

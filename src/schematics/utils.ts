@@ -1,9 +1,10 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as childProcess from 'child_process';
-import * as os from 'os';
+import * as fs from 'fs';
 import * as JSON5 from 'json5';
+import * as os from 'os';
+import * as path from 'path';
+import * as vscode from 'vscode';
+
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');

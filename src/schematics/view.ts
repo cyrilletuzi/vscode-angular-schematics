@@ -1,8 +1,9 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
-import { Schematics } from './schematics';
+import * as vscode from 'vscode';
 import { Collection } from './collection';
+import { Schematics } from './schematics';
 import { Utils } from './utils';
+
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
 
