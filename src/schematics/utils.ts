@@ -42,8 +42,10 @@ export class Utils {
 
     }
 
-    static getSchemaFromPath<T = any>(cwd:string, p: string, file: string): Promise<T | null> {
-        return this.parseJSONFile<T>(path.join(cwd, p, file));
+    static getSchemaFromLocal<T = any>(cwd:string, schemaPath: string): Promise<T | null> {
+
+        return this.parseJSONFile<T>(path.join(cwd, schemaPath));
+
     }
 
     static getNodeModulesPath(cwd: string, ...paths: string[]) {

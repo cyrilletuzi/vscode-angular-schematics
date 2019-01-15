@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { Schema } from './schema';
 import { Utils } from './utils';
@@ -17,7 +16,6 @@ export interface CollectionDataSchema {
 
 export interface CollectionData {
     path: string;
-    name: string;
     schematics: {
         [key: string]: CollectionDataSchema;
     };
@@ -27,6 +25,7 @@ export class Collection {
 
     name: string;
     path = '';
+    isLocal = false;
     schemas = new Map<string, CollectionDataSchema>();
     get schemasNames(): string[] {
         return Array.from(this.schemas.keys()).sort();
@@ -49,16 +48,14 @@ export class Collection {
 
         } else {
 
-            if (this.name.startsWith(".") && this.name.endsWith(".json")) {
+            if (this.name.startsWith('.') && this.name.endsWith('.json')) {
 
-                const collectionPath = Utils.getDirectoryFromFilename(this.name);
-                const collectionJson = path.basename(this.name);
+                this.isLocal = true;
 
-                collection = await Utils.getSchemaFromPath<CollectionData>(cwd, collectionPath, collectionJson); 
+                collection = await Utils.getSchemaFromLocal<CollectionData>(cwd, this.name); 
 
                 if (collection) {
-                    //this.name = collection.name;
-                    collection.path = collectionPath;
+                    collection.path = Utils.getDirectoryFromFilename(this.name);
                 }
                 
             } else {

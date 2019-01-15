@@ -51,7 +51,13 @@ export class Schematics {
 
             } else {
 
-                const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
+                let collectionExists = false;
+
+                if (collectionName.startsWith('.') && collectionName.endsWith('.json')) {
+                    collectionExists = await Utils.existsAsync(path.join(cwd, collectionName));
+                } else {
+                    collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
+                }
 
                 if (collectionExists) {
                     existingCollections.push(collectionName);
@@ -91,7 +97,7 @@ export class Schematics {
 
         if (await Utils.existsAsync(angularConfigPath)) {
 
-            const angularConfig: AngularConfig = await Utils.parseJSONFile(angularConfigPath);
+            const angularConfig = await Utils.parseJSONFile(angularConfigPath) as AngularConfig;
 
             if (angularConfig.cli) {
 

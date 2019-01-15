@@ -60,8 +60,8 @@ export class Schema {
                 Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
             );
 
-            if (this.collection.name.startsWith(".") && this.collection.name.endsWith(".json")) {
-                schema = await Utils.getSchemaFromPath<SchemaData>(cwd, "", this.path); 
+            if (this.collection.isLocal) {
+                schema = await Utils.getSchemaFromLocal<SchemaData>(cwd, this.path); 
             } else {
                 schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
             }
