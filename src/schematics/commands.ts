@@ -140,29 +140,29 @@ export class Commands {
 
         if (confirm) {
 
-            await this.launchCommand(generate.command, workspaceFolderPath, generate.schema, generate.defaultOption);
+            await this.launchCommand(generate, workspaceFolderPath);
 
         }
 
     }
 
     /** @todo Colored output? */
-    static async launchCommand(command: string, cwd: string, schema: string, defaultOption: string): Promise<void> {
+    static async launchCommand(generate: Generate, cwd: string): Promise<void> {
 
         Output.channel.show();
 
-        Output.channel.appendLine(command);
+        Output.channel.appendLine(generate.command);
 
         try {
 
-            const stdout = await Utils.execAsync(command, cwd);
+            const stdout = await Utils.execAsync(await generate.getExecCommand(cwd), cwd);
 
             Output.channel.appendLine(stdout);
 
             vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
 
             try {
-                await this.jumpToFile(stdout, cwd, defaultOption, schema);
+                await this.jumpToFile(stdout, cwd, generate.defaultOption, generate.schema);
             } catch (error) {}
 
         } catch (error) {

@@ -209,9 +209,14 @@ export class Schema {
         });
 
         this.requiredOptions.forEach((requiredOptionName) => {
-            if (requiredOptionName !== 'name') {
+
+            const requiredOptionData = this.options.get(requiredOptionName);
+
+            /* Filter options with $default values already managed by the CLI */
+            if (requiredOptionName !== 'name' && requiredOptionData && !('$default' in requiredOptionData)) {
                 selectedOptions.set(requiredOptionName, this.options.get(requiredOptionName) as SchemaDataOptions);
             }
+
         });
 
         return selectedOptions;

@@ -1,5 +1,37 @@
 # Change Log
 
+## [1.11.4] - 2019-01-12
+
+### Bug fix
+
+- Don't require options managed by Angular CLI like `project`
+(fixes [#20](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/20))
+
+## [1.11.3] - 2018-12-27
+
+### Dev fix
+
+- Internal update of *dev* dependencies to fix a security issue reported by npm (does *not* concern you).
+
+## [1.11.2] - 2018-12-27
+
+### Bug fix
+
+- Make local CLI introduced by 1.11 work.
+
+## [1.11.1] - 2018-12-07
+
+### Bug fix
+
+- Make local CLI introduced by 1.11 work on Windows.
+
+## [1.11.0] - 2018-12-06
+
+### Feature
+
+- A global installation of Angular CLI is no longer needed,
+the extension will use the project's local CLI (if installed in the default directory, ie. `node_modules`).
+
 ## [1.10.0] - 2018-10-29
 
 ### Feature

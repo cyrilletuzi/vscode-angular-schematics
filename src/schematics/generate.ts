@@ -22,6 +22,7 @@ export class Generate {
     protected base = 'ng g';
     protected collection = Schematics.angularCollection;
     protected options = new Map<string, string>();
+    protected cliLocal: boolean | null = null;
 
     constructor(contextPath = '') {
 
@@ -68,6 +69,24 @@ export class Generate {
         const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], { placeHolder: this.command });
 
         return (choice === confirmationText) ? true : false;
+
+    }
+
+    async isCliLocal(cwd: string) {
+
+        if (this.cliLocal === null) {
+
+            this.cliLocal = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, '.bin', 'ng'));
+
+        }
+
+        return this.cliLocal;
+
+    }
+
+    async getExecCommand(cwd: string): Promise<string> {
+
+        return (await this.isCliLocal(cwd)) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
 
     }
 
