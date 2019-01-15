@@ -2,12 +2,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-
+import { AngularSchematicsProvider } from './schematics/view';
 import { Commands } from './schematics/commands';
+import { GenerateConfig } from './schematics/commands';
 import { Output } from './schematics/output';
 import { Schematics } from './schematics/schematics';
-import { AngularSchematicsProvider } from './schematics/view';
-import { GenerateConfig } from './schematics/commands';
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
