@@ -95,7 +95,7 @@ you can also load local schematics by adding a *relative* path in the preference
 
 For example: `"ngschematics.schematics": ["./schematics/collection.json"]`
 
-[Additional steps are required](./docs/NX.md) if you use Nx workspace schematics.
+[Additional steps are required](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/docs/NX.md) if you use Nx workspace schematics.
 
 ### Keyboard shortcuts
 
