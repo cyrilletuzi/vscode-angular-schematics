@@ -47,15 +47,10 @@ Why? Because the destination path will be automatically configured to the direct
 
 ## Requirements
 
-### VS Code
-
-This extension requires VS Code >=1.24.
-
 ### Angular CLI
 
-This extension is only enabled inside an Angular >=5 CLI project, ie.:
-- with `@angular/cli` >=1.7 or >=6 installed globally,
-- with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the CLI).
+This extension is only enabled inside an Angular >=5 CLI project,
+ie. with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the Angular CLI).
 
 The project opened must be the root directory of the Angular project. It won't work from a parent directory,
 as the CLI itself requires to be in the Angular directory.
@@ -92,6 +87,15 @@ If you want to use other schematics, just add their package name in `ngschematic
 For example: `"ngschematics.schematics": ["@angular/material"]`
 
 If you are a library author, feel free to open an issue to ask for your schematics to be added in the default list.
+
+### Custom schematics
+
+If you created your own schematics but didn't published them yet,
+you can also load local schematics by adding a *relative* path in the preferences.
+
+For example: `"ngschematics.schematics": ["./schematics/collection.json"]`
+
+[Additional steps are required](./docs/NX.md) if you use Nx workspace schematics.
 
 ### Keyboard shortcuts
 
