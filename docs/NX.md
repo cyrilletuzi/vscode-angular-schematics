@@ -39,10 +39,16 @@ Your schematics factory needs to be transpiled to be used. To do so:
 }
 ```
 
-2. From your terminal (each time your change your schematics):
+2. Add it to your VS Code preferences:
+
+```
+"ngschematics.schematics": ["./tools/schematics/collection.json"]`
+```
+
+3. From your terminal (each time your change your schematics):
 
 ```bash
 ./node_modules/.bin/tsc -p ./tools/schematics/tsconfig.schematics.json
 ```
 
-3. Reload VS Code, and your local schematics will now be usable via the extension.
+4. Reload VS Code, and your local schematics will now be usable via the extension.
