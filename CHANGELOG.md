@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.12] - 2019-01-16
+
+### Feature
+
+- Local schematics are now supported, by adding a *relative* path in VS Code preferences
+(e.g.: `"ngschematics.schematics": ["./schematics/collection.json"]`)
+
 ## [1.11.4] - 2019-01-12
 
 ### Bug fix
