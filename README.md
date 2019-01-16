@@ -91,7 +91,7 @@ If you are a library author, feel free to open an issue to ask for your schemati
 
 ### Custom schematics
 
-If you created your own schematics but didn't published them yet,
+If you created [your own Angular schematics](https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2) but didn't published them yet,
 this extension can load them too. By default, the extension will look into `./schematics/collection.json`.
 
 If your schematics collection path is different,
