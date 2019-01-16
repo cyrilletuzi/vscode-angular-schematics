@@ -97,9 +97,9 @@ export class Schematics {
 
         if (await Utils.existsAsync(angularConfigPath)) {
 
-            const angularConfig = await Utils.parseJSONFile(angularConfigPath) as AngularConfig;
+            const angularConfig = await Utils.parseJSONFile<AngularConfig>(angularConfigPath);
 
-            if (angularConfig.cli) {
+            if (angularConfig && angularConfig.cli) {
 
                 if (angularConfig.cli.defaultCollection) {
                     return angularConfig.cli.defaultCollection;
