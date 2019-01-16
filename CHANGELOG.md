@@ -6,7 +6,7 @@
 
 - Add `./schematics/collection.json` to the default auto-loaded collections
 
-## [1.12.O] - 2019-01-16
+## [1.12.0] - 2019-01-16
 
 ### Feature
 
