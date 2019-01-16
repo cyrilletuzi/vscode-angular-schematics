@@ -123,4 +123,10 @@ export class Utils {
     
     }
 
+    static isSchemaLocal(name: string): boolean {
+
+        return (name.startsWith('.') && name.endsWith('.json'));
+
+    }
+
 }

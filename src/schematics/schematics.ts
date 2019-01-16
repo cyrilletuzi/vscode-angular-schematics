@@ -53,7 +53,7 @@ export class Schematics {
 
                 let collectionExists = false;
 
-                if (collectionName.startsWith('.') && collectionName.endsWith('.json')) {
+                if (Utils.isSchemaLocal(collectionName)) {
                     collectionExists = await Utils.existsAsync(path.join(cwd, collectionName));
                 } else {
                     collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));

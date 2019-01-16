@@ -25,7 +25,6 @@ export class Collection {
 
     name: string;
     path = '';
-    isLocal = false;
     schemas = new Map<string, CollectionDataSchema>();
     get schemasNames(): string[] {
         return Array.from(this.schemas.keys()).sort();
@@ -48,9 +47,7 @@ export class Collection {
 
         } else {
 
-            if (this.name.startsWith('.') && this.name.endsWith('.json')) {
-
-                this.isLocal = true;
+            if (Utils.isSchemaLocal(this.name)) {
 
                 collection = await Utils.getSchemaFromLocal<CollectionData>(cwd, this.name); 
 
