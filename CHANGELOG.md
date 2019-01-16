@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.12.1] - 2019-01-16
+
+### Bug fix
+
+- Add `./schematics/collection.json` to the default auto-loaded collections
+
 ## [1.12.O] - 2019-01-16
 
 ### Feature

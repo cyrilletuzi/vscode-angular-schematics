@@ -26,6 +26,7 @@ export class Schematics {
         '@ngrx/schematics',
         '@nrwl/schematics',
         '@nstudio/schematics',
+        './schematics/collection.json'
     ];
     static collections: Set<string> = new Set();
 

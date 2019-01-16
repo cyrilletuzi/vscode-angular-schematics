@@ -80,6 +80,7 @@ By default, this extension supports (if they are installed):
 - `@ngrx/schematics`
 - `@nrwl/schematics`
 - `@nstudio/schematics`
+- `./schematics/collection.json`
 
 Scanning all packages to find all potential schematics would be too slow.
 If you want to use other schematics, just add their package name in `ngschematics.schematics` in your VS Code preferences.
@@ -91,9 +92,11 @@ If you are a library author, feel free to open an issue to ask for your schemati
 ### Custom schematics
 
 If you created your own schematics but didn't published them yet,
-you can also load local schematics by adding a *relative* path in the preferences.
+this extension can load them too. By default, the extension will look into `./schematics/collection.json`.
 
-For example: `"ngschematics.schematics": ["./schematics/collection.json"]`
+If your schematics collection path is different,
+you can add a *relative* path in the VS Code preferences.
+For example: `"ngschematics.schematics": ["./path/to/collection.json"]`
 
 [Additional steps are required](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/docs/NX.md) if you use Nx workspace schematics.
 
