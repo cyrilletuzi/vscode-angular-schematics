@@ -51,7 +51,13 @@ export class Schematics {
 
             } else {
 
-                const collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
+                let collectionExists = false;
+
+                if (Utils.isSchemaLocal(collectionName)) {
+                    collectionExists = await Utils.existsAsync(path.join(cwd, collectionName));
+                } else {
+                    collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
+                }
 
                 if (collectionExists) {
                     existingCollections.push(collectionName);
@@ -91,9 +97,9 @@ export class Schematics {
 
         if (await Utils.existsAsync(angularConfigPath)) {
 
-            const angularConfig: AngularConfig = await Utils.parseJSONFile(angularConfigPath);
+            const angularConfig = await Utils.parseJSONFile<AngularConfig>(angularConfigPath);
 
-            if (angularConfig.cli) {
+            if (angularConfig && angularConfig.cli) {
 
                 if (angularConfig.cli.defaultCollection) {
                     return angularConfig.cli.defaultCollection;

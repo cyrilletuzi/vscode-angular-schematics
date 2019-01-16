@@ -47,18 +47,28 @@ export class Collection {
 
         } else {
 
-            const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
+            if (Utils.isSchemaLocal(this.name)) {
 
-            if (!collectionPackage || !collectionPackage.schematics) {
-                return false;
-            }
+                collection = await Utils.getSchemaFromLocal<CollectionData>(cwd, this.name); 
 
-            this.path = Utils.pathTrimRelative(collectionPackage.schematics);
+                if (collection) {
+                    collection.path = Utils.getDirectoryFromFilename(this.name);
+                }
+                
+            } else {
 
-            collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, this.path);
+                const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
 
-            if (collection) {
-                collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
+                if (!collectionPackage || !collectionPackage.schematics) {
+                    return false;
+                }
+    
+                collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, Utils.pathTrimRelative(collectionPackage.schematics));
+    
+                if (collection) {
+                    collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
+                }
+
             }
 
         }

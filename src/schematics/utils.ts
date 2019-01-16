@@ -42,6 +42,12 @@ export class Utils {
 
     }
 
+    static getSchemaFromLocal<T = any>(cwd:string, schemaPath: string): Promise<T | null> {
+
+        return this.parseJSONFile<T>(path.join(cwd, schemaPath));
+
+    }
+
     static getNodeModulesPath(cwd: string, ...paths: string[]) {
 
         return path.join(cwd, 'node_modules', ...paths);
@@ -115,6 +121,12 @@ export class Utils {
     
         return json;
     
+    }
+
+    static isSchemaLocal(name: string): boolean {
+
+        return (name.startsWith('.') && name.endsWith('.json'));
+
     }
 
 }

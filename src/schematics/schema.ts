@@ -60,7 +60,11 @@ export class Schema {
                 Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
             );
 
-            schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
+            if (Utils.isSchemaLocal(this.collection.name)) {
+                schema = await Utils.getSchemaFromLocal<SchemaData>(cwd, this.path); 
+            } else {
+                schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
+            }
 
         }
 
