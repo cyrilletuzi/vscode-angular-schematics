@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.12.2] - 2019-01-29
+
+### Bug fix
+
+- Fix an issue when the project path included `projects`
+
 ## [1.12.1] - 2019-01-16
 
 ### Bug fix
