@@ -56,7 +56,7 @@ export class Commands {
             return;
         }
 
-        const generate = new Generate(this.getContextPath(context));
+        const generate = new Generate(this.getContextPath(context), workspaceFolderPath);
 
         if (collectionName !== Schematics.angularCollection) {
 

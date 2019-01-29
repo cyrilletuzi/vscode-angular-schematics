@@ -24,10 +24,10 @@ export class Generate {
     protected options = new Map<string, string>();
     protected cliLocal: boolean | null = null;
 
-    constructor(contextPath = '') {
+    constructor(contextPath: string, workspacePath: string) {
 
         this.path = this.getCommandPath(contextPath);
-        this.project = this.getProject(contextPath);
+        this.project = this.getProject(contextPath, workspacePath);
 
     }
 
@@ -90,9 +90,11 @@ export class Generate {
 
     }
 
-    protected getProject(contextPath = ''): string {
+    protected getProject(contextPath: string, workspacePath: string): string {
 
-        const pathNormalized = Utils.normalizePath(contextPath);
+        const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
+
+        const pathNormalized = Utils.normalizePath(projectPath);
 
         const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
 
