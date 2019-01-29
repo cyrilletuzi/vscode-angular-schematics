@@ -4,7 +4,7 @@
 
 ### Bug fix
 
-- Fix an issue when the project path included `projects`
+- Fix an issue ([#19](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/19)) when the project path included `projects`
 
 ## [1.12.1] - 2019-01-16
 
