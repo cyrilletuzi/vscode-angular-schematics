@@ -18,6 +18,9 @@ export interface SchemaDataOptions {
     $default?: SchemaDataDefaultOption;
     extends?: string;
     'x-deprecated'?: string;
+    'x-prompt'?: {
+        message?: string;
+    };
 }
 
 export interface SchemaData {
@@ -152,23 +155,24 @@ export class Schema {
         for (let [optionName, option] of options) {
 
             let choice: string | undefined = '';
+            const prompt = (option['x-prompt'] && option['x-prompt'].message) ? option['x-prompt'].message : option.description;
     
             if (option.enum !== undefined) {
     
                 /** @todo Put default value last in choices */
                 /** @todo Take user defaults in angular.json into account in ordering */
-                choice = await this.askEnumOption(optionName, option.enum, option.description);
+                choice = await this.askEnumOption(optionName, option.enum, prompt);
     
             } else if (option.type === 'boolean') {
     
                 /** @todo Take user defaults in angular.json into account in ordering */
                 const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
     
-                choice = await this.askEnumOption(optionName, choices, option.description);
+                choice = await this.askEnumOption(optionName, choices, prompt);
     
             } else {
     
-                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt: option.description });
+                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt });
     
             }
     
