@@ -17,6 +17,7 @@ export interface SchemaDataOptions {
     default?: string | boolean;
     $default?: SchemaDataDefaultOption;
     extends?: string;
+    'x-deprecated'?: string;
 }
 
 export interface SchemaData {
@@ -119,7 +120,11 @@ export class Schema {
 
         this.options.forEach((option, optionName) => {
 
-            if (option.visible !== false) {
+            /* Do not keep:
+             * - options marked as not visible (internal options for the CLI)
+             * - deprecated options
+             */
+            if (option.visible !== false && !('x-deprecated' in option)) {
 
                 choices.push({ label: optionName, description: option.description });
 
