@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.13.0] - 2019-02-02
+
+### Feature
+
+- Do not show deprecated options
+
 ## [1.12.2] - 2019-01-29
 
 ### Bug fix
