@@ -153,7 +153,7 @@ export class Generate {
                 if (option[1] === 'true') {
                     return `--${option[0]}`;
                 } else if (Array.isArray(option[1])) {
-                    return option[1].map((optionItem) => `--${option[0]} ${optionItem}`).join(' ');
+                    return (option[1] as string[]).map((optionItem) => `--${option[0]} ${optionItem}`).join(' ');
                 } else {
                     return `--${option[0]} ${option[1]}`;
                 }
