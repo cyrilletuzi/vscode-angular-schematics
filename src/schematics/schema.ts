@@ -10,7 +10,7 @@ export interface SchemaDataDefaultOption {
 }
 
 export interface SchemaDataOptions {
-    type: 'string' | 'boolean';
+    type: 'string' | 'boolean' | 'array';
     description: string;
     enum?: string[];
     visible?: boolean;
@@ -18,6 +18,10 @@ export interface SchemaDataOptions {
     $default?: SchemaDataDefaultOption;
     extends?: string;
     'x-deprecated'?: string;
+    'x-prompt'?: {
+        multiselect?: boolean;
+        items?: any[];
+    };
 }
 
 export interface SchemaData {
@@ -143,15 +147,15 @@ export class Schema {
 
     }
 
-    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string>> {
+    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string | string[]>> {
 
         const options = this.filterSelectedOptions(optionsNames);
 
-        const filledOptions = new Map();
+        const filledOptions = new Map<string, string | string[]>();
     
         for (let [optionName, option] of options) {
 
-            let choice: string | undefined = '';
+            let choice: string | string[] | undefined = '';
     
             if (option.enum !== undefined) {
     
@@ -165,6 +169,17 @@ export class Schema {
                 const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
     
                 choice = await this.askEnumOption(optionName, choices, option.description);
+    
+            }
+            /* Only makes sense if the option is an array AND have suggestions,
+             * otherwise the user must manually type the value in a classic text input box */
+            else if ((option.type === 'array') && option['x-prompt'] && option['x-prompt'].items) {
+
+                if (option['x-prompt'].multiselect) {
+                    choice = await this.askMultiselectOption(optionName, option['x-prompt'].items, option.description);
+                } else {
+                    choice = await this.askEnumOption(optionName, option['x-prompt'].items, option.description);
+                }
     
             } else {
     
@@ -182,9 +197,20 @@ export class Schema {
     
     }
 
-    protected async askEnumOption(optionName: string, choices: string[], placeholder = '') {
+    protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
 
-        return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}` });
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`
+        });
+
+    }
+
+    protected async askMultiselectOption(optionName: string, choices: string[], placeholder = ''): Promise<string[] | undefined> {
+
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
+            canPickMany: true
+        });
 
     }
 

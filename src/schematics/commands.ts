@@ -112,7 +112,7 @@ export class Commands {
 
         }
 
-        let filledOptions: Map<string, string> | undefined;
+        let filledOptions: Map<string, string | string[]> | undefined;
 
         if (shortcutCommand && (collectionName === Schematics.angularCollection) && (schemaName === 'component')) {
 
@@ -194,7 +194,7 @@ export class Commands {
 
     }
 
-    static async askOptions(schema: Schema): Promise<Map<string, string>> {
+    static async askOptions(schema: Schema): Promise<Map<string, string | string[]>> {
 
         const selectedOptionsNames = await schema.askOptions();
 
