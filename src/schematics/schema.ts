@@ -127,16 +127,45 @@ export class Schema {
             /* Do not keep:
              * - options marked as not visible (internal options for the CLI)
              * - deprecated options
+             * - option already managed by command line args (like name)
              */
-            if (option.visible !== false && !('x-deprecated' in option)) {
+            if (option.visible !== false && !('x-deprecated' in option) &&
+                !(option.$default && option.$default.$source === 'argv')) {
 
-                choices.push({ label: optionName, description: option.description });
+                const picked = !!
+                /* Do not pre-select options with defaults values, as the CLI will take care of them */
+                (!('$default' in option) && (
+                    /* Pre-select required and suggested (x-prompt) properties */
+                    (this.requiredOptions.indexOf(optionName) !== -1) || ('x-prompt' in option)
+                ));
+
+                /* UX: inform the user some options are already managed by the CLI */
+                const defaultTip = ('$default' in option) ? '(inferred) ' : '';
+                /* UX: inform the user why some options are pre-select */
+                const requiredTip = (!defaultTip && (this.requiredOptions.indexOf(optionName) !== -1)) ? '(required) ' : '';
+                const suggestedTip = (!defaultTip && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
+
+                choices.push({
+                    label: optionName,
+                    description: `${defaultTip}${requiredTip}${suggestedTip}${option.description}`,
+                    picked
+                });
 
             }
 
         });
 
-        const sortedChoices = choices.sort((a, b) => a.label.localeCompare(b.label));
+        /* Sort in alphabetical order */
+        const sortedPickedChoices = choices
+        .filter((choice) => choice.picked)
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+        const sortedOptionalChoices = choices
+        .filter((choice) => !choice.picked)
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+        /* Required and suggested options first */
+        const sortedChoices = [...sortedPickedChoices, ...sortedOptionalChoices];
 
         const selectedOptions = await vscode.window.showQuickPick(sortedChoices, {
             canPickMany: true,
