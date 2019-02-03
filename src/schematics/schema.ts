@@ -139,15 +139,13 @@ export class Schema {
                     (this.requiredOptions.indexOf(optionName) !== -1) || ('x-prompt' in option)
                 ));
 
-                /* UX: inform the user some options are already managed by the CLI */
-                const defaultTip = ('$default' in option) ? '(inferred) ' : '';
                 /* UX: inform the user why some options are pre-select */
-                const requiredTip = (!defaultTip && (this.requiredOptions.indexOf(optionName) !== -1)) ? '(required) ' : '';
-                const suggestedTip = (!defaultTip && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
+                const requiredTip = (!('$default' in option) && (this.requiredOptions.indexOf(optionName) !== -1)) ? '(required) ' : '';
+                const suggestedTip = (!('$default' in option) && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
 
                 choices.push({
                     label: optionName,
-                    description: `${defaultTip}${requiredTip}${suggestedTip}${option.description}`,
+                    description: `${requiredTip}${suggestedTip}${option.description}`,
                     picked
                 });
 
