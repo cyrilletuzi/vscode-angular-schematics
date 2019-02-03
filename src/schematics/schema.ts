@@ -183,6 +183,7 @@ export class Schema {
         for (let [optionName, option] of options) {
 
             let choice: string | string[] | undefined = '';
+            const prompt = option['x-prompt'];
     
             if (option.enum !== undefined) {
     
@@ -200,12 +201,12 @@ export class Schema {
             }
             /* Only makes sense if the option is an array AND have suggestions,
              * otherwise the user must manually type the value in a classic text input box */
-            else if ((option.type === 'array') && option['x-prompt'] && option['x-prompt'].items) {
+            else if ((option.type === 'array') && prompt && prompt.items) {
 
-                if (option['x-prompt'].multiselect) {
-                    choice = await this.askMultiselectOption(optionName, option['x-prompt'].items, option.description);
+                if (prompt.multiselect) {
+                    choice = await this.askMultiselectOption(optionName, prompt.items, option.description);
                 } else {
-                    choice = await this.askEnumOption(optionName, option['x-prompt'].items, option.description);
+                    choice = await this.askEnumOption(optionName, prompt.items as string[], option.description);
                 }
     
             } else {
