@@ -174,8 +174,12 @@ export class Schema {
             /* Only makes sense if the option is an array AND have suggestions,
              * otherwise the user must manually type the value in a classic text input box */
             else if ((option.type === 'array') && option['x-prompt'] && option['x-prompt'].items) {
-    
-                choice = await this.askMultiselectOption(optionName, option['x-prompt'].items, option.description);
+
+                if (option['x-prompt'].multiselect) {
+                    choice = await this.askMultiselectOption(optionName, option['x-prompt'].items, option.description);
+                } else {
+                    choice = await this.askEnumOption(optionName, option['x-prompt'].items, option.description);
+                }
     
             } else {
     
@@ -193,9 +197,11 @@ export class Schema {
     
     }
 
-    protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
+    protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
 
-        return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}` });
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`
+        });
 
     }
 
