@@ -10,7 +10,7 @@ export interface SchemaDataDefaultOption {
 }
 
 export interface SchemaDataOptions {
-    type: 'string' | 'boolean';
+    type: 'string' | 'boolean' | 'array';
     description: string;
     enum?: string[];
     visible?: boolean;
@@ -20,6 +20,8 @@ export interface SchemaDataOptions {
     'x-deprecated'?: string;
     'x-prompt'?: {
         message?: string;
+        multiselect?: boolean;
+        items?: any[];
     };
 }
 
@@ -126,16 +128,43 @@ export class Schema {
             /* Do not keep:
              * - options marked as not visible (internal options for the CLI)
              * - deprecated options
+             * - option already managed by command line args (like name)
              */
-            if (option.visible !== false && !('x-deprecated' in option)) {
+            if (option.visible !== false && !('x-deprecated' in option) &&
+                !(option.$default && option.$default.$source === 'argv')) {
 
-                choices.push({ label: optionName, description: option.description });
+                const picked = !!
+                /* Do not pre-select options with defaults values, as the CLI will take care of them */
+                (!('$default' in option) && (
+                    /* Pre-select required and suggested (x-prompt) properties */
+                    (this.requiredOptions.indexOf(optionName) !== -1) || ('x-prompt' in option)
+                ));
+
+                /* UX: inform the user why some options are pre-select */
+                const requiredTip = (!('$default' in option) && (this.requiredOptions.indexOf(optionName) !== -1)) ? '(required) ' : '';
+                const suggestedTip = (!('$default' in option) && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
+
+                choices.push({
+                    label: optionName,
+                    description: `${requiredTip}${suggestedTip}${option.description}`,
+                    picked
+                });
 
             }
 
         });
 
-        const sortedChoices = choices.sort((a, b) => a.label.localeCompare(b.label));
+        /* Sort in alphabetical order */
+        const sortedPickedChoices = choices
+        .filter((choice) => choice.picked)
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+        const sortedOptionalChoices = choices
+        .filter((choice) => !choice.picked)
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+        /* Required and suggested options first */
+        const sortedChoices = [...sortedPickedChoices, ...sortedOptionalChoices];
 
         const selectedOptions = await vscode.window.showQuickPick(sortedChoices, {
             canPickMany: true,
@@ -146,16 +175,17 @@ export class Schema {
 
     }
 
-    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string>> {
+    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string | string[]>> {
 
         const options = this.filterSelectedOptions(optionsNames);
 
-        const filledOptions = new Map();
+        const filledOptions = new Map<string, string | string[]>();
     
         for (let [optionName, option] of options) {
 
-            let choice: string | undefined = '';
-            const prompt = (option['x-prompt'] && option['x-prompt'].message) ? option['x-prompt'].message : option.description;
+            let choice: string | string[] | undefined = '';
+            const promptSchema = option['x-prompt'];
+            const prompt = (promptSchema && promptSchema.message) ? promptSchema.message : option.description;
     
             if (option.enum !== undefined) {
     
@@ -169,6 +199,17 @@ export class Schema {
                 const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
     
                 choice = await this.askEnumOption(optionName, choices, prompt);
+    
+            }
+            /* Only makes sense if the option is an array AND have suggestions,
+             * otherwise the user must manually type the value in a classic text input box */
+            else if ((option.type === 'array') && promptSchema && promptSchema.items) {
+
+                if (promptSchema.multiselect) {
+                    choice = await this.askMultiselectOption(optionName, promptSchema.items, prompt);
+                } else {
+                    choice = await this.askEnumOption(optionName, promptSchema.items as string[], prompt);
+                }
     
             } else {
     
@@ -186,9 +227,20 @@ export class Schema {
     
     }
 
-    protected async askEnumOption(optionName: string, choices: string[], placeholder = '') {
+    protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
 
-        return vscode.window.showQuickPick(choices, { placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}` });
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`
+        });
+
+    }
+
+    protected async askMultiselectOption(optionName: string, choices: string[], placeholder = ''): Promise<string[] | undefined> {
+
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
+            canPickMany: true
+        });
 
     }
 

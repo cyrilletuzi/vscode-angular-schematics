@@ -21,7 +21,7 @@ export class Generate {
     }
     protected base = 'ng g';
     protected collection = Schematics.angularCollection;
-    protected options = new Map<string, string>();
+    protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
     constructor(contextPath: string, workspacePath: string) {
@@ -55,7 +55,7 @@ export class Generate {
 
     }
 
-    addOption(optionName: string, optionValue: string): void {
+    addOption(optionName: string, optionValue: string | string[]): void {
 
         this.options.set(optionName, optionValue);
 
@@ -149,10 +149,15 @@ export class Generate {
     protected formatOptionsForCommand(): string[] {
 
         return Array.from(this.options.entries())
-            .map((option) => (option[1] === 'true') ?
-                `--${option[0]}` :
-                `--${option[0]} ${option[1]}`
-            );
+            .map((option) => {
+                if (option[1] === 'true') {
+                    return `--${option[0]}`;
+                } else if (Array.isArray(option[1])) {
+                    return (option[1] as string[]).map((optionItem) => `--${option[0]} ${optionItem}`).join(' ');
+                } else {
+                    return `--${option[0]} ${option[1]}`;
+                }
+            });
 
     }
 

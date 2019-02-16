@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.16.0] - 2019-02-03
+
+### Features
+
+- Support array options, like new `implements` option for guards in Angular CLI 7.3 (fixes [#32](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/32))
+- UX: pre-select required and suggested options
+- Do not show options already managed by command line args (like `name`)
+
 ## [1.13.0] - 2019-02-02
 
 ### Feature

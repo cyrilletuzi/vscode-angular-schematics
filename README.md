@@ -9,12 +9,12 @@ with a Graphical User Interface, directly inside VS Code!
 Productivity!
 
 - Save time
-- No more typo errors = no more mess cleaning
+- No more typo errors = no more cleaning mess
 - No more chaotic search in the CLI wiki, all options available will be proposed and documented
 - Promote good practices for component types
 
-What about other tools like the Angular Console? Well, this lib will save you more time because:
-- many options are prefilled (like the path and the project where you want to generate things),
+What about other tools like the Angular Console? This extension will save you more time because:
+- many options are prefilled (like the path and the project),
 - generated files will auto open!
 - compared to the desktop Angular Console, it's directly integrated in VS Code (no switch between 2 windows),
 - compared to the Angular Console in VS Code,
@@ -43,7 +43,7 @@ And finally just fill the requested options.
 ![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo.gif)
 
 **The quickest way to launch your Angular CLI commands is the first, with a right-click inside the files Explorer context menu.**
-Why? Because the destination path will be automatically configured to the directory you just right-clicked.
+Why? Because the destination path and `project` will be automatically inferred to the directory you just right-clicked.
 
 ## Requirements
 
@@ -57,7 +57,7 @@ as the CLI itself requires to be in the Angular directory.
 
 ### Path automatic detection
 
-The path automatic detection only works if you stick to official CLI structure, meaning you must be in:
+The path and `project` automatic detection only works if you stick to official CLI structure, meaning you must be in:
 - `/**/app/` (like `/src/app/`)
 - `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
 - `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
@@ -108,10 +108,40 @@ You can add keyboard shortcuts to the following actions:
 - `ngschematics.generateModule`
 - `ngschematics.generate`
 
+But again, it's not the easiest way to use this extension:
+a right-click in the files Explorer menu is better as the extension will infer the destination path and `project`.
+
 ### Default options
 
 [`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
 already allows to save default options for schematics commands.
+
+For example, if you want all your generated components templates to be inline, in *all* your projects,
+just add in `angular.json`:
+```json
+{
+  "schematics": {
+    "@schematics/angular:component": {
+      "inlineTemplate": true
+    }
+  }
+}
+```
+
+Or only in a specific project:
+```json
+{
+  "projects": {
+    "yourprojectname": {
+      "schematics": {
+        "@schematics/angular:component": {
+          "inlineTemplate": true
+        }
+      }
+    }
+  }
+}
+```
 
 ### Icons
 
@@ -128,10 +158,12 @@ Components have a local scope by default, meaning they are only usable inside th
 So if you want to use your component in another module (for example if you are doing a reusable UI component), you have to export it.
 [Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
 
+Reusable components should be exported *and* pure.
+
 ### Pure component (also known as a presentation component)
 
-A pure component is a component which relies only on its `@Input`s for data,
-as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data.
+A pure component is a component which relies only on its `@Input`s for data, ie. its role is only presentation (~ view),
+as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data, ie. a page (~ controller).
 Observing this difference is a good practice, [learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
 
 ### Element component
