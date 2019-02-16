@@ -19,6 +19,7 @@ export interface SchemaDataOptions {
     extends?: string;
     'x-deprecated'?: string;
     'x-prompt'?: {
+        message?: string;
         multiselect?: boolean;
         items?: any[];
     };
@@ -183,35 +184,36 @@ export class Schema {
         for (let [optionName, option] of options) {
 
             let choice: string | string[] | undefined = '';
-            const prompt = option['x-prompt'];
+            const promptSchema = option['x-prompt'];
+            const prompt = (promptSchema && promptSchema.message) ? promptSchema.message : option.description;
     
             if (option.enum !== undefined) {
     
                 /** @todo Put default value last in choices */
                 /** @todo Take user defaults in angular.json into account in ordering */
-                choice = await this.askEnumOption(optionName, option.enum, option.description);
+                choice = await this.askEnumOption(optionName, option.enum, prompt);
     
             } else if (option.type === 'boolean') {
     
                 /** @todo Take user defaults in angular.json into account in ordering */
                 const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
     
-                choice = await this.askEnumOption(optionName, choices, option.description);
+                choice = await this.askEnumOption(optionName, choices, prompt);
     
             }
             /* Only makes sense if the option is an array AND have suggestions,
              * otherwise the user must manually type the value in a classic text input box */
-            else if ((option.type === 'array') && prompt && prompt.items) {
+            else if ((option.type === 'array') && promptSchema && promptSchema.items) {
 
-                if (prompt.multiselect) {
-                    choice = await this.askMultiselectOption(optionName, prompt.items, option.description);
+                if (promptSchema.multiselect) {
+                    choice = await this.askMultiselectOption(optionName, promptSchema.items, prompt);
                 } else {
-                    choice = await this.askEnumOption(optionName, prompt.items as string[], option.description);
+                    choice = await this.askEnumOption(optionName, promptSchema.items as string[], prompt);
                 }
     
             } else {
     
-                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt: option.description });
+                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt });
     
             }
     
