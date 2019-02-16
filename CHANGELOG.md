@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.17.0] - 2019-02-16
+
+### Feature
+
+- Use new CLI prompt messages when available
+
 ## [1.16.0] - 2019-02-03
 
 ### Features
