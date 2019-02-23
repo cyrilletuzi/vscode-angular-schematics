@@ -1,12 +1,11 @@
 # Angular schematics extension for Visual Studio Code
 
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
-allowing you to launch Angular schematics (CLI commands)
-with a Graphical User Interface, directly inside VS Code!
+allowing you to **launch Angular schematics (CLI commands) with a Graphical User Interface, directly inside VS Code!**
 
 ## Why?
 
-Productivity!
+**Productivity!**
 
 - Save time
 - No more typo errors = no more cleaning mess
@@ -14,7 +13,7 @@ Productivity!
 - Promote good practices for component types
 
 What about other tools like the Angular Console? This extension will save you more time because:
-- many options are prefilled (like the path and the project),
+- many options are inferred (like the path and the project),
 - generated files will auto open!
 - compared to the desktop Angular Console, it's directly integrated in VS Code (no switch between 2 windows),
 - compared to the Angular Console in VS Code,
@@ -33,12 +32,11 @@ it's a *real* integration in the editor (not just an embedded view).
 Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
 or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
 
-Then, **you can launch Angular CLI commands from 3 places:**
-- the files Explorer context menu: **right-click on any directory or file**, then choose an "Angular: Generate..." command
+Then, **you can launch Angular CLI commands from 4 places:**
+- the files Explorer context menu: **right-click on any directory, then choose an "Angular: Generate..." command**
 - the dedicated Angular Schematics view (icon in the Activity bar on the left)
-- or the Command Palette
-
-And finally just fill the requested options.
+- the Command Palette
+- from a shortcut (see configuration below)
 
 ![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo.gif)
 
@@ -49,8 +47,10 @@ Why? Because the destination path and `project` will be automatically inferred t
 
 ### Angular CLI
 
-This extension is only enabled inside an Angular >=5 CLI project,
-ie. with an `angular.json` or `.angular-cli.json` file in workspace (automatically done by the Angular CLI).
+This extension is only enabled inside an Angular >=5 CLI project
+(ie. with an `angular.json` or `.angular-cli.json` file in workspace).
+
+### Project root
 
 The project opened must be the root directory of the Angular project. It won't work from a parent directory,
 as the CLI itself requires to be in the Angular directory.
@@ -101,7 +101,7 @@ You can add keyboard shortcuts to the following actions:
 - `ngschematics.generate`
 
 But again, it's not the easiest way to use this extension:
-a right-click in the files Explorer menu is better as the extension will infer the destination path and `project`.
+**a right-click in the files Explorer menu is better as the extension will infer the destination path and `project`**.
 
 ### Default options
 
@@ -115,9 +115,7 @@ just add in `angular.json`:
   "schematics": {
     "@schematics/angular:component": {
       "inlineTemplate": true
-    }
-  }
-}
+} } }
 ```
 
 Or only in a specific project:
@@ -128,11 +126,7 @@ Or only in a specific project:
       "schematics": {
         "@schematics/angular:component": {
           "inlineTemplate": true
-        }
-      }
-    }
-  }
-}
+} } } } }
 ```
 
 ### Icons
