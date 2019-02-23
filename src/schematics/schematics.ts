@@ -10,7 +10,6 @@ interface SettingSchematics {
 
 export class Schematics {
 
-    static defaultCollection = '';
     static commonCollections: string[] = [
         '@angular/material',
         '@ionic/angular-toolkit',
@@ -59,13 +58,7 @@ export class Schematics {
 
         }
 
-        if (!this.defaultCollection) {
-
-            this.defaultCollection = AngularConfig.defaultCollection;
-
-        }
-
-        this.collections = new Set([this.defaultCollection, AngularConfig.cliCollection, ...existingCollections]);
+        this.collections = new Set([AngularConfig.defaultCollection, AngularConfig.cliCollection, ...existingCollections]);
 
     }
 
