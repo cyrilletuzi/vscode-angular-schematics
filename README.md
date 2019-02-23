@@ -55,14 +55,6 @@ ie. with an `angular.json` or `.angular-cli.json` file in workspace (automatical
 The project opened must be the root directory of the Angular project. It won't work from a parent directory,
 as the CLI itself requires to be in the Angular directory.
 
-### Path automatic detection
-
-The path and `project` automatic detection only works if you stick to official CLI structure, meaning you must be in:
-- `/**/app/` (like `/src/app/`)
-- `/projects/**/**/app/` (like `/projects/someotherapp/src/app/`)
-- `/projects/**/**/lib/` (like `/projects/somelibrary/src/lib/`)
-- `/projects/**/**/**/lib/` (like `/projects/company/somelibrary/src/lib/` for scoped `@company/somelibrary`)
-
 ### Custom shell
 
 On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI installation is tied it,

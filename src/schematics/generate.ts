@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { Schematics } from './schematics';
 import { Utils } from './utils';
+import { AngularConfig } from './angular-config';
 
 
 export class Generate {
@@ -20,7 +20,7 @@ export class Generate {
 
     }
     protected base = 'ng g';
-    protected collection = Schematics.angularCollection;
+    protected collection = AngularConfig.cliCollection;
     protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
@@ -47,7 +47,7 @@ export class Generate {
 
         this.defaultOption = value;
 
-        if (withPath && this.project) {
+        if (withPath && this.project && this.project !== AngularConfig.defaultProject) {
 
             this.addOption('project', this.project);
 
@@ -95,6 +95,18 @@ export class Generate {
         const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
 
         const pathNormalized = Utils.normalizePath(projectPath);
+
+        for (const [projectName, projectPath] of AngularConfig.projects) {
+
+            /* Remove leading "/" to match */
+            const pathWithoutLeadingSlash = pathNormalized.substr(1);
+
+            /* Test strict equality or starting with a trailing "/", to avoid collision when projects start with a common path */
+            if (pathWithoutLeadingSlash === projectPath || pathWithoutLeadingSlash.startsWith(`${projectPath}/`)) {
+                return projectName;
+            }
+
+        }
 
         const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
 
@@ -163,7 +175,7 @@ export class Generate {
 
     protected formatCollectionAndSchema(): string {
 
-        return (this.collection !== Schematics.angularCollection) ?
+        return (this.collection !== AngularConfig.cliCollection) ?
             `${this.collection}:${this.schema}` :
             this.schema;
 
