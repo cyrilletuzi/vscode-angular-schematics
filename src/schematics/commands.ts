@@ -6,6 +6,7 @@ import { Output } from './output';
 import { Schema } from './schema';
 import { Schematics } from './schematics';
 import { Utils } from './utils';
+import { AngularConfig } from './angular-config';
 
 
 export interface ExplorerMenuContext {
@@ -58,7 +59,7 @@ export class Commands {
 
         const generate = new Generate(this.getContextPath(context), workspaceFolderPath);
 
-        if (collectionName !== Schematics.angularCollection) {
+        if (collectionName !== AngularConfig.cliCollection) {
 
             await Schematics.load(workspaceFolderPath);
 
@@ -114,11 +115,11 @@ export class Commands {
 
         let filledOptions: Map<string, string | string[]> | undefined;
 
-        if (shortcutCommand && (collectionName === Schematics.angularCollection) && (schemaName === 'component')) {
+        if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'component')) {
 
             filledOptions = await this.askComponentOptions(schema);
 
-        } else if (shortcutCommand && (collectionName === Schematics.angularCollection) && (schemaName === 'module')) {
+        } else if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'module')) {
 
             filledOptions = await this.askModuleOptions(schema);
 

@@ -1,24 +1,15 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Utils } from './utils';
+import { AngularConfig } from './angular-config';
 
 
 interface SettingSchematics {
     schematics?: string[];
 }
 
-interface AngularConfig {
-    cli?: {
-        defaultCollection?: string;
-        schematics?: {
-            defaultCollection?: string;
-        };
-    };
-}
-
 export class Schematics {
 
-    static angularCollection = '@schematics/angular';
     static defaultCollection = '';
     static commonCollections: string[] = [
         '@angular/material',
@@ -70,11 +61,11 @@ export class Schematics {
 
         if (!this.defaultCollection) {
 
-            this.defaultCollection = await this.getDefaultCollection(cwd);
+            this.defaultCollection = await AngularConfig.getDefaultCollection(cwd);
 
         }
 
-        this.collections = new Set([this.defaultCollection, this.angularCollection, ...existingCollections]);
+        this.collections = new Set([this.defaultCollection, AngularConfig.cliCollection, ...existingCollections]);
 
     }
 
@@ -82,37 +73,13 @@ export class Schematics {
 
         if  (this.collections.size === 1) {
 
-            return this.angularCollection;
+            return AngularConfig.cliCollection;
 
         } else {
 
             return vscode.window.showQuickPick(Array.from(this.collections), { placeHolder: `From which schematics collection?` });
 
         }
-
-    }
-
-    private static async getDefaultCollection(cwd: string): Promise<string> {
-
-        const angularConfigPath = path.join(cwd, 'angular.json');
-
-        if (await Utils.existsAsync(angularConfigPath)) {
-
-            const angularConfig = await Utils.parseJSONFile<AngularConfig>(angularConfigPath);
-
-            if (angularConfig && angularConfig.cli) {
-
-                if (angularConfig.cli.defaultCollection) {
-                    return angularConfig.cli.defaultCollection;
-                } else if (angularConfig.cli.schematics && angularConfig.cli.schematics.defaultCollection) {
-                    return angularConfig.cli.schematics.defaultCollection;
-                }
-
-            }
-
-        }
-
-        return this.angularCollection;
 
     }
 

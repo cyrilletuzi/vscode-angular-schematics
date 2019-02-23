@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { Schematics } from './schematics';
 import { Utils } from './utils';
+import { AngularConfig } from './angular-config';
 
 
 export class Generate {
@@ -20,7 +20,7 @@ export class Generate {
 
     }
     protected base = 'ng g';
-    protected collection = Schematics.angularCollection;
+    protected collection = AngularConfig.cliCollection;
     protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
@@ -163,7 +163,7 @@ export class Generate {
 
     protected formatCollectionAndSchema(): string {
 
-        return (this.collection !== Schematics.angularCollection) ?
+        return (this.collection !== AngularConfig.cliCollection) ?
             `${this.collection}:${this.schema}` :
             this.schema;
 

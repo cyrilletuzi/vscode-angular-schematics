@@ -6,7 +6,7 @@ import { AngularSchematicsProvider } from './schematics/view';
 import { Commands } from './schematics/commands';
 import { GenerateConfig } from './schematics/commands';
 import { Output } from './schematics/output';
-import { Schematics } from './schematics/schematics';
+import { AngularConfig } from './schematics/angular-config';
 
 
 // this method is called when your extension is activated
@@ -23,7 +23,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.angularCollection,
+            collectionName: AngularConfig.cliCollection,
             schemaName: 'component'
         });
 
@@ -32,7 +32,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.angularCollection,
+            collectionName: AngularConfig.cliCollection,
             schemaName: 'service'
         });
 
@@ -41,7 +41,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context) => {
 
         await Commands.generate(context, {
-            collectionName: Schematics.angularCollection,
+            collectionName: AngularConfig.cliCollection,
             schemaName: 'module'
         });
 
