@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { Utils } from './utils';
 
 export interface AngularConfigSchema {
@@ -26,6 +27,7 @@ export class AngularConfig {
     static defaultProject = '';
 
     private static config: AngularConfigSchema | null = null;
+    private static watcher: vscode.FileSystemWatcher;
 
     static async init(cwd: string): Promise<void> {
 
@@ -33,19 +35,31 @@ export class AngularConfig {
 
         if (!this.config && await Utils.existsAsync(configPath)) {
 
-            const config = await Utils.parseJSONFile<AngularConfigSchema>(configPath);
+            this.config = await Utils.parseJSONFile<AngularConfigSchema>(configPath);
 
-            this.defaultCollection = this.getDefaultCollection(config);
+            this.defaultCollection = this.getDefaultCollection(this.config);
 
-            this.projects = this.getProjects(config);
+            this.projects = this.getProjects(this.config);
 
-            this.defaultProject = this.getDefaultProject(config);
+            this.defaultProject = this.getDefaultProject(this.config);
+
+            // if (!this.watcher) {
+
+            //     /* Listen to change in config file to update config */
+            //     this.watcher = vscode.workspace.createFileSystemWatcher(configPath, true, undefined, true);
+
+            //     this.watcher.onDidChange(() => {
+            //         this.config = null;
+            //         this.init(cwd);
+            //     })
+
+            // }
 
         }
 
     }
 
-    static getDefaultCollection(config: AngularConfigSchema | null): string {
+    private static getDefaultCollection(config: AngularConfigSchema | null): string {
 
         if (config && config.cli) {
 
@@ -61,7 +75,7 @@ export class AngularConfig {
 
     }
 
-    static getProjects(config: AngularConfigSchema | null): Map<string, string> {
+    private static getProjects(config: AngularConfigSchema | null): Map<string, string> {
 
         const projects = new Map<string, string>();
 
@@ -94,7 +108,7 @@ export class AngularConfig {
 
     }
 
-    static getDefaultProject(config: AngularConfigSchema | null): string {
+    private static getDefaultProject(config: AngularConfigSchema | null): string {
 
         return config && config.defaultProject ? config.defaultProject : '';
 
