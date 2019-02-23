@@ -43,17 +43,17 @@ export class AngularConfig {
 
             this.defaultProject = this.getDefaultProject(this.config);
 
-            // if (!this.watcher) {
+            if (!this.watcher) {
 
-            //     /* Listen to change in config file to update config */
-            //     this.watcher = vscode.workspace.createFileSystemWatcher(configPath, true, undefined, true);
+                /* Listen to change in config file to update config */
+                this.watcher = vscode.workspace.createFileSystemWatcher(configPath, true, undefined, true);
 
-            //     this.watcher.onDidChange(() => {
-            //         this.config = null;
-            //         this.init(cwd);
-            //     })
+                this.watcher.onDidChange(() => {
+                    this.config = null;
+                    this.init(cwd);
+                })
 
-            // }
+            }
 
         }
 
