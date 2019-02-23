@@ -99,9 +99,7 @@ export class Generate {
 
         const pathNormalized = Utils.normalizePath(projectPath);
 
-        const projects = await AngularConfig.getProjects(workspacePath);
-
-        for (const [projectName, projectPath] of projects) {
+        for (const [projectName, projectPath] of AngularConfig.projects) {
 
             /* Remove leading "/" to match */
             const pathWithoutLeadingSlash = pathNormalized.substr(1);

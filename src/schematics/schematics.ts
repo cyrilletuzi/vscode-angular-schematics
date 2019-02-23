@@ -61,7 +61,7 @@ export class Schematics {
 
         if (!this.defaultCollection) {
 
-            this.defaultCollection = await AngularConfig.getDefaultCollection(cwd);
+            this.defaultCollection = AngularConfig.defaultCollection;
 
         }
 

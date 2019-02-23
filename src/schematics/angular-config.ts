@@ -14,39 +14,45 @@ export interface AngularConfigSchema {
             sourceRoot?: string;
         };
     };
+    defaultProject?: string;
 }
 
 export class AngularConfig {
 
     static readonly configPath = 'angular.json';
     static readonly cliCollection = '@schematics/angular';
+    static defaultCollection = '@schematics/angular';
+    static projects = new Map<string, string>();
+    static defaultProject = '';
 
     private static config: AngularConfigSchema | null = null;
 
-    static async getConfig(cwd: string): Promise<AngularConfigSchema | null> {
+    static async init(cwd: string): Promise<void> {
 
         const configPath = path.join(cwd, this.configPath);
 
         if (!this.config && await Utils.existsAsync(configPath)) {
 
-            return await Utils.parseJSONFile<AngularConfigSchema>(configPath);
+            const config = await Utils.parseJSONFile<AngularConfigSchema>(configPath);
+
+            this.defaultCollection = this.getDefaultCollection(config);
+
+            this.projects = this.getProjects(config);
+
+            this.defaultProject = this.getDefaultProject(config);
 
         }
 
-        return null;
-
     }
 
-    static async getDefaultCollection(cwd: string): Promise<string> {
+    static getDefaultCollection(config: AngularConfigSchema | null): string {
 
-        const angularConfig = await this.getConfig(cwd);
+        if (config && config.cli) {
 
-        if (angularConfig && angularConfig.cli) {
-
-            if (angularConfig.cli.defaultCollection) {
-                return angularConfig.cli.defaultCollection;
-            } else if (angularConfig.cli.schematics && angularConfig.cli.schematics.defaultCollection) {
-                return angularConfig.cli.schematics.defaultCollection;
+            if (config.cli.defaultCollection) {
+                return config.cli.defaultCollection;
+            } else if (config.cli.schematics && config.cli.schematics.defaultCollection) {
+                return config.cli.schematics.defaultCollection;
             }
 
         }
@@ -55,20 +61,18 @@ export class AngularConfig {
 
     }
 
-    static async getProjects(cwd: string): Promise<Map<string, string>> {
+    static getProjects(config: AngularConfigSchema | null): Map<string, string> {
 
         const projects = new Map<string, string>();
 
-        const angularConfig = await this.getConfig(cwd);
+        if (config && config.projects) {
 
-        if (angularConfig && angularConfig.projects) {
+            for (const projectName in config.projects) {
 
-            for (const projectName in angularConfig.projects) {
-
-                if (angularConfig.projects.hasOwnProperty(projectName)) {
+                if (config.projects.hasOwnProperty(projectName)) {
 
                     /* The main application will have an empty root but should have a "src" sourceRoot */
-                    let projectPath = angularConfig.projects[projectName].root || angularConfig.projects[projectName].sourceRoot;
+                    let projectPath = config.projects[projectName].root || config.projects[projectName].sourceRoot;
 
                     /* If both are empty, we can't detect the project path so we don't add it to the list */
                     if (projectPath) {
@@ -87,6 +91,12 @@ export class AngularConfig {
         }
 
         return projects;
+
+    }
+
+    static getDefaultProject(config: AngularConfigSchema | null): string {
+
+        return config && config.defaultProject ? config.defaultProject : '';
 
     }
 
