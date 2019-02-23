@@ -103,8 +103,11 @@ export class Generate {
 
         for (const [projectName, projectPath] of projects) {
 
-            /* Remove leading "/" */
-            if (pathNormalized.substr(1).startsWith(projectPath)) {
+            /* Remove leading "/" to match */
+            const pathWithoutLeadingSlash = pathNormalized.substr(1);
+
+            /* Test strict equality or starting with a trailing "/", to avoid collision when projects start with a common path */
+            if (pathWithoutLeadingSlash === projectPath || pathWithoutLeadingSlash.startsWith(`${projectPath}/`)) {
                 return projectName;
             }
 
