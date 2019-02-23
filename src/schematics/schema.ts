@@ -110,9 +110,15 @@ export class Schema {
 
     async askDefaultOption(contextPath = '', project = ''): Promise<string | undefined> {
 
+        let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
+
+        if (!contextPath || !project) {
+            prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
+        }
+
         /** @todo Investigate if there could be other default option than name */
         return vscode.window.showInputBox({
-            prompt: `Name or pathname${project ? ` in project ${project}` : ''}?`,
+            prompt,
             value: contextPath,
             valueSelection: [contextPath.length, contextPath.length]
         });
