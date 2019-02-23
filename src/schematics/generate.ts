@@ -24,14 +24,11 @@ export class Generate {
     protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
-    constructor(contextPath: string) {
+    constructor(contextPath: string, workspacePath: string) {
 
         this.path = this.getCommandPath(contextPath);
+        this.project = this.getProject(contextPath, workspacePath);
 
-    }
-
-    async init(contextPath: string, workspacePath: string) {
-        this.project = await this.getProject(contextPath, workspacePath);
     }
 
     addCollection(name: string): void {
@@ -93,7 +90,7 @@ export class Generate {
 
     }
 
-    protected async getProject(contextPath: string, workspacePath: string): Promise<string> {
+    protected getProject(contextPath: string, workspacePath: string): string {
 
         const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
 

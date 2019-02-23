@@ -59,8 +59,7 @@ export class Commands {
 
         await AngularConfig.init(workspaceFolderPath);
 
-        const generate = new Generate(this.getContextPath(context));
-        await generate.init(this.getContextPath(context), workspaceFolderPath);
+        const generate = new Generate(this.getContextPath(context), workspaceFolderPath);
 
         if (collectionName !== AngularConfig.cliCollection) {
 
