@@ -8,12 +8,18 @@ export interface AngularConfigSchema {
             defaultCollection?: string;
         };
     };
+    projects?: {
+        [key: string]: {
+            root: string;
+            sourceRoot?: string;
+        };
+    };
 }
 
 export class AngularConfig {
 
-    static configPath = 'angular.json';
-    static cliCollection = '@schematics/angular';
+    static readonly configPath = 'angular.json';
+    static readonly cliCollection = '@schematics/angular';
 
     private static config: AngularConfigSchema | null = null;
 
@@ -46,6 +52,41 @@ export class AngularConfig {
         }
 
         return this.cliCollection;
+
+    }
+
+    static async getProjects(cwd: string): Promise<Map<string, string>> {
+
+        const projects = new Map<string, string>();
+
+        const angularConfig = await this.getConfig(cwd);
+
+        if (angularConfig && angularConfig.projects) {
+
+            for (const projectName in angularConfig.projects) {
+
+                if (angularConfig.projects.hasOwnProperty(projectName)) {
+
+                    /* The main application will have an empty root but should have a "src" sourceRoot */
+                    let projectPath = angularConfig.projects[projectName].root || angularConfig.projects[projectName].sourceRoot;
+
+                    /* If both are empty, we can't detect the project path so we don't add it to the list */
+                    if (projectPath) {
+
+                        /* Angular CLI inconsistently adds a trailing "/" on some projects paths */
+                        projectPath = projectPath.endsWith('/') ? projectPath.slice(0, -1) : projectPath;
+
+                        projects.set(projectName, projectPath);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return projects;
 
     }
 

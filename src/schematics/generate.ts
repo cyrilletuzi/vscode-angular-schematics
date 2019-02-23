@@ -24,11 +24,14 @@ export class Generate {
     protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
-    constructor(contextPath: string, workspacePath: string) {
+    constructor(contextPath: string) {
 
         this.path = this.getCommandPath(contextPath);
-        this.project = this.getProject(contextPath, workspacePath);
 
+    }
+
+    async init(contextPath: string, workspacePath: string) {
+        this.project = await this.getProject(contextPath, workspacePath);
     }
 
     addCollection(name: string): void {
@@ -90,11 +93,22 @@ export class Generate {
 
     }
 
-    protected getProject(contextPath: string, workspacePath: string): string {
+    protected async getProject(contextPath: string, workspacePath: string): Promise<string> {
 
         const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
 
         const pathNormalized = Utils.normalizePath(projectPath);
+
+        const projects = await AngularConfig.getProjects(workspacePath);
+
+        for (const [projectName, projectPath] of projects) {
+
+            /* Remove leading "/" */
+            if (pathNormalized.substr(1).startsWith(projectPath)) {
+                return projectName;
+            }
+
+        }
 
         const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
 
