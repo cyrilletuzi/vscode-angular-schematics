@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.18.0] - 2019-02-23
+
+### Feature
+
+- Auto-inference of the project now works with custom paths (as long as they are registered in `angular.json`)
+
 ## [1.17.0] - 2019-02-16
 
 ### Feature
