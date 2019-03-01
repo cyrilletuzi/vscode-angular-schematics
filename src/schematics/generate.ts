@@ -90,6 +90,12 @@ export class Generate {
 
     }
 
+    resetCommandPath(contextPath = ''): void {
+
+        this.path = this.getCommandPath(contextPath);
+
+    }
+
     protected getProject(contextPath: string, workspacePath: string): string {
 
         const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
@@ -141,6 +147,11 @@ export class Generate {
             const splittedPath = pathNormalized.split(`/${contextPathMatches[1]}/`)[1];
     
             if (splittedPath.includes('.')) {
+
+                /* Special case: ngx-spec works on a existing file, so it needs the full path */
+                if (this.collection === 'ngx-spec') {
+                    return splittedPath;
+                }
     
                 /* If filename, delete filename by removing everything after the last "/" */
                 return Utils.getDirectoryFromFilename(splittedPath);
