@@ -72,6 +72,12 @@ By default, this extension supports (if they are installed):
 - `@ngrx/schematics`
 - `@nrwl/schematics`
 - `@nstudio/schematics`
+- `@ngxs/schematics`
+- `@nativescript/schematics`
+- `@ngx-formly/schematics`
+- `primeng-schematics`
+- `@ngx-kit/collection`
+- `ngx-spec`
 - `./schematics/collection.json`
 
 Scanning all packages to find all potential schematics would be too slow.
