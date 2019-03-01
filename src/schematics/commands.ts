@@ -51,7 +51,8 @@ export class Commands {
 
         const shortcutCommand = (collectionName && schemaName) ? true : false;
 
-        const workspaceFolderPath = await this.getWorkspaceFolderPath(this.getContextPath(context));
+        const contextPath = this.getContextPath(context);
+        const workspaceFolderPath = await this.getWorkspaceFolderPath(contextPath);
 
         if (!workspaceFolderPath) {
             return;
@@ -59,7 +60,7 @@ export class Commands {
 
         await AngularConfig.init(workspaceFolderPath);
 
-        const generate = new Generate(this.getContextPath(context), workspaceFolderPath);
+        const generate = new Generate(contextPath, workspaceFolderPath);
 
         if (collectionName !== AngularConfig.cliCollection) {
 
@@ -76,6 +77,11 @@ export class Commands {
             }
 
             generate.addCollection(collectionName);
+
+            /* Special case: ngx-spec needs a special path */
+            if (collectionName === 'ngx-spec') {
+                generate.resetCommandPath(contextPath);
+            }
         
         }
 
