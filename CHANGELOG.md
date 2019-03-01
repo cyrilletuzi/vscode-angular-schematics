@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.19.0] - 2019-03-01
+
+### Feature
+
+- Default support for these schematics:
+  - `@ngxs/schematics`
+  - `@nativescript/schematics`
+  - `@ngx-formly/schematics`
+  - `primeng-schematics`
+  - `@ngx-kit/collection`
+  - `ngx-spec`
+
 ## [1.18.0] - 2019-02-23
 
 ### Feature
