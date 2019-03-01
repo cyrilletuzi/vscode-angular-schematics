@@ -14,8 +14,14 @@ export class Schematics {
         '@angular/material',
         '@ionic/angular-toolkit',
         '@ngrx/schematics',
+        '@ngxs/schematics',
+        '@nativescript/schematics',
         '@nrwl/schematics',
         '@nstudio/schematics',
+        '@ngx-formly/schematics',
+        'primeng-schematics',
+        '@ngx-kit/collection',
+        'ngx-spec',
         './schematics/collection.json'
     ];
     static collections: Set<string> = new Set();
