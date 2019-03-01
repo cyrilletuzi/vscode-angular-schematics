@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.20.0] - 2019-03-01
+
+### Feature
+
+- Better pathname inference for `ngx-spec` schematics special case
+
 ## [1.19.0] - 2019-03-01
 
 ### Feature
