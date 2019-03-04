@@ -168,6 +168,8 @@ export class Commands {
 
             Output.channel.appendLine(stdout);
 
+            await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+
             vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
 
             try {
