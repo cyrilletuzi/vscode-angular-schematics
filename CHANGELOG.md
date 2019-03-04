@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.21.0] - 2019-03-04
+
+### Feature
+
+- Ensure refresh of files explorer
+
 ## [1.20.0] - 2019-03-01
 
 ### Feature
