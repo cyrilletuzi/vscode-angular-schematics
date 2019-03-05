@@ -7,17 +7,13 @@ allowing you to **launch Angular schematics (CLI commands) with a Graphical User
 
 **Productivity!**
 
-- Save time
-- No more typo errors = no more cleaning mess
-- No more chaotic search in the CLI wiki, all options available will be proposed and documented
-- Promote good practices for component types
+This extension will save you time:
 
-What about other tools like the Angular Console? This extension will save you more time because:
-- many options are inferred (like the path and the project),
-- generated files will auto open!
-- compared to the desktop Angular Console, it's directly integrated in VS Code (no switch between 2 windows),
-- compared to the Angular Console in VS Code,
-it's a *real* integration in the editor (not just an embedded view).
+- No more typo errors = no more cleaning mess
+- No more documentation search, all options available are proposed and described
+- Many options are inferred (like the path and the project)
+- Generated files will auto open!
+- Promote good practices for component types
 
 ## By the same author
 
