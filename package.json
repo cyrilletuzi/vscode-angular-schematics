@@ -1,5 +1,5 @@
 {
-    "version": "1.21.0",
+    "version": "1.21.1",
     "name": "angular-schematics",
     "displayName": "Angular Schematics",
     "description": "Angular schematics (CLI commands) from files Explorer or Command Palette.",
