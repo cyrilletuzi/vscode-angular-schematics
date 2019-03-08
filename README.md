@@ -48,8 +48,11 @@ This extension is only enabled inside an Angular >=5 CLI project
 
 ### Project root
 
-The project opened must be the root directory of the Angular project. It won't work from a parent directory,
-as the CLI itself requires to be in the Angular directory.
+**The project opened must be the root directory of the Angular project. It won't work from a parent directory, as the CLI itself requires to be in the Angular directory.**
+
+If your Angular project is inside your backend project, and you want both opened in VS Code:
+- open the *root* directory of the Angular project,
+- then in VS Code menu: "File" > "Add Folder to Workspace" > open the directory of your backend project.
 
 ### Custom shell
 
