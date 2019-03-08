@@ -9,10 +9,10 @@ allowing you to **launch Angular schematics (CLI commands) with a Graphical User
 
 This extension will save you time:
 
-- No more typo errors = no more cleaning mess
+- **No more typo errors** = no more cleaning mess
 - No more documentation search, all options available are proposed and described
-- Many options are inferred (like the path and the project)
-- Generated files will auto open!
+- **Many options are inferred** (like the path and the project)
+- **Generated files will auto open!**
 - Promote good practices for component types
 
 ## By the same author
