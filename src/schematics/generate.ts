@@ -47,7 +47,7 @@ export class Generate {
 
         this.defaultOption = value;
 
-        if (withPath && this.project && this.project !== AngularConfig.defaultProject) {
+        if (withPath && this.project && this.project !== AngularConfig.rootProject) {
 
             this.addOption('project', this.project);
 

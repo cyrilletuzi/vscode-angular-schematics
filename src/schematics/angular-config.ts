@@ -15,7 +15,6 @@ export interface AngularConfigSchema {
             sourceRoot?: string;
         };
     };
-    defaultProject?: string;
 }
 
 export class AngularConfig {
@@ -24,7 +23,7 @@ export class AngularConfig {
     static readonly cliCollection = '@schematics/angular';
     static defaultCollection = '@schematics/angular';
     static projects = new Map<string, string>();
-    static defaultProject = '';
+    static rootProject = '';
 
     private static config: AngularConfigSchema | null = null;
     private static watcher: vscode.FileSystemWatcher;
@@ -40,8 +39,6 @@ export class AngularConfig {
             this.defaultCollection = this.getDefaultCollection(this.config);
 
             this.projects = this.getProjects(this.config);
-
-            this.defaultProject = this.getDefaultProject(this.config);
 
             if (!this.watcher) {
 
@@ -94,6 +91,10 @@ export class AngularConfig {
                         /* Angular CLI inconsistently adds a trailing "/" on some projects paths */
                         projectPath = projectPath.endsWith('/') ? projectPath.slice(0, -1) : projectPath;
 
+                        if (projectPath === 'src') {
+                            this.rootProject = projectName;
+                        } 
+
                         projects.set(projectName, projectPath);
 
                     }
@@ -105,12 +106,6 @@ export class AngularConfig {
         }
 
         return projects;
-
-    }
-
-    private static getDefaultProject(config: AngularConfigSchema | null): string {
-
-        return config && config.defaultProject ? config.defaultProject : '';
 
     }
 
