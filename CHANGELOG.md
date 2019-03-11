@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.22.0] - 2019-03-04
+
+### Feature
+
+- Hide `project` option in final command only for root application
+
 ## [1.21.0] - 2019-03-04
 
 ### Feature
