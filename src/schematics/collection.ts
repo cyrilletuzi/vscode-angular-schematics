@@ -116,7 +116,10 @@ export class Collection {
                 description: (this.schemas.get(schemaName) as CollectionDataSchema).description
             }));
 
-        const choice = await vscode.window.showQuickPick(choices, { placeHolder: `What do you want to generate?` });
+        const choice = await vscode.window.showQuickPick(choices, {
+            placeHolder: `What do you want to generate?`,
+            ignoreFocusOut: true,
+        });
 
         return choice ? choice.label : undefined;
 

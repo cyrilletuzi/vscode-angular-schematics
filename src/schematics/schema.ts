@@ -120,7 +120,8 @@ export class Schema {
         return vscode.window.showInputBox({
             prompt,
             value: contextPath,
-            valueSelection: [contextPath.length, contextPath.length]
+            valueSelection: [contextPath.length, contextPath.length],
+            ignoreFocusOut: true,
         });
 
     }
@@ -174,7 +175,8 @@ export class Schema {
 
         const selectedOptions = await vscode.window.showQuickPick(sortedChoices, {
             canPickMany: true,
-            placeHolder: `Do you need some options?`
+            placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
+            ignoreFocusOut: true,
         }) || [];
 
         return selectedOptions.map((selectedOption) => selectedOption.label);
@@ -219,7 +221,11 @@ export class Schema {
     
             } else {
     
-                choice = await vscode.window.showInputBox({ placeHolder: `--${optionName}`, prompt });
+                choice = await vscode.window.showInputBox({
+                    placeHolder: `--${optionName}`,
+                    prompt,
+                    ignoreFocusOut: true,
+                });
     
             }
     
@@ -236,7 +242,8 @@ export class Schema {
     protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
 
         return vscode.window.showQuickPick(choices, {
-            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`
+            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
+            ignoreFocusOut: true,
         });
 
     }
@@ -245,7 +252,8 @@ export class Schema {
 
         return vscode.window.showQuickPick(choices, {
             placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
-            canPickMany: true
+            canPickMany: true,
+            ignoreFocusOut: true,
         });
 
     }

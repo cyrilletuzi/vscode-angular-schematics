@@ -246,7 +246,10 @@ export class Commands {
 
         componentTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
 
-        const componentType = await vscode.window.showQuickPick(componentTypes, { placeHolder: `What type of component do you want?` });
+        const componentType = await vscode.window.showQuickPick(componentTypes, {
+            placeHolder: `What type of component do you want?`,
+            ignoreFocusOut: true,
+        });
 
         if (!componentType) {
             return undefined;
@@ -293,7 +296,10 @@ export class Commands {
             { label: `Advanced module`, description: `You'll be able to choose all available options` },
         ];
 
-        const moduleType = await vscode.window.showQuickPick(moduleTypes, { placeHolder: `What type of module do you want?` });
+        const moduleType = await vscode.window.showQuickPick(moduleTypes, {
+            placeHolder: `What type of module do you want?`,
+            ignoreFocusOut: true,
+        });
 
         if (!moduleType) {
             return undefined;

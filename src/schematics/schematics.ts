@@ -76,7 +76,10 @@ export class Schematics {
 
         } else {
 
-            return vscode.window.showQuickPick(Array.from(this.collections), { placeHolder: `From which schematics collection?` });
+            return vscode.window.showQuickPick(Array.from(this.collections), {
+                placeHolder: `From which schematics collection?`,
+                ignoreFocusOut: true,
+            });
 
         }
 
