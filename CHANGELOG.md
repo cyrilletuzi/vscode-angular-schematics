@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.23.0] - 2019-03-19
+
+### Feature
+
+- Keep dialogs opened on focus out (just press `Esc` to cancel)
+
 ## [1.22.0] - 2019-03-04
 
 ### Feature
