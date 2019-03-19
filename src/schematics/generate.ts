@@ -66,7 +66,10 @@ export class Generate {
         const confirmationText = `Confirm`;
         const cancellationText = `Cancel`;
 
-        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], { placeHolder: this.command });
+        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
+            placeHolder: this.command,
+            ignoreFocusOut: true,
+        });
 
         return (choice === confirmationText) ? true : false;
 
