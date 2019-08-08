@@ -1,19 +1,8 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as JSON5 from 'json5';
-import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
-
-
-const osList = new Map<string, string>();
-osList.set('darwin', 'osx');
-osList.set('win32', 'windows');
-
-const userOs = osList.get(os.platform()) || 'linux';
-
-// TODO: Manage custom shell for Windows
-const userShell = (userOs === 'windows') ? undefined : vscode.workspace.getConfiguration().get(`terminal.integrated.shell.${userOs}`) as string;
 
 export class Utils {
 
@@ -93,7 +82,7 @@ export class Utils {
 
         return new Promise((resolve, reject) => {
     
-            childProcess.exec(command, { cwd, shell: userShell }, (error, stdout, stderr) => {
+            childProcess.exec(command, { cwd, shell: vscode.env.shell }, (error, stdout, stderr) => {
     
                 if (error) {
                     reject([stdout, stderr]);
