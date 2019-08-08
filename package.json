@@ -1,5 +1,5 @@
 {
-    "version": "1.23.0",
+    "version": "2.0.0-beta.0",
     "name": "angular-schematics",
     "displayName": "Angular Schematics",
     "description": "Angular schematics (CLI commands) from files Explorer or Command Palette.",
@@ -36,7 +36,7 @@
     },
     "qna": false,
     "engines": {
-        "vscode": "^1.24.0"
+        "vscode": "^1.37.0"
     },
     "activationEvents": [
         "workspaceContains:angular.json",
@@ -129,10 +129,10 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^7.0.43",
-        "tslint": "^5.12.0",
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.26"
+        "@types/node": "^10.14.15",
+        "tslint": "^5.18.0",
+        "typescript": "^3.5.3",
+        "vscode": "^1.1.36"
     },
     "dependencies": {
         "@types/json5": "0.0.30",
