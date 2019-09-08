@@ -109,9 +109,11 @@ export class Commands {
             return;
         }
 
+        let defaultOption: string | undefined;
+
         if (schema.hasDefaultOption()) {
 
-            const defaultOption = await schema.askDefaultOption(generate.path, generate.project);
+            defaultOption = await schema.askDefaultOption(generate.path, generate.project);
 
             if (!defaultOption) {
                 return;
@@ -129,7 +131,7 @@ export class Commands {
 
         } else if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'module')) {
 
-            filledOptions = await this.askModuleOptions(schema);
+            filledOptions = await this.askModuleOptions(schema, defaultOption);
 
         } else {
 
@@ -287,14 +289,25 @@ export class Commands {
 
     }
     
-    static async askModuleOptions(schema: Schema): Promise<Map<string, string> | undefined> {
+    static async askModuleOptions(schema: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
+
+        const TYPE_CLASSIC = `Classic module`;
+        const TYPE_IMPORTED = `Classic module, imported`;
+        const TYPE_ROUTING = `Module with routing, imported`;
+        const TYPE_LAZY = `Lazy-loaded module`;
+        const TYPE_ADVANCED = `Advanced module`;
 
         const moduleTypes: vscode.QuickPickItem[] = [
-            { label: `Classic module`, description: `No option` },
-            { label: `Classic module, imported`, description: `--module app (no other option)` },
-            { label: `Module with routing, imported`, description: `--routing --module app (no other option)` },
-            { label: `Advanced module`, description: `You'll be able to choose all available options` },
+            { label: TYPE_CLASSIC, description: `No option` },
+            { label: TYPE_IMPORTED, description: `--module app (no other option)` },
+            { label: TYPE_ROUTING, description: `--routing --module app (no other option)` },
         ];
+
+        if (moduleName && schema.options.get('route')) {
+            moduleTypes.push({ label: TYPE_LAZY, description: `--route ${moduleName} --module app` },);
+        }
+
+        moduleTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` },);
 
         const moduleType = await vscode.window.showQuickPick(moduleTypes, {
             placeHolder: `What type of module do you want?`,
@@ -309,18 +322,23 @@ export class Commands {
 
         switch (moduleType.label) {
 
-            case moduleTypes[1].label:
+            case TYPE_IMPORTED:
             moduleOptions.set('module', 'app');
             break;
 
-            case moduleTypes[2].label:
+            case TYPE_ROUTING:
             moduleOptions.set('routing', 'true');
+            moduleOptions.set('module', 'app');
+            break;
+
+            case TYPE_LAZY:
+            moduleOptions.set('route', moduleName);
             moduleOptions.set('module', 'app');
             break;
 
         }
 
-        if (moduleType.label === moduleTypes[3].label) {
+        if (moduleType.label === TYPE_ADVANCED) {
             moduleOptions = await this.askOptions(schema);
         }
 
