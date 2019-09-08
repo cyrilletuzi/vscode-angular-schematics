@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.24.0] - 2019-09-08
+
+### Feature
+
+- New shortcut for generating lazy-loaded modules, based on new Angular CLI 8.3 feature `ng g module hello --route hello --module app`
+
 ## [1.23.0] - 2019-03-19
 
 ### Feature
