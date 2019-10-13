@@ -49,6 +49,21 @@ Then, **you can launch Angular CLI commands from 4 places:**
 **The quickest way to launch your Angular CLI commands is the first, with a right-click inside the files Explorer context menu.**
 Why? Because the destination path and `project` will be automatically inferred to the directory you just right-clicked.
 
+## Angular >= 9 component `type` shortchut
+
+Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
+For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class.
+(instead of the `hello.component.ts` file with a `HelloComponent` class).
+
+This is particullary helpful for projects following a good architecture, ie. distinguishing components types
+(see below if interested for more details), or for tools with special components (like modals in Ionic).
+
+This extension makes things even easier: when asked for the name of your component,
+just type `hello.page`, and the extension will automatically set the `--type page` option for you.
+
+Note that you must change your `tslint.json` config accordingly:
+`"component-class-suffix": [true, "Component", "Page"]`.
+
 ## Requirements
 
 ### Angular CLI
