@@ -124,6 +124,14 @@ export class Commands {
                 defaultOption = defaultOption.replace(`.${schemaName}`, '');
             }
 
+            /* Shortcut to use new Angular CLI 9+ component `type` option by typing `name.type` */
+            if ((schemaName === 'component') && schema.options.get('type') && defaultOption.includes('.')) {
+                const dotPosition = defaultOption.lastIndexOf('.');
+                const componentType = defaultOption.substr(dotPosition + 1);
+                defaultOption = defaultOption.substring(0, dotPosition);
+                generate.addOption('type', componentType);
+            }
+
             generate.addDefaultOption(defaultOption, schema.hasPath());
 
         }
