@@ -70,22 +70,23 @@ On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI i
 it must be configured accordingly in your VS Code settings
 (`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
 
-## Angular >= 9 component `type` shortchut
+## Other features
+
+### Angular >= 9 component `type`
 
 Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
-This is particullary helpful for projects following a good architecture, ie. distinguishing components types
+This is particullary helpful for projects following a good architecture, ie. distinguishing components behaviors
 (see below if interested for more details), or for tools with special components (like modals in Ionic).
 
-This extension makes things even easier: when asked for the name of your component,
-just type `hello.page`, and the extension will automatically set the `--type page` option for you.
-
-Note that you must change your `tslint.json` config accordingly:
+Your `tslint.json` config must be set accordingly:
 `"component-class-suffix": [true, "Component", "Page"]`.
 
-## Other features
+If your config is correctly set, this extension makes things even easier:
+you'll be asked which component type you want based on the `tslint.json` suffixes list,
+and the `--type` option will be set accordingly.
 
 ### Other schematics
 
@@ -164,9 +165,9 @@ Or only in a specific project:
 The icons in the Angular Schematics view will be nicer if you use
 the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
 
-## Component types
+## Component behaviors
 
-Puzzled about the component type choice?
+Puzzled about the component behavior choice?
 
 ### Exported component
 

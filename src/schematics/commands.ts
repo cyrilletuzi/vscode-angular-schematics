@@ -126,22 +126,6 @@ export class Commands {
                 defaultOption = defaultOption.replace(`.${schemaName}`, '');
             }
 
-            /* Shortcut to use new Angular CLI 9+ component `type` option by typing `name.type` */
-            if ((schemaName === 'component') && schema.options.get('type') && defaultOption.includes('.')) {
-                const dotPosition = defaultOption.lastIndexOf('.');
-                const componentType = defaultOption.substr(dotPosition + 1);
-
-                if (TSLintConfig.componentSuffixes && TSLintConfig.componentSuffixes.indexOf(componentType) === -1) {
-                    const componentTypeUppercase = `${componentType.charAt(0).toUpperCase()}${componentType.slice(1)}`;
-                    const warningMessage = `The '${componentType}' type is not authorized by your TSLint config. In your tslint.json, please add this config: "component-class-suffix": [true, "Component", "${componentTypeUppercase}"]`;
-                    vscode.window.showWarningMessage(warningMessage);
-                }
-
-                defaultOption = defaultOption.substring(0, dotPosition);
-                generate.addOption('type', componentType);
-
-            }
-
             generate.addDefaultOption(defaultOption, schema.hasPath());
 
         }
@@ -245,7 +229,27 @@ export class Commands {
 
     }
 
-    static async askComponentOptions(schema: Schema): Promise<Map<string, string> | undefined> {
+    static async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
+
+        const componentOptions = new Map<string, string | string[]>();
+
+        /* Component `type` option is new in Angular CLI 9 */
+        if (schema.options.get('type') && TSLintConfig.componentSuffixes) {
+
+            const componentType = await vscode.window.showQuickPick(TSLintConfig.componentSuffixes, {
+                placeHolder: `What type of component do you want?`,
+                ignoreFocusOut: true,
+            });
+
+            if (!componentType) {
+                return;
+            }
+
+            if (componentType !== 'Component') {
+                componentOptions.set('type', componentType.toLowerCase());
+            }
+
+        }
 
         const TYPE_CLASSIC = `Classic component`;
         const TYPE_EXPORTED = `Exported component`;
@@ -254,7 +258,7 @@ export class Commands {
         const TYPE_ELEMENT = `Element component`;
         const TYPE_ADVANCED = `Advanced component`;
 
-        const componentTypes: vscode.QuickPickItem[] = [
+        const componentBehaviors: vscode.QuickPickItem[] = [
             { label: TYPE_CLASSIC, description: `No option` },
             { label: TYPE_EXPORTED, description: `--export (no other option)` },
             { label: TYPE_PURE, description: `--changeDetection OnPush (no other option)` },
@@ -265,24 +269,22 @@ export class Commands {
 
         if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.indexOf('ShadowDom') !== -1)) {
 
-            componentTypes.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
+            componentBehaviors.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
 
         }
 
-        componentTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
+        componentBehaviors.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
 
-        const componentType = await vscode.window.showQuickPick(componentTypes, {
-            placeHolder: `What type of component do you want?`,
+        const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
+            placeHolder: `What component behavior do you want?`,
             ignoreFocusOut: true,
         });
 
-        if (!componentType) {
+        if (!componentBehavior) {
             return undefined;
         }
 
-        let componentOptions = new Map();
-
-        switch (componentType.label) {
+        switch (componentBehavior.label) {
 
             case TYPE_EXPORTED:
             componentOptions.set('export', 'true');
@@ -304,8 +306,11 @@ export class Commands {
 
         }
 
-        if (componentType.label === TYPE_ADVANCED) {
-            componentOptions = await this.askOptions(schema);
+        if (componentBehavior.label === TYPE_ADVANCED) {
+            const componentAdvancedOptions = await this.askOptions(schema);
+            for (const [key, value] of componentAdvancedOptions) {
+                componentOptions.set(key, value);
+            }
         }
 
         return componentOptions;

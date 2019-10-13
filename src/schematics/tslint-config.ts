@@ -46,16 +46,9 @@ export class TSLintConfig {
 
         if (config && config.rules) {
 
-            if (Array.isArray(config.rules['component-class-suffix'])) {
+            if (Array.isArray(config.rules['component-class-suffix']) && config.rules['component-class-suffix'].length > 2) {
 
-                const componentSuffixes = (config.rules['component-class-suffix'].slice(1) as string[])
-                    .map((componentSuffix) => componentSuffix.toLowerCase());
-                
-                return componentSuffixes;
-
-            } else if (config.rules['component-class-suffix'] === true) {
-
-                return ['component'];
+                return config.rules['component-class-suffix'].slice(1) as string[];
 
             }
 
