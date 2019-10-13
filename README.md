@@ -52,7 +52,7 @@ Why? Because the destination path and `project` will be automatically inferred t
 ## Angular >= 9 component `type` shortchut
 
 Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
-For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class.
+For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
 This is particullary helpful for projects following a good architecture, ie. distinguishing components types
