@@ -119,6 +119,11 @@ export class Commands {
                 return;
             }
 
+            /* Remove suffix (like `.component`) as Angular CLI will already add it */
+            if (defaultOption.endsWith(`.${schemaName}`)) { 
+                defaultOption = defaultOption.replace(`.${schemaName}`, '');
+            }
+
             generate.addDefaultOption(defaultOption, schema.hasPath());
 
         }
