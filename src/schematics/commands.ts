@@ -7,6 +7,7 @@ import { Schema } from './schema';
 import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
+import { TSLintConfig } from './tslint-config';
 
 
 export interface ExplorerMenuContext {
@@ -59,6 +60,7 @@ export class Commands {
         }
 
         await AngularConfig.init(workspaceFolderPath);
+        await TSLintConfig.init(workspaceFolderPath);
 
         const generate = new Generate(contextPath, workspaceFolderPath);
 
@@ -128,8 +130,16 @@ export class Commands {
             if ((schemaName === 'component') && schema.options.get('type') && defaultOption.includes('.')) {
                 const dotPosition = defaultOption.lastIndexOf('.');
                 const componentType = defaultOption.substr(dotPosition + 1);
+
+                if (TSLintConfig.componentSuffixes && TSLintConfig.componentSuffixes.indexOf(componentType) === -1) {
+                    const componentTypeUppercase = `${componentType.charAt(0).toUpperCase()}${componentType.slice(1)}`;
+                    const warningMessage = `The '${componentType}' type is not authorized by your TSLint config. In your tslint.json, please add this config: "component-class-suffix": [true, "Component", "${componentTypeUppercase}"]`;
+                    vscode.window.showWarningMessage(warningMessage);
+                }
+
                 defaultOption = defaultOption.substring(0, dotPosition);
                 generate.addOption('type', componentType);
+
             }
 
             generate.addDefaultOption(defaultOption, schema.hasPath());
