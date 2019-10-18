@@ -158,6 +158,14 @@ Or only in a specific project:
 } } } } }
 ```
 
+If you want different values from the official defaults, the following options should be configured like above to ease the generation process:
+- `@schematics/angular:component`
+  - `inlineTemplate`
+  - `inlineStyle`
+  - `style`
+- all schematics
+  - `skipTests`
+
 ### Other schematics
 
 By default, this extension supports (if they are installed):
