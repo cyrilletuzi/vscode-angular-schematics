@@ -114,7 +114,7 @@ the native encapsulation called `ShadowDom` must be used.
 Note it's only available in Angular >= 7,
 and it won't work in Internet Explorer / Edge (pre-Chromium).
 
-### Component types
+### Component types (Angular >= 9)
 
 Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
@@ -142,8 +142,8 @@ Even better: some common suffixes will automatically pre-select the recommended 
 
 #### Custom types
 
-The list includes common components types in Angular Material and Ionic.
-If you think some other common suffixes are missing, please do a PR (or file an issue).
+The list above includes common components types in Angular, Material and Ionic.
+If you think some other common suffixes are missing, please open a Pull Request.
 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
 - exported: `"ngschematics.exportedComponentTypes": ["Custom"]`
@@ -152,9 +152,10 @@ For uncommon suffixes, you can add a custom configuration in VS Code preferences
 - no selector & entry: `"ngschematics.runtimeComponentTypes": ["Custom"]`
 - entry & shadow: `"ngschematics.elementComponentTypes": ["Custom"]`
 
-#### Default `Component` suffix
+#### Default suffix
 
-If you use the default `Component` suffix only for your pure presentation components, add this config:
+If you use the default `Component` suffix only for your pure presentation components, 
+configure your VS Code preferences like this:
 `"ngschematics.pureComponentTypes": ["Component"]`
 
 This is a good practice but not the default configuration, as `Component` is the default suffix,
@@ -218,7 +219,7 @@ If you want to use other schematics, just add their package name in `ngschematic
 
 For example: `"ngschematics.schematics": ["@angular/material"]`
 
-If you are a library author, feel free to open an issue to ask for your schematics to be added in the default list.
+If you are a library author, feel free to open a Pull Request to add your schematics in the default list.
 
 ### Custom schematics
 
