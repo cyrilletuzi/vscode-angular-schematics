@@ -70,9 +70,51 @@ On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI i
 it must be configured accordingly in your VS Code settings
 (`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
 
-## Other features
+## Component good practices
 
-### Angular >= 9 component `type`
+This extension helps you to follow good practices,
+by suggesting different component types and behaviors.
+
+### Special component behaviors
+
+#### Exported component
+
+Components have a local scope by default, meaning they are only usable inside the module where they are declared.
+So if you want to use a component in another module (for example if you are doing a reusable UI component), you have to export it.
+
+[Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
+
+#### Pure component (also known as a presentation component)
+
+A pure component is a component which relies only on its `@Input`s for data, ie. its role is only presentation / UI (~ view),
+as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data, ie. a page (~ controller).
+
+[Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
+
+#### Component without selector
+
+Components associated to a route (ie. pages) or instantiated at runtime (like dialogs/modals) relies on specific features
+(like the `ActivatedRoute` service to get URL params).
+Thus, they should not be called via a HTML tag and so should not have a selector.
+
+#### Entry component
+
+Most of the time, Angular automatically manage the internal code to instantiate components,
+because they are either associated to a route (ie. pages) or used somewhere in a template (ie. presentation components).
+
+But dialogs (like in Angular Material), modals (like in Ionic)
+and [Angular Elements](https://angular.io/guide/elements)
+are invoked at runtime, so it's required to register them in `entryComponents`.
+
+#### Component with Shadow DOM encapsulation
+
+When creating an [Angular Element](https://angular.io/guide/elements), i.e. a reusable native Web Component,
+the native encapsulation called `ShadowDom` must be used.
+
+Note it's only available in Angular >= 7,
+and it won't work in Internet Explorer / Edge (pre-Chromium).
+
+### Component types
 
 Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
@@ -81,12 +123,40 @@ For example, `ng g hello --type page` will generate the `hello.page.ts` file wit
 This is particullary helpful for projects following a good architecture, ie. distinguishing components behaviors
 (see below if interested for more details), or for tools with special components (like modals in Ionic).
 
-Your `tslint.json` config must be set accordingly:
+Your *root* `tslint.json` config must be set accordingly:
 `"component-class-suffix": [true, "Component", "Page"]`.
 
 If your config is correctly set, this extension makes things even easier:
 you'll be asked which component type you want based on the `tslint.json` suffixes list,
 and the `--type` option will be set accordingly.
+
+## Other features
+
+### Default options
+
+[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
+allows to save default options for schematics commands.
+
+For example, if you want all your generated components templates to be inline, in *all* your projects,
+just add in `angular.json`:
+```json
+{
+  "schematics": {
+    "@schematics/angular:component": {
+      "inlineTemplate": true
+} } }
+```
+
+Or only in a specific project:
+```json
+{
+  "projects": {
+    "yourprojectname": {
+      "schematics": {
+        "@schematics/angular:component": {
+          "inlineTemplate": true
+} } } } }
+```
 
 ### Other schematics
 
@@ -134,62 +204,10 @@ You can add keyboard shortcuts to the following actions:
 But again, it's not the easiest way to use this extension:
 **a right-click in the files Explorer menu is better as the extension will infer the destination path and `project`**.
 
-### Default options
-
-[`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
-already allows to save default options for schematics commands.
-
-For example, if you want all your generated components templates to be inline, in *all* your projects,
-just add in `angular.json`:
-```json
-{
-  "schematics": {
-    "@schematics/angular:component": {
-      "inlineTemplate": true
-} } }
-```
-
-Or only in a specific project:
-```json
-{
-  "projects": {
-    "yourprojectname": {
-      "schematics": {
-        "@schematics/angular:component": {
-          "inlineTemplate": true
-} } } } }
-```
-
 ### Icons
 
 The icons in the Angular Schematics view will be nicer if you use
 the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
-
-## Component behaviors
-
-Puzzled about the component behavior choice?
-
-### Exported component
-
-Components have a local scope by default, meaning they are only usable inside the module where they are declared.
-So if you want to use your component in another module (for example if you are doing a reusable UI component), you have to export it.
-[Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
-
-Reusable components should be exported *and* pure.
-
-### Pure component (also known as a presentation component)
-
-A pure component is a component which relies only on its `@Input`s for data, ie. its role is only presentation (~ view),
-as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data, ie. a page (~ controller).
-Observing this difference is a good practice, [learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
-
-### Element component
-
-Only available in Angular >= 7.
-
-Used to create an Angular Element, i.e. a reusable native Web Component.
-Such components need to be registered in `entryComponents` and to use native `ShadowDom` viewEncapsulation.
-See [the documentation](https://angular.io/guide/elements) for more info.
 
 ## Release Notes
 
