@@ -232,21 +232,19 @@ export class Commands {
     static async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
 
         const componentOptions = new Map<string, string | string[]>();
+        let componentType: string | undefined;
 
         /* Component `type` option is new in Angular CLI 9 */
         if (schema.options.get('type') && TSLintConfig.componentSuffixes) {
 
-            const componentType = await vscode.window.showQuickPick(TSLintConfig.componentSuffixes, {
+            componentType = await vscode.window.showQuickPick(TSLintConfig.componentSuffixes, {
                 placeHolder: `What type of component do you want?`,
                 ignoreFocusOut: true,
             });
 
-            if (!componentType) {
-                return;
-            }
-
-            if (componentType !== 'Component') {
-                componentOptions.set('type', componentType.toLowerCase());
+            if (componentType && (componentType !== 'Component')) {
+                componentType = componentType.toLowerCase();
+                componentOptions.set('type', componentType);
             }
 
         }
@@ -258,24 +256,45 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
+        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb'];
+        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route'];
+        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover'];
+        const elementComponentType = 'element';
+
         const componentBehaviors: vscode.QuickPickItem[] = [
             { label: TYPE_EXPORTED, description: `--export (required for reusable components consumed outside of their own module)` },
-            { label: TYPE_PURE, description: `--change-detection OnPush (recommended to optimize UI / presentation components)` },
+            {
+                label: TYPE_PURE,
+                description: `--change-detection OnPush (recommended to optimize UI / presentation components)`,
+                picked: (componentType && pureComponentTypes.indexOf(componentType) !== -1) ? true : false,
+            },
         ];
 
         const skipSelectorOption = schema.options.get('skipSelector');
         if (skipSelectorOption) {
-            componentBehaviors.push({ label: TYPE_NO_SELECTOR, description: `--skip-selector (recommended for routed components and modals/dialogs)` });
+            componentBehaviors.push({
+                label: TYPE_NO_SELECTOR,
+                description: `--skip-selector (recommended for routed components and modals/dialogs)`,
+                picked: (componentType && [...pageComponentTypes, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
+            });
         }
 
         const entryComponentOption = schema.options.get('entryComponent');
         if (entryComponentOption) {
-            componentBehaviors.push({ label: TYPE_ENTRY, description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)` });
+            componentBehaviors.push({
+                label: TYPE_ENTRY,
+                description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)`,
+                picked: (componentType && [elementComponentType, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
+            });
         }
 
         const viewEncapsulationOption = schema.options.get('viewEncapsulation');
         if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.indexOf('ShadowDom') !== -1)) {
-            componentBehaviors.push({ label: TYPE_SHADOW, description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)` },);
+            componentBehaviors.push({
+                label: TYPE_SHADOW,
+                description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)`,
+                picked: (componentType === elementComponentType) ? true : false,
+            });
         }
 
         componentBehaviors.push({ label: TYPE_ADVANCED, description: `I need to add other advanced options` });
