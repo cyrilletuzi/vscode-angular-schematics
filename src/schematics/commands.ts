@@ -251,66 +251,64 @@ export class Commands {
 
         }
 
-        const TYPE_CLASSIC = `Classic component`;
-        const TYPE_EXPORTED = `Exported component`;
-        const TYPE_PURE = `Pure component`;
-        const TYPE_EXPORTED_PURE = `Exported pure component`;
-        const TYPE_ELEMENT = `Element component`;
-        const TYPE_ADVANCED = `Advanced component`;
+        const TYPE_EXPORTED = `Exported`;
+        const TYPE_PURE = `Pure`;
+        const TYPE_NO_SELECTOR = `No selector`;
+        const TYPE_ENTRY = `Entry`;
+        const TYPE_SHADOW = `Shadow`;
+        const TYPE_ADVANCED = `Advanced`;
 
         const componentBehaviors: vscode.QuickPickItem[] = [
-            { label: TYPE_CLASSIC, description: `No option` },
-            { label: TYPE_EXPORTED, description: `--export (no other option)` },
-            { label: TYPE_PURE, description: `--changeDetection OnPush (no other option)` },
-            { label: TYPE_EXPORTED_PURE, description: `--export --changeDetection OnPush (no other option)` },
+            { label: TYPE_EXPORTED, description: `--export (required for reusable components consumed outside of their own module)` },
+            { label: TYPE_PURE, description: `--change-detection OnPush (recommended to optimize UI / presentation components)` },
         ];
 
-        const viewEncapsulation = schema.options.get('viewEncapsulation');
-
-        if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.indexOf('ShadowDom') !== -1)) {
-
-            componentBehaviors.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
-
+        const skipSelectorOption = schema.options.get('skipSelector');
+        if (skipSelectorOption) {
+            componentBehaviors.push({ label: TYPE_NO_SELECTOR, description: `--skip-selector (recommended for routed components and modals/dialogs)` });
         }
 
-        componentBehaviors.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
+        const entryComponentOption = schema.options.get('entryComponent');
+        if (entryComponentOption) {
+            componentBehaviors.push({ label: TYPE_ENTRY, description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)` });
+        }
+
+        const viewEncapsulationOption = schema.options.get('viewEncapsulation');
+        if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.indexOf('ShadowDom') !== -1)) {
+            componentBehaviors.push({ label: TYPE_SHADOW, description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)` },);
+        }
+
+        componentBehaviors.push({ label: TYPE_ADVANCED, description: `I need to add other advanced options` });
 
         const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
-            placeHolder: `What component behavior do you want?`,
+            canPickMany: true,
+            placeHolder: `Do you want special component behavior(s)? (otherwise just press Enter)`,
             ignoreFocusOut: true,
         });
 
-        if (!componentBehavior) {
-            return undefined;
-        }
+        if (componentBehavior) {
 
-        switch (componentBehavior.label) {
+            const labels = componentBehavior.map((item) => item.label);
 
-            case TYPE_EXPORTED:
-            componentOptions.set('export', 'true');
-            break;
-
-            case TYPE_PURE:
-            componentOptions.set('changeDetection', 'OnPush');
-            break;
-
-            case TYPE_EXPORTED_PURE:
-            componentOptions.set('export', 'true');
-            componentOptions.set('changeDetection', 'OnPush');
-            break;
-
-            case TYPE_ELEMENT:
-            componentOptions.set('entryComponent', 'true');
-            componentOptions.set('viewEncapsulation', 'ShadowDom');
-            break;
-
-        }
-
-        if (componentBehavior.label === TYPE_ADVANCED) {
-            const componentAdvancedOptions = await this.askOptions(schema);
-            for (const [key, value] of componentAdvancedOptions) {
-                componentOptions.set(key, value);
+            if (labels.indexOf(TYPE_EXPORTED) !== -1) {
+                componentOptions.set('export', 'true');
+            } else if (labels.indexOf(TYPE_PURE) !== -1) {
+                componentOptions.set('changeDetection', 'OnPush');
+            } else if (labels.indexOf(TYPE_NO_SELECTOR) !== -1) {
+                componentOptions.set('skipSelector', 'true');
+            } else if (labels.indexOf(TYPE_ENTRY) !== -1) {
+                componentOptions.set('entryComponent', 'true');
+            } else if (labels.indexOf(TYPE_SHADOW) !== -1) {
+                componentOptions.set('viewEncapsulation', 'ShadowDom');
             }
+
+            if (labels.indexOf(TYPE_ADVANCED) !== -1) {
+                const componentAdvancedOptions = await this.askOptions(schema);
+                for (const [key, value] of componentAdvancedOptions) {
+                    componentOptions.set(key, value);
+                }
+            }
+
         }
 
         return componentOptions;
