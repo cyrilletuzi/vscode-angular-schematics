@@ -121,7 +121,7 @@ For example, `ng g hello --type page` will generate the `hello.page.ts` file wit
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
 This is particullary helpful for projects following a good architecture, ie. distinguishing components behaviors
-(see below if interested for more details), or for tools with special components (like modals in Ionic).
+(explained above), or for tools with special components (like modals in Ionic).
 
 #### TSLint config
 
