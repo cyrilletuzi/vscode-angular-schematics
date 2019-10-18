@@ -13,7 +13,7 @@ This extension will save you time:
 - No more documentation search, all options available are proposed and described
 - **Many options are inferred** (like the path and the project)
 - **Generated files will auto open!**
-- Promote good practices for component types
+- Promote **good practices** for component types
 
 ### Differences with Angular Console
 
