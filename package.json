@@ -97,6 +97,46 @@
                         },
                         "default": [],
                         "description": "Add other schematics (for example: \"@angular/material\")"
+                    },
+                    "ngschematics.exportedComponentTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom exported component suffixes (for example: \"UI\")"
+                    },
+                    "ngschematics.pureComponentTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom pure component suffixes (for example: \"Presentation\")"
+                    },
+                    "ngschematics.pageComponentTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom page component suffixes (for example: \"Page\")"
+                    },
+                    "ngschematics.runtimeComponentTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom runtime component suffixes (for example: \"Modal\")"
+                    },
+                    "ngschematics.elementComponentTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom Angular Element suffixes (for example: \"Native\")"
                     }
                 }
             }

@@ -8,6 +8,7 @@ import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
 import { TSLintConfig } from './tslint-config';
+import { Configuration } from './preferences';
 
 
 export interface ExplorerMenuContext {
@@ -242,9 +243,11 @@ export class Commands {
                 ignoreFocusOut: true,
             });
 
-            if (componentType && (componentType !== 'Component')) {
+            if (componentType) {
                 componentType = componentType.toLowerCase();
-                componentOptions.set('type', componentType);
+                if (componentType !== 'Component') {
+                    componentOptions.set('type', componentType);
+                }
             }
 
         }
@@ -256,13 +259,24 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
-        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb'];
-        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route'];
-        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover'];
-        const elementComponentType = 'element';
+        const userExportedComponentTypes: string[] = Configuration.get('exportedComponentTypes') || [];
+        const userPureComponentTypes: string[] = Configuration.get('pureComponentTypes') || [];
+        const userPageComponentTypes: string[] = Configuration.get('pageComponentTypes') || [];
+        const userRuntimeComponentTypes: string[] = Configuration.get('runtimeComponentTypes') || [];
+        const userElementComponentTypes: string[] = Configuration.get('elementComponentTypes') || [];
+
+        const exportedComponentTypes: string[] = userExportedComponentTypes.map((value) => value.toLowerCase());
+        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb', ...(userPureComponentTypes.map((value) => value.toLowerCase()))];
+        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route', ...(userPageComponentTypes.map((value) => value.toLowerCase()))];
+        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', ...(userRuntimeComponentTypes.map((value) => value.toLowerCase()))];
+        const elementComponentTypes: string[] = ['element', ...(userElementComponentTypes.map((value) => value.toLowerCase()))];
 
         const componentBehaviors: vscode.QuickPickItem[] = [
-            { label: TYPE_EXPORTED, description: `--export (required for reusable components consumed outside of their own module)` },
+            {
+                label: TYPE_EXPORTED,
+                description: `--export (required for reusable components consumed outside of their own module)`,
+                picked: (componentType && exportedComponentTypes.indexOf(componentType) !== -1) ? true : false,
+            },
             {
                 label: TYPE_PURE,
                 description: `--change-detection OnPush (recommended to optimize UI / presentation components)`,
@@ -284,7 +298,7 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_ENTRY,
                 description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)`,
-                picked: (componentType && [elementComponentType, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && [...elementComponentTypes, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
             });
         }
 
@@ -293,7 +307,7 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_SHADOW,
                 description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)`,
-                picked: (componentType === elementComponentType) ? true : false,
+                picked: (componentType && elementComponentTypes.indexOf(componentType) !== -1) ? true : false,
             });
         }
 

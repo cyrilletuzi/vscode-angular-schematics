@@ -147,7 +147,7 @@ If you think some other common suffixes are missing, please do a PR (or file an 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
 - exported: `"ngschematics.exportedComponentTypes": ["Custom"]`
 - pure: `"ngschematics.pureComponentTypes": ["Custom"]`
-- no selector: `"ngschematics.pagesComponentTypes": ["Custom"]`
+- no selector: `"ngschematics.pageComponentTypes": ["Custom"]`
 - no selector & entry: `"ngschematics.runtimeComponentTypes": ["Custom"]`
 - entry & shadow: `"ngschematics.elementComponentTypes": ["Custom"]`
 

@@ -2,11 +2,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
+import { Configuration } from './preferences';
 
-
-interface SettingSchematics {
-    schematics?: string[];
-}
 
 export class Schematics {
 
@@ -30,11 +27,11 @@ export class Schematics {
 
         const collectionsNames: string[] = [...this.commonCollections];
 
-        const userConfiguration: SettingSchematics | undefined = vscode.workspace.getConfiguration().get('ngschematics');
+        const userSchematics = Configuration.get('schematics');
 
-        if (userConfiguration && userConfiguration.schematics) {
+        if (userSchematics) {
 
-            collectionsNames.push(...userConfiguration.schematics);
+            collectionsNames.push(...userSchematics);
 
         }
 
