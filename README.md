@@ -123,12 +123,41 @@ For example, `ng g hello --type page` will generate the `hello.page.ts` file wit
 This is particullary helpful for projects following a good architecture, ie. distinguishing components behaviors
 (see below if interested for more details), or for tools with special components (like modals in Ionic).
 
-Your *root* `tslint.json` config must be set accordingly:
-`"component-class-suffix": [true, "Component", "Page"]`.
+#### TSLint config
 
-If your config is correctly set, this extension makes things even easier:
-you'll be asked which component type you want based on the `tslint.json` suffixes list,
-and the `--type` option will be set accordingly.
+Your *root* `tslint.json` config must be set accordingly. For example:
+`"component-class-suffix": [true, "Component", "Page", "Modal"]`.
+
+Now the extension will ask which component type you want based on the `tslint.json` suffixes list,
+and the `--type` option will be set automatically.
+
+#### Common types
+
+Even better: some common suffixes will automatically pre-select the recommended behaviors:
+- `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > pure
+- `Page`, `Container`, `Smart`, `Routed`, `Route` > no selector
+- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover` > no selector & entry
+- `Element` > entry & shadow
+
+#### Custom types
+
+The list includes common components types in Angular Material and Ionic.
+If you think some other common suffixes are missing, please do a PR (or file an issue).
+
+For uncommon suffixes, you can add a custom configuration in VS Code preferences:
+- exported: `"ngschematics.exportedComponentTypes": ["Custom"]`
+- pure: `"ngschematics.pureComponentTypes": ["Custom"]`
+- no selector: `"ngschematics.pagesComponentTypes": ["Custom"]`
+- no selector & entry: `"ngschematics.runtimeComponentTypes": ["Custom"]`
+- entry & shadow: `"ngschematics.elementComponentTypes": ["Custom"]`
+
+#### Default `Component` suffix
+
+If you use the default `Component` suffix only for your pure presentation components, add this config:
+`"ngschematics.pureComponentTypes": ["Component"]`
+
+This is a good practice but not the default configuration, as `Component` is the default suffix,
+and changing the `changeDetection` option has consequences that you need to be aware of.
 
 ## Other features
 
