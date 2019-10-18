@@ -271,6 +271,9 @@ export class Commands {
         const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', ...(userRuntimeComponentTypes.map((value) => value.toLowerCase()))];
         const elementComponentTypes: string[] = ['element', ...(userElementComponentTypes.map((value) => value.toLowerCase()))];
 
+        const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
+        const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
+
         const componentBehaviors: vscode.QuickPickItem[] = [
             {
                 label: TYPE_EXPORTED,
@@ -289,7 +292,7 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_NO_SELECTOR,
                 description: `--skip-selector (recommended for routed components and modals/dialogs)`,
-                picked: (componentType && [...pageComponentTypes, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && noSelectorComponentTypes.indexOf(componentType) !== -1) ? true : false,
             });
         }
 
@@ -298,7 +301,7 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_ENTRY,
                 description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)`,
-                picked: (componentType && [...elementComponentTypes, ...runtimeComponentTypes].indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && entryComponentTypes.indexOf(componentType) !== -1) ? true : false,
             });
         }
 
