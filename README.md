@@ -125,7 +125,8 @@ This is particullary helpful for projects following a good architecture, ie. dis
 
 #### TSLint config
 
-Your *root* `tslint.json` config must be set accordingly. For example:
+**Your *root* `tslint.json` config must be set accordingly**. For example:
+
 `"component-class-suffix": [true, "Component", "Page", "Modal"]`.
 
 Now the extension will ask which component type you want based on the `tslint.json` suffixes list,
