@@ -245,7 +245,7 @@ export class Commands {
 
             if (componentType) {
                 componentType = componentType.toLowerCase();
-                if (componentType !== 'Component') {
+                if (componentType !== 'component') {
                     componentOptions.set('type', componentType);
                 }
             }
