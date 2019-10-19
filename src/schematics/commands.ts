@@ -259,17 +259,17 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
-        const userExportedComponentTypes: string[] = Configuration.get('exportedComponentTypes') || [];
-        const userPureComponentTypes: string[] = Configuration.get('pureComponentTypes') || [];
-        const userPageComponentTypes: string[] = Configuration.get('pageComponentTypes') || [];
-        const userRuntimeComponentTypes: string[] = Configuration.get('runtimeComponentTypes') || [];
-        const userElementComponentTypes: string[] = Configuration.get('elementComponentTypes') || [];
+        const userExportedComponentTypes: string[] = (Configuration.get('exportedComponentTypes') || []).map((value) => value.toLowerCase());
+        const userPureComponentTypes: string[] = (Configuration.get('pureComponentTypes') || []).map((value) => value.toLowerCase());
+        const userPageComponentTypes: string[] = (Configuration.get('pageComponentTypes') || []).map((value) => value.toLowerCase());
+        const userRuntimeComponentTypes: string[] = (Configuration.get('runtimeComponentTypes') || []).map((value) => value.toLowerCase());
+        const userElementComponentTypes: string[] = (Configuration.get('elementComponentTypes') || []).map((value) => value.toLowerCase());
 
-        const exportedComponentTypes: string[] = userExportedComponentTypes.map((value) => value.toLowerCase());
-        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb', ...(userPureComponentTypes.map((value) => value.toLowerCase()))];
-        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route', ...(userPageComponentTypes.map((value) => value.toLowerCase()))];
-        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', ...(userRuntimeComponentTypes.map((value) => value.toLowerCase()))];
-        const elementComponentTypes: string[] = ['element', ...(userElementComponentTypes.map((value) => value.toLowerCase()))];
+        const exportedComponentTypes: string[] = userExportedComponentTypes;
+        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb', ...userPureComponentTypes];
+        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route', ...userPageComponentTypes];
+        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', ...userRuntimeComponentTypes];
+        const elementComponentTypes: string[] = ['element', ...userElementComponentTypes];
 
         const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
         const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
