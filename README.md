@@ -137,7 +137,7 @@ and the `--type` option will be set automatically.
 Even better: some common suffixes will automatically pre-select the recommended behaviors:
 - `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > pure
 - `Page`, `Container`, `Smart`, `Routed`, `Route` > no selector
-- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover` > no selector & entry
+- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > no selector & entry
 - `Element` > entry & shadow
 
 #### Custom types
