@@ -30,7 +30,7 @@ export const defaultComponentTypes: ComponentTypes = {
     /* Options: `--skip-selector` */
     page: ['page', 'container', 'smart', 'routed', 'route'],
     /* Options: `--entry --skip-selector` */
-    runtime: ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover'],
+    runtime: ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', 'entry'],
     /* Options: `--entry --view-encapsulation ShadowDom` */
     element: ['element'],
 };
