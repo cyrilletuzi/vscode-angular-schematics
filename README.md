@@ -146,17 +146,17 @@ The list above includes common components types in Angular, Material and Ionic.
 If you think some other common suffixes are missing, please open a Pull Request.
 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
-- exported: `"ngschematics.exportedComponentTypes": ["Custom"]`
-- pure: `"ngschematics.pureComponentTypes": ["Custom"]`
-- no selector: `"ngschematics.pageComponentTypes": ["Custom"]`
-- no selector & entry: `"ngschematics.runtimeComponentTypes": ["Custom"]`
-- entry & shadow: `"ngschematics.elementComponentTypes": ["Custom"]`
+- exported: `"ngschematics.componentTypes.exported": ["Custom"]`
+- pure: `"ngschematics.componentTypes.pure": ["Custom"]`
+- no selector: `"ngschematics.componentTypes.page": ["Custom"]`
+- no selector & entry: `"ngschematics.componentTypes.runtime": ["Custom"]`
+- entry & shadow: `"ngschematics.componentTypes.element": ["Custom"]`
 
 #### Default suffix
 
 If you use the default `Component` suffix only for your pure presentation components, 
 configure your VS Code preferences like this:
-`"ngschematics.pureComponentTypes": ["Component"]`
+`"ngschematics.componentTypes.pure": ["Component"]`
 
 This is a good practice but not the default configuration, as `Component` is the default suffix,
 and changing the `changeDetection` option has consequences that you need to be aware of.

@@ -8,7 +8,8 @@ import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
 import { TSLintConfig } from './tslint-config';
-import { Configuration } from './preferences';
+import { UserPreferences } from './preferences';
+import { defaultComponentTypes } from './defaults';
 
 
 export interface ExplorerMenuContext {
@@ -259,17 +260,11 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
-        const userExportedComponentTypes: string[] = (Configuration.get('exportedComponentTypes') || []).map((value) => value.toLowerCase());
-        const userPureComponentTypes: string[] = (Configuration.get('pureComponentTypes') || []).map((value) => value.toLowerCase());
-        const userPageComponentTypes: string[] = (Configuration.get('pageComponentTypes') || []).map((value) => value.toLowerCase());
-        const userRuntimeComponentTypes: string[] = (Configuration.get('runtimeComponentTypes') || []).map((value) => value.toLowerCase());
-        const userElementComponentTypes: string[] = (Configuration.get('elementComponentTypes') || []).map((value) => value.toLowerCase());
-
-        const exportedComponentTypes: string[] = userExportedComponentTypes;
-        const pureComponentTypes: string[] = ['pure', 'ui', 'presentation', 'presentational', 'dumb', ...userPureComponentTypes];
-        const pageComponentTypes: string[] = ['page', 'container', 'smart', 'routed', 'route', ...userPageComponentTypes];
-        const runtimeComponentTypes: string[] = ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', ...userRuntimeComponentTypes];
-        const elementComponentTypes: string[] = ['element', ...userElementComponentTypes];
+        const exportedComponentTypes: string[] = [...defaultComponentTypes.exported, ...UserPreferences.getComponentTypes('exported')];
+        const pureComponentTypes: string[] = [...defaultComponentTypes.pure, ...UserPreferences.getComponentTypes('pure')];
+        const pageComponentTypes: string[] = [...defaultComponentTypes.page, ...UserPreferences.getComponentTypes('page')];
+        const runtimeComponentTypes: string[] = [...defaultComponentTypes.runtime, ...UserPreferences.getComponentTypes('runtime')];
+        const elementComponentTypes: string[] = [...defaultComponentTypes.element, ...UserPreferences.getComponentTypes('element')];
 
         const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
         const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
@@ -328,13 +323,17 @@ export class Commands {
 
             if (labels.indexOf(TYPE_EXPORTED) !== -1) {
                 componentOptions.set('export', 'true');
-            } else if (labels.indexOf(TYPE_PURE) !== -1) {
+            } 
+            if (labels.indexOf(TYPE_PURE) !== -1) {
                 componentOptions.set('changeDetection', 'OnPush');
-            } else if (labels.indexOf(TYPE_NO_SELECTOR) !== -1) {
+            }
+            if (labels.indexOf(TYPE_NO_SELECTOR) !== -1) {
                 componentOptions.set('skipSelector', 'true');
-            } else if (labels.indexOf(TYPE_ENTRY) !== -1) {
+            }
+            if (labels.indexOf(TYPE_ENTRY) !== -1) {
                 componentOptions.set('entryComponent', 'true');
-            } else if (labels.indexOf(TYPE_SHADOW) !== -1) {
+            }
+            if (labels.indexOf(TYPE_SHADOW) !== -1) {
                 componentOptions.set('viewEncapsulation', 'ShadowDom');
             }
 
