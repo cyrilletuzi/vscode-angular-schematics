@@ -48,7 +48,7 @@ export class AngularConfig {
                 this.watcher.onDidChange(() => {
                     this.config = null;
                     this.init(cwd);
-                })
+                });
 
             }
 

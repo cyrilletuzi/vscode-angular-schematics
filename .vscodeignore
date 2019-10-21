@@ -1,10 +1,19 @@
 .vscode/**
 .vscode-test/**
 out/test/**
-out/**/*.map
 src/**
 .gitignore
-tsconfig.json
 vsc-extension-quickstart.md
-tslint.json
+**/tsconfig.json
+**/tslint.json
+**/*.map
+**/*.ts
+
+# Because of webpack bundling
+node_modules
+out/
+src/
+webpack.config.js
+
+# Custom
 angular-schematics-demo.gif

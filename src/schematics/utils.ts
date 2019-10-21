@@ -1,6 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as JSON5 from 'json5';
+import * as util from 'util';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -54,41 +54,18 @@ export class Utils {
 
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static readFileAsync(path: string): Promise<string> {
 
-        return new Promise((resolve, reject) => {
-    
-            fs.readFile(path, 'utf8', (error, data) => {
-    
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(data);
-                }
-    
-            });
-    
-        });
+        return (util.promisify(fs.readFile))(path, 'utf8');
     
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static existsAsync(path: string): Promise<boolean> {
 
-        return new Promise((resolve) => {
-    
-            fs.exists(path, (exists) => {
-    
-                resolve(exists);
-    
-            });
-    
-        });
+        return (util.promisify(fs.exists))(path);
     
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static execAsync(command: string, cwd?: string): Promise<string> {
 
         return new Promise((resolve, reject) => {
@@ -109,13 +86,20 @@ export class Utils {
 
     static async parseJSONFile<T = any>(path: string): Promise<T | null> {
 
+        console.log(path);
+
         let json: T | null = null;
     
         try {
             
-            const data = await this.readFileAsync(path);
+            let data: string = await this.readFileAsync(path);
+
+            /* Angular Material schematics have comments, we remove them as it's not JSON compliant */
+            if (path.includes('@angular/material')) {
+                data = data.split('\n').map((line) => line.replace(/^ *\/\/.*/, '')).join('\n');
+            }
     
-            json = JSON5.parse(data) as T;
+            json = JSON.parse(data) as T;
     
         } catch (error) {}
     
