@@ -9,5 +9,11 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 
+# Because of webpack bundling
+node_modules
+out/
+src/
+webpack.config.js
+
 # Custom
 angular-schematics-demo.gif

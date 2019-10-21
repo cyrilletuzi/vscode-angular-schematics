@@ -42,7 +42,7 @@
         "workspaceContains:angular.json",
         "workspaceContains:.angular-cli.json"
     ],
-    "main": "./out/extension.js",
+    "main": "./dist/extension.js",
     "contributes": {
         "commands": [
             {
@@ -121,25 +121,26 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile",
+        "vscode:prepublish": "webpack --mode production",
+        "compile": "webpack --mode development",
+        "watch": "webpack --mode development --watch",
+        "test-compile": "tsc -p ./",
+        "pretest": "npm run test-compile",
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
         "@types/glob": "^7.1.1",
-        "@types/json5": "^0.0.30",
         "@types/mocha": "^5.2.7",
         "@types/node": "^10.14.22",
         "@types/vscode": "1.39.0",
         "glob": "^7.1.4",
         "mocha": "^6.2.2",
+        "ts-loader": "^6.2.0",
         "tslint": "^5.20.0",
         "typescript": "^3.6.4",
-        "vscode-test": "^1.2.0"
+        "vscode-test": "^1.2.0",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.9"
     },
-    "dependencies": {
-        "json5": "^2.1.1"
-    }
+    "dependencies": {}
 }

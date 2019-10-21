@@ -1,7 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as util from 'util';
-import * as JSON5 from 'json5';
 import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -87,13 +86,20 @@ export class Utils {
 
     static async parseJSONFile<T = any>(path: string): Promise<T | null> {
 
+        console.log(path);
+
         let json: T | null = null;
     
         try {
             
-            const data = await this.readFileAsync(path);
+            let data: string = await this.readFileAsync(path);
+
+            /* Angular Material schematics have comments, we remove them as it's not JSON compliant */
+            if (path.includes('@angular/material')) {
+                data = data.split('\n').map((line) => line.replace(/^ *\/\/.*/, '')).join('\n');
+            }
     
-            json = JSON5.parse(data) as T;
+            json = JSON.parse(data) as T;
     
         } catch (error) {}
     
