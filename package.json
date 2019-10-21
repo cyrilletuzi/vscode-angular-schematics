@@ -129,7 +129,7 @@
     },
     "devDependencies": {
         "@types/glob": "^7.1.1",
-        "@types/json5": "0.0.30",
+        "@types/json5": "^0.0.30",
         "@types/mocha": "^5.2.7",
         "@types/node": "^10.14.22",
         "@types/vscode": "1.39.0",
