@@ -1,5 +1,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as util from 'util';
 import * as JSON5 from 'json5';
 import * as os from 'os';
 import * as path from 'path';
@@ -54,41 +55,18 @@ export class Utils {
 
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static readFileAsync(path: string): Promise<string> {
 
-        return new Promise((resolve, reject) => {
-    
-            fs.readFile(path, 'utf8', (error, data) => {
-    
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(data);
-                }
-    
-            });
-    
-        });
+        return (util.promisify(fs.readFile))(path, 'utf8');
     
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static existsAsync(path: string): Promise<boolean> {
 
-        return new Promise((resolve) => {
-    
-            fs.exists(path, (exists) => {
-    
-                resolve(exists);
-    
-            });
-    
-        });
+        return (util.promisify(fs.exists))(path);
     
     }
 
-    /** @todo Replace with utils.promisify() when Electron / VS Code is updated to Node 8 */
     static execAsync(command: string, cwd?: string): Promise<string> {
 
         return new Promise((resolve, reject) => {
