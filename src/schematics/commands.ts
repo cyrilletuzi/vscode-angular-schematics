@@ -273,12 +273,12 @@ export class Commands {
             {
                 label: TYPE_EXPORTED,
                 description: `--export (required for reusable components consumed outside of their own module)`,
-                picked: (componentType && exportedComponentTypes.indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
             },
             {
                 label: TYPE_PURE,
                 description: `--change-detection OnPush (recommended to optimize UI / presentation components)`,
-                picked: (componentType && pureComponentTypes.indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && pureComponentTypes.includes(componentType)) ? true : false,
             },
         ];
 
@@ -287,7 +287,7 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_NO_SELECTOR,
                 description: `--skip-selector (recommended for routed components and modals/dialogs)`,
-                picked: (componentType && noSelectorComponentTypes.indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && noSelectorComponentTypes.includes(componentType)) ? true : false,
             });
         }
 
@@ -296,16 +296,16 @@ export class Commands {
             componentBehaviors.push({
                 label: TYPE_ENTRY,
                 description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)`,
-                picked: (componentType && entryComponentTypes.indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && entryComponentTypes.includes(componentType)) ? true : false,
             });
         }
 
         const viewEncapsulationOption = schema.options.get('viewEncapsulation');
-        if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.indexOf('ShadowDom') !== -1)) {
+        if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.includes('ShadowDom'))) {
             componentBehaviors.push({
                 label: TYPE_SHADOW,
                 description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)`,
-                picked: (componentType && elementComponentTypes.indexOf(componentType) !== -1) ? true : false,
+                picked: (componentType && elementComponentTypes.includes(componentType)) ? true : false,
             });
         }
 
@@ -321,23 +321,23 @@ export class Commands {
 
             const labels = componentBehavior.map((item) => item.label);
 
-            if (labels.indexOf(TYPE_EXPORTED) !== -1) {
+            if (labels.includes(TYPE_EXPORTED)) {
                 componentOptions.set('export', 'true');
             } 
-            if (labels.indexOf(TYPE_PURE) !== -1) {
+            if (labels.includes(TYPE_PURE)) {
                 componentOptions.set('changeDetection', 'OnPush');
             }
-            if (labels.indexOf(TYPE_NO_SELECTOR) !== -1) {
+            if (labels.includes(TYPE_NO_SELECTOR)) {
                 componentOptions.set('skipSelector', 'true');
             }
-            if (labels.indexOf(TYPE_ENTRY) !== -1) {
+            if (labels.includes(TYPE_ENTRY)) {
                 componentOptions.set('entryComponent', 'true');
             }
-            if (labels.indexOf(TYPE_SHADOW) !== -1) {
+            if (labels.includes(TYPE_SHADOW)) {
                 componentOptions.set('viewEncapsulation', 'ShadowDom');
             }
 
-            if (labels.indexOf(TYPE_ADVANCED) !== -1) {
+            if (labels.includes(TYPE_ADVANCED)) {
                 const componentAdvancedOptions = await this.askOptions(schema);
                 for (const [key, value] of componentAdvancedOptions) {
                     componentOptions.set(key, value);
