@@ -126,7 +126,8 @@
         "watch": "webpack --mode development --watch",
         "test-compile": "tsc -p ./",
         "pretest": "npm run test-compile",
-        "test": "node ./out/test/runTest.js"
+        "test": "node ./out/test/runTest.js",
+        "lint": "tslint -p ."
     },
     "devDependencies": {
         "@types/glob": "^7.1.1",
