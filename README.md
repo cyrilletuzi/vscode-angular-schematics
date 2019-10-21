@@ -54,7 +54,7 @@ Why? Because the destination path and `project` will be automatically inferred t
 ### VS Code
 
 Last version (v2) of this extension officially requires Visual Studio Code version >= 1.39.
-But it may work an some older VS Code versions too.
+But it may work on some older VS Code versions too.
 
 If you use on an older version of VS Code and run into issues, you can still install v1 of the extension 
 ([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)).

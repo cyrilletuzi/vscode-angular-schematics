@@ -1,5 +1,22 @@
 # Change Log
 
+## [2.0.0] - 2019-10-21
+
+### Performance
+
+- Update all dependencies (and future updates will be automated)
+- Remove `json5` lib: the extension now has 0 dependency
+- Bundle and minify code with webpack: this extension is now <= 25 Ko
+- Use up to date Node APIs
+
+### New VS Code requirement
+
+As a consequence, this version now officially requires Visual Studio Code version >= 1.39.
+But it may work on some older VS Code versions too.
+
+If you use on an older version of VS Code and run into issues, you can still install v1 of the extension 
+([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)).
+
 ## [1.27.0] - 2019-09-08
 
 ### Feature
