@@ -105,8 +105,6 @@ If your schematics collection path is different,
 you can add a *relative* path in the VS Code preferences.
 For example: `"ngschematics.schematics": ["./path/to/collection.json"]`
 
-[Additional steps are required](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/docs/NX.md) if you use Nx workspace schematics.
-
 ### Keyboard shortcuts
 
 You can add keyboard shortcuts to the following actions:
