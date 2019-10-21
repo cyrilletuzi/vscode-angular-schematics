@@ -93,7 +93,7 @@ export class Schema {
 
         for (let option of this.options.values()) {
             if ((option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0))
-            || (this.requiredOptions.indexOf('name') !== -1)) {
+            || (this.requiredOptions.includes('name'))) {
                 return true;
             }
         }
@@ -144,11 +144,11 @@ export class Schema {
                 /* Do not pre-select options with defaults values, as the CLI will take care of them */
                 (!('$default' in option) && (
                     /* Pre-select required and suggested (x-prompt) properties */
-                    (this.requiredOptions.indexOf(optionName) !== -1) || ('x-prompt' in option)
+                    (this.requiredOptions.includes(optionName)) || ('x-prompt' in option)
                 ));
 
                 /* UX: inform the user why some options are pre-select */
-                const requiredTip = (!('$default' in option) && (this.requiredOptions.indexOf(optionName) !== -1)) ? '(required) ' : '';
+                const requiredTip = (!('$default' in option) && (this.requiredOptions.includes(optionName))) ? '(required) ' : '';
                 const suggestedTip = (!('$default' in option) && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
 
                 choices.push({

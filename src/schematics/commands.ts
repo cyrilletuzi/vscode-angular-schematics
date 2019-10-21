@@ -240,7 +240,7 @@ export class Commands {
 
         const viewEncapsulation = schema.options.get('viewEncapsulation');
 
-        if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.indexOf('ShadowDom') !== -1)) {
+        if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.includes('ShadowDom'))) {
 
             componentTypes.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
 
