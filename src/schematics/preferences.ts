@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import { defaultSchematics, defaultComponentTypes } from './defaults';
+
 
 export interface ComponentTypes {
     /** Options: `--export` */
@@ -14,7 +16,7 @@ export interface ComponentTypes {
     element: string[];
 }
 
-export class UserPreferences {
+export class Preferences {
 
     private static schematics: string[] | null = null;
     private static componentTypes: string[] | null = null;
@@ -22,10 +24,12 @@ export class UserPreferences {
     static getSchematics(): string[] {
 
         if (!this.schematics) {
-            this.schematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+            const userSchematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+            this.schematics = [...defaultSchematics, ...userSchematics];
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                this.schematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+                const userSchematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+                this.schematics = [...defaultSchematics, ...userSchematics];
             });
         }
 
@@ -36,15 +40,15 @@ export class UserPreferences {
     static getComponentTypes<T extends keyof ComponentTypes>(type: T): string[] {
 
         if (!this.componentTypes) {
-            this.componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, [])
-                .map((type) => type.toLowerCase());
+            const userComponentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
+            this.componentTypes = [...defaultComponentTypes[type], ...userComponentTypes].map((type) => type.toLowerCase());
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                this.componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, [])
-                    .map((type) => type.toLowerCase());
+                const userComponentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
+                this.componentTypes = [...defaultComponentTypes[type], ...userComponentTypes].map((type) => type.toLowerCase());
             });
         }
-        
+
         return this.componentTypes;
 
     }

@@ -8,8 +8,7 @@ import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
 import { TSLintConfig } from './tslint-config';
-import { UserPreferences } from './preferences';
-import { defaultComponentTypes } from './defaults';
+import { Preferences } from './preferences';
 
 
 export interface ExplorerMenuContext {
@@ -260,11 +259,11 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
-        const exportedComponentTypes: string[] = [...defaultComponentTypes.exported, ...UserPreferences.getComponentTypes('exported')];
-        const pureComponentTypes: string[] = [...defaultComponentTypes.pure, ...UserPreferences.getComponentTypes('pure')];
-        const pageComponentTypes: string[] = [...defaultComponentTypes.page, ...UserPreferences.getComponentTypes('page')];
-        const runtimeComponentTypes: string[] = [...defaultComponentTypes.runtime, ...UserPreferences.getComponentTypes('runtime')];
-        const elementComponentTypes: string[] = [...defaultComponentTypes.element, ...UserPreferences.getComponentTypes('element')];
+        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
+        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
+        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
+        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
+        const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
 
         const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
         const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];

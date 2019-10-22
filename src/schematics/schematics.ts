@@ -2,22 +2,16 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
-import { UserPreferences } from './preferences';
-import { defaultSchematics } from './defaults';
+import { Preferences } from './preferences';
 
 
 export class Schematics {
 
-    static commonCollections: string[] = defaultSchematics;
     static collections: Set<string> = new Set();
 
     static async load(cwd: string) {
 
-        const collectionsNames: string[] = [...this.commonCollections];
-
-        const userSchematics = UserPreferences.getSchematics();
-
-        collectionsNames.push(...userSchematics);
+        const collectionsNames: string[] = Preferences.getSchematics();
 
         const existingCollections: string[] = [];
 
