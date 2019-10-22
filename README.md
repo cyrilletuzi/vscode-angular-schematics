@@ -136,49 +136,35 @@ By default, the extension will propose you these component types:
 - Component: no special behavior
 - Page: component associated to a route (`--skip-selector`)
 - Pure: presentation / UI component (`--change-detection OnPush`)
-- Runtime: like modals or dialogs (`--skip-selector --entry-component`)
-- Exported: pure components reused outside of their modules, ie. component lib (`--exported --change-detection OnPush`)
+- Runtime: component like modals or dialogs (`--skip-selector --entry-component`)
+- Exported: pure component reused outside of their modules, ie. component lib (`--exported --change-detection OnPush`)
 - Element: Angular Element, ie. a native Web Component (`--entry-component --view-encapsulation ShadowDom`)
 
-#### Customize component types
+#### Customize component suffixes (Angular >= 9)
+
+Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
+
+For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
+(instead of the `hello.component.ts` file with a `HelloComponent` class).
 
 To customize component types, **your *root* `tslint.json` config must be changed** like this:
 
 `"component-class-suffix": [true, "Component", "Page", "Modal"]`.
 
-Now the extension will ask which component type you want based on this suffixes list.
+Now the extension will ask which component type you want based on this suffixes list,
+and set the `--type` option automatically.
 
-#### Angular >= 9 suffixes
+Note `--type` is set automatically only for your custom suffixes in `tslint.json`,
+not for the default component types, as otherwise lint would fail.
 
-Why is the config managed via TSLint components suffixes?
-Because Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
+#### Link a custom suffix to a component type
 
-For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
-(instead of the `hello.component.ts` file with a `HelloComponent` class).
-
-This extension will set the `--type` option automatically if these 2 conditions are met:
-- in an Angular >= 9 project,
-- the component type has been set in `tslint.json`.
-
-It's not done automatically with the default component types, as suffixes need to be explicitly authorized in `tslint.json`,
-otherwise lint would fail.
-
-If you customized the component types but want to keep the pre-Angular 9 behavior
-(ie. keep `Component` suffix for all components, no matter their type),
-just set the following config in your Visual Studio Code preferences:
-
-`"ngschematics.disableComponentTypeAsSuffix": true`
-
-#### Common suffixes
-
-If you configured custom component types, some common suffixes will automatically pre-select the recommended behaviors:
+Some common suffixes will automatically pre-select the recommended behaviors:
 - `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > `--change-detection OnPush`
 - `Page`, `Container`, `Smart`, `Routed`, `Route` > `--skip-selector`
 - `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > `--skip-selector --entry-component`
 - `Exported`, `Lib` > `--exported --change-detection OnPush`
 - `Element` > `--entry-component --view-encapsulation ShadowDom`: 
-
-#### Custom suffixes
 
 The list above includes common suffixes in Angular, Material and Ionic.
 If you think some other common suffixes are missing, please open a Pull Request.
@@ -192,7 +178,7 @@ For uncommon suffixes, you can add a custom configuration in VS Code preferences
 
 #### Default suffix
 
-If you use the default `Component` suffix only for your pure presentation components, 
+If you want to use the default `Component` suffix only for your pure presentation components, 
 configure your VS Code preferences like this:
 
 `"ngschematics.componentTypes.pure": ["Component"]`

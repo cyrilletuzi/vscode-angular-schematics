@@ -20,7 +20,6 @@ export class Preferences {
 
     private static schematics: string[] | null = null;
     private static componentTypes: ComponentTypes | null = null;
-    private static disableComponentTypeAsSuffix: boolean | null = null;
     private static event: vscode.Disposable | null;
 
     static init(): void {
@@ -30,7 +29,6 @@ export class Preferences {
             this.event = vscode.workspace.onDidChangeConfiguration(() => {
                 this.schematics = null;
                 this.componentTypes = null;
-                this.disableComponentTypeAsSuffix = null;
             });
 
         } 
@@ -62,16 +60,6 @@ export class Preferences {
         }
 
         return this.componentTypes[type].map((type) => type.toLowerCase());
-
-    }
-
-    static isComponentTypeAsSuffixDisabled(): boolean {
-
-        if (this.disableComponentTypeAsSuffix === null) {
-            this.disableComponentTypeAsSuffix = vscode.workspace.getConfiguration().get<boolean>(`ngschematics.disableComponentTypeAsSuffix`, false);
-        }
-
-        return this.disableComponentTypeAsSuffix;
 
     }
 

@@ -279,7 +279,6 @@ export class Commands {
         if (componentTypeChoice) {
             componentType = componentTypeChoice.label.toLowerCase();
             if ((componentType !== 'component') && schema.options.get('type')
-                && !Preferences.isComponentTypeAsSuffixDisabled()
                 && TSLintConfig.userComponentSuffixes.includes(componentTypeChoice.label)) {
                 componentOptions.set('type', componentType);
             }

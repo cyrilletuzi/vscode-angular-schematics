@@ -137,11 +137,6 @@
                         },
                         "default": [],
                         "description": "Add custom Angular Element suffixes (for example: \"Native\")"
-                    },
-                    "ngschematics.disableComponentTypeAsSuffix": {
-                        "type": "boolean",
-                        "default": false,
-                        "description": "Do not use component type (like `Page`) as component suffix in Angular >= 9 projects"
                     }
                 }
             }
