@@ -16,17 +16,36 @@ export interface ComponentTypes {
 
 export class UserPreferences {
 
+    private static schematics: string[] | null = null;
+    private static componentTypes: string[] | null = null;
+
     static getSchematics(): string[] {
 
-        return vscode.workspace.getConfiguration().get<string[]>(`schematics.`, []);
+        if (!this.schematics) {
+            this.schematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+
+            vscode.workspace.onDidChangeConfiguration(() => {
+                this.schematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+            });
+        }
+
+        return this.schematics;
 
     }
 
     static getComponentTypes<T extends keyof ComponentTypes>(type: T): string[] {
 
-        const componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
+        if (!this.componentTypes) {
+            this.componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, [])
+                .map((type) => type.toLowerCase());
 
-        return componentTypes.map((type) => type.toLowerCase());
+            vscode.workspace.onDidChangeConfiguration(() => {
+                this.componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, [])
+                    .map((type) => type.toLowerCase());
+            });
+        }
+        
+        return this.componentTypes;
 
     }
 
