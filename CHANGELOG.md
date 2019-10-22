@@ -33,7 +33,7 @@ The extension will now correct this error automatically.
 
 - Update all dependencies (and future updates will be automated)
 - Remove `json5` lib: the extension now has 0 dependency
-- Bundle and minify code with webpack: this extension is now <= 25 Ko
+- Bundle and minify code with webpack: this extension is now <= 30 Ko
 - Use up to date Node APIs
 
 ### New VS Code requirement
