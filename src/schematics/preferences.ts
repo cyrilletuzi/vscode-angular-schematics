@@ -29,8 +29,7 @@ export class Preferences {
             this.schematics = [...defaultSchematics, ...userSchematics];
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                const userSchematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
-                this.schematics = [...defaultSchematics, ...userSchematics];
+                this.schematics = null;
             });
         }
 
@@ -51,14 +50,7 @@ export class Preferences {
             };
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                const userComponentTypes = vscode.workspace.getConfiguration().get<Partial<ComponentTypes>>('ngschematics.componentTypes', {});
-                this.componentTypes = {
-                    exported: [...defaultComponentTypes.exported, ...(userComponentTypes.exported || [])],
-                    pure: [...defaultComponentTypes.pure, ...(userComponentTypes.pure || [])],
-                    page: [...defaultComponentTypes.page, ...(userComponentTypes.page || [])],
-                    runtime: [...defaultComponentTypes.runtime, ...(userComponentTypes.runtime || [])],
-                    element: [...defaultComponentTypes.element, ...(userComponentTypes.element || [])],
-                };
+                this.componentTypes = null;
             });
         }
 
@@ -72,7 +64,7 @@ export class Preferences {
             this.disableComponentTypeAsSuffix = vscode.workspace.getConfiguration().get<boolean>(`ngschematics.disableComponentTypeAsSuffix`, false);
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                this.disableComponentTypeAsSuffix = vscode.workspace.getConfiguration().get<boolean>(`ngschematics.disableComponentTypeAsSuffix`, false);
+                this.disableComponentTypeAsSuffix = null;
             });
         }
 
