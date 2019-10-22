@@ -122,27 +122,39 @@ the native encapsulation called `ShadowDom` must be used.
 Note it's only available in Angular >= 7,
 and it won't work in Internet Explorer / Edge (pre-Chromium).
 
-### Component types (Angular >= 9)
+### Component types
 
-Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
-For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
-(instead of the `hello.component.ts` file with a `HelloComponent` class).
+Having different component types is particullary helpful for projects following a good architecture,
+ie. distinguishing components behaviors (explained above), or for tools with special components (like pages and modals in Ionic).
 
-This is particullary helpful for projects following a good architecture, ie. distinguishing components behaviors
-(explained above), or for tools with special components (like modals in Ionic).
+[Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
 
-#### TSLint config
+#### Add a component type
 
-**Your *root* `tslint.json` config must be set accordingly**. For example:
+To add a new component type, **your *root* `tslint.json` config must be changed** like this:
 
 `"component-class-suffix": [true, "Component", "Page", "Modal"]`.
 
-Now the extension will ask which component type you want based on the `tslint.json` suffixes list,
-and the `--type` option will be set automatically.
+Now the extension will ask which component type you want based on this suffixes list.
+
+#### Angular >= 9
+
+Why is the config managed via TSLint components suffixes?
+Because Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
+
+For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
+(instead of the `hello.component.ts` file with a `HelloComponent` class).
+
+In Angular >= 9 projects, this extension will set the `--type` option automatically.
+
+If you want to keep the pre-Angular 9 behavior (ie. keep `Component` suffix for all components, no matter their type),
+just set the following config in your Visual Studio Code preferences:
+
+`"ngschematics.disableComponentTypeAsSuffix": true`
 
 #### Common types
 
-Even better: some common suffixes will automatically pre-select the recommended behaviors:
+Some common suffixes will automatically pre-select the recommended behaviors:
 - `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > pure
 - `Page`, `Container`, `Smart`, `Routed`, `Route` > no selector
 - `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > no selector & entry
@@ -164,6 +176,7 @@ For uncommon suffixes, you can add a custom configuration in VS Code preferences
 
 If you use the default `Component` suffix only for your pure presentation components, 
 configure your VS Code preferences like this:
+
 `"ngschematics.componentTypes.pure": ["Component"]`
 
 This is a good practice but not the default configuration, as `Component` is the default suffix,
