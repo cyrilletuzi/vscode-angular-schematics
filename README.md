@@ -129,13 +129,23 @@ ie. distinguishing components behaviors (explained above), or for tools with spe
 
 [Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
 
-#### Add a component type
+#### Default component types
 
-To add a new component type, **your *root* `tslint.json` config must be changed** like this:
+By default, the extension will propose you these component types:
+
+- Component: no special behavior
+- Page: component associated to a route (`--skip-selector`)
+- Pure: presentation / UI component (`--change-detection OnPush`)
+- Runtime: like modals or dialogs (`--skip-selector --entry-component`)
+- Element: Angular Element, ie. a native Web Component (`--entry-component --view-encapsulation ShadowDom`)
+
+#### Customize component types
+
+To customize component types, **your *root* `tslint.json` config must be changed** like this:
 
 `"component-class-suffix": [true, "Component", "Page", "Modal"]`.
 
-Now the extension will ask which component type you want based on this suffixes list.
+This will override the defaults, and now the extension will ask which component type you want based on this suffixes list.
 
 #### Angular >= 9
 
@@ -145,24 +155,30 @@ Because Angular CLI >= 9 introduces a new `type` option for component generation
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
-In Angular >= 9 projects, this extension will set the `--type` option automatically.
+This extension will set the `--type` option automatically if these 2 conditions are met:
+- in an Angular >= 9 project,
+- you customized your component types in `tslint.json`.
 
-If you want to keep the pre-Angular 9 behavior (ie. keep `Component` suffix for all components, no matter their type),
+It's not done automatically with the default component types, as suffixes need to be explicitly authorized in `tslint.json`,
+otherwise lint would fail.
+
+If the conditions are met but you want to keep the pre-Angular 9 behavior
+(ie. keep `Component` suffix for all components, no matter their type),
 just set the following config in your Visual Studio Code preferences:
 
 `"ngschematics.disableComponentTypeAsSuffix": true`
 
-#### Common types
+#### Common suffixes
 
-Some common suffixes will automatically pre-select the recommended behaviors:
+If you configured custom component types, some common suffixes will automatically pre-select the recommended behaviors:
 - `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > pure
 - `Page`, `Container`, `Smart`, `Routed`, `Route` > no selector
 - `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > no selector & entry
 - `Element` > entry & shadow
 
-#### Custom types
+#### Custom suffixes
 
-The list above includes common components types in Angular, Material and Ionic.
+The list above includes common suffixes in Angular, Material and Ionic.
 If you think some other common suffixes are missing, please open a Pull Request.
 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
