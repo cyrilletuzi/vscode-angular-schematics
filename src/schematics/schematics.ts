@@ -15,13 +15,9 @@ export class Schematics {
 
         const collectionsNames: string[] = [...this.commonCollections];
 
-        const userSchematics = UserPreferences.get('schematics');
+        const userSchematics = UserPreferences.getSchematics();
 
-        if (userSchematics) {
-
-            collectionsNames.push(...userSchematics);
-
-        }
+        collectionsNames.push(...userSchematics);
 
         const existingCollections: string[] = [];
 

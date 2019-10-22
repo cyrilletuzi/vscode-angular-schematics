@@ -14,28 +14,19 @@ export interface ComponentTypes {
     element: string[];
 }
 
-interface Preferences {
-    schematics?: string[];
-    componentTypes?: Partial<ComponentTypes>;
-}
-
 export class UserPreferences {
 
-    static get<T extends keyof Preferences>(name: T): Preferences[T] | undefined {
+    static getSchematics(): string[] {
 
-        const userConfiguration = vscode.workspace.getConfiguration().get<Preferences>('ngschematics');
-
-        return userConfiguration && (name in userConfiguration) ? userConfiguration[name] : undefined;
+        return vscode.workspace.getConfiguration().get<string[]>(`schematics.`, []);
 
     }
 
-    static getComponentTypes<T extends keyof ComponentTypes>(name: T): string[] {
+    static getComponentTypes<T extends keyof ComponentTypes>(type: T): string[] {
 
-        const componentTypes = this.get('componentTypes');
+        const componentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
 
-        const askedcomponentTypes = (componentTypes && name in componentTypes) ? componentTypes[name] as string[] : [];
-
-        return askedcomponentTypes.map((type) => type.toLowerCase());
+        return componentTypes.map((type) => type.toLowerCase());
 
     }
 
