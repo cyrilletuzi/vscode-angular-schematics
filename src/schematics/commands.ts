@@ -236,7 +236,7 @@ export class Commands {
         let componentType: string | undefined;
 
         /* Component `type` option is new in Angular CLI 9 */
-        if (schema.options.get('type') && TSLintConfig.componentSuffixes) {
+        if (TSLintConfig.componentSuffixes) {
 
             componentType = await vscode.window.showQuickPick(TSLintConfig.componentSuffixes, {
                 placeHolder: `What type of component do you want?`,
@@ -245,7 +245,7 @@ export class Commands {
 
             if (componentType) {
                 componentType = componentType.toLowerCase();
-                if (componentType !== 'component') {
+                if ((componentType !== 'component') && schema.options.get('type') && !Preferences.isComponentTypeAsSuffixDisabled()) {
                     componentOptions.set('type', componentType);
                 }
             }
