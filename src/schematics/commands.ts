@@ -232,19 +232,48 @@ export class Commands {
 
     static async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
 
+        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
+        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
+        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
+        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
+        const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
+
+        const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
+        const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
+
         const componentOptions = new Map<string, string | string[]>();
-        let componentType: string | undefined;
+        let componentType = '';
 
         /* Component `type` option is new in Angular CLI 9 */
         if (TSLintConfig.componentSuffixes) {
 
-            componentType = await vscode.window.showQuickPick(TSLintConfig.componentSuffixes, {
+            const componentTypeChoices: vscode.QuickPickItem[] = TSLintConfig.componentSuffixes.map((componentSuffix) => {
+                const componentSuffixLowerCase = componentSuffix.toLowerCase();
+                let description = '';
+                if (pureComponentTypes.includes(componentSuffixLowerCase)) {
+                    description = `Pure presentation / UI component`;
+                } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
+                    description = `Component associated to a route`;
+                } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
+                    description = `Runtime component, like dialogs or modals`;
+                } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
+                    description = `Angular Element, ie. a native Web Component`;
+                } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
+                    description = `Shared component used outside of its own module`;
+                }
+                return {
+                    label: componentSuffix,
+                    description,
+                };
+            });
+
+            const componentTypeChoice = await vscode.window.showQuickPick(componentTypeChoices, {
                 placeHolder: `What type of component do you want?`,
                 ignoreFocusOut: true,
             });
 
-            if (componentType) {
-                componentType = componentType.toLowerCase();
+            if (componentTypeChoice) {
+                componentType = componentTypeChoice.label.toLowerCase();
                 if ((componentType !== 'component') && schema.options.get('type') && !Preferences.isComponentTypeAsSuffixDisabled()) {
                     componentOptions.set('type', componentType);
                 }
@@ -258,15 +287,6 @@ export class Commands {
         const TYPE_ENTRY = `Entry`;
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
-
-        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
-        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
-        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
-        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
-        const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
-
-        const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
-        const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
 
         const componentBehaviors: vscode.QuickPickItem[] = [
             {
