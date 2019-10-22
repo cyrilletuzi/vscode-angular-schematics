@@ -21,14 +21,19 @@ export class Preferences {
     private static schematics: string[] | null = null;
     private static componentTypes: ComponentTypes | null = null;
     private static disableComponentTypeAsSuffix: boolean | null = null;
+    private static event: vscode.Disposable | null;
 
     static init(): void {
 
-        vscode.workspace.onDidChangeConfiguration(() => {
-            this.schematics = null;
-            this.componentTypes = null;
-            this.disableComponentTypeAsSuffix = null;
-        });
+        if (!this.event) {
+
+            this.event = vscode.workspace.onDidChangeConfiguration(() => {
+                this.schematics = null;
+                this.componentTypes = null;
+                this.disableComponentTypeAsSuffix = null;
+            });
+
+        } 
 
     }
 
