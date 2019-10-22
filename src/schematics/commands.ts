@@ -240,28 +240,29 @@ export class Commands {
 
         const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
         const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
+        const allPureComponentTypes: string[] = [...pureComponentTypes, ...exportedComponentTypes];
 
         const componentOptions = new Map<string, string | string[]>();
         let componentType = '';
 
-        const componentSuffixes: string[] = TSLintConfig.componentSuffixes || ['Component', 'Page', 'Pure', 'Entry', 'Element'];
-        const isComponentTypeAsSuffixDisabled: boolean = !TSLintConfig.componentSuffixes || Preferences.isComponentTypeAsSuffixDisabled();
+        const componentSuffixes: string[] = TSLintConfig.componentSuffixes;
 
         const componentTypeChoices: vscode.QuickPickItem[] = componentSuffixes.map((componentSuffix) => {
             const componentSuffixLowerCase = componentSuffix.toLowerCase();
             let description = '';
             if (componentSuffixLowerCase === 'component') {
                 description = `Component with no special behavior`;
-            } else if (pureComponentTypes.includes(componentSuffixLowerCase)) {
+            }
+            if (pureComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Pure presentation / UI component`;
             } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Component associated to a route`;
             } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Runtime component, like dialogs or modals`;
-            } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Angular Element, ie. a native Web Component`;
             } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Shared component used outside of its own module`;
+            } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Angular Element, ie. a native Web Component`;
             }
             return {
                 label: componentSuffix,
@@ -276,7 +277,9 @@ export class Commands {
 
         if (componentTypeChoice) {
             componentType = componentTypeChoice.label.toLowerCase();
-            if ((componentType !== 'component') && schema.options.get('type') && !isComponentTypeAsSuffixDisabled) {
+            if ((componentType !== 'component') && schema.options.get('type')
+                && !Preferences.isComponentTypeAsSuffixDisabled()
+                && TSLintConfig.userComponentSuffixes.includes(componentTypeChoice.label)) {
                 componentOptions.set('type', componentType);
             }
         }
@@ -288,20 +291,7 @@ export class Commands {
         const TYPE_SHADOW = `Shadow`;
         const TYPE_ADVANCED = `Advanced`;
 
-        const componentBehaviors: vscode.QuickPickItem[] = [
-            {
-                label: TYPE_EXPORTED,
-                description: `--export`,
-                picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
-                detail: ` Required for reusable components consumed outside of their own module`,
-            },
-            {
-                label: TYPE_PURE,
-                description: `--change-detection OnPush`,
-                picked: (componentType && pureComponentTypes.includes(componentType)) ? true : false,
-                detail: `Recommended to optimize UI / presentation components`,
-            },
-        ];
+        const componentBehaviors: vscode.QuickPickItem[] = [];
 
         const skipSelectorOption = schema.options.get('skipSelector');
         if (skipSelectorOption) {
@@ -312,6 +302,20 @@ export class Commands {
                 detail: `Recommended for routed components and modals/dialogs`,
             });
         }
+
+        componentBehaviors.push({
+            label: TYPE_PURE,
+            description: `--change-detection OnPush`,
+            picked: (componentType && allPureComponentTypes.includes(componentType)) ? true : false,
+            detail: `Recommended to optimize UI / presentation components`,
+        });
+
+        componentBehaviors.push({
+            label: TYPE_EXPORTED,
+            description: `--export`,
+            picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
+            detail: ` Required for reusable components consumed outside of their own module`,
+        });
 
         const entryComponentOption = schema.options.get('entryComponent');
         if (entryComponentOption) {

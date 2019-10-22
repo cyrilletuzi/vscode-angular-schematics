@@ -23,14 +23,14 @@ export const defaultSchematics: string[] = [
  * Default component types.
  */
 export const defaultComponentTypes: ComponentTypes = {
-    /* Options: `--export` */
-    exported: [],
     /* Options: `--change-detection OnPush` */
     pure: ['pure', 'ui', 'presentation', 'presentational', 'dumb'],
     /* Options: `--skip-selector` */
     page: ['page', 'container', 'smart', 'routed', 'route'],
     /* Options: `--entry --skip-selector` */
     runtime: ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', 'entry'],
+    /* Options: `--export --change-detection OnPush` */
+    exported: ['exported', 'lib'],
     /* Options: `--entry --view-encapsulation ShadowDom` */
     element: ['element'],
 };

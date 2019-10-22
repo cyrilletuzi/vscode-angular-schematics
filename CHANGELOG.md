@@ -2,16 +2,17 @@
 
 ## [2.1.0] - 2019-10-22
 
-### New component types management
+### New powerful and customizable component types management
 
-In Angular, it's all about components, but there are very different kind of components,
+In Angular, it's all about components, but there are very different kinds of components,
 and distinguishing the different behaviors is a good practice.
 
 This extension already promoted components good practices,
-but Angular CLI >= 9 adds a new `--type` option and so we redesigned component types choice to go even further
-(and you can even take advantage of it in previous Angular versions).
+but Angular CLI >= 9 adds a new `--type` option, and so we redesigned component types choice.
+Now it goes even further, it's customizable and you can even take advantage of it in previous Angular versions.
 
-As a consequence, **the UI changed a little, so be sure to not select the wrong type by error**.
+As a consequence, the UI changed a little:
+**the order of suggested component types has changed, so be sure to not select the wrong type by error**.
 
 See the detailed [instructions in README](./README.md).
 

@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { Utils } from './utils';
+import { Preferences } from './preferences';
 
 export interface TSLintConfigSchema {
     rules?: {
@@ -11,7 +12,8 @@ export interface TSLintConfigSchema {
 export class TSLintConfig {
 
     static readonly configPath = 'tslint.json';
-    static componentSuffixes: string[] | null = null;
+    static componentSuffixes: string[] = [];
+    static userComponentSuffixes: string[] = [];
 
     private static config: TSLintConfigSchema | null = null;
     private static watcher: vscode.FileSystemWatcher;
@@ -20,11 +22,60 @@ export class TSLintConfig {
 
         const configPath = path.join(cwd, this.configPath);
 
-        if (!this.config && await Utils.existsAsync(configPath)) {
+        if (!this.config) {
 
-            this.config = await Utils.parseJSONFile<TSLintConfigSchema>(configPath);
+            if (await Utils.existsAsync(configPath)) {
 
-            this.componentSuffixes = this.getComponentSuffixes(this.config);
+                this.config = await Utils.parseJSONFile<TSLintConfigSchema>(configPath);
+
+                this.userComponentSuffixes = this.getUserComponentSuffixes(this.config);
+
+            }
+
+            const componentSuffixesSet = new Set<string>(['Component', ...(this.userComponentSuffixes || ['Page', 'Pure', 'Entry', 'Exported', 'Element']) ]);
+
+            if (this.userComponentSuffixes) {
+
+                let hasPureType = false;
+                let hasPageType = false;
+                let hasRuntimeType = false;
+                let hasExportedType = false;
+                let hasElementType = false;
+
+                componentSuffixesSet.forEach((componentSuffixRaw) => {
+                    const componentSuffix = componentSuffixRaw.toLowerCase();
+                    if (Preferences.getComponentTypes('pure').includes(componentSuffix)) {
+                        hasPureType = true;
+                    } else if (Preferences.getComponentTypes('page').includes(componentSuffix)) {
+                        hasPageType = true;
+                    } else if (Preferences.getComponentTypes('runtime').includes(componentSuffix)) {
+                        hasRuntimeType = true;
+                    } else if (Preferences.getComponentTypes('exported').includes(componentSuffix)) {
+                        hasExportedType = true;
+                    } else if (Preferences.getComponentTypes('element').includes(componentSuffix)) {
+                        hasElementType = true;
+                    }
+                });
+
+                if (!hasPageType) {
+                    componentSuffixesSet.add('Page');
+                }
+                if (!hasPureType) {
+                    componentSuffixesSet.add('Pure');
+                }
+                if (!hasRuntimeType) {
+                    componentSuffixesSet.add('Entry');
+                }
+                if (!hasExportedType) {
+                    componentSuffixesSet.add('Exported');
+                }
+                if (!hasElementType) {
+                    componentSuffixesSet.add('Element');
+                }
+            
+            }
+
+            this.componentSuffixes = Array.from(componentSuffixesSet);
 
             if (!this.watcher) {
 
@@ -42,7 +93,7 @@ export class TSLintConfig {
 
     }
 
-    private static getComponentSuffixes(config: TSLintConfigSchema | null): string[] | null {
+    private static getUserComponentSuffixes(config: TSLintConfigSchema | null): string[] {
 
         if (config && config.rules) {
 
@@ -54,7 +105,7 @@ export class TSLintConfig {
 
         }
 
-        return null;
+        return [];
 
     }
 

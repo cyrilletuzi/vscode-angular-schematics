@@ -137,6 +137,7 @@ By default, the extension will propose you these component types:
 - Page: component associated to a route (`--skip-selector`)
 - Pure: presentation / UI component (`--change-detection OnPush`)
 - Runtime: like modals or dialogs (`--skip-selector --entry-component`)
+- Exported: pure components reused outside of their modules, ie. component lib (`--exported --change-detection OnPush`)
 - Element: Angular Element, ie. a native Web Component (`--entry-component --view-encapsulation ShadowDom`)
 
 #### Customize component types
@@ -145,9 +146,9 @@ To customize component types, **your *root* `tslint.json` config must be changed
 
 `"component-class-suffix": [true, "Component", "Page", "Modal"]`.
 
-This will override the defaults, and now the extension will ask which component type you want based on this suffixes list.
+Now the extension will ask which component type you want based on this suffixes list.
 
-#### Angular >= 9
+#### Angular >= 9 suffixes
 
 Why is the config managed via TSLint components suffixes?
 Because Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
@@ -157,7 +158,7 @@ For example, `ng g hello --type page` will generate the `hello.page.ts` file wit
 
 This extension will set the `--type` option automatically if these 2 conditions are met:
 - in an Angular >= 9 project,
-- you customized your component types in `tslint.json`.
+- the component type has been set in `tslint.json`.
 
 It's not done automatically with the default component types, as suffixes need to be explicitly authorized in `tslint.json`,
 otherwise lint would fail.
@@ -171,10 +172,11 @@ just set the following config in your Visual Studio Code preferences:
 #### Common suffixes
 
 If you configured custom component types, some common suffixes will automatically pre-select the recommended behaviors:
-- `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > pure
-- `Page`, `Container`, `Smart`, `Routed`, `Route` > no selector
-- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > no selector & entry
-- `Element` > entry & shadow
+- `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > `--change-detection OnPush`
+- `Page`, `Container`, `Smart`, `Routed`, `Route` > `--skip-selector`
+- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > `--skip-selector --entry-component`
+- `Exported`, `Lib` > `--exported --change-detection OnPush`
+- `Element` > `--entry-component --view-encapsulation ShadowDom`: 
 
 #### Custom suffixes
 
@@ -182,10 +184,10 @@ The list above includes common suffixes in Angular, Material and Ionic.
 If you think some other common suffixes are missing, please open a Pull Request.
 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
-- exported: `"ngschematics.componentTypes.exported": ["Custom"]`
 - pure: `"ngschematics.componentTypes.pure": ["Custom"]`
 - no selector: `"ngschematics.componentTypes.page": ["Custom"]`
 - no selector & entry: `"ngschematics.componentTypes.runtime": ["Custom"]`
+- exported & pure: `"ngschematics.componentTypes.exported": ["Custom"]`
 - entry & shadow: `"ngschematics.componentTypes.element": ["Custom"]`
 
 #### Default suffix

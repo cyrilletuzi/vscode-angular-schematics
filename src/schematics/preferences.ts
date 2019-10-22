@@ -4,14 +4,14 @@ import { defaultSchematics, defaultComponentTypes } from './defaults';
 
 
 export interface ComponentTypes {
-    /** Options: `--export` */
-    exported: string[];
     /** Options: `--change-detection OnPush` */
     pure: string[];
     /** Options: `--skip-selector` */
     page: string[];
     /** Options: `--entry --skip-selector` */
     runtime: string[];
+    /** Options: `--export --change-detection OnPush` */
+    exported: string[];
     /** Options: `--entry --view-encapsulation ShadowDom` */
     element: string[];
 }
