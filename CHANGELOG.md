@@ -16,6 +16,11 @@ As a consequence, the UI changed a little:
 
 See the detailed [instructions in README](./README.md).
 
+### Easier contributions
+
+All default values are now in a simple and single file,
+so you can easily do a Pull Request to add new defaults (for example to add a commonly used schematics).
+
 ### Other feature
 
 - Angular CLI automatically adds files suffix (like `.component`),
