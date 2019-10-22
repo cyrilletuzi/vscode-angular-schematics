@@ -244,41 +244,41 @@ export class Commands {
         const componentOptions = new Map<string, string | string[]>();
         let componentType = '';
 
-        /* Component `type` option is new in Angular CLI 9 */
-        if (TSLintConfig.componentSuffixes) {
+        const componentSuffixes: string[] = TSLintConfig.componentSuffixes || ['Component', 'Page', 'Pure'];
+        const isComponentTypeAsSuffixDisabled: boolean = !TSLintConfig.componentSuffixes || Preferences.isComponentTypeAsSuffixDisabled();
 
-            const componentTypeChoices: vscode.QuickPickItem[] = TSLintConfig.componentSuffixes.map((componentSuffix) => {
-                const componentSuffixLowerCase = componentSuffix.toLowerCase();
-                let description = '';
-                if (pureComponentTypes.includes(componentSuffixLowerCase)) {
-                    description = `Pure presentation / UI component`;
-                } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
-                    description = `Component associated to a route`;
-                } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
-                    description = `Runtime component, like dialogs or modals`;
-                } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
-                    description = `Angular Element, ie. a native Web Component`;
-                } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
-                    description = `Shared component used outside of its own module`;
-                }
-                return {
-                    label: componentSuffix,
-                    description,
-                };
-            });
-
-            const componentTypeChoice = await vscode.window.showQuickPick(componentTypeChoices, {
-                placeHolder: `What type of component do you want?`,
-                ignoreFocusOut: true,
-            });
-
-            if (componentTypeChoice) {
-                componentType = componentTypeChoice.label.toLowerCase();
-                if ((componentType !== 'component') && schema.options.get('type') && !Preferences.isComponentTypeAsSuffixDisabled()) {
-                    componentOptions.set('type', componentType);
-                }
+        const componentTypeChoices: vscode.QuickPickItem[] = componentSuffixes.map((componentSuffix) => {
+            const componentSuffixLowerCase = componentSuffix.toLowerCase();
+            let description = '';
+            if (componentSuffixLowerCase === 'component') {
+                description = `Component with no special behavior`;
+            } else if (pureComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Pure presentation / UI component`;
+            } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Component associated to a route`;
+            } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Runtime component, like dialogs or modals`;
+            } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Angular Element, ie. a native Web Component`;
+            } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Shared component used outside of its own module`;
             }
+            return {
+                label: componentSuffix,
+                description,
+            };
+        });
 
+        const componentTypeChoice = await vscode.window.showQuickPick(componentTypeChoices, {
+            placeHolder: `What type of component do you want?`,
+            ignoreFocusOut: true,
+        });
+
+        if (componentTypeChoice) {
+            componentType = componentTypeChoice.label.toLowerCase();
+            if ((componentType !== 'component') && schema.options.get('type') && !isComponentTypeAsSuffixDisabled) {
+                componentOptions.set('type', componentType);
+            }
         }
 
         const TYPE_EXPORTED = `Exported`;
