@@ -167,7 +167,8 @@ Some common suffixes will automatically pre-select the recommended behaviors:
 - `Element` > `--entry-component --view-encapsulation ShadowDom`: 
 
 The list above includes common suffixes in Angular, Material and Ionic.
-If you think some other common suffixes are missing, please open a Pull Request.
+If you think some other common suffixes are missing, please open a Pull Request with new
+[defaults](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
 - pure: `"ngschematics.componentTypes.pure": ["Custom"]`
@@ -244,7 +245,8 @@ If you want to use other schematics, just add their package name in `ngschematic
 
 For example: `"ngschematics.schematics": ["@angular/material"]`
 
-If you are a library author, feel free to open a Pull Request to add your schematics in the default list.
+If you are a library author, feel free to open a Pull Request to add your schematics in the
+[default list](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
 
 ### Custom schematics
 
