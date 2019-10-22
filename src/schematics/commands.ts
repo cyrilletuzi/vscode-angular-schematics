@@ -271,13 +271,15 @@ export class Commands {
         const componentBehaviors: vscode.QuickPickItem[] = [
             {
                 label: TYPE_EXPORTED,
-                description: `--export (required for reusable components consumed outside of their own module)`,
+                description: `--export`,
                 picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
+                detail: ` Required for reusable components consumed outside of their own module`,
             },
             {
                 label: TYPE_PURE,
-                description: `--change-detection OnPush (recommended to optimize UI / presentation components)`,
+                description: `--change-detection OnPush`,
                 picked: (componentType && pureComponentTypes.includes(componentType)) ? true : false,
+                detail: `Recommended to optimize UI / presentation components`,
             },
         ];
 
@@ -285,8 +287,9 @@ export class Commands {
         if (skipSelectorOption) {
             componentBehaviors.push({
                 label: TYPE_NO_SELECTOR,
-                description: `--skip-selector (recommended for routed components and modals/dialogs)`,
+                description: `--skip-selector`,
                 picked: (componentType && noSelectorComponentTypes.includes(componentType)) ? true : false,
+                detail: `Recommended for routed components and modals/dialogs`,
             });
         }
 
@@ -294,8 +297,9 @@ export class Commands {
         if (entryComponentOption) {
             componentBehaviors.push({
                 label: TYPE_ENTRY,
-                description: `--entry-component (required for runtime components like modals/dialogs and Angular Elements)`,
+                description: `--entry-component`,
                 picked: (componentType && entryComponentTypes.includes(componentType)) ? true : false,
+                detail: `Required for runtime components like modals/dialogs and Angular Elements`,
             });
         }
 
@@ -303,12 +307,13 @@ export class Commands {
         if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.includes('ShadowDom'))) {
             componentBehaviors.push({
                 label: TYPE_SHADOW,
-                description: `--view-encapsulation ShadowDom (recommended for Angular Elements, doesn't work in IE/Edge)`,
+                description: `--view-encapsulation ShadowDom`,
                 picked: (componentType && elementComponentTypes.includes(componentType)) ? true : false,
+                detail: `Recommended for Angular Elements, doesn't work in IE/Edge`,
             });
         }
 
-        componentBehaviors.push({ label: TYPE_ADVANCED, description: `I need to add other advanced options` });
+        componentBehaviors.push({ label: TYPE_ADVANCED, detail: `I need to add other advanced options` });
 
         const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
             canPickMany: true,
