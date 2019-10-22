@@ -7,6 +7,8 @@ import { Schema } from './schema';
 import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
+import { TSLintConfig } from './tslint-config';
+import { Preferences } from './preferences';
 
 
 export interface ExplorerMenuContext {
@@ -58,7 +60,9 @@ export class Commands {
             return;
         }
 
+        Preferences.init();
         await AngularConfig.init(workspaceFolderPath);
+        await TSLintConfig.init(workspaceFolderPath);
 
         const generate = new Generate(contextPath, workspaceFolderPath);
 
@@ -117,6 +121,11 @@ export class Commands {
 
             if (!defaultOption) {
                 return;
+            }
+
+            /* Remove suffix (like `.component`) as Angular CLI will already add it */
+            if (defaultOption.endsWith(`.${schemaName}`)) { 
+                defaultOption = defaultOption.replace(`.${schemaName}`, '');
             }
 
             generate.addDefaultOption(defaultOption, schema.hasPath());
@@ -222,67 +231,147 @@ export class Commands {
 
     }
 
-    static async askComponentOptions(schema: Schema): Promise<Map<string, string> | undefined> {
+    static async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
 
-        const TYPE_CLASSIC = `Classic component`;
-        const TYPE_EXPORTED = `Exported component`;
-        const TYPE_PURE = `Pure component`;
-        const TYPE_EXPORTED_PURE = `Exported pure component`;
-        const TYPE_ELEMENT = `Element component`;
-        const TYPE_ADVANCED = `Advanced component`;
+        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
+        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
+        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
+        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
+        const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
 
-        const componentTypes: vscode.QuickPickItem[] = [
-            { label: TYPE_CLASSIC, description: `No option` },
-            { label: TYPE_EXPORTED, description: `--export (no other option)` },
-            { label: TYPE_PURE, description: `--changeDetection OnPush (no other option)` },
-            { label: TYPE_EXPORTED_PURE, description: `--export --changeDetection OnPush (no other option)` },
-        ];
+        const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
+        const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
+        const allPureComponentTypes: string[] = [...pureComponentTypes, ...exportedComponentTypes];
 
-        const viewEncapsulation = schema.options.get('viewEncapsulation');
+        const componentOptions = new Map<string, string | string[]>();
+        let componentType = '';
 
-        if (schema.options.get('entryComponent') && viewEncapsulation && viewEncapsulation.enum && (viewEncapsulation.enum.includes('ShadowDom'))) {
+        const componentSuffixes: string[] = TSLintConfig.componentSuffixes;
 
-            componentTypes.push({ label: TYPE_ELEMENT, description: `--entryComponent --viewEncapsulation ShadowDom` },);
+        const componentTypeChoices: vscode.QuickPickItem[] = componentSuffixes.map((componentSuffix) => {
+            const componentSuffixLowerCase = componentSuffix.toLowerCase();
+            let description = '';
+            if (componentSuffixLowerCase === 'component') {
+                description = `Component with no special behavior`;
+            }
+            if (pureComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Pure presentation / UI component`;
+            } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Component associated to a route`;
+            } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Runtime component, like dialogs or modals`;
+            } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Shared component used outside of its own module`;
+            } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
+                description = `Angular Element, ie. a native Web Component`;
+            }
+            return {
+                label: componentSuffix,
+                description,
+            };
+        });
 
-        }
-
-        componentTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` });
-
-        const componentType = await vscode.window.showQuickPick(componentTypes, {
+        const componentTypeChoice = await vscode.window.showQuickPick(componentTypeChoices, {
             placeHolder: `What type of component do you want?`,
             ignoreFocusOut: true,
         });
 
-        if (!componentType) {
-            return undefined;
+        if (componentTypeChoice) {
+            componentType = componentTypeChoice.label.toLowerCase();
+            if ((componentType !== 'component') && schema.options.get('type')
+                && TSLintConfig.userComponentSuffixes.includes(componentTypeChoice.label)) {
+                componentOptions.set('type', componentType);
+            }
         }
 
-        let componentOptions = new Map();
+        const TYPE_EXPORTED = `Exported`;
+        const TYPE_PURE = `Pure`;
+        const TYPE_NO_SELECTOR = `No selector`;
+        const TYPE_ENTRY = `Entry`;
+        const TYPE_SHADOW = `Shadow`;
+        const TYPE_ADVANCED = `Advanced`;
 
-        switch (componentType.label) {
+        const componentBehaviors: vscode.QuickPickItem[] = [];
 
-            case TYPE_EXPORTED:
-            componentOptions.set('export', 'true');
-            break;
-
-            case TYPE_PURE:
-            componentOptions.set('changeDetection', 'OnPush');
-            break;
-
-            case TYPE_EXPORTED_PURE:
-            componentOptions.set('export', 'true');
-            componentOptions.set('changeDetection', 'OnPush');
-            break;
-
-            case TYPE_ELEMENT:
-            componentOptions.set('entryComponent', 'true');
-            componentOptions.set('viewEncapsulation', 'ShadowDom');
-            break;
-
+        const skipSelectorOption = schema.options.get('skipSelector');
+        if (skipSelectorOption) {
+            componentBehaviors.push({
+                label: TYPE_NO_SELECTOR,
+                description: `--skip-selector`,
+                picked: (componentType && noSelectorComponentTypes.includes(componentType)) ? true : false,
+                detail: `Recommended for routed components and modals/dialogs`,
+            });
         }
 
-        if (componentType.label === TYPE_ADVANCED) {
-            componentOptions = await this.askOptions(schema);
+        componentBehaviors.push({
+            label: TYPE_PURE,
+            description: `--change-detection OnPush`,
+            picked: (componentType && allPureComponentTypes.includes(componentType)) ? true : false,
+            detail: `Recommended to optimize UI / presentation components`,
+        });
+
+        componentBehaviors.push({
+            label: TYPE_EXPORTED,
+            description: `--export`,
+            picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
+            detail: ` Required for reusable components consumed outside of their own module`,
+        });
+
+        const entryComponentOption = schema.options.get('entryComponent');
+        if (entryComponentOption) {
+            componentBehaviors.push({
+                label: TYPE_ENTRY,
+                description: `--entry-component`,
+                picked: (componentType && entryComponentTypes.includes(componentType)) ? true : false,
+                detail: `Required for runtime components like modals/dialogs and Angular Elements`,
+            });
+        }
+
+        const viewEncapsulationOption = schema.options.get('viewEncapsulation');
+        if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.includes('ShadowDom'))) {
+            componentBehaviors.push({
+                label: TYPE_SHADOW,
+                description: `--view-encapsulation ShadowDom`,
+                picked: (componentType && elementComponentTypes.includes(componentType)) ? true : false,
+                detail: `Recommended for Angular Elements, doesn't work in IE/Edge`,
+            });
+        }
+
+        componentBehaviors.push({ label: TYPE_ADVANCED, detail: `I need to add other advanced options` });
+
+        const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
+            canPickMany: true,
+            placeHolder: `Do you want special component behavior(s)? (otherwise just press Enter)`,
+            ignoreFocusOut: true,
+        });
+
+        if (componentBehavior) {
+
+            const labels = componentBehavior.map((item) => item.label);
+
+            if (labels.includes(TYPE_EXPORTED)) {
+                componentOptions.set('export', 'true');
+            } 
+            if (labels.includes(TYPE_PURE)) {
+                componentOptions.set('changeDetection', 'OnPush');
+            }
+            if (labels.includes(TYPE_NO_SELECTOR)) {
+                componentOptions.set('skipSelector', 'true');
+            }
+            if (labels.includes(TYPE_ENTRY)) {
+                componentOptions.set('entryComponent', 'true');
+            }
+            if (labels.includes(TYPE_SHADOW)) {
+                componentOptions.set('viewEncapsulation', 'ShadowDom');
+            }
+
+            if (labels.includes(TYPE_ADVANCED)) {
+                const componentAdvancedOptions = await this.askOptions(schema);
+                for (const [key, value] of componentAdvancedOptions) {
+                    componentOptions.set(key, value);
+                }
+            }
+
         }
 
         return componentOptions;

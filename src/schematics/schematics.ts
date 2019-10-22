@@ -2,41 +2,16 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
+import { Preferences } from './preferences';
 
-
-interface SettingSchematics {
-    schematics?: string[];
-}
 
 export class Schematics {
 
-    static commonCollections: string[] = [
-        '@angular/material',
-        '@ionic/angular-toolkit',
-        '@ngrx/schematics',
-        '@ngxs/schematics',
-        '@nativescript/schematics',
-        '@nrwl/schematics',
-        '@nstudio/schematics',
-        '@ngx-formly/schematics',
-        'primeng-schematics',
-        '@ngx-kit/collection',
-        'ngx-spec',
-        './schematics/collection.json'
-    ];
     static collections: Set<string> = new Set();
 
     static async load(cwd: string) {
 
-        const collectionsNames: string[] = [...this.commonCollections];
-
-        const userConfiguration: SettingSchematics | undefined = vscode.workspace.getConfiguration().get('ngschematics');
-
-        if (userConfiguration && userConfiguration.schematics) {
-
-            collectionsNames.push(...userConfiguration.schematics);
-
-        }
+        const collectionsNames: string[] = Preferences.getSchematics();
 
         const existingCollections: string[] = [];
 

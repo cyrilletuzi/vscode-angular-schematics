@@ -97,6 +97,46 @@
                         },
                         "default": [],
                         "description": "Add other schematics (for example: \"@angular/material\")"
+                    },
+                    "ngschematics.componentTypes.exported": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom exported component suffixes (for example: \"UI\")"
+                    },
+                    "ngschematics.componentTypes.pure": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom pure component suffixes (for example: \"Presentation\")"
+                    },
+                    "ngschematics.componentTypes.page": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom page component suffixes (for example: \"Page\")"
+                    },
+                    "ngschematics.componentTypes.runtime": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom runtime component suffixes (for example: \"Modal\")"
+                    },
+                    "ngschematics.componentTypes.element": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "description": "Add custom Angular Element suffixes (for example: \"Native\")"
                     }
                 }
             }
