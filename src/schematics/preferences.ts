@@ -19,7 +19,7 @@ export interface ComponentTypes {
 export class Preferences {
 
     private static schematics: string[] | null = null;
-    private static componentTypes: string[] | null = null;
+    private static componentTypes: ComponentTypes | null = null;
 
     static getSchematics(): string[] {
 
@@ -40,16 +40,28 @@ export class Preferences {
     static getComponentTypes<T extends keyof ComponentTypes>(type: T): string[] {
 
         if (!this.componentTypes) {
-            const userComponentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
-            this.componentTypes = [...defaultComponentTypes[type], ...userComponentTypes].map((type) => type.toLowerCase());
+            const userComponentTypes = vscode.workspace.getConfiguration().get<Partial<ComponentTypes>>('ngschematics.componentTypes', {});
+            this.componentTypes = {
+                exported: [...defaultComponentTypes.exported, ...(userComponentTypes.exported || [])],
+                pure: [...defaultComponentTypes.pure, ...(userComponentTypes.pure || [])],
+                page: [...defaultComponentTypes.page, ...(userComponentTypes.page || [])],
+                runtime: [...defaultComponentTypes.runtime, ...(userComponentTypes.runtime || [])],
+                element: [...defaultComponentTypes.element, ...(userComponentTypes.element || [])],
+            };
 
             vscode.workspace.onDidChangeConfiguration(() => {
-                const userComponentTypes = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.componentTypes.${type}`, []);
-                this.componentTypes = [...defaultComponentTypes[type], ...userComponentTypes].map((type) => type.toLowerCase());
+                const userComponentTypes = vscode.workspace.getConfiguration().get<Partial<ComponentTypes>>('ngschematics.componentTypes', {});
+                this.componentTypes = {
+                    exported: [...defaultComponentTypes.exported, ...(userComponentTypes.exported || [])],
+                    pure: [...defaultComponentTypes.pure, ...(userComponentTypes.pure || [])],
+                    page: [...defaultComponentTypes.page, ...(userComponentTypes.page || [])],
+                    runtime: [...defaultComponentTypes.runtime, ...(userComponentTypes.runtime || [])],
+                    element: [...defaultComponentTypes.element, ...(userComponentTypes.element || [])],
+                };
             });
         }
 
-        return this.componentTypes;
+        return this.componentTypes[type].map((type) => type.toLowerCase());
 
     }
 
