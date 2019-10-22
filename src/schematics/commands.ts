@@ -60,6 +60,7 @@ export class Commands {
             return;
         }
 
+        Preferences.init();
         await AngularConfig.init(workspaceFolderPath);
         await TSLintConfig.init(workspaceFolderPath);
 
