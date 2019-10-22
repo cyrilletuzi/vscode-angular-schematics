@@ -162,7 +162,7 @@ This extension will set the `--type` option automatically if these 2 conditions 
 It's not done automatically with the default component types, as suffixes need to be explicitly authorized in `tslint.json`,
 otherwise lint would fail.
 
-If the conditions are met but you want to keep the pre-Angular 9 behavior
+If you customized the component types but want to keep the pre-Angular 9 behavior
 (ie. keep `Component` suffix for all components, no matter their type),
 just set the following config in your Visual Studio Code preferences:
 
