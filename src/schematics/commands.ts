@@ -244,7 +244,7 @@ export class Commands {
         const componentOptions = new Map<string, string | string[]>();
         let componentType = '';
 
-        const componentSuffixes: string[] = TSLintConfig.componentSuffixes || ['Component', 'Page', 'Pure'];
+        const componentSuffixes: string[] = TSLintConfig.componentSuffixes || ['Component', 'Page', 'Pure', 'Entry', 'Element'];
         const isComponentTypeAsSuffixDisabled: boolean = !TSLintConfig.componentSuffixes || Preferences.isComponentTypeAsSuffixDisabled();
 
         const componentTypeChoices: vscode.QuickPickItem[] = componentSuffixes.map((componentSuffix) => {
