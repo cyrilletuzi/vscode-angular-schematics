@@ -9,7 +9,7 @@ export class Schematics {
 
     static collections: Set<string> = new Set();
 
-    static async load(cwd: string) {
+    static async load(cwd: string): Promise<void> {
 
         const collectionsNames: string[] = Preferences.getSchematics();
 

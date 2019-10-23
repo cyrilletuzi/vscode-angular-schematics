@@ -36,19 +36,19 @@ export class Utils {
 
     }
 
-    static getSchemaFromNodeModules<T = any>(cwd: string, packageName: string, filePath: string): Promise<T | null> {
+    static getSchemaFromNodeModules<T = unknown>(cwd: string, packageName: string, filePath: string): Promise<T | null> {
 
         return this.parseJSONFile<T>(this.getNodeModulesPath(cwd, packageName, filePath));
 
     }
 
-    static getSchemaFromLocal<T = any>(cwd:string, schemaPath: string): Promise<T | null> {
+    static getSchemaFromLocal<T = unknown>(cwd:string, schemaPath: string): Promise<T | null> {
 
         return this.parseJSONFile<T>(path.join(cwd, schemaPath));
 
     }
 
-    static getNodeModulesPath(cwd: string, ...paths: string[]) {
+    static getNodeModulesPath(cwd: string, ...paths: string[]): string {
 
         return path.join(cwd, 'node_modules', ...paths);
 
@@ -84,7 +84,7 @@ export class Utils {
     
     }
 
-    static async parseJSONFile<T = any>(path: string): Promise<T | null> {
+    static async parseJSONFile<T = unknown>(path: string): Promise<T | null> {
 
         console.log(path);
 

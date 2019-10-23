@@ -21,7 +21,7 @@ export interface SchemaDataOptions {
     'x-prompt'?: {
         message?: string;
         multiselect?: boolean;
-        items?: any[];
+        items?: string[];
     };
 }
 

@@ -9,7 +9,9 @@
 			true,
 			"always"
 		],
-		"triple-equals": true
+		"triple-equals": true,
+		"no-any": true,
+		"typedef":  [true, "call-signature"]
 	},
 	"defaultSeverity": "warning"
 }

@@ -49,7 +49,7 @@ export class Commands {
 
     }
 
-    static async generate(context: ExplorerMenuContext, { collectionName, schemaName }: GenerateConfig = {}) {
+    static async generate(context: ExplorerMenuContext, { collectionName, schemaName }: GenerateConfig = {}): Promise<void> {
 
         const shortcutCommand = (collectionName && schemaName) ? true : false;
 

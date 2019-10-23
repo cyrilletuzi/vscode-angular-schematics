@@ -75,7 +75,7 @@ export class Generate {
 
     }
 
-    async isCliLocal(cwd: string) {
+    async isCliLocal(cwd: string): Promise<boolean> {
 
         if (this.cliLocal === null) {
 

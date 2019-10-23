@@ -11,7 +11,7 @@ export class Output {
         return this._channel;
     }
 
-    static dispose() {
+    static dispose(): void {
 
         if (this._channel) {
             this._channel.dispose();

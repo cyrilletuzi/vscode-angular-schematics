@@ -44,7 +44,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         }
 
-        const schematicsExtension = vscode.extensions.getExtension('cyrilletuzi.angular-schematics') as vscode.Extension<any>;
+        const schematicsExtension = vscode.extensions.getExtension('cyrilletuzi.angular-schematics') as vscode.Extension<unknown>;
 
         this.defaultIconPath = path.join(schematicsExtension.extensionPath, 'angular.svg');
 
@@ -52,7 +52,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         if (iconTheme === 'material-icon-theme') {
 
-            const materialExtension = vscode.extensions.getExtension('PKief.material-icon-theme') as vscode.Extension<any>;
+            const materialExtension = vscode.extensions.getExtension('PKief.material-icon-theme') as vscode.Extension<unknown>;
 
             if (materialExtension) {
 
