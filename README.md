@@ -44,7 +44,7 @@ Then, **you can launch Angular CLI commands from 4 places:**
 - the Command Palette
 - from a shortcut (see configuration below)
 
-![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo.gif)
+![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo-20191025.gif)
 
 **The quickest way to launch your Angular CLI commands is the first, with a right-click inside the files Explorer context menu.**
 Why? Because the destination path and `project` will be automatically inferred to the directory you just right-clicked.
