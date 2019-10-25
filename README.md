@@ -28,7 +28,6 @@ So it's up to you: test both and see which one saves you more time.
 ## By the same author
 
 - [@ngx-pwa/local-storage](https://github.com/cyrilletuzi/angular-async-local-storage): 1st Angular library for local storage
-- Other Angular libraries: [@ngx-pwa/offline](https://github.com/cyrilletuzi/ngx-pwa-offline) and [@ngx-pwa/ngsw-schema](https://github.com/cyrilletuzi/ngsw-schema)
 - Popular [Angular posts on Medium](https://medium.com/@cyrilletuzi)
 - Follow updates of this lib on [Twitter](https://twitter.com/cyrilletuzi)
 - **[Angular onsite trainings](https://formationjavascript.com/formation-angular/)** (based in Paris, so the website is in French, but [my English bio is here](https://www.cyrilletuzi.com/en/web/) and I'm open to travel)
