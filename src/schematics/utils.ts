@@ -86,8 +86,6 @@ export class Utils {
 
     static async parseJSONFile<T = unknown>(path: string): Promise<T | null> {
 
-        console.log(path);
-
         let json: T | null = null;
     
         try {

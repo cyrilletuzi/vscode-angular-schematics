@@ -240,7 +240,7 @@ export class Commands {
         const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
 
         const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
-        const entryComponentTypes: string[] = [...elementComponentTypes, ...runtimeComponentTypes];
+        const entryComponentTypes: string[] = AngularConfig.isIvy ? [] : [...elementComponentTypes, ...runtimeComponentTypes];
         const allPureComponentTypes: string[] = [...pureComponentTypes, ...exportedComponentTypes];
 
         const componentOptions = new Map<string, string | string[]>();
@@ -257,7 +257,7 @@ export class Commands {
             if (pureComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Pure presentation / UI component`;
             } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Component associated to a route`;
+                description = `Component associated to a route${AngularConfig.isIvy ? ' or modals/dialogs' : ''}`;
             } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
                 description = `Runtime component, like dialogs or modals`;
             } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
@@ -318,7 +318,7 @@ export class Commands {
         });
 
         const entryComponentOption = schema.options.get('entryComponent');
-        if (entryComponentOption) {
+        if (!AngularConfig.isIvy && entryComponentOption) {
             componentBehaviors.push({
                 label: TYPE_ENTRY,
                 description: `--entry-component`,

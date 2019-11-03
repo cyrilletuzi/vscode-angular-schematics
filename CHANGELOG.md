@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.2.0] - 2019-11-03
+
+### Feature
+
+- Disable entry component type when in Ivy, as `--entry-component` option is not required anymore
+
 ## [2.1.0] - 2019-10-22
 
 ### New powerful and customizable component types management
