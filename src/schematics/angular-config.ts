@@ -17,22 +17,54 @@ export interface AngularConfigSchema {
     };
 }
 
+export interface TSConfigSchema {
+    angularCompilerOptions?: {
+        enableIvy?: boolean;
+    };
+}
+
+export interface PackageJSONSchema {
+    dependencies?: {
+        "@angular/core"?: string;
+    };
+}
+
 export class AngularConfig {
 
     static readonly configPath = 'angular.json';
+    static readonly packageJSONPath = 'package.json';
+    static readonly tsConfigPath = 'tsconfig.json';
     static readonly cliCollection = '@schematics/angular';
     static defaultCollection = '@schematics/angular';
     static projects = new Map<string, string>();
     static rootProject = '';
+    static isIvy = false;
 
+    private static initialized = false;
     private static config: AngularConfigSchema | null = null;
     private static watcher: vscode.FileSystemWatcher;
 
     static async init(cwd: string): Promise<void> {
 
+        if (!this.initialized) {
+
+            await this.initAngularConfig(cwd);
+
+            this.isIvy = await this.detectIsIvy(cwd);
+
+            this.initialized = true;
+
+        }
+
+        console.log(this.isIvy);
+
+    }
+
+    private static async initAngularConfig(cwd: string): Promise<void> {
+
         const configPath = path.join(cwd, this.configPath);
 
-        if (!this.config && await Utils.existsAsync(configPath)) {
+        if (await Utils.existsAsync(configPath)) {
 
             this.config = await Utils.parseJSONFile<AngularConfigSchema>(configPath);
 
@@ -53,6 +85,42 @@ export class AngularConfig {
             }
 
         }
+
+    }
+
+    private static async detectIsIvy(cwd: string): Promise<boolean> {
+
+        const tsConfigPath = path.join(cwd, this.tsConfigPath);
+        const packageJSONPath = path.join(cwd, this.packageJSONPath);
+
+        if (await Utils.existsAsync(tsConfigPath) && await Utils.existsAsync(packageJSONPath)) {
+
+            const tsConfig = await Utils.parseJSONFile<TSConfigSchema>(tsConfigPath);
+            const packageJSON = await Utils.parseJSONFile<PackageJSONSchema>(packageJSONPath);
+
+            if (tsConfig && packageJSON && packageJSON.dependencies) {
+
+                const angularFullVersion: string = packageJSON.dependencies['@angular/core'] || '0';
+                const angularPinnedVersion: string = angularFullVersion.replace('^', '').replace('~', '');
+                const angularMajorVersion = Number.parseInt(angularPinnedVersion.substr(0, 1), 10);
+
+                let tsConfigIvyEnabled: boolean | undefined;
+                if (tsConfig && tsConfig.angularCompilerOptions && 'enableIvy' in tsConfig.angularCompilerOptions) {
+                    tsConfigIvyEnabled = tsConfig.angularCompilerOptions.enableIvy;
+                }
+
+
+                if ((angularMajorVersion === 8) && (tsConfigIvyEnabled === true)) {
+                    return true;
+                } else if ((angularMajorVersion >= 9) && (tsConfigIvyEnabled !== false)) {
+                    return true;
+                }
+
+            }
+
+        }
+
+        return false;
 
     }
 

@@ -106,12 +106,17 @@ Thus, they should not be called via a HTML tag and so should not have a selector
 
 #### Entry component
 
-Most of the time, Angular automatically manage the internal code to instantiate components,
+This behavior is *not* required anymore with [Ivy](https://angular.io/guide/ivy)
+(ie. Angular >= 9 with default config or Angular 8 with Ivy explicitly enable).
+It's only *required in non-Ivy mode*
+(ie. Angular <= 7, Angular 8 with default config or Angular 9 with Ivy explicitly disabled).
+
+Most of the time, Angular automatically manages the internal code to instantiate components,
 because they are either associated to a route (ie. pages) or used somewhere in a template (ie. presentation components).
 
 But dialogs (like in Angular Material), modals (like in Ionic)
 and [Angular Elements](https://angular.io/guide/elements)
-are invoked at runtime, so it's required to register them in `entryComponents`.
+are invoked at runtime, so it was required to register them in `entryComponents`.
 
 #### Component with Shadow DOM encapsulation
 
@@ -133,11 +138,11 @@ ie. distinguishing components behaviors (explained above), or for tools with spe
 By default, the extension will propose you these component types:
 
 - Component: no special behavior
-- Page: component associated to a route (`--skip-selector`)
+- Page: component associated to a route (`--skip-selector`) & modals/dialogs (Angular >=9)
 - Pure: presentation / UI component (`--change-detection OnPush`)
-- Runtime: component like modals or dialogs (`--skip-selector --entry-component`)
 - Exported: pure component reused outside of their modules, ie. component lib (`--exported --change-detection OnPush`)
 - Element: Angular Element, ie. a native Web Component (`--entry-component --view-encapsulation ShadowDom`)
+- Runtime: component like modals or dialogs (`--skip-selector --entry-component`) (Angular <=8)
 
 #### Customize component suffixes (Angular >= 9)
 
@@ -161,9 +166,9 @@ not for the default component types, as otherwise lint would fail.
 Some common suffixes will automatically pre-select the recommended behaviors:
 - `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > `--change-detection OnPush`
 - `Page`, `Container`, `Smart`, `Routed`, `Route` > `--skip-selector`
-- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > `--skip-selector --entry-component`
 - `Exported`, `Lib` > `--exported --change-detection OnPush`
-- `Element` > `--entry-component --view-encapsulation ShadowDom`: 
+- `Element` > `--entry-component --view-encapsulation ShadowDom`
+- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > `--skip-selector` (Angular >=9) or `--skip-selector --entry-component` (Angular <=8)
 
 The list above includes common suffixes in Angular, Material and Ionic.
 If you think some other common suffixes are missing, please open a Pull Request with new
@@ -172,9 +177,9 @@ If you think some other common suffixes are missing, please open a Pull Request 
 For uncommon suffixes, you can add a custom configuration in VS Code preferences:
 - pure: `"ngschematics.componentTypes.pure": ["Custom"]`
 - no selector: `"ngschematics.componentTypes.page": ["Custom"]`
-- no selector & entry: `"ngschematics.componentTypes.runtime": ["Custom"]`
 - exported & pure: `"ngschematics.componentTypes.exported": ["Custom"]`
 - entry & shadow: `"ngschematics.componentTypes.element": ["Custom"]`
+- no selector & entry: `"ngschematics.componentTypes.runtime": ["Custom"]` (Angular <=8 only)
 
 #### Default suffix
 

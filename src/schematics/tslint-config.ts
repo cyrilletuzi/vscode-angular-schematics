@@ -1,7 +1,9 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import { Utils } from './utils';
 import { Preferences } from './preferences';
+import { AngularConfig } from './angular-config';
 
 export interface TSLintConfigSchema {
     rules?: {
@@ -63,7 +65,7 @@ export class TSLintConfig {
                 if (!hasPureType) {
                     componentSuffixesSet.add('Pure');
                 }
-                if (!hasRuntimeType) {
+                if (!AngularConfig.isIvy && !hasRuntimeType) {
                     componentSuffixesSet.add('Entry');
                 }
                 if (!hasExportedType) {
