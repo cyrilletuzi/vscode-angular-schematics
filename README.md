@@ -107,7 +107,7 @@ Thus, they should not be called via a HTML tag and so should not have a selector
 #### Entry component
 
 This behavior is *not* required anymore with [Ivy](https://angular.io/guide/ivy)
-(ie. Angular >= 9 with default config or Angular 8 with Ivy explicitly enable).
+(ie. Angular >= 9 with default config or Angular 8 with Ivy explicitly enabled).
 It's only *required in non-Ivy mode*
 (ie. Angular <= 7, Angular 8 with default config or Angular 9 with Ivy explicitly disabled).
 
