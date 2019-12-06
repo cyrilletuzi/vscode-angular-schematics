@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.2.1] - 2019-12-06
+
+### Bug fix
+
+- Project was not determined on Windows when not using the default CLI directory (`projects`)
+for sub-applications (`ng g application`) or libraries (`ng g library`)
+
+Thanks to @kvetis for the report and debug.
+
 ## [2.2.0] - 2019-11-03
 
 ### Feature

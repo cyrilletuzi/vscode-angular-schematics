@@ -56,8 +56,6 @@ export class AngularConfig {
 
         }
 
-        console.log(this.isIvy);
-
     }
 
     private static async initAngularConfig(cwd: string): Promise<void> {
