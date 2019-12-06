@@ -101,7 +101,9 @@ export class Generate {
 
     protected getProject(contextPath: string, workspacePath: string): string {
 
-        const projectPath = contextPath.substr(contextPath.indexOf(workspacePath) + workspacePath.length);
+        const workspacePathNormalized = workspacePath.replace(/\\/g, '/');
+
+        const projectPath = contextPath.substr(contextPath.indexOf(workspacePathNormalized) + workspacePathNormalized.length);
 
         const pathNormalized = Utils.normalizePath(projectPath);
 
@@ -116,6 +118,7 @@ export class Generate {
             }
 
         }
+
 
         const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
 
