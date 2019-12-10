@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.2.2] - 2019-12-10
+
+### Bug fix
+
+- Strip directories in route option in lazy-loaded module generation
+
 ## [2.2.1] - 2019-12-06
 
 ### Bug fix

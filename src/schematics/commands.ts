@@ -392,8 +392,11 @@ export class Commands {
             { label: TYPE_ROUTING, description: `--routing --module app (no other option)` },
         ];
 
+        let routeName = '';
+
         if (moduleName && schema.options.get('route')) {
-            moduleTypes.push({ label: TYPE_LAZY, description: `--route ${moduleName} --module app` },);
+            routeName = moduleName.split('/').pop() || moduleName;
+            moduleTypes.push({ label: TYPE_LAZY, description: `--route ${routeName} --module app` },);
         }
 
         moduleTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` },);
@@ -421,7 +424,7 @@ export class Commands {
             break;
 
             case TYPE_LAZY:
-            moduleOptions.set('route', moduleName);
+            moduleOptions.set('route', routeName);
             moduleOptions.set('module', 'app');
             break;
 
