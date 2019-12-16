@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.3.0] - 2019-12-16
+
+### Feature
+
+- Auto-opening the component created now works with custom component types
+(introduced in Angular 9 and v2.1 of this extension)
+
 ## [2.2.2] - 2019-12-10
 
 ### Bug fix

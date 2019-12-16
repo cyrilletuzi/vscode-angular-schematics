@@ -184,7 +184,7 @@ export class Commands {
             vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
 
             try {
-                await this.jumpToFile(stdout, cwd, generate.defaultOption, generate.schema);
+                await this.jumpToFile(stdout, cwd, generate);
             } catch (error) {}
 
         } catch (error) {
@@ -198,13 +198,16 @@ export class Commands {
     
     }
 
-    static async jumpToFile(stdout: string, cwd: string, defaultOption: string, schema: string): Promise<void> {
+    static async jumpToFile(stdout: string, cwd: string, generate: Generate): Promise<void> {
 
-        const name = defaultOption.includes('/') ? defaultOption.substr(defaultOption.lastIndexOf('/') + 1) : defaultOption;
+        const name = generate.defaultOption.includes('/') ? generate.defaultOption.substr(generate.defaultOption.lastIndexOf('/') + 1) : generate.defaultOption;
 
-        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.${schema})?\.ts)`);
+        const suffix = (generate.schema === 'component') ? generate.getOption('type') : '';
+        const suffixTest = suffix ? `|${suffix}` : '';
 
-        const stdoutMatches = stdout.match(stdoutRegExp);
+        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${generate.schema}${suffixTest}))?\.ts)`);
+
+        let stdoutMatches = stdout.match(stdoutRegExp);
 
         if (stdoutMatches) {
 

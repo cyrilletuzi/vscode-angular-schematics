@@ -61,6 +61,12 @@ export class Generate {
 
     }
 
+    getOption(optionName: string): undefined | string | string[] {
+
+        return this.options.get(optionName);
+
+    }
+
     async askConfirmation(): Promise<boolean> {
 
         const confirmationText = `Confirm`;
