@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.3.1] - 2019-12-2O
+
+### Bug fix
+
+- Make guard type choice work with new Angular 9 schema
+
 ## [2.3.0] - 2019-12-16
 
 ### Feature

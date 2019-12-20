@@ -17,6 +17,9 @@ export interface SchemaDataOptions {
     default?: string | boolean;
     $default?: SchemaDataDefaultOption;
     extends?: string;
+    items?: {
+        enum?: string[];
+    };
     'x-deprecated'?: string;
     'x-prompt'?: {
         message?: string;
@@ -211,12 +214,18 @@ export class Schema {
             }
             /* Only makes sense if the option is an array AND have suggestions,
              * otherwise the user must manually type the value in a classic text input box */
-            else if ((option.type === 'array') && promptSchema && promptSchema.items) {
+            else if ((option.type === 'array')) {
 
-                if (promptSchema.multiselect) {
+                if (promptSchema && promptSchema.multiselect && promptSchema.items) {
                     choice = await this.askMultiselectOption(optionName, promptSchema.items, prompt);
+                } else if (option.items && option.items.enum) {
+                    choice = await this.askMultiselectOption(optionName, option.items.enum, prompt);
                 } else {
-                    choice = await this.askEnumOption(optionName, promptSchema.items as string[], prompt);
+                    choice = await vscode.window.showInputBox({
+                        placeHolder: `--${optionName}`,
+                        prompt,
+                        ignoreFocusOut: true,
+                    });
                 }
     
             } else {
