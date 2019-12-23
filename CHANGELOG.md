@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.3.2] - 2019-12-23
+
+### Bug fix
+
+- Correct path detection when the application full path has an `app` directory in it
+
 ## [2.3.1] - 2019-12-2O
 
 ### Bug fix
