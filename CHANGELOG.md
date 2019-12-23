@@ -4,7 +4,7 @@
 
 ### Bug fix
 
-- Fixes path detection when the application full path has an `app` directory in it
+- Correct path detection when the application full path has an `app` directory in it
 
 ## [2.3.1] - 2019-12-2O
 
