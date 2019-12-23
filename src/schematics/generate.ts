@@ -156,7 +156,9 @@ export class Generate {
 
         if (contextPathMatches) {
 
-            const splittedPath = pathNormalized.split(`/${contextPathMatches[1]}/`)[1];
+            const splittedArray = pathNormalized.split(`/${contextPathMatches[1]}/`);
+
+            const splittedPath = splittedArray[splittedArray.length - 1];
     
             if (splittedPath.includes('.')) {
 
