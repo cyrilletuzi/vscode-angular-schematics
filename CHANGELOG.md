@@ -1,5 +1,17 @@
 # Change Log
 
+## [3.0.0] - 2020-01-02
+
+### Breaking changes
+
+The extension now requires:
+- Visual Studio Code version >= 1.41,
+- a LTS version of Angular (ie. currently Angular >= 7).
+
+As for now, there is no code change in the extension, so it will still work
+in older versions of VS Code and/or Angular,
+but it may break at any time in future 3.x releases.
+
 ## [2.3.2] - 2019-12-23
 
 ### Bug fix
