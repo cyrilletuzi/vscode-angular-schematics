@@ -52,16 +52,22 @@ Why? Because the destination path and `project` will be automatically inferred t
 
 ### VS Code
 
-Last version (v2) of this extension officially requires Visual Studio Code version >= 1.39.
+Current version of this extension officially requires Visual Studio Code version >= 1.41.
 But it may work on some older VS Code versions too.
 
-If you use on an older version of VS Code and run into issues, you can still install v1 of the extension 
-([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)).
+If you use an older version of VS Code and run into issues, you can still install
+([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)):
+- v2 of the extension for VS Code 1.39 & 1.40,
+- v1 of the extension for VS Code < 1.39.
 
 ### Angular CLI
 
-This extension is only enabled inside an Angular >=5 CLI project
-(ie. with an `angular.json` or `.angular-cli.json` file in workspace).
+This extension is only enabled inside an Angular CLI project
+(ie. with an `angular.json` file in workspace).
+
+We follow [Angular LTS support](https://angular.io/guide/releases),
+ie. currently your project should use Angular >= 7.
+But the extension may still work in older versions.
 
 ### Project root
 
