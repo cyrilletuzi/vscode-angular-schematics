@@ -25,6 +25,17 @@ and auto-opening generated files are not possible in Angular Console (at least f
 
 So it's up to you: test both and see which one saves you more time.
 
+## Sponsorship
+
+I started this project to help my students learning Angular.
+Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
+**this extension helps more than 230 000 developers** like you to be more productive.
+
+But I'm still the only maintainer, and everything is done during my free time.
+The lib may seem easy to use, but it's a lot of work.
+So if your company earns money with projects using this extension,
+it would be nice to **consider becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**.
+
 ## By the same author
 
 - [@ngx-pwa/local-storage](https://github.com/cyrilletuzi/angular-async-local-storage): 1st Angular library for local storage
