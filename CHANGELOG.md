@@ -1,5 +1,9 @@
 # Change Log
 
+## [3.0.1] - 2020-01-13
+
+Just a documentation change, with info about [sponsorship](https://github.com/sponsors/cyrilletuzi/).
+
 ## [3.0.0] - 2020-01-02
 
 ### Breaking changes
