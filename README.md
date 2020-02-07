@@ -97,7 +97,7 @@ it must be configured accordingly in your VS Code settings
 ## Component good practices
 
 This extension helps you to follow good practices,
-by suggesting different component types and behaviors.
+by suggesting [different component types](https://medium.com/@cyrilletuzi/angular-component-types-with-angular-9-new-features-a53d6272acdc?source=friends_link&sk=893d5009e03252ba0f5ea074141cd18b) and behaviors.
 
 ### Special component behaviors
 
