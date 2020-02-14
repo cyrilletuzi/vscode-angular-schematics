@@ -353,7 +353,6 @@ export class Commands {
         const TYPE_NO_SELECTOR = `No selector`;
         const TYPE_ENTRY = `Entry`;
         const TYPE_SHADOW = `Shadow`;
-        const TYPE_ADVANCED = `Advanced`;
 
         const componentBehaviors: vscode.QuickPickItem[] = [];
 
@@ -401,8 +400,6 @@ export class Commands {
             });
         }
 
-        componentBehaviors.push({ label: TYPE_ADVANCED, detail: `I need to add other advanced options` });
-
         const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
             canPickMany: true,
             placeHolder: `Do you want special component behavior(s)? (otherwise just press Enter)`,
@@ -429,13 +426,6 @@ export class Commands {
                 componentOptions.set('viewEncapsulation', 'ShadowDom');
             }
 
-            if (labels.includes(TYPE_ADVANCED)) {
-                const componentAdvancedOptions = await this.askOptions(schema);
-                for (const [key, value] of componentAdvancedOptions) {
-                    componentOptions.set(key, value);
-                }
-            }
-
         }
 
         return componentOptions;
@@ -448,7 +438,6 @@ export class Commands {
         const TYPE_IMPORTED = `Classic module, imported`;
         const TYPE_ROUTING = `Module with routing, imported`;
         const TYPE_LAZY = `Lazy-loaded module`;
-        const TYPE_ADVANCED = `Advanced module`;
 
         const moduleTypes: vscode.QuickPickItem[] = [
             { label: TYPE_CLASSIC, description: `No option` },
@@ -462,8 +451,6 @@ export class Commands {
             routeName = moduleName.split('/').pop() || moduleName;
             moduleTypes.push({ label: TYPE_LAZY, description: `--route ${routeName} --module app` },);
         }
-
-        moduleTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` },);
 
         const moduleType = await vscode.window.showQuickPick(moduleTypes, {
             placeHolder: `What type of module do you want?`,
@@ -492,10 +479,6 @@ export class Commands {
             moduleOptions.set('module', 'app');
             break;
 
-        }
-
-        if (moduleType.label === TYPE_ADVANCED) {
-            moduleOptions = await this.askOptions(schema);
         }
 
         return moduleOptions;
