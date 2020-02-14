@@ -180,7 +180,7 @@
         "tslint": "5.20.1",
         "typescript": "3.7.5",
         "vscode-test": "1.3.0",
-        "webpack": "4.41.5",
+        "webpack": "4.41.6",
         "webpack-cli": "3.3.10"
     },
     "dependencies": {}
