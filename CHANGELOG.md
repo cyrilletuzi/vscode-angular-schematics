@@ -1,5 +1,15 @@
 # Change Log
 
+## [3.1.0] - 2020-02-14
+
+### UX improvements
+
+- A better balance has been found between simplicity and flexibility:
+it is now one step quicker to generate common schematics (component / service / module),
+while still being able to choose custom advanced options.
+
+- Modules types have been updated to match current simpler usages in last Angular versions.
+
 ## [3.0.1] - 2020-01-13
 
 Just a documentation change, with info about [sponsorship](https://github.com/sponsors/cyrilletuzi/).
