@@ -209,18 +209,24 @@ export class Commands {
 
     static async askShortcutConfirmation(generate: Generate): Promise<boolean | undefined> {
 
-        const CONFIRM = `Confirm`;
-        const MORE_OPTIONS = `Add more options`;
-        const CANCEL = `Cancel`;
+        const CONFIRM: vscode.QuickPickItem = {
+            label: `Confirm`,
+            description: `Pro-tip: take a minute to check the command above is really what you want`,
+        };
+        const MORE_OPTIONS: vscode.QuickPickItem = {
+            label: `Add more options`,
+            description: `Pro-tip: you can set default values to schematics options in angular.json`,
+        };
+        const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
 
         const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
             placeHolder: generate.command,
             ignoreFocusOut: true,
         });
 
-        if (choice === CONFIRM) {
+        if (choice?.label === CONFIRM.label) {
             return true;
-        } else if (choice === MORE_OPTIONS) {
+        } else if (choice?.label === MORE_OPTIONS.label) {
             return false;
         }
         return undefined;
