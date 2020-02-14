@@ -132,37 +132,98 @@ export class Commands {
 
         }
 
-        let filledOptions: Map<string, string | string[]> | undefined;
+        let shortcutConfirm: boolean | undefined = false;
 
-        if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'component')) {
+        /* Quicker scenario for basic schematics (component, service, module) */
+        if (shortcutCommand) {
 
-            filledOptions = await this.askComponentOptions(schema);
+            let shortcutOptions: Map<string, string | string[]> | undefined;
 
-        } else if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'module')) {
+            // TODO: check if this check is relevant
+            if (collectionName === AngularConfig.cliCollection) {
 
-            filledOptions = await this.askModuleOptions(schema, defaultOption);
+                /* Special scenario for component types */
+                if (schemaName === 'component') {
 
-        } else {
+                    shortcutOptions = await this.askComponentOptions(schema);
+                    if (!shortcutOptions) {
+                        return;
+                    }
+
+                /* Special scenario for module types */
+                } else if (schemaName === 'module') {
+
+                    shortcutOptions = await this.askModuleOptions(schema, defaultOption);
+                    if (!shortcutOptions) {
+                        return;
+                    }
+
+                }
+
+            }
+
+            if (shortcutOptions) {
+                shortcutOptions.forEach((option, optionName) => {
+                    generate.addOption(optionName, option);
+                });
+            }
+
+            /* Ask direct confirmation or adding more options or cancel */
+            shortcutConfirm = await this.askShortcutConfirmation(generate);
+
+            /* "Cancel" choice */
+            if (shortcutConfirm === undefined) {
+                return;
+            }
+            
+        }
+
+        /* Ask for advanced options if user didn't choose a direct confirmation */
+        if (!shortcutConfirm) {
+
+            let filledOptions: Map<string, string | string[]> | undefined;
 
             filledOptions = await this.askOptions(schema);
 
+            if (!filledOptions) {
+                return;
+            }
+
+            filledOptions.forEach((option, optionName) => {
+                generate.addOption(optionName, option);
+            });
+
+            /* Ask final confirmation */
+            const confirm = await generate.askConfirmation();
+
+            /* "Cancel" choice */
+            if (!confirm) {
+                return;
+            }
+
         }
 
-        if (!filledOptions) {
-            return;
-        }
+        await this.launchCommand(generate, workspaceFolderPath);
 
-        filledOptions.forEach((option, optionName) => {
-            generate.addOption(optionName, option);
+    }
+
+    static async askShortcutConfirmation(generate: Generate): Promise<boolean | undefined> {
+
+        const CONFIRM = `Confirm`;
+        const MORE_OPTIONS = `Add more options`;
+        const CANCEL = `Cancel`;
+
+        const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
+            placeHolder: generate.command,
+            ignoreFocusOut: true,
         });
 
-        const confirm = await generate.askConfirmation();
-
-        if (confirm) {
-
-            await this.launchCommand(generate, workspaceFolderPath);
-
+        if (choice === CONFIRM) {
+            return true;
+        } else if (choice === MORE_OPTIONS) {
+            return false;
         }
+        return undefined;
 
     }
 
