@@ -429,23 +429,33 @@ export class Commands {
     
     static async askModuleOptions(schema: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
 
-        const TYPE_CLASSIC = `Classic module`;
-        const TYPE_IMPORTED = `Classic module, imported`;
-        const TYPE_ROUTING = `Module with routing, imported`;
-        const TYPE_LAZY = `Lazy-loaded module`;
+        const TYPE_CLASSIC = `Module of components`;
+        const TYPE_LAZY = `Lazy-loaded module of pages`;
+        const TYPE_ROUTING = `Classic module of pages`;
 
         const moduleTypes: vscode.QuickPickItem[] = [
-            { label: TYPE_CLASSIC, description: `No option` },
-            { label: TYPE_IMPORTED, description: `--module app (no other option)` },
-            { label: TYPE_ROUTING, description: `--routing --module app (no other option)` },
+            {
+                label: TYPE_CLASSIC,
+                description: `No pre-filled option`,
+                detail: `Module of UI / presentation components, don't forget to import it somewhere`,
+            },
         ];
 
         let routeName = '';
-
         if (moduleName && schema.options.get('route')) {
             routeName = moduleName.split('/').pop() || moduleName;
-            moduleTypes.push({ label: TYPE_LAZY, description: `--route ${routeName} --module app` },);
+            moduleTypes.push({
+                label: TYPE_LAZY,
+                description: `--route ${routeName} --module app`,
+                detail: `Module with routing, lazy-loaded`,
+            });
         }
+
+        moduleTypes.push({
+            label: TYPE_ROUTING,
+            description: `--routing --module app`,
+            detail: `Module with routing${schema.options.get('route') ? `, immediately loaded` : ''}`,
+        },);
 
         const moduleType = await vscode.window.showQuickPick(moduleTypes, {
             placeHolder: `What type of module do you want?`,
@@ -459,10 +469,6 @@ export class Commands {
         let moduleOptions = new Map();
 
         switch (moduleType.label) {
-
-            case TYPE_IMPORTED:
-            moduleOptions.set('module', 'app');
-            break;
 
             case TYPE_ROUTING:
             moduleOptions.set('routing', 'true');
