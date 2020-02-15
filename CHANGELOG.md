@@ -12,7 +12,7 @@ while still being able to choose custom advanced options.
 
 - Components types have been updated to match current simpler usages in last Angular versions:
   - Note that `--entry-component` is not required anymore for dialogs/modals since Angular 9.
-  Dailogs/modals should now be generated as pages.
+  Dialogs/modals should now be generated as pages.
   - Angular Element choice has been removed for now, as it's still experimental and
   not a common scenario currently. If you have a project for your Angular Elements,
   just set `viewEncapsulation` schematics default to `ShadowDom` in your `angular.json`.
