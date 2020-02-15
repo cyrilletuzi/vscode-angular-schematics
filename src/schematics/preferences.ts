@@ -63,4 +63,20 @@ export class Preferences {
 
     }
 
+    static disableCompactFolders(): void {
+
+
+        const settingName = 'explorer.compactFolders';
+
+        const setting = vscode.workspace.getConfiguration().inspect(settingName);
+
+        if (setting && (setting.globalValue === undefined) && (setting.workspaceValue === undefined)) {
+
+            vscode.workspace.getConfiguration().update(settingName, false, vscode.ConfigurationTarget.Workspace)
+            .then(() => {}, () => {});
+
+        }
+
+    }
+
 }

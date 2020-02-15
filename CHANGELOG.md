@@ -1,5 +1,21 @@
 # Change Log
 
+## [3.2.0] - 2020-02-15
+
+### VS Code compact folders
+
+Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
+a new default behavior combines single folders together.
+
+While it might be a good idea in general, it is annoying with this extension,
+as clicking on the right directory where you want to generate something becomes more confusing.
+
+So the extension will disable this setting for you in `.vscode/settings.json`
+(only in Angular projects).
+
+If you want to keep the default VS Code behavior, just revert it:
+`"explorer.compactFolders": true`
+
 ## [3.1.0] - 2020-02-15
 
 ### UX improvements
