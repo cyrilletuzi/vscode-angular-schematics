@@ -1,6 +1,6 @@
 # Change Log
 
-## [3.1.0] - 2020-02-14
+## [3.1.0] - 2020-02-15
 
 ### UX improvements
 
@@ -12,16 +12,16 @@ while still being able to choose custom advanced options.
 
 - Components types have been updated to match current simpler usages in last Angular versions:
   - Note that `--entry-component` is not required anymore for dialogs/modals since Angular 9.
-  Dailogs/modals are now regular pages when generating.
+  Dailogs/modals should now be generated as pages.
   - Angular Element choice has been removed for now, as it's still experimental and
   not a common scenario currently. If you have a project for your Angular Elements,
-  just set `viewEncapsulation` default to `ShadowDom` in your `angular.json`.
+  just set `viewEncapsulation` schematics default to `ShadowDom` in your `angular.json`.
 
 - Modules types have been updated to match current simpler usages in last Angular versions:
   - Promote lazy-loaded modules
   - "Module, imported" choice has been removed: this type was useful for modules of services,
   but since Angular 6, services don't require a `NgModule` anymore.
-  So what's left is just modules with routing (these ones will automatically be imported in your `AppModule`) or modules of UI / presentation components. These last ones should not be imported just once
+  So what is left is just modules with routing (these ones will automatically be imported in your `AppModule`) or modules of UI / presentation components. These last ones should not be imported just once
   in your `AppModule` but in each feature module where you need them
   (a feature to select the modules may come later).
 
