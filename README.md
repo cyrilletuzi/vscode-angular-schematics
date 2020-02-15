@@ -3,7 +3,7 @@
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
 allowing you to **launch Angular schematics (CLI commands) with a Graphical User Interface, directly inside VS Code!**
 
-## Why?
+## Why this extension?
 
 **Productivity!**
 
@@ -29,7 +29,7 @@ So it's up to you: test both and see which one saves you more time.
 
 I started this project to help my students learning Angular.
 Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-**this extension helps more than 230 000 developers** like you to be more productive.
+**this extension helps more than 240 000 developers** like you to be more productive.
 
 But I'm still the only maintainer, and everything is done during my free time.
 The lib may seem easy to use, but it's a lot of work.
@@ -97,71 +97,41 @@ it must be configured accordingly in your VS Code settings
 ## Component good practices
 
 This extension helps you to follow good practices,
-by suggesting [different component types](https://medium.com/@cyrilletuzi/angular-component-types-with-angular-9-new-features-a53d6272acdc?source=friends_link&sk=893d5009e03252ba0f5ea074141cd18b) and behaviors.
+by suggesting different component types.
 
-### Special component behaviors
+[Learn more about Angular components types](https://medium.com/@cyrilletuzi/angular-component-types-with-angular-9-new-features-a53d6272acdc?source=friends_link&sk=893d5009e03252ba0f5ea074141cd18b).
 
-#### Exported component
+### Page
+
+Option pre-filled: `--skip-selector`
+
+A component associated to a route relies on specific features
+(like the `ActivatedRoute` service to get URL params).
+Thus, it should not be called via a HTML tag and so should not have a selector.
+
+Since Angular 9, a modal/dialog must be generated as a page too
+(previously it was another special component type: `--entry-component`).
+
+### Pure component
+
+Option pre-filled: `--change-detection OnPush`
+
+A pure component, also known as a presentation component,
+is a component which relies only on its `@Input`s for data, ie. its role is only presentation / UI (~ view),
+as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data, ie. a page (~ controller).
+
+[Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40?source=friends_link&sk=ad8233d7934c08b6f8f364a46f3c8967).
+
+### Exported component
+
+Options pre-filled: `--export --change-detection OnPush`
 
 Components have a local scope by default, meaning they are only usable inside the module where they are declared.
 So if you want to use a component in another module (for example if you are doing a reusable UI component), you have to export it.
 
-[Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407).
+[Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407?source=friends_link&sk=4d246eec7026910c950f19e0a16ee9bd).
 
-#### Pure component (also known as a presentation component)
-
-A pure component is a component which relies only on its `@Input`s for data, ie. its role is only presentation / UI (~ view),
-as opposed to an impure component, which relies on external asynchronous operations (like a HTTP request via a service) for data, ie. a page (~ controller).
-
-[Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
-
-#### Component without selector
-
-Components associated to a route (ie. pages) or instantiated at runtime (like dialogs/modals) relies on specific features
-(like the `ActivatedRoute` service to get URL params).
-Thus, they should not be called via a HTML tag and so should not have a selector.
-
-#### Entry component
-
-This behavior is *not* required anymore with [Ivy](https://angular.io/guide/ivy)
-(ie. Angular >= 9 with default config or Angular 8 with Ivy explicitly enabled).
-It's only *required in non-Ivy mode*
-(ie. Angular <= 7, Angular 8 with default config or Angular 9 with Ivy explicitly disabled).
-
-Most of the time, Angular automatically manages the internal code to instantiate components,
-because they are either associated to a route (ie. pages) or used somewhere in a template (ie. presentation components).
-
-But dialogs (like in Angular Material), modals (like in Ionic)
-and [Angular Elements](https://angular.io/guide/elements)
-are invoked at runtime, so it was required to register them in `entryComponents`.
-
-#### Component with Shadow DOM encapsulation
-
-When creating an [Angular Element](https://angular.io/guide/elements), i.e. a reusable native Web Component,
-the native encapsulation called `ShadowDom` must be used.
-
-Note it's only available in Angular >= 7,
-and it won't work in Internet Explorer / Edge (pre-Chromium).
-
-### Component types
-
-Having different component types is particullary helpful for projects following a good architecture,
-ie. distinguishing components behaviors (explained above), or for tools with special components (like pages and modals in Ionic).
-
-[Learn more about architecture in Angular projects](https://medium.com/@cyrilletuzi/architecture-in-angular-projects-242606567e40).
-
-#### Default component types
-
-By default, the extension will propose you these component types:
-
-- Component: no special behavior
-- Page: component associated to a route (`--skip-selector`) & modals/dialogs (Angular >=9)
-- Pure: presentation / UI component (`--change-detection OnPush`)
-- Exported: pure component reused outside of their modules, ie. component lib (`--exported --change-detection OnPush`)
-- Element: Angular Element, ie. a native Web Component (`--entry-component --view-encapsulation ShadowDom`)
-- Runtime: component like modals or dialogs (`--skip-selector --entry-component`) (Angular <=8)
-
-#### Customize component suffixes (Angular >= 9)
+## Customize component suffixes (Angular >= 9)
 
 Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
 
@@ -178,39 +148,16 @@ and set the `--type` option automatically.
 Note `--type` is set automatically only for your custom suffixes in `tslint.json`,
 not for the default component types, as otherwise lint would fail.
 
-#### Link a custom suffix to a component type
+Common suffixes will automatically pre-select the recommended type:
+- Page: `Page`, `Container`, `Smart`, `Routed`, `Route`, `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry`
+- Pure: `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb`
+- Exported: `Exported`, `Lib`
 
-Some common suffixes will automatically pre-select the recommended behaviors:
-- `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb` > `--change-detection OnPush`
-- `Page`, `Container`, `Smart`, `Routed`, `Route` > `--skip-selector`
-- `Exported`, `Lib` > `--exported --change-detection OnPush`
-- `Element` > `--entry-component --view-encapsulation ShadowDom`
-- `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry` > `--skip-selector` (Angular >=9) or `--skip-selector --entry-component` (Angular <=8)
-
-The list above includes common suffixes in Angular, Material and Ionic.
+The list above includes common suffixes in Angular, Material, Ionic and PrimeNG.
 If you think some other common suffixes are missing, please open a Pull Request with new
 [defaults](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
 
-For uncommon suffixes, you can add a custom configuration in VS Code preferences:
-- pure: `"ngschematics.componentTypes.pure": ["Custom"]`
-- no selector: `"ngschematics.componentTypes.page": ["Custom"]`
-- exported & pure: `"ngschematics.componentTypes.exported": ["Custom"]`
-- entry & shadow: `"ngschematics.componentTypes.element": ["Custom"]`
-- no selector & entry: `"ngschematics.componentTypes.runtime": ["Custom"]` (Angular <=8 only)
-
-#### Default suffix
-
-If you want to use the default `Component` suffix only for your pure presentation components, 
-configure your VS Code preferences like this:
-
-`"ngschematics.componentTypes.pure": ["Component"]`
-
-This is a good practice but not the default configuration, as `Component` is the default suffix,
-and changing the `changeDetection` option has consequences that you need to be aware of.
-
-## Other features
-
-### Default options
+## Default options
 
 [`schematics` option of `angular.json`](https://github.com/angular/angular-cli/wiki/angular-workspace)
 allows to save default options for schematics commands.
@@ -241,10 +188,15 @@ If you want different values from the official defaults, the following options s
   - `inlineTemplate`
   - `inlineStyle`
   - `style`
+  - `prefix`
+  - `flat`
+  - `changeDetection`
+  - `viewEncapsulation`
 - all schematics
+  - `flat`
   - `skipTests`
 
-### Other schematics
+## Libraries schematics
 
 By default, this extension supports (if they are installed):
 - `@schematics/angular` (official Angular CLI commands)
@@ -262,21 +214,20 @@ By default, this extension supports (if they are installed):
 - `./schematics/collection.json`
 
 Scanning all packages to find all potential schematics would be too slow.
-If you want to use other schematics, just add their package name in `ngschematics.schematics` in your VS Code preferences.
-
-For example: `"ngschematics.schematics": ["@angular/material"]`
-
 If you are a library author, feel free to open a Pull Request to add your schematics in the
 [default list](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
 
-### Custom schematics
+## Custom schematics
 
-If you created [your own Angular schematics](https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2) but didn't published them yet,
+If you created [your own Angular schematics](https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2),
 this extension can load them too. By default, the extension will look into `./schematics/collection.json`.
 
 If your schematics collection path is different,
-you can add a *relative* path in the VS Code preferences.
-For example: `"ngschematics.schematics": ["./path/to/collection.json"]`
+you can add:
+- a *relative* path in VS Code preferences: `"ngschematics.schematics": ["./path/to/collection.json"]`
+- if it's a package in `node_modules`: `"ngschematics.schematics": ["my-private-lib"]`
+
+## Other features
 
 ### Keyboard shortcuts
 

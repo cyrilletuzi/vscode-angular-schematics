@@ -132,37 +132,104 @@ export class Commands {
 
         }
 
-        let filledOptions: Map<string, string | string[]> | undefined;
+        let shortcutConfirm: boolean | undefined = false;
 
-        if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'component')) {
+        /* Quicker scenario for basic schematics (component, service, module) */
+        if (shortcutCommand) {
 
-            filledOptions = await this.askComponentOptions(schema);
+            let shortcutOptions: Map<string, string | string[]> | undefined;
 
-        } else if (shortcutCommand && (collectionName === AngularConfig.cliCollection) && (schemaName === 'module')) {
+            // TODO: check if this check is relevant
+            if (collectionName === AngularConfig.cliCollection) {
 
-            filledOptions = await this.askModuleOptions(schema, defaultOption);
+                /* Special scenario for component types */
+                if (schemaName === 'component') {
 
-        } else {
+                    shortcutOptions = await this.askComponentOptions(schema);
+                    if (!shortcutOptions) {
+                        return;
+                    }
+
+                /* Special scenario for module types */
+                } else if (schemaName === 'module') {
+
+                    shortcutOptions = await this.askModuleOptions(schema, defaultOption);
+                    if (!shortcutOptions) {
+                        return;
+                    }
+
+                }
+
+            }
+
+            if (shortcutOptions) {
+                shortcutOptions.forEach((option, optionName) => {
+                    generate.addOption(optionName, option);
+                });
+            }
+
+            /* Ask direct confirmation or adding more options or cancel */
+            shortcutConfirm = await this.askShortcutConfirmation(generate);
+
+            /* "Cancel" choice */
+            if (shortcutConfirm === undefined) {
+                return;
+            }
+            
+        }
+
+        /* Ask for advanced options if user didn't choose a direct confirmation */
+        if (!shortcutConfirm) {
+
+            let filledOptions: Map<string, string | string[]> | undefined;
 
             filledOptions = await this.askOptions(schema);
 
+            if (!filledOptions) {
+                return;
+            }
+
+            filledOptions.forEach((option, optionName) => {
+                generate.addOption(optionName, option);
+            });
+
+            /* Ask final confirmation */
+            const confirm = await generate.askConfirmation();
+
+            /* "Cancel" choice */
+            if (!confirm) {
+                return;
+            }
+
         }
 
-        if (!filledOptions) {
-            return;
-        }
+        await this.launchCommand(generate, workspaceFolderPath);
 
-        filledOptions.forEach((option, optionName) => {
-            generate.addOption(optionName, option);
+    }
+
+    static async askShortcutConfirmation(generate: Generate): Promise<boolean | undefined> {
+
+        const CONFIRM: vscode.QuickPickItem = {
+            label: `Confirm`,
+            description: `Pro-tip: take a minute to check the command above is really what you want`,
+        };
+        const MORE_OPTIONS: vscode.QuickPickItem = {
+            label: `Add more options`,
+            description: `Pro-tip: you can set default values to schematics options in angular.json`,
+        };
+        const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
+
+        const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
+            placeHolder: generate.command,
+            ignoreFocusOut: true,
         });
 
-        const confirm = await generate.askConfirmation();
-
-        if (confirm) {
-
-            await this.launchCommand(generate, workspaceFolderPath);
-
+        if (choice?.label === CONFIRM.label) {
+            return true;
+        } else if (choice?.label === MORE_OPTIONS.label) {
+            return false;
         }
+        return undefined;
 
     }
 
@@ -236,144 +303,123 @@ export class Commands {
 
     static async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
 
-        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
-        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
-        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
-        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
-        const elementComponentTypes: string[] = Preferences.getComponentTypes('element');
-
-        const noSelectorComponentTypes: string[] = [...pageComponentTypes, ...runtimeComponentTypes];
-        const entryComponentTypes: string[] = AngularConfig.isIvy ? [] : [...elementComponentTypes, ...runtimeComponentTypes];
-        const allPureComponentTypes: string[] = [...pureComponentTypes, ...exportedComponentTypes];
-
         const componentOptions = new Map<string, string | string[]>();
-        let componentType = '';
 
-        const componentSuffixes: string[] = TSLintConfig.componentSuffixes;
+        const entryRequired = !AngularConfig.isIvy && schema.options.get('entryComponent');
 
-        const componentTypeChoices: vscode.QuickPickItem[] = componentSuffixes.map((componentSuffix) => {
-            const componentSuffixLowerCase = componentSuffix.toLowerCase();
-            let description = '';
-            if (componentSuffixLowerCase === 'component') {
-                description = `Component with no special behavior`;
-            }
-            if (pureComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Pure presentation / UI component`;
-            } else if (pageComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Component associated to a route${AngularConfig.isIvy ? ' or modals/dialogs' : ''}`;
-            } else if (runtimeComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Runtime component, like dialogs or modals`;
-            } else if (exportedComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Shared component used outside of its own module`;
-            } else if (elementComponentTypes.includes(componentSuffixLowerCase)) {
-                description = `Angular Element, ie. a native Web Component`;
-            }
-            return {
-                label: componentSuffix,
-                description,
-            };
+        const TYPE_BASIC = `Basic component`;
+        const TYPE_PAGE = `Page${!entryRequired ? ` (or dialog / modal)` : ''}`;
+        const TYPE_PURE = `Pure component`;
+        const TYPE_EXPORTED = `Exported component`;
+        const TYPE_ENTRY = `Entry component`;
+
+        const componentTypes: vscode.QuickPickItem[] = [];
+
+        componentTypes.push({
+            label: TYPE_BASIC,
+            description: `No pre-filled option`,
+            detail: `Component with no special behavior (pro-tip: learn about component types in our documentation)`,
         });
 
-        const componentTypeChoice = await vscode.window.showQuickPick(componentTypeChoices, {
+        componentTypes.push({
+            label: TYPE_PAGE,
+            description: `--skip-selector${schema.options.get('type') && TSLintConfig.userComponentSuffixes.includes('Page') ? ` --type page` : ''}`,
+            detail: `Component associated to a route${!entryRequired ? ` or a dialog / modal` : ''}`,
+        });
+
+        componentTypes.push({
+            label: TYPE_PURE,
+            description: `--change-detection OnPush`,
+            detail: `UI / presentation component, used only in its own feature module`,
+        });
+
+        componentTypes.push({
+            label: TYPE_EXPORTED,
+            description: `--export --change-detection OnPush`,
+            detail: `UI / presentation component, declared in a shared UI module and used in multiple feature modules`,
+        });
+
+        if (entryRequired) {
+            componentTypes.push({
+                label: TYPE_ENTRY,
+                description: `--entry-component --skip-selector`,
+                detail: `Component instanciated at runtime, like a dialog or modal`,
+            });
+        }
+
+        const userComponentTypes = TSLintConfig.userComponentSuffixes.filter((type) => !['Component', 'Page'].includes(type));
+        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
+        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
+        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
+        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
+
+        if (userComponentTypes.length > 0) {
+
+            for (const userComponentType of userComponentTypes) {
+
+                const userComponentTypeLowerCased = userComponentType.toLocaleLowerCase();
+                let description = '';
+
+                if (pageComponentTypes.includes(userComponentTypeLowerCased)) {
+                    description = `--skip-selector`;
+                } else if (pureComponentTypes.includes(userComponentTypeLowerCased)) {
+                    description = `--change-detection OnPush`;
+                } else if (exportedComponentTypes.includes(userComponentTypeLowerCased)) {
+                    description = `--export --change-detection OnPush`;
+                } else if (entryRequired && runtimeComponentTypes.includes(userComponentTypeLowerCased)) {
+                    description = `--entry-component --skip-selector`;
+                }
+                if (schema.options.get('type')) {
+                    description += ` --type ${userComponentTypeLowerCased}`;
+                }
+
+                componentTypes.push({
+                    label: userComponentType,
+                    description,
+                    detail: `Custom component type`,
+                });
+
+            }
+
+        }
+
+        const componentTypeChoice = await vscode.window.showQuickPick(componentTypes, {
             placeHolder: `What type of component do you want?`,
             ignoreFocusOut: true,
         });
 
         if (componentTypeChoice) {
-            componentType = componentTypeChoice.label.toLowerCase();
-            if ((componentType !== 'component') && schema.options.get('type')
-                && TSLintConfig.userComponentSuffixes.includes(componentTypeChoice.label)) {
-                componentOptions.set('type', componentType);
-            }
-        }
 
-        const TYPE_EXPORTED = `Exported`;
-        const TYPE_PURE = `Pure`;
-        const TYPE_NO_SELECTOR = `No selector`;
-        const TYPE_ENTRY = `Entry`;
-        const TYPE_SHADOW = `Shadow`;
-        const TYPE_ADVANCED = `Advanced`;
+            const componentType = componentTypeChoice.label;
+            const componentTypeLowerCased = componentType.toLowerCase();
 
-        const componentBehaviors: vscode.QuickPickItem[] = [];
-
-        const skipSelectorOption = schema.options.get('skipSelector');
-        if (skipSelectorOption) {
-            componentBehaviors.push({
-                label: TYPE_NO_SELECTOR,
-                description: `--skip-selector`,
-                picked: (componentType && noSelectorComponentTypes.includes(componentType)) ? true : false,
-                detail: `Recommended for routed components and modals/dialogs`,
-            });
-        }
-
-        componentBehaviors.push({
-            label: TYPE_PURE,
-            description: `--change-detection OnPush`,
-            picked: (componentType && allPureComponentTypes.includes(componentType)) ? true : false,
-            detail: `Recommended to optimize UI / presentation components`,
-        });
-
-        componentBehaviors.push({
-            label: TYPE_EXPORTED,
-            description: `--export`,
-            picked: (componentType && exportedComponentTypes.includes(componentType)) ? true : false,
-            detail: ` Required for reusable components consumed outside of their own module`,
-        });
-
-        const entryComponentOption = schema.options.get('entryComponent');
-        if (!AngularConfig.isIvy && entryComponentOption) {
-            componentBehaviors.push({
-                label: TYPE_ENTRY,
-                description: `--entry-component`,
-                picked: (componentType && entryComponentTypes.includes(componentType)) ? true : false,
-                detail: `Required for runtime components like modals/dialogs and Angular Elements`,
-            });
-        }
-
-        const viewEncapsulationOption = schema.options.get('viewEncapsulation');
-        if (viewEncapsulationOption && viewEncapsulationOption.enum && (viewEncapsulationOption.enum.includes('ShadowDom'))) {
-            componentBehaviors.push({
-                label: TYPE_SHADOW,
-                description: `--view-encapsulation ShadowDom`,
-                picked: (componentType && elementComponentTypes.includes(componentType)) ? true : false,
-                detail: `Recommended for Angular Elements, doesn't work in IE/Edge`,
-            });
-        }
-
-        componentBehaviors.push({ label: TYPE_ADVANCED, detail: `I need to add other advanced options` });
-
-        const componentBehavior = await vscode.window.showQuickPick(componentBehaviors, {
-            canPickMany: true,
-            placeHolder: `Do you want special component behavior(s)? (otherwise just press Enter)`,
-            ignoreFocusOut: true,
-        });
-
-        if (componentBehavior) {
-
-            const labels = componentBehavior.map((item) => item.label);
-
-            if (labels.includes(TYPE_EXPORTED)) {
-                componentOptions.set('export', 'true');
-            } 
-            if (labels.includes(TYPE_PURE)) {
-                componentOptions.set('changeDetection', 'OnPush');
-            }
-            if (labels.includes(TYPE_NO_SELECTOR)) {
-                componentOptions.set('skipSelector', 'true');
-            }
-            if (labels.includes(TYPE_ENTRY)) {
+            /* Not required anymore in Ivy */
+            if (entryRequired
+            && ((componentType === TYPE_ENTRY) || runtimeComponentTypes.includes(componentTypeLowerCased))) {
                 componentOptions.set('entryComponent', 'true');
             }
-            if (labels.includes(TYPE_SHADOW)) {
-                componentOptions.set('viewEncapsulation', 'ShadowDom');
+            /* --skip-selector was added in Angular CLI 8.1 */
+            if (schema.options.get('skipSelector') &&
+            ([TYPE_PAGE, TYPE_ENTRY].includes(componentType) || [...pageComponentTypes, ...runtimeComponentTypes].includes(componentTypeLowerCased))) {
+                componentOptions.set('skipSelector', 'true');
             }
-
-            if (labels.includes(TYPE_ADVANCED)) {
-                const componentAdvancedOptions = await this.askOptions(schema);
-                for (const [key, value] of componentAdvancedOptions) {
-                    componentOptions.set(key, value);
-                }
+            if ((componentType === TYPE_EXPORTED) || exportedComponentTypes.includes(componentTypeLowerCased)) {
+                componentOptions.set('export', 'true');
             }
+            if ([TYPE_PURE, TYPE_EXPORTED].includes(componentType)
+            || [...pureComponentTypes, ...exportedComponentTypes].includes(componentTypeLowerCased)) {
+                componentOptions.set('changeDetection', 'OnPush');
+            }
+            /* --type was added in Angular CLI 9.0 */
+            if (schema.options.get('type')) {
+                if ((TSLintConfig.userComponentSuffixes.includes('Page') || TSLintConfig.userComponentSuffixes.includes('page'))
+                && (componentType === TYPE_PAGE)) {
+                    componentOptions.set('type', 'page');
+                } else if (TSLintConfig.userComponentSuffixes.includes(componentType)
+                || TSLintConfig.userComponentSuffixes.includes(componentTypeLowerCased)) {
+                    componentOptions.set('type', componentTypeLowerCased);
+                } 
+             }
 
         }
 
@@ -383,26 +429,33 @@ export class Commands {
     
     static async askModuleOptions(schema: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
 
-        const TYPE_CLASSIC = `Classic module`;
-        const TYPE_IMPORTED = `Classic module, imported`;
-        const TYPE_ROUTING = `Module with routing, imported`;
-        const TYPE_LAZY = `Lazy-loaded module`;
-        const TYPE_ADVANCED = `Advanced module`;
+        const TYPE_CLASSIC = `Module of components`;
+        const TYPE_LAZY = `Lazy-loaded module of pages`;
+        const TYPE_ROUTING = `Classic module of pages`;
 
         const moduleTypes: vscode.QuickPickItem[] = [
-            { label: TYPE_CLASSIC, description: `No option` },
-            { label: TYPE_IMPORTED, description: `--module app (no other option)` },
-            { label: TYPE_ROUTING, description: `--routing --module app (no other option)` },
+            {
+                label: TYPE_CLASSIC,
+                description: `No pre-filled option`,
+                detail: `Module of UI / presentation components, don't forget to import it somewhere`,
+            },
         ];
 
         let routeName = '';
-
         if (moduleName && schema.options.get('route')) {
             routeName = moduleName.split('/').pop() || moduleName;
-            moduleTypes.push({ label: TYPE_LAZY, description: `--route ${routeName} --module app` },);
+            moduleTypes.push({
+                label: TYPE_LAZY,
+                description: `--route ${routeName} --module app`,
+                detail: `Module with routing, lazy-loaded`,
+            });
         }
 
-        moduleTypes.push({ label: TYPE_ADVANCED, description: `You'll be able to choose all available options` },);
+        moduleTypes.push({
+            label: TYPE_ROUTING,
+            description: `--routing --module app`,
+            detail: `Module with routing${schema.options.get('route') ? `, immediately loaded` : ''}`,
+        },);
 
         const moduleType = await vscode.window.showQuickPick(moduleTypes, {
             placeHolder: `What type of module do you want?`,
@@ -417,10 +470,6 @@ export class Commands {
 
         switch (moduleType.label) {
 
-            case TYPE_IMPORTED:
-            moduleOptions.set('module', 'app');
-            break;
-
             case TYPE_ROUTING:
             moduleOptions.set('routing', 'true');
             moduleOptions.set('module', 'app');
@@ -431,10 +480,6 @@ export class Commands {
             moduleOptions.set('module', 'app');
             break;
 
-        }
-
-        if (moduleType.label === TYPE_ADVANCED) {
-            moduleOptions = await this.askOptions(schema);
         }
 
         return moduleOptions;
