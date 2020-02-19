@@ -94,6 +94,17 @@ On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI i
 it must be configured accordingly in your VS Code settings
 (`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
 
+### VS Code compact folders
+
+Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
+a new default behavior combines single folders together.
+
+While it might be a good idea in general, it is annoying with this extension,
+as clicking on the right directory where you want to generate something becomes more confusing.
+
+So you should consider disabling this setting in your VS Code *workspace* preferences:
+`"explorer.compactFolders": false`
+
 ## Component good practices
 
 This extension helps you to follow good practices,
@@ -230,20 +241,6 @@ you can add:
 `"ngschematics.schematics": ["my-private-lib"]`
 
 ## Other features
-
-### VS Code compact folders
-
-Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
-a new default behavior combines single folders together.
-
-While it might be a good idea in general, it is annoying with this extension,
-as clicking on the right directory where you want to generate something becomes more confusing.
-
-So the extension will disable this setting for you in `.vscode/settings.json`
-(only in Angular projects).
-
-If you want to keep the default VS Code behavior, just revert it:
-`"explorer.compactFolders": true`
 
 ### Keyboard shortcuts
 

@@ -7,7 +7,6 @@ import { Commands } from './schematics/commands';
 import { GenerateConfig } from './schematics/commands';
 import { Output } from './schematics/output';
 import { AngularConfig } from './schematics/angular-config';
-import { Preferences } from './schematics/preferences';
 
 
 // this method is called when your extension is activated
@@ -15,8 +14,6 @@ import { Preferences } from './schematics/preferences';
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
 
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
-
-    Preferences.disableCompactFolders();
 
     vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
 
