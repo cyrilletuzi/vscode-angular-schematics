@@ -1,5 +1,15 @@
 # Change Log
 
+## [3.2.1] - 2020-02-19
+
+### VS Code compact folders
+
+Revert automatic change of `compactFolders` setting introduced in 3.2.0,
+as some users report it as invasive.
+
+You should consider disabling this setting by yourself in your VS Code *workspace* preferences:
+`"explorer.compactFolders": false`
+
 ## [3.2.0] - 2020-02-15
 
 ### VS Code compact folders
