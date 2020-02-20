@@ -15,16 +15,6 @@ This extension will save you time:
 - **Generated files will auto open!**
 - Promote **good practices** for component types
 
-### Differences with Angular Console
-
-If you've heard about Angular Console, you may ask what's the difference with this extension (which was released first).
-
-While this extension is specific to VS Code, Angular Console was first designed as a desktop app,
-and then ported to VS Code. As a consequence, some useful features like inferred options
-and auto-opening generated files are not possible in Angular Console (at least for now).
-
-So it's up to you: test both and see which one saves you more time.
-
 ## Sponsorship
 
 I started this project to help my students learning Angular.
