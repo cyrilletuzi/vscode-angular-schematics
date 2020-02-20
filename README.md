@@ -69,7 +69,7 @@ This extension is only enabled inside an Angular CLI project
 (ie. with an `angular.json` file in workspace).
 
 We follow [Angular LTS support](https://angular.io/guide/releases),
-ie. currently your project should use Angular >= 7.
+ie. your project should use Angular >= 7.
 
 ### Project root
 
