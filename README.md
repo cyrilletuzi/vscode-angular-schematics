@@ -5,15 +5,25 @@ allowing you to **launch Angular schematics (CLI commands) with a Graphical User
 
 ## Why this extension?
 
-**Productivity!**
+### Productivity!
 
 This extension will save you time:
 
+- **Simple interface for Angular CLI commands**, no command line required
 - **No more typo errors** = no more cleaning mess
 - No more documentation search, all options available are proposed and described
 - **Many options are inferred** (like the path and the project)
-- **Generated files will auto open!**
-- Promote **good practices** for component types
+- **Generated files will auto open**
+
+### Good practices
+
+This extension promote **Angular good practices**,
+by improving component generation with the choice of different component types
+(explained below).
+
+Separate component types is a good things for:
+- the **architecture** of your project,
+- **performances**: pure components are optimized.
 
 ## Sponsorship
 
