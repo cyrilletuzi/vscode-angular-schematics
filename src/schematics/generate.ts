@@ -200,7 +200,7 @@ export class Generate {
 
     protected formatCollectionAndSchema(): string {
 
-        return (this.collection !== AngularConfig.cliCollection) ?
+        return (this.collection !== AngularConfig.defaultCollection) ?
             `${this.collection}:${this.schema}` :
             this.schema;
 
