@@ -9,11 +9,11 @@ allowing you to **launch Angular schematics (CLI commands) with a Graphical User
 
 This extension will save you time:
 
-- **Simple interface for Angular CLI commands**: no command line required
-- **No more typo errors** = no more cleaning mess
-- No more documentation search, all options available are proposed and described
+- **Simple interface for Angular CLI**: no command line required
 - **Many options are inferred** (like the path and the project)
 - **Generated files will auto open**
+- No more typo errors = no more cleaning mess
+- No more documentation search, all options available are proposed and described
 
 ### Good practices
 
@@ -31,7 +31,7 @@ Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstu
 
 It's a lot of *free* work.
 So if your company earns money with projects using this extension,
-it would be nice to **consider becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**.
+**consider becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**.
 
 ## By the same author
 
@@ -61,13 +61,7 @@ Why? Because the destination path and `project` will be automatically inferred t
 
 ### VS Code
 
-Current version of this extension officially requires Visual Studio Code version >= 1.41.
-But it may work on some older VS Code versions too.
-
-If you use an older version of VS Code and run into issues, you can still install
-([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)):
-- v2 of the extension for VS Code 1.39 & 1.40,
-- v1 of the extension for VS Code < 1.39.
+This extension requires Visual Studio Code version >= 1.41.
 
 ### Angular CLI
 
@@ -76,7 +70,6 @@ This extension is only enabled inside an Angular CLI project
 
 We follow [Angular LTS support](https://angular.io/guide/releases),
 ie. currently your project should use Angular >= 7.
-But the extension may still work in older versions.
 
 ### Project root
 
@@ -91,6 +84,8 @@ If your Angular project is inside your backend project, and you want both opened
 On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI installation is tied it,
 it must be configured accordingly in your VS Code settings
 (`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
+
+## Recommendation
 
 ### VS Code compact folders
 
@@ -119,7 +114,7 @@ A component associated to a route relies on specific features
 Thus, it should not be called via a HTML tag and so should not have a selector.
 
 Since Angular 9, a modal/dialog must be generated as a page too
-(previously it was another special component type: `--entry-component`).
+(previously it was a special type: `--entry-component`).
 
 ### Pure component
 
@@ -147,15 +142,12 @@ Angular CLI >= 9 introduces a new `type` option for component generation, to cha
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
-To customize component types, **your *root* `tslint.json` config must be changed** like this:
+To customize component suffixes, **your *root* `tslint.json` config must be changed** like this:
 
-`"component-class-suffix": [true, "Component", "Page", "Modal"]`.
+`"component-class-suffix": [true, "Component", "Page", "Dialog"]`.
 
 Now the extension will ask which component type you want based on this suffixes list,
 and set the `--type` option automatically.
-
-Note `--type` is set automatically only for your custom suffixes in `tslint.json`,
-not for the default component types, as otherwise lint would fail.
 
 Common suffixes will automatically pre-select the recommended type:
 - Page: `Page`, `Container`, `Smart`, `Routed`, `Route`, `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry`
@@ -192,7 +184,7 @@ Or only in a specific project:
 } } } } }
 ```
 
-If you want different values from the official defaults, the following options should be configured like above to ease the generation process:
+It can be interesting for the following options:
 - `@schematics/angular:component`
   - `inlineTemplate`
   - `inlineStyle`

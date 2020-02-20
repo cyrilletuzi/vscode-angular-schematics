@@ -67,6 +67,11 @@ As for now, there is no code change in the extension, so it will still work
 in older versions of VS Code and/or Angular,
 but it may break at any time in future 3.x releases.
 
+If you use an older version of VS Code and run into issues, you can still install
+([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)):
+- v2 of the extension for VS Code 1.39 & 1.40,
+- v1 of the extension for VS Code < 1.39.
+
 ## [2.3.2] - 2019-12-23
 
 ### Bug fix
