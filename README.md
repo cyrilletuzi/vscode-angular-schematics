@@ -100,7 +100,7 @@ So you should consider disabling this setting in your VS Code *workspace* prefer
 
 ### Ionic
 
-Ionic configures custom default schematics in `angular.json`:
+If you use Ionic, it configures custom default schematics in `angular.json`:
 ```json
 { "cli": { "defaultCollection": "@ionic/angular-toolkit" } }
 ```
