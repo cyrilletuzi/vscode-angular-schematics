@@ -200,9 +200,9 @@ If you want different values from the official defaults, the following options s
   - `inlineStyle`
   - `style`
   - `prefix`
-  - `flat`
   - `changeDetection`
   - `viewEncapsulation`
+  - `displayBlock` (Angular CLI >= 9.1)
 - all schematics
   - `flat`
   - `skipTests`
