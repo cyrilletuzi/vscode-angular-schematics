@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import { Collection } from './collection';
 import { Generate } from './generate';
 import { Output } from './output';
@@ -9,11 +10,8 @@ import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
 import { TSLintConfig } from './tslint-config';
 import { Preferences } from './preferences';
+import { Workspace, ExplorerMenuContext } from './workspace';
 
-
-export interface ExplorerMenuContext {
-    path: string;
-}
 
 export interface GenerateConfig {
     collectionName?: string;
@@ -22,45 +20,17 @@ export interface GenerateConfig {
 
 export class Commands {
 
-    static getContextPath(context?: ExplorerMenuContext): string {
-
-        /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
-        return (typeof context === 'object') && (context !== null) && ('path' in context) ? context.path : '';
-
-    }
-
-    static getDefaultWorkspace(): vscode.WorkspaceFolder | null {
-
-        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length === 1) {
-            return vscode.workspace.workspaceFolders[0];
-        }
-
-        return null;
-
-    }
-
-    static async getWorkspaceFolderPath(path = ''): Promise<string> {
-
-        const workspaceFolder = path ?
-            vscode.workspace.getWorkspaceFolder(vscode.Uri.file(path)) :
-            (this.getDefaultWorkspace() || await vscode.window.showWorkspaceFolderPick());
-
-        return workspaceFolder ? workspaceFolder.uri.fsPath : '';
-
-    }
-
     static async generate(context: ExplorerMenuContext, { collectionName, schemaName }: GenerateConfig = {}): Promise<void> {
 
         const shortcutCommand = (collectionName && schemaName) ? true : false;
 
-        const contextPath = this.getContextPath(context);
-        const workspaceFolderPath = await this.getWorkspaceFolderPath(contextPath);
+        const contextPath = Workspace.getContextPath(context);
+        const workspaceFolderPath = await Workspace.getWorkspaceFolderPath(contextPath);
 
         if (!workspaceFolderPath) {
             return;
         }
 
-        Preferences.init();
         await AngularConfig.init(workspaceFolderPath);
         await TSLintConfig.init(workspaceFolderPath);
 
@@ -360,9 +330,9 @@ export class Commands {
                 const userComponentTypeLowerCased = userComponentType.toLocaleLowerCase();
                 let description = '';
 
-                if (pageComponentTypes.includes(userComponentTypeLowerCased)) {
+                if ([...pageComponentTypes, ...runtimeComponentTypes].includes(userComponentTypeLowerCased)) {
                     description = `--skip-selector`;
-                } else if (pureComponentTypes.includes(userComponentTypeLowerCased)) {
+                } else if ([...pureComponentTypes, ...exportedComponentTypes].includes(userComponentTypeLowerCased)) {
                     description = `--change-detection OnPush`;
                 } else if (exportedComponentTypes.includes(userComponentTypeLowerCased)) {
                     description = `--export --change-detection OnPush`;
@@ -403,11 +373,13 @@ export class Commands {
             ([TYPE_PAGE, TYPE_ENTRY].includes(componentType) || [...pageComponentTypes, ...runtimeComponentTypes].includes(componentTypeLowerCased))) {
                 componentOptions.set('skipSelector', 'true');
             }
-            if ((componentType === TYPE_EXPORTED) || exportedComponentTypes.includes(componentTypeLowerCased)) {
+            if (schema.options.get('export') &&
+            ((componentType === TYPE_EXPORTED) || exportedComponentTypes.includes(componentTypeLowerCased))) {
                 componentOptions.set('export', 'true');
             }
-            if ([TYPE_PURE, TYPE_EXPORTED].includes(componentType)
-            || [...pureComponentTypes, ...exportedComponentTypes].includes(componentTypeLowerCased)) {
+            if (schema.options.get('changeDetection') &&
+            ([TYPE_PURE, TYPE_EXPORTED].includes(componentType)
+            || [...pureComponentTypes, ...exportedComponentTypes].includes(componentTypeLowerCased))) {
                 componentOptions.set('changeDetection', 'OnPush');
             }
             /* --type was added in Angular CLI 9.0 */
@@ -468,17 +440,23 @@ export class Commands {
 
         let moduleOptions = new Map();
 
-        switch (moduleType.label) {
+        if (moduleType.label === TYPE_ROUTING) {
 
-            case TYPE_ROUTING:
-            moduleOptions.set('routing', 'true');
-            moduleOptions.set('module', 'app');
-            break;
+            if (schema.options.get('routing')) {
+                moduleOptions.set('routing', 'true');
+            }
+            if (schema.options.get('module')) {
+                moduleOptions.set('module', 'app');
+            }
 
-            case TYPE_LAZY:
-            moduleOptions.set('route', routeName);
-            moduleOptions.set('module', 'app');
-            break;
+        } else if (moduleType.label === TYPE_LAZY) {
+
+            if (schema.options.get('route')) {
+                moduleOptions.set('route', routeName);
+            }
+            if (schema.options.get('module')) {
+                moduleOptions.set('module', 'app');
+            }
 
         }
 

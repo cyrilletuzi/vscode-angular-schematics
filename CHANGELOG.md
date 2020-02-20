@@ -1,5 +1,32 @@
 # Change Log
 
+## [3.3.0] - 2020-02-20
+
+### Shortchuts use Angular CLI
+
+Generation shortcuts ("Generate a component/service/module") are based on official Angular CLI schematics.
+But before v3.3 of this extension,
+the final command was launched with the default schematics configured in your `angular.json`.
+
+This was problematic for Ionic users, were a custom version of Angular schematics
+is set as default (`@ionic/angular-toolkit`). Unfortunately, these schematics are completely outdated
+(some important options like `--change-detection` or `--skip-selector` are missing),
+and some are even buggy (lazy-loaded module schematics is failing).
+
+Now Angular CLI is always used in shortcuts,
+so you can take advantage of up to date official schematics.
+You can still use custom schematics with "Generate another schematics".
+
+While Ionic custom schematics were useful in Ionic 3,
+because Ionic added special things on top of Angular,
+they are now useless in Ionic >= 4, which is just standard Angular.
+So you should remove the following line of config in your `angular.json`,
+to take advantage of the official and up to date Angular CLI schematics instead:
+
+```json
+{ "cli": { "defaultCollection": "@ionic/angular-toolkit" } }
+```
+
 ## [3.2.1] - 2020-02-19
 
 ### VS Code compact folders

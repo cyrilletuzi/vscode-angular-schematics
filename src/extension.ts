@@ -2,11 +2,14 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+
 import { AngularSchematicsProvider } from './schematics/view';
 import { Commands } from './schematics/commands';
 import { GenerateConfig } from './schematics/commands';
 import { Output } from './schematics/output';
 import { AngularConfig } from './schematics/angular-config';
+import { Preferences } from './schematics/preferences';
+import { ExplorerMenuContext } from './schematics/workspace';
 
 
 // this method is called when your extension is activated
@@ -17,10 +20,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
 
+    Preferences.init();
+
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
-    const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context) => {
+    const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context: ExplorerMenuContext) => {
 
         await Commands.generate(context, {
             collectionName: AngularConfig.cliCollection,
@@ -29,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     });
 
-    const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context) => {
+    const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context: ExplorerMenuContext) => {
 
         await Commands.generate(context, {
             collectionName: AngularConfig.cliCollection,
@@ -38,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     });
 
-    const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context) => {
+    const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context: ExplorerMenuContext) => {
 
         await Commands.generate(context, {
             collectionName: AngularConfig.cliCollection,
@@ -47,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     });
 
-    const generateCommand = vscode.commands.registerCommand('ngschematics.generate', async (context, options: GenerateConfig = {}) => {
+    const generateCommand = vscode.commands.registerCommand('ngschematics.generate', async (context: ExplorerMenuContext, options: GenerateConfig = {}) => {
 
         await Commands.generate(context, options);
 

@@ -85,7 +85,7 @@ On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI i
 it must be configured accordingly in your VS Code settings
 (`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
 
-## Recommendation
+## Recommendations
 
 ### VS Code compact folders
 
@@ -97,6 +97,23 @@ as clicking on the right directory where you want to generate something becomes 
 
 So you should consider disabling this setting in your VS Code *workspace* preferences:
 `"explorer.compactFolders": false`
+
+### Ionic
+
+Ionic configures custom default schematics in `angular.json`:
+```json
+{ "cli": { "defaultCollection": "@ionic/angular-toolkit" } }
+```
+
+Unfortunately, these schematics are completely outdated
+(some important options like `--change-detection` or `--skip-selector` are missing),
+and some are even buggy (lazy-loaded module schematics is failing).
+
+While Ionic custom schematics were useful in Ionic 3,
+because Ionic added special things on top of Angular,
+they are now useless in Ionic >= 4, which is just standard Angular.
+So you should remove this line of config in your `angular.json`,
+to take advantage of the official and up to date Angular CLI schematics instead.
 
 ## Component good practices
 
