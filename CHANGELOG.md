@@ -1,5 +1,12 @@
 # Change Log
 
+## [3.3.1] - 2020-03-19
+
+### UX
+
+Fix mingled description for page / modals / dialogs component type
+when `Page` suffix is used.
+
 ## [3.3.0] - 2020-02-20
 
 ### Shortchuts use Angular CLI

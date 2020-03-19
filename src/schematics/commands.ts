@@ -276,9 +276,10 @@ export class Commands {
         const componentOptions = new Map<string, string | string[]>();
 
         const entryRequired = !AngularConfig.isIvy && schema.options.get('entryComponent');
+        const hasPageSuffix = schema.options.get('type') && (TSLintConfig.userComponentSuffixes.includes('Page') || TSLintConfig.userComponentSuffixes.includes('page'));
 
         const TYPE_BASIC = `Basic component`;
-        const TYPE_PAGE = `Page${!entryRequired ? ` (or dialog / modal)` : ''}`;
+        const TYPE_PAGE = `Page${(!entryRequired && !hasPageSuffix) ? ` (or dialog / modal)` : ''}`;
         const TYPE_PURE = `Pure component`;
         const TYPE_EXPORTED = `Exported component`;
         const TYPE_ENTRY = `Entry component`;
@@ -293,8 +294,8 @@ export class Commands {
 
         componentTypes.push({
             label: TYPE_PAGE,
-            description: `--skip-selector${schema.options.get('type') && TSLintConfig.userComponentSuffixes.includes('Page') ? ` --type page` : ''}`,
-            detail: `Component associated to a route${!entryRequired ? ` or a dialog / modal` : ''}`,
+            description: `--skip-selector${hasPageSuffix ? ` --type page` : ''}`,
+            detail: `Component associated to a route${(!entryRequired && !hasPageSuffix) ? ` or a dialog / modal` : ''}`,
         });
 
         componentTypes.push({
@@ -384,8 +385,7 @@ export class Commands {
             }
             /* --type was added in Angular CLI 9.0 */
             if (schema.options.get('type')) {
-                if ((TSLintConfig.userComponentSuffixes.includes('Page') || TSLintConfig.userComponentSuffixes.includes('page'))
-                && (componentType === TYPE_PAGE)) {
+                if (hasPageSuffix && (componentType === TYPE_PAGE)) {
                     componentOptions.set('type', 'page');
                 } else if (TSLintConfig.userComponentSuffixes.includes(componentType)
                 || TSLintConfig.userComponentSuffixes.includes(componentTypeLowerCased)) {
