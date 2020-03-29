@@ -1,69 +1,65 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
 import { AngularSchematicsProvider } from './schematics/view';
 import { Commands } from './schematics/commands';
-import { GenerateConfig } from './schematics/commands';
 import { Output } from './schematics/output';
-import { AngularConfig } from './schematics/angular-config';
 import { Preferences } from './schematics/preferences';
-import { ExplorerMenuContext } from './schematics/workspace';
 
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+/**
+ * Function called when the extension is activated, to register new commands.
+ * Activation triggers are configured in `package.json`.
+ */
+export function activate(context: vscode.ExtensionContext): void {
 
+    // TODO: check if it's really useful
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
+    // TODO: do a class to init, and check if it should be removed on deactivate
     vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
 
+    // TODO: refactor
     Preferences.init();
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context: ExplorerMenuContext) => {
+    /* 
+     * Register new commands. Important things:
+     * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
+     * - the callback parameters' values depends on how the command is trigerred:
+     *   - with a right click in Explorer: will a `Uri` object of the file or folder clicked
+     *   - with the Command Palette or the dedicated extension panel: `undefined`
+     *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name 
+     */
+    context.subscriptions.push(
+        vscode.commands.registerCommand('ngschematics.generateComponent', (context?: vscode.Uri) => {
 
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'component'
-        });
+            Commands.generate(context, 'component');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
 
-    });
+            Commands.generate(context, 'service');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
 
-    const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context: ExplorerMenuContext) => {
+            Commands.generate(context, 'module');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, schemaName?: string, collectionName?: string) => {
 
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'service'
-        });
-
-    });
-
-    const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context: ExplorerMenuContext) => {
-
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'module'
-        });
-
-    });
-
-    const generateCommand = vscode.commands.registerCommand('ngschematics.generate', async (context: ExplorerMenuContext, options: GenerateConfig = {}) => {
-
-        await Commands.generate(context, options);
-
-    });
-
-    context.subscriptions.push(generateComponentCommand, generateServiceCommand, generateModuleCommand, generateCommand);
+            Commands.generate(context, schemaName, collectionName);
+    
+        }),
+    );
 
 }
 
-// this method is called when your extension is deactivated
+/** 
+ * Function called when the extension is deactivated, to do cleaning.
+ */
 export function deactivate(): void {
 
+    // TODO: will be removed when switching to Terminal API
     Output.dispose();
 
 }

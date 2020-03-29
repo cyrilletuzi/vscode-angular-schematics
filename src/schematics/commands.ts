@@ -10,19 +10,12 @@ import { Utils } from './utils';
 import { AngularConfig } from './angular-config';
 import { TSLintConfig } from './tslint-config';
 import { Preferences } from './preferences';
-import { Workspace, ExplorerMenuContext } from './workspace';
+import { Workspace } from './workspace';
 
-
-export interface GenerateConfig {
-    collectionName?: string;
-    schemaName?: string;
-}
 
 export class Commands {
 
-    static async generate(context: ExplorerMenuContext, { collectionName, schemaName }: GenerateConfig = {}): Promise<void> {
-
-        const shortcutCommand = (collectionName && schemaName) ? true : false;
+    static async generate(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
 
         const contextPath = Workspace.getContextPath(context);
         const workspaceFolderPath = await Workspace.getWorkspaceFolderPath(contextPath);
@@ -36,25 +29,33 @@ export class Commands {
 
         const generate = new Generate(contextPath, workspaceFolderPath);
 
-        if (collectionName !== AngularConfig.cliCollection) {
+        if (!collectionName) {
 
-            await Schematics.load(workspaceFolderPath);
+            if (schemaName) {
 
-            if (!collectionName) {
+                collectionName = AngularConfig.cliCollection;
 
-                collectionName = await Schematics.askSchematic();
+            } else {
+
+                await Schematics.load(workspaceFolderPath);
 
                 if (!collectionName) {
-                    return;
+
+                    collectionName = await Schematics.askSchematic();
+
+                    if (!collectionName) {
+                        return;
+                    }
+
                 }
 
-            }
+                generate.addCollection(collectionName);
 
-            generate.addCollection(collectionName);
+                /* Special case: ngx-spec needs a special path */
+                if (collectionName === 'ngx-spec') {
+                    generate.resetCommandPath(contextPath);
+                }
 
-            /* Special case: ngx-spec needs a special path */
-            if (collectionName === 'ngx-spec') {
-                generate.resetCommandPath(contextPath);
             }
         
         }
@@ -105,7 +106,7 @@ export class Commands {
         let shortcutConfirm: boolean | undefined = false;
 
         /* Quicker scenario for basic schematics (component, service, module) */
-        if (shortcutCommand) {
+        if (['component', 'service', 'module'].includes(schemaName) && (collectionName === AngularConfig.cliCollection)) {
 
             let shortcutOptions: Map<string, string | string[]> | undefined;
 

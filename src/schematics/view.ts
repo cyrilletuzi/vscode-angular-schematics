@@ -90,7 +90,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
                         item.command = {
                             title: `Generate ${schemaName}`,
                             command: 'ngschematics.generate',
-                            arguments: [null, { collectionName: collection.name, schemaName }]
+                            arguments: [undefined, schemaName, collection.name]
                         };
                         item.iconPath = await this.getIconPath(collection.name, schemaName);
                         items.push(item);

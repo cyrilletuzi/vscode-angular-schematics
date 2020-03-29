@@ -1,13 +1,10 @@
 import * as vscode from 'vscode';
 
-export interface ExplorerMenuContext {
-    path: string;
-}
-
 export class Workspace {
 
-    static getContextPath(context?: ExplorerMenuContext): string {
+    static getContextPath(context?: vscode.Uri): string {
 
+        // TODO: check if we should use fsPath instead
         /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
         return (typeof context === 'object') && (context !== null) && ('path' in context) ? context.path : '';
 
