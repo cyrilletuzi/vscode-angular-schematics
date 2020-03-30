@@ -66,11 +66,11 @@ export class Utils {
     
     }
 
-    static execAsync(command: string, cwd?: string): Promise<string> {
+    static execAsync(command: string, workspaceUri?: vscode.Uri): Promise<string> {
 
         return new Promise((resolve, reject) => {
     
-            childProcess.exec(command, { cwd, shell: userShell }, (error, stdout, stderr) => {
+            childProcess.exec(command, { cwd: workspaceUri?.fsPath, shell: userShell }, (error, stdout, stderr) => {
     
                 if (error) {
                     reject([stdout, stderr]);

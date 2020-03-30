@@ -31,11 +31,14 @@ export class Collection {
     }
     static cache = new Map<string, CollectionData>();
 
-    constructor(name: string) {
+    constructor(
+        private workspace: vscode.WorkspaceFolder,
+        name: string,
+    ) {
         this.name = name;
     }
 
-    async load(cwd: string): Promise<boolean> {
+    async load(): Promise<boolean> {
 
         let collection: CollectionData | null = null;
 
@@ -49,7 +52,7 @@ export class Collection {
 
             if (Utils.isSchemaLocal(this.name)) {
 
-                collection = await Utils.getSchemaFromLocal<CollectionData>(cwd, this.name); 
+                collection = await Utils.getSchemaFromLocal<CollectionData>(this.workspace.uri.fsPath, this.name); 
 
                 if (collection) {
                     collection.path = Utils.getDirectoryFromFilename(this.name);
@@ -57,13 +60,13 @@ export class Collection {
                 
             } else {
 
-                const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(cwd, this.name, 'package.json');
+                const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.workspace.uri.fsPath, this.name, 'package.json');
 
                 if (!collectionPackage || !collectionPackage.schematics) {
                     return false;
                 }
     
-                collection = await Utils.getSchemaFromNodeModules<CollectionData>(cwd, this.name, Utils.pathTrimRelative(collectionPackage.schematics));
+                collection = await Utils.getSchemaFromNodeModules<CollectionData>(this.workspace.uri.fsPath, this.name, Utils.pathTrimRelative(collectionPackage.schematics));
     
                 if (collection) {
                     collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
@@ -77,7 +80,7 @@ export class Collection {
 
             this.path = collection.path;
 
-            await this.initSchemasMap(collection, cwd);
+            await this.initSchemasMap(collection);
 
             Collection.cache.set(this.name, collection);
 
@@ -89,7 +92,7 @@ export class Collection {
 
     }
 
-    async createSchema(name: string, cwd: string): Promise<Schema> {
+    async createSchema(name: string): Promise<Schema> {
 
         let collection: Collection = this;
 
@@ -99,8 +102,8 @@ export class Collection {
 
             const [parentCollectionName] = schema.extends.split(':');
 
-            collection = new Collection(parentCollectionName);
-            await collection.load(cwd);
+            collection = new Collection(this.workspace, parentCollectionName);
+            await collection.load();
 
         }
 
@@ -125,7 +128,7 @@ export class Collection {
 
     }
 
-    protected async initSchemasMap(collection: CollectionData, cwd: string): Promise<void> {
+    protected async initSchemasMap(collection: CollectionData): Promise<void> {
 
         for (let schemaName in collection.schematics) {
 
@@ -139,8 +142,8 @@ export class Collection {
 
                     const [parentCollectionName, parentSchemaName] = schema.extends.split(':');
 
-                    const parentCollection = new Collection(parentCollectionName);
-                    await parentCollection.load(cwd);
+                    const parentCollection = new Collection(this.workspace, parentCollectionName);
+                    await parentCollection.load();
 
                     const parentSchema = Object.assign({}, parentCollection.schemas.get(parentSchemaName) as CollectionDataSchema);
                     parentSchema.extends = schema.extends;

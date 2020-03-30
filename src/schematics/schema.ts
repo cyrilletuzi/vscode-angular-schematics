@@ -52,7 +52,7 @@ export class Schema {
         this.collection = collection;
     }
 
-    async load(cwd: string): Promise<boolean> {
+    async load(workspace: vscode.WorkspaceFolder): Promise<boolean> {
 
         let schema: SchemaData | null = null;
 
@@ -70,9 +70,9 @@ export class Schema {
             );
 
             if (Utils.isSchemaLocal(this.collection.name)) {
-                schema = await Utils.getSchemaFromLocal<SchemaData>(cwd, this.path); 
+                schema = await Utils.getSchemaFromLocal<SchemaData>(workspace.uri.fsPath, this.path); 
             } else {
-                schema = await Utils.getSchemaFromNodeModules<SchemaData>(cwd, this.collection.name, this.path);
+                schema = await Utils.getSchemaFromNodeModules<SchemaData>(workspace.uri.fsPath, this.collection.name, this.path);
             }
 
         }

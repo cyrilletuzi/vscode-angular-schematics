@@ -1,7 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+
 import { Utils } from './utils';
-import { AngularConfig } from './angular-config';
+import { AngularConfig } from './config-angular';
 import { Preferences } from './preferences';
 
 
@@ -9,7 +10,7 @@ export class Schematics {
 
     static collections: Set<string> = new Set();
 
-    static async load(cwd: string): Promise<void> {
+    static async load(workspace: vscode.WorkspaceFolder): Promise<void> {
 
         const collectionsNames: string[] = Preferences.getSchematics();
 
@@ -26,9 +27,9 @@ export class Schematics {
                 let collectionExists = false;
 
                 if (Utils.isSchemaLocal(collectionName)) {
-                    collectionExists = await Utils.existsAsync(path.join(cwd, collectionName));
+                    collectionExists = await Utils.existsAsync(path.join(workspace.uri.fsPath, collectionName));
                 } else {
-                    collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, collectionName));
+                    collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(workspace.uri.fsPath, collectionName));
                 }
 
                 if (collectionExists) {
@@ -39,7 +40,8 @@ export class Schematics {
 
         }
 
-        this.collections = new Set([AngularConfig.defaultCollection, AngularConfig.cliCollection, ...existingCollections]);
+        // TODO: reintroduce defaultCollection
+        this.collections = new Set([/* AngularConfig.defaultCollection, */AngularConfig.defaultAngularCollection, ...existingCollections]);
 
     }
 
@@ -47,7 +49,7 @@ export class Schematics {
 
         if  (this.collections.size === 1) {
 
-            return AngularConfig.cliCollection;
+            return AngularConfig.defaultAngularCollection;
 
         } else {
 
