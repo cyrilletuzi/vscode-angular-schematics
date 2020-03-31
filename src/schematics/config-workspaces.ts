@@ -15,7 +15,7 @@ export interface WorkspaceExtended extends vscode.WorkspaceFolder {
 export class WorkspacesConfig {
 
     /** Map of all the opened workspaces. The map key is the workspace's name. */
-    private static workspaces: Map<string, WorkspaceExtended>;
+    private static workspaces = new Map<string, WorkspaceExtended>();
 
     // TODO: manage async
     /**

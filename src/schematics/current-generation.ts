@@ -8,9 +8,20 @@ import { Output } from './output';
 import { Schema } from './schema';
 import { Preferences } from './preferences';
 
+interface ContextPath {
+    /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
+    full: string;
+    /** Eg. `src/app/some-module` */
+    relativeToWorkspace: string;
+    /** Eg. `some-module` */
+    // relativeToSource: string;
+}
 
 export class CurrentGeneration {
 
+    static readonly sourceFolders: string[] = ['app', 'lib'];
+    /* Path details of the right-clicked file or directory */
+    private contextPath!: ContextPath;
     path = '';
     project = '';
     schema = '';
@@ -32,11 +43,11 @@ export class CurrentGeneration {
 
     constructor(
         private workspaceExtended: WorkspaceExtended,
-        contextPath: string,
+        context?: vscode.Uri,
     ) {
 
-        this.path = this.getCommandPath(contextPath);
-        this.project = this.getProject(contextPath);
+        this.setContextPath(context);
+        this.setProject();
 
     }
 
@@ -108,62 +119,65 @@ export class CurrentGeneration {
 
     }
 
-    resetCommandPath(contextPath = ''): void {
+    resetCommandPath(): void {
 
-        this.path = this.getCommandPath(contextPath);
+        this.path = this.getCommandPath();
 
     }
 
-    protected getProject(contextPath: string): string {
-
-        const workspaceUri = this.workspaceExtended.uri;
-
-        const workspacePathNormalized = workspaceUri.fsPath.replace(/\\/g, '/');
-
-        const toRenameProjectPath = contextPath.substr(contextPath.indexOf(workspacePathNormalized) + workspacePathNormalized.length);
-
-        const pathNormalized = Utils.normalizePath(toRenameProjectPath);
+    protected setProject(): void {
 
         for (const [projectName, projectConfig] of this.workspaceExtended.angularConfig.getProjects()) {
 
-            const projectPath = projectConfig.root || projectConfig.sourceRoot;
-
-            /* Remove leading "/" to match */
-            const pathWithoutLeadingSlash = pathNormalized.substr(1);
-
-            /* Test strict equality or starting with a trailing "/", to avoid collision when projects start with a common path */
-            if (pathWithoutLeadingSlash === projectPath || pathWithoutLeadingSlash.startsWith(`${projectPath}/`)) {
-                return projectName;
+            if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.sourcePath)) {
+                this.project = projectName;
+                return;
             }
 
         }
 
-
-        const projectMatches = pathNormalized.match(/projects\/([^\/]+)\/[^\/]+\/(?:app|lib)/);
-
-        if (projectMatches) {
-
-            return projectMatches[1];
-
-        } else {
-
-            const scopedProjectMatches = pathNormalized.match(/projects\/([^\/]+\/[^\/]+)\/[^\/]+\/(?:app|lib)/);
-
-            if (scopedProjectMatches) {
-
-                return `@${scopedProjectMatches[1]}`;
-
-            }
-
-        }
-
-        return '';
+        this.project = '';
 
     }
 
-    protected getCommandPath(contextPath = ''): string {
+    private setContextPath(context?: vscode.Uri): void {
 
-        const pathNormalized = Utils.normalizePath(contextPath);
+        /* Default values */
+        this.contextPath = {
+            full: context?.path ?? '',
+            relativeToWorkspace: '',
+            // relativeToSource: '',
+        };
+
+        if (this.contextPath.full === '') {
+            return;
+        }
+
+        this.contextPath.relativeToWorkspace = this.contextPath.full.substr(this.workspaceExtended.uri.path.length + 1);
+
+        // /* 
+        //  * - `[^\/]+/` matches a directory: at least one character except slashes, followed by a slash`
+        //  * - `((?:app|lib))` matches `app` or `lib` and extra parenthesis capture the value
+        //  * - `/` final slash
+        //  */
+        // const pathRegExp = new RegExp(`[^\/]+\/((?:${CurrentGeneration.sourceFolders.join('|')}))\/`);
+
+        // /* 
+        //  * - `null` if not matching
+        //  * - [0]: full string
+        //  * - [1]: value of first parenthesis, ie. `app` or `lib`
+        //  */
+        // const patchMatches = this.contextPath.full.match(pathRegExp);
+
+        // if (!patchMatches) {
+        //     return;
+        // }
+
+    }
+
+    protected getCommandPath(): string {
+
+        const pathNormalized = Utils.normalizePath(this.contextPath.full);
 
         const contextPathMatches = pathNormalized.match(/[^\/]+\/((?:app|lib))\//);
 

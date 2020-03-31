@@ -6,20 +6,29 @@ import { Watchers } from './watchers';
 import { TypescriptConfig } from './config-typescript';
 import { PackageJsonConfig } from './config-package-json';
 
-export interface AngularJsonProjectSchema {
+type AngularProjectType = 'application' | 'library';
+
+interface AngularJsonProjectSchema {
+    projectType: AngularProjectType;
     /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
     root: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     sourceRoot?: string;
 }
 
-export interface AngularJsonSchema {
+interface AngularJsonSchema {
     cli?: {
         defaultCollection?: string;
     };
     projects?: {
         [key: string]: AngularJsonProjectSchema;
     };
+}
+
+export interface AngularProject {
+    type: AngularProjectType;
+    sourcePath: string;
+    isRoot: boolean;
 }
 
 export class AngularConfig {
@@ -33,7 +42,7 @@ export class AngularConfig {
     /** User default collection, otherwise official Angular CLI default collection */
     private defaultUserCollection!: string;
     /** List of projects registered in Angular config file */
-    private projects!: Map<string, AngularJsonProjectSchema>;
+    private projects!: Map<string, AngularProject>;
     /** Tells if Angular is in Ivy mode */
     private ivy!: boolean;
     /** File system path of the Angular config file */
@@ -55,10 +64,9 @@ export class AngularConfig {
 
         this.defaultUserCollection = this.config?.cli?.defaultCollection ?? AngularConfig.defaultAngularCollection;
 
-        // TODO: previously, projects with no root and sourceRoot where filtered
-        // TODO: previsouly, we removed trailing slash
-        this.projects = new Map(this.config?.projects ? Object.entries(this.config?.projects) : []);
+        this.setProjects();
 
+        // TODO: should be retrigger if package.json or tsconfig.json change
         this.setIvy();
 
         // TODO: check it still works
@@ -78,7 +86,7 @@ export class AngularConfig {
     /**
      * List of projects registered in Angular config file.
      */
-    getProjects(): Map<string, AngularJsonProjectSchema> {
+    getProjects(): Map<string, AngularProject> {
         return this.projects;
     }
 
@@ -95,7 +103,51 @@ export class AngularConfig {
     isRootProject(name: string): boolean {
 
         // TODO: it can be something else than src?
-        return (this.projects.get(name)?.root === 'src');
+        return this.projects.get(name)?.isRoot ?? false;
+
+    }
+
+    private setProjects(): void {
+
+        const projectsFromConfig = this.config?.projects ? Object.entries(this.config?.projects) : [];
+
+        const projects: [string, AngularProject][] = projectsFromConfig.map(([projectName, projectConfig]) => {
+
+            /* `projectType` is supposed to be required, but default to `application` for safety */
+            const type = projectConfig.projectType ? projectConfig.projectType : 'application';
+            
+            /* These folders are imposed by Angular CLI.
+             * See https://github.com/angular/angular-cli/blob/9190f622365b8eb85b7d8828f170959ded643518/packages/schematics/angular/utility/project.ts#L17 */
+            const fixedFolder = (projectConfig.projectType === 'library') ? 'lib' : 'app';
+
+            /* Project's path relative to workspace (ie. where `angular.json` is).
+             * For the main application, it's empty as it's directly in the workspace.
+             * For sub-applications/libraries, it's `<projects-root>/hello-world`. */
+            const root = projectConfig.root ?? '';
+
+            /* Project's source path relative to workspace (ie. where `angular.json` is).
+             * For the main application, it's `src` by default but can be customized.
+             * For sub-applications/libraries, it's `<projects-root>/hello-world/<src-or-something-else>`.
+             * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
+            const sourceRoot = projectConfig.sourceRoot ?? path.posix.join(root, 'src');
+
+            /* Default for:
+             * - root application: `src/app`
+             * - sub-application: `projects/hello-world/src/app`
+             * - sub-library: `projects/hello-world/src/lib`
+             * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
+            const sourcePath = path.posix.join(sourceRoot, fixedFolder);
+
+            const isRoot = ((projectConfig.root === '') && (sourceRoot === 'src'));
+
+            return [projectName, {
+                type,
+                sourcePath,
+                isRoot,
+            }];
+        });
+
+        this.projects = new Map(projects);
 
     }
 

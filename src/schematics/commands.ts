@@ -12,10 +12,6 @@ export class Commands {
 
     static async generate(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
 
-        // TODO: check if we should use fsPath instead
-        /* Check if there is an Explorer context (command could be launched from Palette too, where there is no context) */
-        const fullContextPath = context?.path ?? '';
-
         /* Resolve the current workspace config */
         const workspace = await WorkspacesConfig.getCurrentWorkspace(context);
         if (!workspace) {
@@ -24,16 +20,21 @@ export class Commands {
 
         const workspaceExtended = WorkspacesConfig.getWorkspaceExtended(workspace);
         if (!workspaceExtended) {
-            Output.logError(`Can not find a workspace config with the provided name.`);
+            Output.logError(`Cannot find the workspace config of the provided workspace name.`);
             return;
         }
 
-        const generate = new CurrentGeneration(workspaceExtended, fullContextPath);
+        const generate = new CurrentGeneration(workspaceExtended, context);
 
+        /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
 
+            /* Schema will already be set when coming from generation shortcuts like "Generate a component" */
             if (schemaName) {
 
+                /* For shortcuts, always use default official collection
+                 * (default user collection can be set to something else,
+                 * and this can be an issue when they are buggy like the Ionic ones) */
                 collectionName = AngularConfig.defaultAngularCollection;
 
             } else {
@@ -54,7 +55,7 @@ export class Commands {
 
                 /* Special case: ngx-spec needs a special path */
                 if (collectionName === 'ngx-spec') {
-                    generate.resetCommandPath(fullContextPath);
+                    generate.resetCommandPath();
                 }
 
             }
