@@ -2,15 +2,21 @@ import * as vscode from 'vscode';
 
 import { Collection } from './collection';
 import { CurrentGeneration } from './current-generation';
-import { Output } from './output';
 import { Schematics } from './schematics';
 import { AngularConfig } from './config-angular';
-import { WorkspacesConfig } from './config-workspaces';
+import { WorkspacesConfig, WorkspaceExtended } from './config-workspaces';
+import { Schema } from './schema';
 
 
 export class Commands {
 
-    static async generate(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
+    workspace!: WorkspaceExtended;
+    generation!: CurrentGeneration;
+    schematics!: Schematics;
+    collection!: Collection;
+    schema!: Schema;
+
+    async generate(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
 
         /* Resolve the current workspace config */
         const workspace = await WorkspacesConfig.getCurrentWorkspace(context);
@@ -20,11 +26,13 @@ export class Commands {
 
         const workspaceExtended = WorkspacesConfig.getWorkspaceExtended(workspace);
         if (!workspaceExtended) {
-            Output.logError(`Cannot find the workspace config of the provided workspace name.`);
+            vscode.window.showErrorMessage(`Cannot find the workspace config of the provided workspace name.`);
             return;
         }
+        this.workspace = workspaceExtended;
+        this.schematics = this.workspace.schematics;
 
-        const generate = new CurrentGeneration(workspaceExtended, context);
+        this.generation = new CurrentGeneration(workspaceExtended, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
@@ -39,11 +47,15 @@ export class Commands {
 
             } else {
 
-                await Schematics.load(workspace);
-
                 if (!collectionName) {
 
-                    collectionName = await Schematics.askSchematic();
+                    try {
+                        collectionName = await this.askSchematic();
+                    } catch (error) {
+                        /* Happens if `@schematics/angular` is not installed */
+                        vscode.window.showErrorMessage(error.message);
+                        return;
+                    }
 
                     if (!collectionName) {
                         return;
@@ -51,26 +63,24 @@ export class Commands {
 
                 }
 
-                generate.addCollection(collectionName);
-
-                /* Special case: ngx-spec needs a special path */
-                if (collectionName === 'ngx-spec') {
-                    generate.resetCommandPath();
-                }
-
             }
         
         }
 
-        const collection = new Collection(workspace, collectionName);
+        this.generation.setCollectionName(collectionName);
 
-        if (!await collection.load()) {
+        const collection = await this.schematics.getCollection(collectionName);
+
+        if (!collection) {
+            vscode.window.showErrorMessage(`Cannot load "${collectionName}" schematics collection.`);
             return;
         }
 
+        this.collection = collection;
+
         if (!schemaName) {
 
-            schemaName = await collection.askSchema();
+            schemaName = await this.askSchema();
 
             if (!schemaName) {
                 return;
@@ -78,30 +88,28 @@ export class Commands {
 
         }
 
-        generate.addSchema(schemaName);
+        this.generation.setSchema(schemaName);
 
-        const schema = await collection.createSchema(schemaName);
+        const schema = await this.collection.getSchema(schemaName);
 
-        if (!await schema.load(workspace)) {
+        if (!schema) {
+            vscode.window.showErrorMessage(`Cannot load "${schemaName}" schematics schema in "${collectionName}" collection.`);
             return;
         }
 
+        this.schema = schema;
+
         let defaultOption: string | undefined;
 
-        if (schema.hasDefaultOption()) {
+        if (this.schema.hasNameAsFirstArg()) {
 
-            defaultOption = await schema.askDefaultOption(generate.path, generate.project);
+            defaultOption = await this.askNameAsFirstArg();
 
             if (!defaultOption) {
                 return;
             }
 
-            /* Remove suffix (like `.component`) as Angular CLI will already add it */
-            if (defaultOption.endsWith(`.${schemaName}`)) { 
-                defaultOption = defaultOption.replace(`.${schemaName}`, '');
-            }
-
-            generate.addDefaultOption(defaultOption, schema.hasPath());
+            this.generation.setNameAsFirstArg(defaultOption);
 
         }
 
@@ -118,7 +126,7 @@ export class Commands {
                 /* Special scenario for component types */
                 if (schemaName === 'component') {
 
-                    shortcutOptions = await generate.askComponentOptions(schema);
+                    shortcutOptions = await this.generation.askComponentOptions();
                     if (!shortcutOptions) {
                         return;
                     }
@@ -126,7 +134,7 @@ export class Commands {
                 /* Special scenario for module types */
                 } else if (schemaName === 'module') {
 
-                    shortcutOptions = await generate.askModuleOptions(schema, defaultOption);
+                    shortcutOptions = await this.generation.askModuleOptions(schema, defaultOption);
                     if (!shortcutOptions) {
                         return;
                     }
@@ -137,12 +145,12 @@ export class Commands {
 
             if (shortcutOptions) {
                 shortcutOptions.forEach((option, optionName) => {
-                    generate.addOption(optionName, option);
+                    this.generation.addOption(optionName, option);
                 });
             }
 
             /* Ask direct confirmation or adding more options or cancel */
-            shortcutConfirm = await generate.askShortcutConfirmation(generate);
+            shortcutConfirm = await this.generation.askShortcutConfirmation(this.generation);
 
             /* "Cancel" choice */
             if (shortcutConfirm === undefined) {
@@ -156,18 +164,18 @@ export class Commands {
 
             let filledOptions: Map<string, string | string[]> | undefined;
 
-            filledOptions = await generate.askOptions(schema);
+            filledOptions = await this.generation.askOptions(schema);
 
             if (!filledOptions) {
                 return;
             }
 
             filledOptions.forEach((option, optionName) => {
-                generate.addOption(optionName, option);
+                this.generation.addOption(optionName, option);
             });
 
             /* Ask final confirmation */
-            const confirm = await generate.askConfirmation();
+            const confirm = await this.generation.askConfirmation();
 
             /* "Cancel" choice */
             if (!confirm) {
@@ -176,7 +184,65 @@ export class Commands {
 
         }
 
-        await generate.launchCommand();
+        await this.generation.launchCommand();
+
+    }
+
+    private async askSchematic(): Promise<string | undefined> {
+
+        if  (this.schematics.getCollectionsNames().length === 0) {
+            throw new Error('Cannot find any schematics.');
+        }
+
+        if  (this.schematics.getCollectionsNames().length === 1) {
+            return AngularConfig.defaultAngularCollection;
+        }
+
+        return vscode.window.showQuickPick(this.schematics.getCollectionsNames(), {
+            placeHolder: `From which schematics collection?`,
+            ignoreFocusOut: true,
+        });
+
+    }
+
+    private async askSchema(): Promise<string | undefined> {
+
+        const choice = await vscode.window.showQuickPick(this.collection.getSchemasChoices(), {
+            placeHolder: `What do you want to generate?`,
+            ignoreFocusOut: true,
+        });
+
+        return choice ? choice.label : undefined;
+
+    }
+
+    private async askNameAsFirstArg(): Promise<string | undefined> {
+
+        const project = this.generation.getProject();
+
+        let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
+
+        /* Pro-tip to educate users that it is easier to launch the command from a right-click in Explorer */
+        if (this.workspace.angularConfig.isRootProject(project) && !this.generation.hasContextPath()) {
+            prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
+        }
+
+        const contextPath = this.generation.getContextForNameAsFirstArg();
+
+        const nameInput = await vscode.window.showInputBox({
+            prompt,
+            /* If existing, prefill the input with the rgiht-clicked directory */
+            value: contextPath,
+            /* Position the cursor to the end of the prefilled value, so the user can type directly after */
+            valueSelection: [contextPath.length, contextPath.length],
+            ignoreFocusOut: true,
+        });
+
+        /* Remove suffix (like `.component`) as Angular CLI will already add it */
+        const suffix = `.${this.schema.getName()}`;
+        const name = nameInput?.endsWith(suffix) ? nameInput.replace(suffix, '') : nameInput;
+
+        return name;
 
     }
 

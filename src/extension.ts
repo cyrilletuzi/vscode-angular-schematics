@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-import { AngularSchematicsProvider } from './schematics/view';
 import { Commands } from './schematics/commands';
 import { Output } from './schematics/output';
 import { Preferences } from './schematics/preferences';
@@ -19,9 +18,6 @@ export function activate(context: vscode.ExtensionContext): void {
 
     WorkspacesConfig.init();
 
-    // TODO: do a class to init, and check if it should be removed on deactivate
-    vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
-
     // TODO: refactor
     Preferences.init();
 
@@ -36,22 +32,26 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('ngschematics.generateComponent', (context?: vscode.Uri) => {
 
-            Commands.generate(context, 'component');
+            const command = new Commands();
+            command.generate(context, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
 
-            Commands.generate(context, 'service');
+            const command = new Commands();
+            command.generate(context, 'service');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
 
-            Commands.generate(context, 'module');
+            const command = new Commands();
+            command.generate(context, 'module');
     
         }),
         vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, schemaName?: string, collectionName?: string) => {
 
-            Commands.generate(context, schemaName, collectionName);
+            const command = new Commands();
+            command.generate(context, schemaName, collectionName);
     
         }),
     );

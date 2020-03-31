@@ -34,14 +34,10 @@ export class TSLintConfig {
 
     async init(): Promise<void> {
 
-        this.config = await FileSystem.parseJsonFile<TSLintSchema>(this.fsPath, this.workspace);
+        await this.setConfig();
 
-        this.setUserComponentSuffixes();
-
-        this.setComponentSuffixes();
-
-        Watchers.create(this.fsPath, () => {
-            this.init();
+        Watchers.watchFile(this.fsPath, () => {
+            this.setConfig();
         });
 
     }
@@ -52,6 +48,16 @@ export class TSLintConfig {
 
     getComponentSuffixes(): string[] {
         return this.componentSuffixes;
+    }
+
+    private async setConfig(): Promise<void> {
+
+        this.config = await FileSystem.parseJsonFile<TSLintSchema>(this.fsPath, this.workspace);
+
+        this.setUserComponentSuffixes();
+
+        this.setComponentSuffixes();
+
     }
 
     private setUserComponentSuffixes(): void {

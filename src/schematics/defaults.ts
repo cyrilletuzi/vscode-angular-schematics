@@ -4,7 +4,7 @@ import { ComponentTypes } from './preferences';
 /**
  * Default third-party schematics.
  */
-export const defaultSchematics: string[] = [
+export const defaultSchematicsNames: string[] = [
     '@angular/material',
     '@ionic/angular-toolkit',
     '@ngrx/schematics',

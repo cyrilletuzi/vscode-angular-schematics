@@ -30,12 +30,10 @@ export class PackageJsonConfig {
 
     async init(): Promise<void> {
 
-        this.config = await FileSystem.parseJsonFile<PackageJsonSchema>(this.fsPath, this.workspace);
+        await this.setConfig();
 
-        this.setAngularMajorVersion();
-
-        Watchers.create(this.fsPath, () => {
-            this.init();
+        Watchers.watchFile(this.fsPath, () => {
+            this.setConfig();
         });
 
     }
@@ -45,6 +43,14 @@ export class PackageJsonConfig {
      */
     getAngularMajorVersion(): number | undefined {
         return this.angularMajorVersion;
+    }
+
+    private async setConfig(): Promise<void> {
+
+        this.config = await FileSystem.parseJsonFile<PackageJsonSchema>(this.fsPath, this.workspace);
+
+        this.setAngularMajorVersion();
+
     }
 
     /**

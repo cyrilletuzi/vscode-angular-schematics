@@ -1,15 +1,20 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
-import { Collection, CollectionDataSchema } from './collection';
-import { Utils } from './utils';
 
+import { FileSystem } from './file-system';
 
-export interface SchemaDataDefaultOption {
+export interface SchemaConfig {
+    name: string;
+    collectionName: string;
+    description: string;
+    fsPath: string;
+}
+
+interface SchemaDataDefaultOption {
     $source: 'argv' | 'projectName';
     index?: number;
 }
 
-export interface SchemaDataOptions {
+interface SchemaDataOptions {
     type: 'string' | 'boolean' | 'array';
     description: string;
     enum?: string[];
@@ -28,7 +33,7 @@ export interface SchemaDataOptions {
     };
 }
 
-export interface SchemaData {
+interface SchemaData {
     properties: {
         [key: string]: SchemaDataOptions;
     };
@@ -37,68 +42,61 @@ export interface SchemaData {
 
 export class Schema {
 
-    collection: Collection;
-    name: string;
-    path = '';
-    requiredOptions: string[] = [];
-    options = new Map<string, SchemaDataOptions>();
+    private name: string;
+    private fsPath: string;
+    private config!: SchemaData;
+    private requiredOptions: string[] = [];
+    private options = new Map<string, SchemaDataOptions>();
     get optionsNames(): string[] {
         return Array.from(this.options.keys()).sort();
     }
     static cache = new Map<string, SchemaData>();
 
-    constructor(name: string, collection: Collection) {
-        this.name = name;
-        this.collection = collection;
-    }
+    constructor(
+        config: SchemaConfig,
+        private workspace: vscode.WorkspaceFolder,
+    ) {
 
-    async load(workspace: vscode.WorkspaceFolder): Promise<boolean> {
-
-        let schema: SchemaData | null = null;
-
-        const cachedSchema = Schema.cache.get(`${this.collection}:${this.name}`);
-
-        if (cachedSchema) {
-
-            schema = cachedSchema;
-
-        } else {
-
-            this.path = path.join(
-                Utils.getDirectoryFromFilename(this.collection.path),
-                Utils.pathTrimRelative((this.collection.schemas.get(this.name) as CollectionDataSchema).schema)
-            );
-
-            if (Utils.isSchemaLocal(this.collection.name)) {
-                schema = await Utils.getSchemaFromLocal<SchemaData>(workspace.uri.fsPath, this.path); 
-            } else {
-                schema = await Utils.getSchemaFromNodeModules<SchemaData>(workspace.uri.fsPath, this.collection.name, this.path);
-            }
-
-        }
-
-        if (schema) {
-
-            this.initOptionsMap(schema);
-
-            this.requiredOptions = schema.required || [];
-
-            Schema.cache.set(`${this.collection}:${this.name}`, schema);
-
-            return true;
-        }
-
-        return false;
+        this.name = config.name;
+        this.fsPath = config.fsPath;
 
     }
 
-    hasDefaultOption(): boolean {
+    async init(): Promise<void> {
 
-        for (let option of this.options.values()) {
-            if ((option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0))
-            || (this.requiredOptions.includes('name'))) {
+        if (!await FileSystem.isReadable(this.fsPath, this.workspace)) {
+            throw new Error(`${this.name} schematics schema can not be found or read.`);
+        }
+
+        const config = await FileSystem.parseJsonFile<SchemaData>(this.fsPath);
+
+        if (!config) {
+            throw new Error(`${this.name} schematics collection can not be parsed.`);
+        }
+
+        this.setOptions();
+
+    }
+
+    /**
+     * Get schema's name without collection
+     */
+    getName(): string {
+        return this.name;
+    }
+
+    /**
+     * Tells if the schema requires a path/to/name as first command line argument
+     */
+    hasNameAsFirstArg(): boolean {
+
+        for (const [name, option] of this.options.entries()) {
+
+            /* `argv[0]` means it is the first argument in command line after `ng g <some-schema>` */
+            if ((name === 'name') && (option.$default?.$source === 'argv') && (option.$default?.index === 0)) {
                 return true;
             }
+
         }
 
         return false;
@@ -109,24 +107,6 @@ export class Schema {
 
         return this.options.has('path');
     
-    }
-
-    async askDefaultOption(contextPath = '', project = ''): Promise<string | undefined> {
-
-        let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
-
-        if (!contextPath || !project) {
-            prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
-        }
-
-        /** @todo Investigate if there could be other default option than name */
-        return vscode.window.showInputBox({
-            prompt,
-            value: contextPath,
-            valueSelection: [contextPath.length, contextPath.length],
-            ignoreFocusOut: true,
-        });
-
     }
 
     async askOptions(): Promise<string[]> {
@@ -267,17 +247,15 @@ export class Schema {
 
     }
 
-    protected initOptionsMap(schema: SchemaData): void {
+    private setOptions(): void {
 
-        for (let optionName in schema.properties) {
+        const options = Object.entries(this.config.properties);
 
-            if (schema.properties.hasOwnProperty(optionName)) {
-
-                this.options.set(optionName, schema.properties[optionName]);
-
-            }
-
+        for (const [name, option] of options) {
+            this.options.set(name, option);
         }
+
+        this.requiredOptions = this.config.required ?? [];
 
     }
 

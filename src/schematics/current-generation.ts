@@ -7,6 +7,7 @@ import { WorkspaceExtended } from './config-workspaces';
 import { Output } from './output';
 import { Schema } from './schema';
 import { Preferences } from './preferences';
+import { FileSystem } from './file-system';
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
@@ -14,30 +15,34 @@ interface ContextPath {
     /** Eg. `src/app/some-module` */
     relativeToWorkspace: string;
     /** Eg. `some-module` */
-    // relativeToSource: string;
+    relativeToSource: string;
 }
 
 export class CurrentGeneration {
 
     static readonly sourceFolders: string[] = ['app', 'lib'];
     /* Path details of the right-clicked file or directory */
-    private contextPath!: ContextPath;
+    private contextPath: ContextPath = {
+        full: '',
+        relativeToWorkspace: '',
+        relativeToSource: '',
+    };
     path = '';
-    project = '';
-    schema = '';
-    defaultOption = '';
+    private collectionName = AngularConfig.defaultAngularCollection;
+    private schemaName = '';
+    private project = '';
+    private nameAsFirstArg = '';
     get command(): string {
 
         return [
             this.base,
             this.formatCollectionAndSchema(),
-            this.defaultOption,
+            this.nameAsFirstArg,
             ...this.formatOptionsForCommand()
         ].join(' ');
 
     }
     protected base = 'ng g';
-    protected collection = AngularConfig.defaultAngularCollection;
     protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
@@ -47,31 +52,75 @@ export class CurrentGeneration {
     ) {
 
         this.setContextPath(context);
-        this.setProject();
 
     }
 
-    addCollection(name: string): void {
-
-        this.collection = name;
-
+    /**
+     * Get project (can be an empty string, in which case the command will be for the root project)
+     */
+    getProject(): string {
+        return this.project;
     }
 
-    addSchema(name: string): void {
+    /**
+     * Get context path with a trailing slash to prefill first argument option.
+     * With a trailing slash so the user can just write the name directly.
+     */
+    getContextForNameAsFirstArg(): string {
 
-        this.schema = name;
-
-    }
-
-    addDefaultOption(value: string, withPath = true): void {
-
-        this.defaultOption = value;
-
-        if (withPath && this.project && this.workspaceExtended.angularConfig.isRootProject(this.project)) {
-
-            this.addOption('project', this.project);
-
+        /* `ngx-spec` schematics works on a file, and thus need the file part */
+        if (this.collectionName === 'ngx-spec') {
+            return this.contextPath.relativeToSource;
         }
+
+        /* Otherwise we remove the file part */
+        const context = FileSystem.removeFilename(this.contextPath.relativeToSource);
+
+        /* Add  trailing slash so the user can just write the name directly*/
+        const contextWithTrailingSlash = (context !== '') ? `${context}/` : '';
+
+        return contextWithTrailingSlash;
+
+    }
+
+    /**
+     * Was the command launched with a context, ie. from a right-click in Explorer
+     */
+    hasContextPath(): boolean {
+        return (this.contextPath.full !== '');
+    }
+
+    /**
+     * Set collection's name
+     */
+    setCollectionName(name: string): void {
+
+        this.collectionName = name;
+
+    }
+
+    /**
+     * Set schema's name
+     */
+    setSchema(name: string): void {
+
+        this.schemaName = name;
+
+    }
+
+    /**
+     * Set name as first argument of the command line, eg. `path/to/some-component`
+     */
+    setNameAsFirstArg(pathToName: string): void {
+
+        this.nameAsFirstArg = pathToName;
+
+        // TODO: check
+        // if (withPath && this.project && this.workspaceExtended.angularConfig.isRootProject(this.project)) {
+
+        //     this.addOption('project', this.project);
+
+        // }
 
     }
 
@@ -119,95 +168,52 @@ export class CurrentGeneration {
 
     }
 
-    resetCommandPath(): void {
+    /**
+     * Set context path, full and relative to workspace.
+     * Then launch `.setProject()`.
+     */
+    private setContextPath(context?: vscode.Uri): void {
 
-        this.path = this.getCommandPath();
+        if (!context?.path) {
+            return;
+        }
+
+        this.contextPath.full = context.path;
+
+        /* Remove workspace path from full path,
+         * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
+        this.contextPath.relativeToWorkspace = this.contextPath.full.substr(this.workspaceExtended.uri.path.length + 1);
+
+        this.setProject();
 
     }
 
-    protected setProject(): void {
+    /**
+     * Set project and context path relative to source.
+     * Requires `relativeToWorkspace` to be set via `.setContextPath()` first.
+     */
+    private setProject(): void {
 
         for (const [projectName, projectConfig] of this.workspaceExtended.angularConfig.getProjects()) {
 
             if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.sourcePath)) {
+
                 this.project = projectName;
+
+                /* Remove source path from workspace relative path,
+                 * eg. `src/app/some-module` => `some-module` */
+                this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.sourcePath.length + 1);
+
                 return;
+
             }
 
         }
-
-        this.project = '';
-
-    }
-
-    private setContextPath(context?: vscode.Uri): void {
 
         /* Default values */
-        this.contextPath = {
-            full: context?.path ?? '',
-            relativeToWorkspace: '',
-            // relativeToSource: '',
-        };
+        this.contextPath.relativeToSource = '';
+        this.project = '';
 
-        if (this.contextPath.full === '') {
-            return;
-        }
-
-        this.contextPath.relativeToWorkspace = this.contextPath.full.substr(this.workspaceExtended.uri.path.length + 1);
-
-        // /* 
-        //  * - `[^\/]+/` matches a directory: at least one character except slashes, followed by a slash`
-        //  * - `((?:app|lib))` matches `app` or `lib` and extra parenthesis capture the value
-        //  * - `/` final slash
-        //  */
-        // const pathRegExp = new RegExp(`[^\/]+\/((?:${CurrentGeneration.sourceFolders.join('|')}))\/`);
-
-        // /* 
-        //  * - `null` if not matching
-        //  * - [0]: full string
-        //  * - [1]: value of first parenthesis, ie. `app` or `lib`
-        //  */
-        // const patchMatches = this.contextPath.full.match(pathRegExp);
-
-        // if (!patchMatches) {
-        //     return;
-        // }
-
-    }
-
-    protected getCommandPath(): string {
-
-        const pathNormalized = Utils.normalizePath(this.contextPath.full);
-
-        const contextPathMatches = pathNormalized.match(/[^\/]+\/((?:app|lib))\//);
-
-        if (contextPathMatches) {
-
-            const splittedArray = pathNormalized.split(`/${contextPathMatches[1]}/`);
-
-            const splittedPath = splittedArray[splittedArray.length - 1];
-    
-            if (splittedPath.includes('.')) {
-
-                /* Special case: ngx-spec works on a existing file, so it needs the full path */
-                if (this.collection === 'ngx-spec') {
-                    return splittedPath;
-                }
-    
-                /* If filename, delete filename by removing everything after the last "/" */
-                return Utils.getDirectoryFromFilename(splittedPath);
-    
-            } else {
-    
-                /* If directory, add a trailing "/" */
-                return `${splittedPath}/`;
-    
-            }
-    
-        }
-    
-        return '';
-    
     }
 
     protected formatOptionsForCommand(): string[] {
@@ -227,9 +233,9 @@ export class CurrentGeneration {
 
     protected formatCollectionAndSchema(): string {
 
-        return (this.collection !== this.workspaceExtended.angularConfig.getDefaultUserCollection()) ?
-            `${this.collection}:${this.schema}` :
-            this.schema;
+        return (this.collectionName !== this.workspaceExtended.angularConfig.getDefaultUserCollection()) ?
+            `${this.collectionName}:${this.schemaName}` :
+            this.schemaName;
 
     }
 
@@ -266,12 +272,12 @@ export class CurrentGeneration {
 
     async jumpToFile(stdout: string): Promise<void> {
 
-        const name = this.defaultOption.includes('/') ? this.defaultOption.substr(this.defaultOption.lastIndexOf('/') + 1) : this.defaultOption;
+        const name = this.nameAsFirstArg.includes('/') ? this.nameAsFirstArg.substr(this.nameAsFirstArg.lastIndexOf('/') + 1) : this.nameAsFirstArg;
 
-        const suffix = (this.schema === 'component') ? this.getOption('type') : '';
+        const suffix = (this.schemaName === 'component') ? this.getOption('type') : '';
         const suffixTest = suffix ? `|${suffix}` : '';
 
-        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${this.schema}${suffixTest}))?\.ts)`);
+        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${this.schemaName}${suffixTest}))?\.ts)`);
 
         let stdoutMatches = stdout.match(stdoutRegExp);
 
@@ -326,12 +332,12 @@ export class CurrentGeneration {
 
     }
 
-    async askComponentOptions(schema: Schema): Promise<Map<string, string | string[]> | undefined> {
+    async askComponentOptions(): Promise<Map<string, string | string[]> | undefined> {
 
         const componentOptions = new Map<string, string | string[]>();
 
-        const entryRequired = !this.workspaceExtended.angularConfig.isIvy() && schema.options.get('entryComponent');
-        const hasPageSuffix = schema.options.get('type') && (this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('Page') || this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('page'));
+        const entryRequired = !this.workspaceExtended.angularConfig.isIvy() && this.options.get('entryComponent');
+        const hasPageSuffix = this.options.get('type') && (this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('Page') || this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('page'));
 
         const TYPE_BASIC = `Basic component`;
         const TYPE_PAGE = `Page${(!entryRequired && !hasPageSuffix) ? ` (or dialog / modal)` : ''}`;
@@ -395,7 +401,7 @@ export class CurrentGeneration {
                 } else if (entryRequired && runtimeComponentTypes.includes(userComponentTypeLowerCased)) {
                     description = `--entry-component --skip-selector`;
                 }
-                if (schema.options.get('type')) {
+                if (this.options.get('type')) {
                     description += ` --type ${userComponentTypeLowerCased}`;
                 }
 
@@ -425,21 +431,21 @@ export class CurrentGeneration {
                 componentOptions.set('entryComponent', 'true');
             }
             /* --skip-selector was added in Angular CLI 8.1 */
-            if (schema.options.get('skipSelector') &&
+            if (this.options.get('skipSelector') &&
             ([TYPE_PAGE, TYPE_ENTRY].includes(componentType) || [...pageComponentTypes, ...runtimeComponentTypes].includes(componentTypeLowerCased))) {
                 componentOptions.set('skipSelector', 'true');
             }
-            if (schema.options.get('export') &&
+            if (this.options.get('export') &&
             ((componentType === TYPE_EXPORTED) || exportedComponentTypes.includes(componentTypeLowerCased))) {
                 componentOptions.set('export', 'true');
             }
-            if (schema.options.get('changeDetection') &&
+            if (this.options.get('changeDetection') &&
             ([TYPE_PURE, TYPE_EXPORTED].includes(componentType)
             || [...pureComponentTypes, ...exportedComponentTypes].includes(componentTypeLowerCased))) {
                 componentOptions.set('changeDetection', 'OnPush');
             }
             /* --type was added in Angular CLI 9.0 */
-            if (schema.options.get('type')) {
+            if (this.options.get('type')) {
                 if (hasPageSuffix && (componentType === TYPE_PAGE)) {
                     componentOptions.set('type', 'page');
                 } else if (this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes(componentType)
@@ -454,7 +460,7 @@ export class CurrentGeneration {
 
     }
     
-    async askModuleOptions(schema: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
+    async askModuleOptions(_: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
 
         const TYPE_CLASSIC = `Module of components`;
         const TYPE_LAZY = `Lazy-loaded module of pages`;
@@ -469,7 +475,7 @@ export class CurrentGeneration {
         ];
 
         let routeName = '';
-        if (moduleName && schema.options.get('route')) {
+        if (moduleName && this.options.get('route')) {
             routeName = moduleName.split('/').pop() || moduleName;
             moduleTypes.push({
                 label: TYPE_LAZY,
@@ -481,7 +487,7 @@ export class CurrentGeneration {
         moduleTypes.push({
             label: TYPE_ROUTING,
             description: `--routing --module app`,
-            detail: `Module with routing${schema.options.get('route') ? `, immediately loaded` : ''}`,
+            detail: `Module with routing${this.options.get('route') ? `, immediately loaded` : ''}`,
         },);
 
         const moduleType = await vscode.window.showQuickPick(moduleTypes, {
@@ -497,19 +503,19 @@ export class CurrentGeneration {
 
         if (moduleType.label === TYPE_ROUTING) {
 
-            if (schema.options.get('routing')) {
+            if (this.options.get('routing')) {
                 moduleOptions.set('routing', 'true');
             }
-            if (schema.options.get('module')) {
+            if (this.options.get('module')) {
                 moduleOptions.set('module', 'app');
             }
 
         } else if (moduleType.label === TYPE_LAZY) {
 
-            if (schema.options.get('route')) {
+            if (this.options.get('route')) {
                 moduleOptions.set('route', routeName);
             }
-            if (schema.options.get('module')) {
+            if (this.options.get('module')) {
                 moduleOptions.set('module', 'app');
             }
 

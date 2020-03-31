@@ -1,62 +1,83 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { Utils } from './utils';
 import { AngularConfig } from './config-angular';
-import { Preferences } from './preferences';
-
+import { Watchers } from './watchers';
+import { defaultSchematicsNames } from './defaults';
+import { Collection } from './collection';
 
 export class Schematics {
 
-    static collections: Set<string> = new Set();
+    private collections = new Map<string, Collection | undefined>();
 
-    static async load(workspace: vscode.WorkspaceFolder): Promise<void> {
+    constructor(
+        private workspace: vscode.WorkspaceFolder,
+        private angularConfig: AngularConfig,
+    ) {}
 
-        const collectionsNames: string[] = Preferences.getSchematics();
+    async init(): Promise<void> {
 
-        const existingCollections: string[] = [];
+        await this.setConfig();
 
-        for (let collectionName of collectionsNames) {
-
-            if (this.collections.has(collectionName)) {
-
-                existingCollections.push(collectionName);
-
-            } else {
-
-                let collectionExists = false;
-
-                if (Utils.isSchemaLocal(collectionName)) {
-                    collectionExists = await Utils.existsAsync(path.join(workspace.uri.fsPath, collectionName));
-                } else {
-                    collectionExists = await Utils.existsAsync(Utils.getNodeModulesPath(workspace.uri.fsPath, collectionName));
-                }
-
-                if (collectionExists) {
-                    existingCollections.push(collectionName);
-                }
-
-            }
-
-        }
-
-        // TODO: reintroduce defaultCollection
-        this.collections = new Set([/* AngularConfig.defaultCollection, */AngularConfig.defaultAngularCollection, ...existingCollections]);
+        Watchers.watchCodePreferences(() => {
+            this.setConfig();
+        });
 
     }
 
-    static async askSchematic(): Promise<string | undefined> {
+    getCollectionsNames(): string[] {
+        return Array.from(this.collections.keys());
+    }
 
-        if  (this.collections.size === 1) {
+    // TODO: watcher on collection
+    async getCollection(name: string): Promise<Collection | undefined> {
 
-            return AngularConfig.defaultAngularCollection;
+        /* Not all collections are preloaded */
+        if (!this.collections.has(name)) {
+            const collectionInstance = new Collection(name, this.workspace);
+            try {
+                await collectionInstance.init();
+                this.collections.set(name, collectionInstance);
+            } catch {}
+            
+        }
+        
+        return this.collections.get(name);
 
-        } else {
+    }
 
-            return vscode.window.showQuickPick(Array.from(this.collections), {
-                placeHolder: `From which schematics collection?`,
-                ignoreFocusOut: true,
-            });
+    private async setConfig(): Promise<void> {
+
+        await this.setCollections();
+
+    }
+
+    private async setCollections(): Promise<void> {
+
+        /* Configuration key is configured in `package.json` */
+        const userSchematicsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+
+        /* `Set` removes duplicate.
+         * Default collections are set first as they are the most used */
+        const collectionsNames = Array.from(new Set([...this.angularConfig.getDefaultCollections(), ...defaultSchematicsNames, ...userSchematicsNames]));
+        
+        /* `.filter()` is not possible here as there is an async operation */
+        for (const name of collectionsNames) {
+
+            let collection: Collection | undefined = undefined;
+
+            /* Preload only defaut schematics for performance */
+            if (this.angularConfig.getDefaultCollections().includes(name)) {
+
+                const collectionInstance = new Collection(name, this.workspace);
+                
+                try {
+                    await collectionInstance.init({ silent: true });
+                    collection = collectionInstance;
+                } catch {}
+
+            }
+
+            this.collections.set(name, collection);
 
         }
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { defaultSchematics, defaultComponentTypes } from './defaults';
+import { defaultComponentTypes } from './defaults';
 
 
 export interface ComponentTypes {
@@ -18,7 +18,6 @@ export interface ComponentTypes {
 
 export class Preferences {
 
-    private static schematics: string[] | null = null;
     private static componentTypes: ComponentTypes | null = null;
     private static event: vscode.Disposable | null;
 
@@ -27,22 +26,10 @@ export class Preferences {
         if (!this.event) {
 
             this.event = vscode.workspace.onDidChangeConfiguration(() => {
-                this.schematics = null;
                 this.componentTypes = null;
             });
 
         } 
-
-    }
-
-    static getSchematics(): string[] {
-
-        if (!this.schematics) {
-            const userSchematics = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
-            this.schematics = [...defaultSchematics, ...userSchematics];
-        }
-
-        return this.schematics;
 
     }
 

@@ -30,12 +30,10 @@ export class TypescriptConfig {
 
     async init(): Promise<void> {
 
-        this.config = await FileSystem.parseJsonFile<TSConfigSchema>(this.fsPath, this.workspace);
+        await this.setConfig();
 
-        this.enableIvy = this.config?.angularCompilerOptions?.enableIvy;
-
-        Watchers.create(this.fsPath, () => {
-            this.init();
+        Watchers.watchFile(this.fsPath, () => {
+            this.setConfig();
         });
 
     }
@@ -45,6 +43,14 @@ export class TypescriptConfig {
      */
     getEnableIvy(): boolean | undefined {
         return this.enableIvy;
+    }
+
+    private async setConfig(): Promise<void> {
+
+        this.config = await FileSystem.parseJsonFile<TSConfigSchema>(this.fsPath, this.workspace);
+
+        this.enableIvy = this.config?.angularCompilerOptions?.enableIvy;
+
     }
 
 }

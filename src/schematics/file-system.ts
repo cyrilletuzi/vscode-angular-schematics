@@ -47,7 +47,7 @@ export class FileSystem {
     /**
      * Check if a file exists and is readable.
      */
-    private static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder): Promise<boolean> {
+    static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder, silent = false): Promise<boolean> {
 
         try {
 
@@ -57,13 +57,25 @@ export class FileSystem {
         } catch (error) {
 
             // TODO: type of error and check against a constant
-            this.showError(fsPath, (error.code === 'ENOENT') ? `found` : `read`, workspace);
+            if (!silent) {
+                this.showError(fsPath, (error.code === 'ENOENT') ? `found` : `read`, workspace);
+            }
             
             return false;
 
         }
 
         return true;
+
+    }
+
+    static removeFilename(partialPath: string): string {
+
+        /* Basename, ie. last directory if a directory, or `file.extension` if a file */
+        const basename = path.basename(partialPath);
+
+        /* If a file: remove the file name, otherwise it is a directory so keep it */
+        return basename.includes('.') ? path.dirname(partialPath) : partialPath;
 
     }
 

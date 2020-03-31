@@ -41,6 +41,8 @@ export class AngularConfig {
     static readonly defaultAngularCollection = '@schematics/angular';
     /** User default collection, otherwise official Angular CLI default collection */
     private defaultUserCollection!: string;
+    /** User and official default collections */
+    private defaultCollections!: string[];
     /** List of projects registered in Angular config file */
     private projects!: Map<string, AngularProject>;
     /** Tells if Angular is in Ivy mode */
@@ -55,25 +57,20 @@ export class AngularConfig {
         private typescriptConfig: TypescriptConfig,
         private packageJsonConfig: PackageJsonConfig,
     ) {
+
         this.fsPath = path.join(this.workspace.uri.fsPath, AngularConfig.fileName);
+
     }
 
     async init(): Promise<void> {
 
-        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(this.fsPath, this.workspace);
-
-        this.defaultUserCollection = this.config?.cli?.defaultCollection ?? AngularConfig.defaultAngularCollection;
-
-        this.setProjects();
-
-        // TODO: should be retrigger if package.json or tsconfig.json change
-        this.setIvy();
+        await this.setConfig();
 
         // TODO: check it still works
-        Watchers.create(this.fsPath, () => {
-            this.init();
+        Watchers.watchFile(this.fsPath, () => {
+            this.setConfig();
         });
-
+        
     }
 
     /**
@@ -81,6 +78,10 @@ export class AngularConfig {
      */
     getDefaultUserCollection(): string {
         return this.defaultUserCollection;
+    }
+
+    getDefaultCollections(): string[] {
+        return this.defaultCollections;
     }
 
     /**
@@ -104,6 +105,28 @@ export class AngularConfig {
 
         // TODO: it can be something else than src?
         return this.projects.get(name)?.isRoot ?? false;
+
+    }
+
+    private async setConfig(): Promise<void> {
+
+        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(this.fsPath, this.workspace);
+
+        this.setDefaultCollections();
+
+        this.setProjects();
+
+        // TODO: should be retrigger if package.json or tsconfig.json change
+        this.setIvy();
+        
+    }
+
+    private setDefaultCollections(): void {
+
+        this.defaultUserCollection = this.config?.cli?.defaultCollection ?? AngularConfig.defaultAngularCollection;
+
+        /* `Set` removes duplicates */
+        this.defaultCollections = Array.from(new Set([this.defaultUserCollection, AngularConfig.defaultAngularCollection]));
 
     }
 

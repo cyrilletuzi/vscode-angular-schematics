@@ -1,164 +1,210 @@
 import * as vscode from 'vscode';
-import { Schema } from './schema';
-import { Utils } from './utils';
+import * as path from 'path';
 
+import { Schema, SchemaConfig } from './schema';
+import { FileSystem } from './file-system';
+import { basename } from 'path';
 
-interface PackageJSON {
+interface PackageJsonSchema {
     schematics?: string;
 }
 
-export interface CollectionDataSchema {
+interface SchemaData {
     schema: string;
     description: string;
     hidden?: boolean;
     extends?: string;
 }
 
-export interface CollectionData {
-    path: string;
+interface CollectionData {
+    // path: string;
     schematics: {
-        [key: string]: CollectionDataSchema;
+        [key: string]: SchemaData;
     };
 }
 
 export class Collection {
 
-    name: string;
-    path = '';
-    schemas = new Map<string, CollectionDataSchema>();
-    get schemasNames(): string[] {
-        return Array.from(this.schemas.keys()).sort();
-    }
-    static cache = new Map<string, CollectionData>();
+    private fsPath!: string;
+    private config!: CollectionData;
+    private schemasConfigs = new Map<string, SchemaConfig>();
+    private schemas = new Map<string, Schema | undefined>();
+    private schemasChoices: vscode.QuickPickItem[] = [];
 
     constructor(
+        private name: string,
         private workspace: vscode.WorkspaceFolder,
-        name: string,
     ) {
-        this.name = name;
+
     }
 
-    async load(): Promise<boolean> {
+    async init({ silent = false } = {}): Promise<void> {
 
-        let collection: CollectionData | null = null;
+        const fsPath = await this.getSchematicsFsPath(this.name);
 
-        const cachedCollection = Collection.cache.get(this.name);
-
-        if (cachedCollection) {
-
-            collection = cachedCollection;
-
-        } else {
-
-            if (Utils.isSchemaLocal(this.name)) {
-
-                collection = await Utils.getSchemaFromLocal<CollectionData>(this.workspace.uri.fsPath, this.name); 
-
-                if (collection) {
-                    collection.path = Utils.getDirectoryFromFilename(this.name);
-                }
-                
-            } else {
-
-                const collectionPackage = await Utils.getSchemaFromNodeModules<PackageJSON>(this.workspace.uri.fsPath, this.name, 'package.json');
-
-                if (!collectionPackage || !collectionPackage.schematics) {
-                    return false;
-                }
-    
-                collection = await Utils.getSchemaFromNodeModules<CollectionData>(this.workspace.uri.fsPath, this.name, Utils.pathTrimRelative(collectionPackage.schematics));
-    
-                if (collection) {
-                    collection.path = Utils.pathTrimRelative(collectionPackage.schematics);
-                }
-
-            }
-
+        if (!fsPath || !await FileSystem.isReadable(fsPath, this.workspace, silent)) {
+            throw new Error(`${this.name} schematics collection can not be found or read.`);
         }
 
-        if (collection) {
+        const config = await FileSystem.parseJsonFile<CollectionData>(this.fsPath);
 
-            this.path = collection.path;
+        if (!config) {
+            throw new Error(`${this.name} schematics collection can not be parsed.`);
+        }
 
-            await this.initSchemasMap(collection);
+        this.config = config;
 
-            Collection.cache.set(this.name, collection);
+        await this.setSchemas();
 
-            return true;
+    }
+
+    getName(): string {
+        return this.name;
+    }
+
+    getSchemasNames(): string[] {
+        return Array.from(this.schemasConfigs.keys()).sort();
+    }
+
+    // TODO: watcher on collection
+    async getSchema(name: string): Promise<Schema | undefined> {
+
+        const fullName = this.getFullSchemaName(name);
+
+        if (!this.schemasConfigs.has(fullName)) {
+            return undefined;
+        }
+
+        const schemaConfig = this.schemasConfigs.get(fullName)!;
+
+        /* Schemas are not preloaded */
+        if (!this.schemas.has(fullName)) {
+
+            const schemaInstance = new Schema(schemaConfig, this.workspace);
+            try {
+                await schemaInstance.init();
+                this.schemas.set(fullName, schemaInstance);
+            } catch {}
 
         }
         
-        return false;
+        return this.schemas.get(fullName);
 
     }
 
-    async createSchema(name: string): Promise<Schema> {
-
-        let collection: Collection = this;
-
-        const schema = this.schemas.get(name) as CollectionDataSchema;
-
-        if (schema.extends) {
-
-            const [parentCollectionName] = schema.extends.split(':');
-
-            collection = new Collection(this.workspace, parentCollectionName);
-            await collection.load();
-
-        }
-
-        return new Schema(name, collection);
-
+    getSchemasChoices(): vscode.QuickPickItem[] {
+        return this.schemasChoices;
     }
 
-    async askSchema(): Promise<string | undefined> {
+    // async createSchema(name: string): Promise<Schema> {
 
-        const choices: vscode.QuickPickItem[] = this.schemasNames
-            .map((schemaName) => ({
-                label: schemaName,
-                description: (this.schemas.get(schemaName) as CollectionDataSchema).description
-            }));
+    //     let collection: Collection = this;
 
-        const choice = await vscode.window.showQuickPick(choices, {
-            placeHolder: `What do you want to generate?`,
-            ignoreFocusOut: true,
-        });
+    //     const schema = this.schemas.get(name) as CollectionDataSchema;
 
-        return choice ? choice.label : undefined;
+    //     if (schema.extends) {
 
-    }
+    //         const [parentCollectionName] = schema.extends.split(':');
 
-    protected async initSchemasMap(collection: CollectionData): Promise<void> {
+    //         collection = new Collection(parentCollectionName, this.workspace);
+    //         await collection.init();
 
-        for (let schemaName in collection.schematics) {
+    //     }
 
-            if (collection.schematics.hasOwnProperty(schemaName)
-                && !collection.schematics[schemaName].hidden
-                && (schemaName !== 'ng-add')) {
+    //     return new Schema(name, collection);
 
-                const schema = collection.schematics[schemaName];
+    // }
 
-                if (schema.extends) {
+    private async setSchemas(): Promise<void> {
 
-                    const [parentCollectionName, parentSchemaName] = schema.extends.split(':');
+        const schemas = Object.entries(this.config.schematics)
+            /* Remove internal schematics */
+            .filter(([_, schemaConfig]) => !schemaConfig.hidden)
+            /* Remove `ng-add` schematics are they are not relevant for the extension */
+            .filter(([schemaName]) => (schemaName !== 'ng-add'));
 
-                    const parentCollection = new Collection(this.workspace, parentCollectionName);
-                    await parentCollection.load();
+        for (const [schemaName, schemaConfig] of schemas) {
 
-                    const parentSchema = Object.assign({}, parentCollection.schemas.get(parentSchemaName) as CollectionDataSchema);
-                    parentSchema.extends = schema.extends;
+            const schemaFsPath = path.join(basename(this.fsPath), schemaConfig.schema);
 
-                    this.schemas.set(schemaName, parentSchema);
+            if (await FileSystem.isReadable(schemaFsPath)) {
 
-                } else {
-
-                    this.schemas.set(schemaName, collection.schematics[schemaName]);
-
-                }
+                // TODO: manage `extends`
+                this.schemasConfigs.set(this.getFullSchemaName(schemaName), {
+                    name: schemaName,
+                    collectionName: this.name,
+                    description: schemaConfig.description,
+                    fsPath: path.join(path.basename(this.fsPath), schemaConfig.schema),
+                });
 
             }
 
         }
+
+        this.setSchemasChoices();
+
+    }
+
+    private setSchemasChoices(): void {
+
+        this.schemasChoices = Array.from(this.schemasConfigs).map(([label, config]) => ({
+            label,
+            description: config.description,
+        }));
+
+    }
+
+    private getFullSchemaName(name: string): string {
+        return `${this.name}:${name}`;
+    }
+
+    // protected async initSchemasMap(collection: CollectionData): Promise<void> {
+
+    //     for (let schemaName in collection.schematics) {
+
+    //         if (collection.schematics.hasOwnProperty(schemaName)
+    //             && !collection.schematics[schemaName].hidden
+    //             && (schemaName !== 'ng-add')) {
+
+    //             const schema = collection.schematics[schemaName];
+
+    //             if (schema.extends) {
+
+    //                 const [parentCollectionName, parentSchemaName] = schema.extends.split(':');
+
+                    
+
+    //             } else {
+
+    //                 this.schemas.set(schemaName, collection.schematics[schemaName]);
+
+    //             }
+
+    //         }
+
+    //     }
+
+    // }
+
+    private async getSchematicsFsPath(name: string): Promise<string | undefined> {
+
+        /* Local schematics */
+        if (name.startsWith('.') && name.endsWith('.json')) {
+            return path.join(this.workspace.uri.fsPath, name);
+        }
+        
+        /* Package schematics */
+
+        // TODO: handle custom node_modules folder
+        const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
+
+        const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, this.workspace);
+
+        if (!packageJsonConfig?.schematics) {
+            return undefined;
+        }
+
+        return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
 
     }
 

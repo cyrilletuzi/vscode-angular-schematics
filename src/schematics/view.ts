@@ -4,6 +4,7 @@ import { Collection } from './collection';
 import { Schematics } from './schematics';
 import { Utils } from './utils';
 import { WorkspacesConfig } from './config-workspaces';
+import { AngularConfig } from './config-angular';
 
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -36,7 +37,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
     private materialIconsExisting = new Set<string>();
     private materialIconsNotExisting = new Set<string>();
 
-    constructor() {
+    constructor(private angularConfig: AngularConfig) {
 
         // TODO: schematics could be different in each workspace...
 
@@ -68,31 +69,35 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         if (!element) {
 
-            await Schematics.load(WorkspacesConfig.getFirstWorkspace());
+            const schematics = new Schematics(WorkspacesConfig.getFirstWorkspace(), this.angularConfig);
 
-            return Array.from(Schematics.collections).map((collection) => new vscode.TreeItem(collection, vscode.TreeItemCollapsibleState.Expanded));
+            await schematics.init();
+
+            return schematics.getCollectionsNames().map((collection) => new vscode.TreeItem(collection, vscode.TreeItemCollapsibleState.Expanded));
 
         } else {
 
-            const collection = new Collection(WorkspacesConfig.getFirstWorkspace(), element.label as string);
+            const collection = new Collection(element.label as string, WorkspacesConfig.getFirstWorkspace());
             const items: vscode.TreeItem[] = [];
 
-            if (await collection.load()) {
-
-                for (const schemaName of collection.schemasNames) {
-                    const item = new vscode.TreeItem(schemaName, vscode.TreeItemCollapsibleState.None);
-                    item.command = {
-                        title: `Generate ${schemaName}`,
-                        command: 'ngschematics.generate',
-                        arguments: [undefined, schemaName, collection.name]
-                    };
-                    item.iconPath = await this.getIconPath(collection.name, schemaName);
-                    items.push(item);
-                }
-
-                return items;
-
+            try {
+                await collection.init();
+            } catch {
+                return [];
             }
+
+            for (const schemaName of collection.getSchemasNames()) {
+                const item = new vscode.TreeItem(schemaName, vscode.TreeItemCollapsibleState.None);
+                item.command = {
+                    title: `Generate ${schemaName}`,
+                    command: 'ngschematics.generate',
+                    arguments: [undefined, schemaName, collection.getName()]
+                };
+                item.iconPath = await this.getIconPath(collection.getName(), schemaName);
+                items.push(item);
+            }
+
+            return items;
 
         }
 

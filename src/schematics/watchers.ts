@@ -2,24 +2,30 @@ import * as vscode from 'vscode';
 
 export class Watchers {
 
-    /** List of all existing watcher */
-    private static activeWatchers = new Map<string, vscode.FileSystemWatcher>();
+    /** List of all existing file watchers */
+    private static activeWatchers: vscode.Disposable[] = [];
 
     /**
-     * Create a watcher
+     * Create a file watcher
      */
-    static create(fsPath: string, onDidChangeListener: () => void): void {
+    static watchFile(fsPath: string, onDidChangeListener: () => void): void {
 
-        /* There should be only one watcher per file */
-        if (!this.activeWatchers.has(fsPath)) {
+        const watcher = vscode.workspace.createFileSystemWatcher(fsPath);
 
-            const watcher = vscode.workspace.createFileSystemWatcher(fsPath);
+        this.activeWatchers.push(watcher);
 
-            this.activeWatchers.set(fsPath, watcher);
+        watcher.onDidChange(onDidChangeListener);
 
-            watcher.onDidChange(onDidChangeListener);
+    }
 
-        }
+    /**
+     * Create a Code preferences watcher
+     */
+    static watchCodePreferences(onDidChangeListener: () => void): void {
+
+        const watcher = vscode.workspace.onDidChangeConfiguration(onDidChangeListener);
+
+        this.activeWatchers.push(watcher);
 
     }
 
