@@ -73,7 +73,7 @@ export class Schema {
     private requiredOptionsNames: string[] = [];
     private shortcutTypesChoices: ShortcutTypes = new Map();
     private optionsChoices: vscode.QuickPickItem[] = [];
-    private initialized = false;
+    private watcher: vscode.Disposable | undefined;
 
     constructor(
         config: SchemaConfig,
@@ -99,16 +99,16 @@ export class Schema {
             throw new Error(`"${this.collectionName}:${this.name}" schema can not be loaded.`);
         }
 
+        this.config = config;
+
         await this.setOptions();
 
         /* Watcher must be set just once */
-        if (!this.initialized
+        if (!this.watcher
         /* Component types can have custom types from user configuration */
         && (this.collectionName === AngularConfig.defaultAngularCollection) && (this.name === 'component')) {
 
-            this.initialized = true;
-
-            Watchers.watchCodePreferences(() => {
+            this.watcher = Watchers.watchCodePreferences(() => {
                 this.setComponentTypesChoices();
             });
             

@@ -12,7 +12,7 @@ export class Schematics {
      * List of collections existing in the workspace
      */
     private collections = new Map<string, Collection | undefined>();
-    private initialized = false;
+    private watcher: vscode.Disposable | undefined;
 
     constructor(private workspace: Omit<WorkspaceExtended, 'schematics'>) {}
 
@@ -24,11 +24,9 @@ export class Schematics {
     async init(): Promise<void> {
 
         /* Watcher must be set just once */
-        if (!this.initialized) {
+        if (!this.watcher) {
 
-            this.initialized = true;
-
-            Watchers.watchCodePreferences(() => {
+            this.watcher = Watchers.watchCodePreferences(() => {
                 this.setCollections();
             });
 

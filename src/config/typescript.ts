@@ -14,12 +14,11 @@ export class TypescriptConfig {
     // TODO: could be in a subdirectory
     /** Basename of TypeScript config file */
     private static readonly fileName = 'tsconfig.json';
-    /** File system path of TypeScript config file */
-    private fsPath!: string;
     /** Values from TypeScript config file */
     private config: TsconfigJsonSchema | undefined;
     /** `enableIvy` value in `angularCompilerOptions` */
     private enableIvy: boolean | undefined;
+    private watcher: vscode.FileSystemWatcher | undefined;
     
     constructor(private workspace: vscode.WorkspaceFolder) {}
 
@@ -30,21 +29,21 @@ export class TypescriptConfig {
      */
     async init(): Promise<void> {
 
+        const fsPath = path.join(this.workspace.uri.fsPath, TypescriptConfig.fileName);
+
+        this.config = await FileSystem.parseJsonFile<TsconfigJsonSchema>(fsPath, this.workspace);
+
+        /* Ivy can be manually enabled/disabled with `enableIvy` in `tsconfig.json` */
+        this.enableIvy = this.config?.angularCompilerOptions?.enableIvy;
+
         /* Watcher must be set just once */
-        if (!this.fsPath) {
+        if (this.config && !this.watcher) {
 
-            this.fsPath = path.join(this.workspace.uri.fsPath, TypescriptConfig.fileName);
-
-            Watchers.watchFile(this.fsPath, () => {
+            this.watcher = Watchers.watchFile(fsPath, () => {
                 this.init();
             });
 
         }
-
-        this.config = await FileSystem.parseJsonFile<TsconfigJsonSchema>(this.fsPath, this.workspace);
-
-        /* Ivy can be manually enabled/disabled with `enableIvy` in `tsconfig.json` */
-        this.enableIvy = this.config?.angularCompilerOptions?.enableIvy;
 
     }
 

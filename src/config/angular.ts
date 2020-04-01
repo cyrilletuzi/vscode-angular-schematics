@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem, Watchers } from '../utils';
@@ -46,12 +47,17 @@ export class AngularConfig {
 
     /** Official default collection of Angular CLI */
     static readonly defaultAngularCollection = '@schematics/angular';
-    // TODO: check if other config files are possible (.angular.json, angular-cli.json...)
     // TODO: could be in a subdirectory
-    /** Basename of official Angular config file */
-    private static readonly fileName = 'angular.json';
-    /** File system path of the Angular config file */
-    private fsPath!: string;
+    /** 
+     * Possible basenames of official Angular config file
+     * From https://github.com/angular/angular-cli/blob/master/packages/angular/cli/utilities/project.ts
+     */
+    private fileNames = [
+        'angular.json',
+        '.angular.json',
+        'angular-cli.json',
+        '.angular-cli.json',
+    ];
     /** Values from the Angular config file */
     private config: AngularJsonSchema | undefined;
     /** User default collection, otherwise official Angular CLI default collection */
@@ -62,6 +68,7 @@ export class AngularConfig {
     private projects = new Map<string, AngularProject>();
     /** Tells if Angular is in Ivy mode */
     private ivy = false;
+    private watcher: vscode.FileSystemWatcher | undefined;
     
     constructor(private workspace: Omit<WorkspaceExtended, 'angularConfig' | 'schematics'>) {}
 
@@ -72,18 +79,24 @@ export class AngularConfig {
      */
     async init(): Promise<void> {
 
-        /* Watcher must be set just once */
-        if (!this.fsPath) {
+        let fsPath = '';
 
-            this.fsPath = path.join(this.workspace.uri.fsPath, AngularConfig.fileName);
+        /* Try the different possible file names */
+        for (const fileName of this.fileNames) {
 
-            Watchers.watchFile(this.fsPath, () => {
-                this.init();
-            });
+            fsPath = path.join(this.workspace.uri.fsPath, fileName);
+
+            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath, this.workspace);
+
+            if (this.config) {
+                /* Keep only the right file name */
+                this.fileNames = [fileName];
+
+                /* Stop the iteration, we have a config */
+                break;
+            }
 
         }
-
-        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(this.fsPath, this.workspace);
 
         this.setDefaultCollections();
 
@@ -91,6 +104,15 @@ export class AngularConfig {
 
         // TODO: should be retrigger if package.json or tsconfig.json change
         this.setIvy();
+
+        /* Watcher must be set just once */
+        if (this.config && !this.watcher) {
+
+            this.watcher = Watchers.watchFile(fsPath, () => {
+                this.init();
+            });
+
+        }
         
     }
 

@@ -13,11 +13,11 @@ export class TslintConfig {
 
     /** Basename of TSLint config file */
     private static readonly fileName = 'tslint.json';
-    /** File system path of TSLint config file */
-    private fsPath!: string;
     /** Values from TSLint config file */
     private config: TslintJsonSchema | undefined;
+    /** List of components suffixes defined in `tslint.json` */
     private componentSuffixes: string[] = [];
+    private watcher: vscode.FileSystemWatcher | undefined;
 
     constructor(private workspace: vscode.WorkspaceFolder) {}
 
@@ -28,20 +28,20 @@ export class TslintConfig {
      */
     async init(): Promise<void> {
 
+        const fsPath = path.join(this.workspace.uri.fsPath, TslintConfig.fileName);
+
+        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, this.workspace);
+
+        this.setComponentSuffixes();
+
         /* Watcher must be set just once */
-        if (!this.fsPath) {
+        if (this.config && !this.watcher) {
 
-            this.fsPath = path.join(this.workspace.uri.fsPath, TslintConfig.fileName);
-
-            Watchers.watchFile(this.fsPath, () => {
+            this.watcher = Watchers.watchFile(fsPath, () => {
                 this.init();
             });
 
         }
-
-        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(this.fsPath, this.workspace);
-
-        this.setComponentSuffixes();
 
     }
 

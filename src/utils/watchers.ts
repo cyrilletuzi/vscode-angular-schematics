@@ -8,7 +8,7 @@ export class Watchers {
     /**
      * Create a file watcher
      */
-    static watchFile(fsPath: string, onDidChangeListener: () => void): void {
+    static watchFile(fsPath: string, onDidChangeListener: () => void): vscode.FileSystemWatcher {
 
         const watcher = vscode.workspace.createFileSystemWatcher(fsPath);
 
@@ -16,16 +16,20 @@ export class Watchers {
 
         watcher.onDidChange(onDidChangeListener);
 
+        return watcher;
+
     }
 
     /**
      * Create a Code preferences watcher
      */
-    static watchCodePreferences(onDidChangeListener: () => void): void {
+    static watchCodePreferences(onDidChangeListener: () => void): vscode.Disposable {
 
         const watcher = vscode.workspace.onDidChangeConfiguration(onDidChangeListener);
 
         this.activeWatchers.push(watcher);
+
+        return watcher;
 
     }
 
