@@ -173,7 +173,7 @@ Common suffixes will automatically pre-select the recommended type:
 
 The list above includes common suffixes in Angular, Material, Ionic and PrimeNG.
 If you think some other common suffixes are missing, please open a Pull Request with new
-[defaults](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
+[defaults](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
 
 ## Default options
 
@@ -233,7 +233,7 @@ By default, this extension supports (if they are installed):
 
 Scanning all packages to find all potential schematics would be too slow.
 If you are a library author, feel free to open a Pull Request to add your schematics in the
-[default list](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts).
+[default list](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
 
 ## Custom schematics
 

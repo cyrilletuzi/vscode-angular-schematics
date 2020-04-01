@@ -5,7 +5,7 @@ import { FileSystem } from '../utils/file-system';
 import { AngularConfig } from '../config/angular';
 import { TslintConfig } from '../config/tslint';
 import { GenerationOptions } from './current-generation';
-import { ComponentType, defaultComponentTypes } from './defaults';
+import { ComponentType, defaultComponentTypes } from '../defaults';
 import { Watchers } from '../utils/watchers';
 import { Output } from '../utils/output';
 

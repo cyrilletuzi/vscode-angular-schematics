@@ -164,7 +164,7 @@ See the detailed [instructions in README](./README.md).
 
 ### Easier contributions
 
-All default values are now in a [simple and single file](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts),
+All default values are now in a [simple and single file](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts),
 so you can easily do a Pull Request to add new defaults (for example to add a commonly used schematics).
 
 ### Other feature

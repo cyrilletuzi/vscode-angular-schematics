@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { AngularConfig } from '../config/angular';
 import { Watchers } from '../utils/watchers';
-import { defaultSchematicsNames } from './defaults';
+import { defaultSchematicsNames } from '../defaults';
 import { Collection } from './collection';
 import { TslintConfig } from '../config/tslint';
 

@@ -1,5 +1,3 @@
-// TODO: add more defaults
-
 /**
  * Default third-party schematics.
  */
@@ -33,6 +31,12 @@ export interface ComponentType {
     packages?: string[];
 }
 
+/**
+ * Default custom component types.
+ * Each type will only be enabled if one of these conditions is met:
+ * - its `suffix` exists in `tslint.json`
+ * - one of its `packages` is installed
+ */
 export const defaultComponentTypes: ComponentType[] = [
     {
         label: `Dialog`,
@@ -105,4 +109,3 @@ export const defaultComponentTypes: ComponentType[] = [
         detail: 'Interoperable native Web component (does not work in Internet Explorer)',
     },
 ];
-

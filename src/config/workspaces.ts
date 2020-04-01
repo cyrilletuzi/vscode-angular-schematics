@@ -5,7 +5,7 @@ import { TypescriptConfig } from './typescript';
 import { AngularConfig } from './angular';
 import { TslintConfig } from './tslint';
 import { Schematics } from '../schematics/schematics';
-import { AngularSchematicsProvider } from '../schematics/view';
+import { AngularSchematicsProvider } from '../view';
 
 export interface WorkspaceExtended extends vscode.WorkspaceFolder {
     angularConfig: AngularConfig;

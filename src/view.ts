@@ -1,11 +1,11 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { Collection } from './collection';
-import { Schematics } from './schematics';
-import { Workspaces } from '../config/workspaces';
-import { AngularConfig } from '../config/angular';
-import { TslintConfig } from '../config/tslint';
-import { FileSystem } from '../utils/file-system';
+import { Collection } from './schematics/collection';
+import { Schematics } from './schematics/schematics';
+import { Workspaces } from './config/workspaces';
+import { AngularConfig } from './config/angular';
+import { TslintConfig } from './config/tslint';
+import { FileSystem } from './utils/file-system';
 
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
