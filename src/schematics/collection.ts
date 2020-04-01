@@ -1,58 +1,67 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { FileSystem } from '../utils';
+import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
+
 import { Schema, SchemaConfig } from './schema';
-import { FileSystem } from '../utils/file-system';
-import { AngularConfig } from '../config/angular';
-import { TslintConfig } from '../config/tslint';
 
 interface PackageJsonSchema {
+    /**
+     * Schematics `package.json` should have a `schematics` property
+     * with the relative path to `collection.json`
+     */
     schematics?: string;
 }
 
-interface SchemaData {
-    schema: string;
-    description: string;
-    hidden?: boolean;
-    extends?: string;
-}
-
-interface CollectionData {
-    // path: string;
+interface CollectionJsonSchema {
     schematics: {
-        [key: string]: SchemaData;
+        /** Key is the schema's name */
+        [key: string]: {
+            /** Relative path to `schema.json` */
+            schema: string;
+            description: string;
+            /** Some schemas are internal for Angular CLI */
+            hidden?: boolean;
+            /** Some schemas extend another one */
+            extends?: string;
+        };
     };
 }
 
 export class Collection {
 
+    private name: string;
     private fsPath!: string;
-    private config!: CollectionData;
+    private config!: CollectionJsonSchema;
     private schemasConfigs = new Map<string, SchemaConfig>();
     private schemas = new Map<string, Schema | undefined>();
     private schemasChoices: vscode.QuickPickItem[] = [];
 
     constructor(
-        private name: string,
+        name: string,
         private workspace: vscode.WorkspaceFolder,
+        private packageJsonConfig: PackageJsonConfig,
         private angularConfig: AngularConfig,
         private tslintConfig: TslintConfig,
     ) {
-
+        this.name = name;
     }
 
-    async init({ silent = false } = {}): Promise<void> {
+    /**
+     * Load the collection.
+     * **Must** be called after each `new Collection()`
+     * (delegated because `async` is not possible on a constructor).
+     */
+    async init(): Promise<void> {
 
-        const fsPath = await this.getSchematicsFsPath(this.name);
+        /* Can throw */
+        this.fsPath = await this.getSchematicsFsPath(this.name);
 
-        if (!fsPath || !await FileSystem.isReadable(fsPath, this.workspace, silent)) {
-            throw new Error(`${this.name} schematics collection can not be found or read.`);
-        }
-
-        const config = await FileSystem.parseJsonFile<CollectionData>(this.fsPath);
+        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath, this.workspace);
 
         if (!config) {
-            throw new Error(`${this.name} schematics collection can not be parsed.`);
+            throw new Error(`"${this.name}" collection can not be loaded.`);
         }
 
         this.config = config;
@@ -61,15 +70,26 @@ export class Collection {
 
     }
 
+    // TODO: use only by view, check it's still usefull
+    /**
+     * Get collection's name
+     */
     getName(): string {
         return this.name;
     }
 
+    // TODO: use only by view, check it's still usefull
+    /**
+     * Get all collection's schemas' names
+     */
     getSchemasNames(): string[] {
         return Array.from(this.schemasConfigs.keys()).sort();
     }
 
     // TODO: watcher on collection
+    /**
+     * Get a schema from cache, or load it.
+     */
     async getSchema(name: string): Promise<Schema | undefined> {
 
         const fullName = this.getFullSchemaName(name);
@@ -83,7 +103,7 @@ export class Collection {
         /* Schemas are not preloaded */
         if (!this.schemas.has(fullName)) {
 
-            const schemaInstance = new Schema(schemaConfig, this.workspace, this.angularConfig, this.tslintConfig);
+            const schemaInstance = new Schema(schemaConfig, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
 
             try {
                 await schemaInstance.init();
@@ -96,52 +116,69 @@ export class Collection {
 
     }
 
+    /**
+     * Get schemas choices
+     */
     getSchemasChoices(): vscode.QuickPickItem[] {
         return this.schemasChoices;
     }
 
-    // async createSchema(name: string): Promise<Schema> {
+    /**
+     * Get the collection filesystem path.
+     */
+    private async getSchematicsFsPath(name: string): Promise<string> {
 
-    //     let collection: Collection = this;
+        /* Local schematics */
+        if (name.startsWith('.') && name.endsWith('.json')) {
+            return path.join(this.workspace.uri.fsPath, name);
+        }
+        
+        /* Package schematics */
 
-    //     const schema = this.schemas.get(name) as CollectionDataSchema;
+        // TODO: handle custom node_modules folder
+        /* `collection.json` path is defined in `package.json` */
+        const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
 
-    //     if (schema.extends) {
+        const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, this.workspace);
 
-    //         const [parentCollectionName] = schema.extends.split(':');
+        /* `package.json` should have a `schematics` property with relative path to `collection.json` */
+        if (!packageJsonConfig?.schematics) {
+            throw new Error(`${this.name} schematics collection can not be found or read.`);
+        }
 
-    //         collection = new Collection(parentCollectionName, this.workspace);
-    //         await collection.init();
+        return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
 
-    //     }
+    }
 
-    //     return new Schema(name, collection);
+    /**
+     * Get full schema name (eg. `@schematics/angular:component`)
+     */
+    private getFullSchemaName(name: string): string {
+        return `${this.name}:${name}`;
+    }
 
-    // }
-
+    /**
+     * Set all schemas of the collection.
+     */
     private async setSchemas(): Promise<void> {
 
         const schemas = Object.entries(this.config.schematics)
             /* Remove internal schematics */
-            .filter(([_, schemaConfig]) => !schemaConfig.hidden)
+            .filter(([_, config]) => !config.hidden)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
-            .filter(([schemaName]) => (schemaName !== 'ng-add'));
+            .filter(([name]) => (name !== 'ng-add'));
 
-        for (const [schemaName, schemaConfig] of schemas) {
+        for (const [name, config] of schemas) {
 
-            const schemaFsPath = path.join(path.basename(this.fsPath), schemaConfig.schema);
+            const fsPath = path.join(path.basename(this.fsPath), config.schema);
 
-            if (await FileSystem.isReadable(schemaFsPath)) {
-
-                // TODO: manage `extends`
-                this.schemasConfigs.set(this.getFullSchemaName(schemaName), {
-                    name: schemaName,
-                    collectionName: this.name,
-                    description: schemaConfig.description,
-                    fsPath: path.join(path.basename(this.fsPath), schemaConfig.schema),
-                });
-
-            }
+            // TODO: manage `extends`
+            this.schemasConfigs.set(this.getFullSchemaName(name), {
+                name,
+                collectionName: this.name,
+                description: config.description,
+                fsPath,
+            });
 
         }
 
@@ -149,6 +186,9 @@ export class Collection {
 
     }
 
+    /**
+     * Set schemas choice (for caching)
+     */
     private setSchemasChoices(): void {
 
         this.schemasChoices = Array.from(this.schemasConfigs).map(([label, config]) => ({
@@ -156,10 +196,6 @@ export class Collection {
             description: config.description,
         }));
 
-    }
-
-    private getFullSchemaName(name: string): string {
-        return `${this.name}:${name}`;
     }
 
     // protected async initSchemasMap(collection: CollectionData): Promise<void> {
@@ -190,26 +226,23 @@ export class Collection {
 
     // }
 
-    private async getSchematicsFsPath(name: string): Promise<string | undefined> {
+        // async createSchema(name: string): Promise<Schema> {
 
-        /* Local schematics */
-        if (name.startsWith('.') && name.endsWith('.json')) {
-            return path.join(this.workspace.uri.fsPath, name);
-        }
-        
-        /* Package schematics */
+    //     let collection: Collection = this;
 
-        // TODO: handle custom node_modules folder
-        const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
+    //     const schema = this.schemas.get(name) as CollectionDataSchema;
 
-        const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, this.workspace);
+    //     if (schema.extends) {
 
-        if (!packageJsonConfig?.schematics) {
-            return undefined;
-        }
+    //         const [parentCollectionName] = schema.extends.split(':');
 
-        return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
+    //         collection = new Collection(parentCollectionName, this.workspace);
+    //         await collection.init();
 
-    }
+    //     }
+
+    //     return new Schema(name, collection);
+
+    // }
 
 }

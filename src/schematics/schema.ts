@@ -1,24 +1,20 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
-import { FileSystem } from '../utils/file-system';
-import { AngularConfig } from '../config/angular';
-import { TslintConfig } from '../config/tslint';
-import { GenerationOptions } from '../generation-command';
 import { ComponentType, defaultComponentTypes } from '../defaults';
-import { Watchers } from '../utils/watchers';
-import { Output } from '../utils/output';
+import { FileSystem, Watchers, Output } from '../utils';
+import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
 
 const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
 const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
 
 export interface ShortcutType {
-    options: GenerationOptions;
+    options: Map<string, string | string[]>;
     choice: vscode.QuickPickItem;
 }
 
 export type ShortcutTypes = Map<string, ShortcutType>;
 
+/** Configuration needed to load a schema */
 export interface SchemaConfig {
     name: string;
     collectionName: string;
@@ -26,34 +22,44 @@ export interface SchemaConfig {
     fsPath: string;
 }
 
-interface SchemaDataDefaultOption {
-    $source: 'argv' | 'projectName';
-    index?: number;
-}
-
-interface SchemaDataOptions {
+export interface SchemaOptionJsonSchema {
     type: 'string' | 'boolean' | 'array';
     description: string;
     enum?: string[];
+    /** Some option are internal to Angular CLI */
     visible?: boolean;
+    /** Classic default value */
     default?: string | boolean;
-    $default?: SchemaDataDefaultOption;
+    /** Default value calculated by Angular CLI */
+    $default?: {
+        /** 
+         * Can be from the first argument of command line,
+         * or some internals like `projectName` which defaults to defaut project
+         */
+        $source: 'argv' | 'projectName';
+        /** Will be `0` for the first argument of command line */
+        index?: number;
+    };
     extends?: string;
     items?: {
         enum?: string[];
     };
     'x-deprecated'?: string;
+    /** Some options can have a prompt for Angular CLI interactive mode */
     'x-prompt'?: {
         message?: string;
         multiselect?: boolean;
+        /** Deprecated, Angular >= 8.3 uses `items.enum` instead */
         items?: string[];
     };
 }
 
-interface SchemaData {
+interface SchemaJsonSchema {
     properties: {
-        [key: string]: SchemaDataOptions;
+        /** Key is the option's name */
+        [key: string]: SchemaOptionJsonSchema;
     };
+    /** Some options may be required */
     required?: string[];
 }
 
@@ -62,19 +68,17 @@ export class Schema {
     private name: string;
     private collectionName: string;
     private fsPath: string;
-    private config!: SchemaData;
-    private options = new Map<string, SchemaDataOptions>();
+    private config!: SchemaJsonSchema;
+    private options = new Map<string, SchemaOptionJsonSchema>();
     private requiredOptionsNames: string[] = [];
     private shortcutTypesChoices: ShortcutTypes = new Map();
     private optionsChoices: vscode.QuickPickItem[] = [];
-    
-    get optionsNames(): string[] {
-        return Array.from(this.options.keys()).sort();
-    }
+    private initialized = false;
 
     constructor(
         config: SchemaConfig,
         private workspace: vscode.WorkspaceFolder,
+        private packageJsonConfig: PackageJsonConfig,
         private angularConfig: AngularConfig,
         private tslintConfig: TslintConfig,
     ) {
@@ -85,32 +89,33 @@ export class Schema {
 
     }
 
+    /**
+     * Load the schema.
+     * **Must** be called after each `new Collection()`
+     * (delegated because `async` is not possible on a constructor).
+     */
     async init(): Promise<void> {
 
-        await this.setConfig();        
-
-        /* Component types can have custom types from user configuration */
-        if ((this.collectionName === AngularConfig.defaultAngularCollection) && (this.name === 'component')) {
-            Watchers.watchCodePreferences(() => {
-                this.setComponentTypesChoices();
-            });
-        }
-
-    }
-
-    private async setConfig(): Promise<void> {
-
-        if (!await FileSystem.isReadable(this.fsPath, this.workspace)) {
-            throw new Error(`${this.name} schematics schema can not be found or read.`);
-        }
-
-        const config = await FileSystem.parseJsonFile<SchemaData>(this.fsPath);
+        const config = await FileSystem.parseJsonFile<SchemaJsonSchema>(this.fsPath, this.workspace);
 
         if (!config) {
-            throw new Error(`${this.name} schematics collection can not be parsed.`);
+            throw new Error(`"${this.collectionName}:${this.name}" schema can not be loaded.`);
         }
 
         await this.setOptions();
+
+        /* Watcher must be set just once */
+        if (!this.initialized
+        /* Component types can have custom types from user configuration */
+        && (this.collectionName === AngularConfig.defaultAngularCollection) && (this.name === 'component')) {
+
+            this.initialized = true;
+
+            Watchers.watchCodePreferences(() => {
+                this.setComponentTypesChoices();
+            });
+            
+        }
 
     }
 
@@ -121,7 +126,10 @@ export class Schema {
         return this.name;
     }
 
-    getSomeOptions(names: string[]): Map<string, SchemaDataOptions> {
+    /**
+     * Get options' details from their names
+     */
+    getSomeOptions(names: string[]): Map<string, SchemaOptionJsonSchema> {
 
         return new Map(names
             .filter((name) => this.options.has(name))
@@ -130,7 +138,10 @@ export class Schema {
 
     }
 
-    getRequiredOptions(): Map<string, SchemaDataOptions> {
+    /**
+     * Get required options details
+     */
+    getRequiredOptions(): Map<string, SchemaOptionJsonSchema> {
 
         return new Map(this.requiredOptionsNames
             .map((name) => [name, this.options.get(name)!])
@@ -138,32 +149,49 @@ export class Schema {
 
     }
 
+    /**
+     * Get component types choices from cache
+     */
     getComponentTypesChoices(): ShortcutTypes {
 
         return this.shortcutTypesChoices;
         
     }
 
+    /**
+     * Get component types choices from cache
+     */
     getModuleTypes(routeName: string): ShortcutTypes {
 
-        const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY)!;
+        /* Lazy-loaded module type has an option that can only be set based on user input */
+        const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY);
 
-        /* Add `route` option */
-        lazyModule.options.set('route', routeName);
+        if (lazyModule) { 
 
-        /* Replace placeholder for `route` option in choice description */
-        lazyModule.choice.description = lazyModule.choice.description!.replace(MODULE_ROUTE_NAME_PLACEHOLDER, routeName);
+            /* Add `route` option */
+            lazyModule.options.set('route', routeName);
 
-        this.shortcutTypesChoices.set(MODULE_TYPE_LAZY, lazyModule)!;
+            /* Replace placeholder for `route` option in choice description */
+            lazyModule.choice.description = lazyModule.choice.description?.replace(MODULE_ROUTE_NAME_PLACEHOLDER, routeName);
+
+            this.shortcutTypesChoices.set(MODULE_TYPE_LAZY, lazyModule);
+
+        }
 
         return this.shortcutTypesChoices;
         
     }
 
+    /**
+     * Get options' choices from cache.
+     */
     getOptionsChoices(): vscode.QuickPickItem[] {
         return this.optionsChoices;
     }
 
+    /**
+     * Tells if an option exists in the schema.
+     */
     hasOption(name: string): boolean {
         return this.options.has(name);
     }
@@ -186,37 +214,105 @@ export class Schema {
     
     }
 
-    hasPath(): boolean {
+    /**
+     * Get custom types (active defaults + user ones)
+     */
+    private getCustomTypes(): ComponentType[] {
 
-        return this.options.has('path');
-    
+        /* `Map` is used to avoid duplicates */
+        const customTypes = new Map<string, ComponentType>();
+
+        /* Default custom types */
+        for (const defaultType of defaultComponentTypes) {
+
+            /* If the `suffix` exists in `tslint.json`, enables the type */
+            if (defaultType.suffix && this.tslintConfig.hasSuffix(defaultType.suffix)) {
+
+                customTypes.set(defaultType.label, defaultType);
+
+            }
+            
+            /* If the package exists, enable the type and adds info about the library */
+            if (defaultType.packages) {
+
+                for (const packageName of defaultType.packages) {
+
+                    if (this.packageJsonConfig.hasDependency(packageName)) {
+
+                        defaultType.detail = `${packageName} custom component type`;
+
+                        customTypes.set(defaultType.label, defaultType);
+
+                        // TODO: check it only breaks current loop
+                        break;
+
+                    }
+
+                }
+
+            }
+            
+        }
+
+        // TODO: Check it get the current workspace config
+        // TODO: validate user input with JSON schema (or check if it's already done by vs code)
+        /* User custom types */
+        let userTypes = vscode.workspace.getConfiguration().get<ComponentType[]>('ngschematics.componentTypes', []);
+
+        /* Info about configuration change in version >= 4 of the extension */
+        if (!Array.isArray(userTypes)) {
+
+            Output.logError(`"ngschematics.componentTypes" option has changed in version >= 4. See the changelog to update it.`);
+
+            userTypes = [];
+
+        } else {
+
+            for (const userType of userTypes) {
+
+                customTypes.set(userType.label, userType);
+
+            }
+
+        }
+
+        return Array.from(customTypes.values());
+
     }
 
     private async setOptions(): Promise<void> {
 
         const options = Object.entries(this.config.properties);
 
+        /* Set all options */
         for (const [name, option] of options) {
             this.options.set(name, option);
         }
 
+        /* Set required options' names */
         this.requiredOptionsNames = (this.config.required ?? [])
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
             .filter((name) => !(('$default') in this.options.get(name)!));
         
+        /* Prepare choices for special schemas with shortcut */
         if (this.collectionName === AngularConfig.defaultAngularCollection) {
+
             if (this.name === 'module') {
                 this.setModuleTypesChoices();
             } else if (this.name === 'component') {
-                await this.setComponentTypesChoices();
+                this.setComponentTypesChoices();
             }
+
         }
         
         this.setOptionsChoices();
 
     }
 
-    private async setComponentTypesChoices(): Promise<void> {
+    /**
+     * Cache component types choices.
+     */
+    private setComponentTypesChoices(): void {
 
         /* Prior to new Ivy engine, components instanciated at runtime (modals, dialogs...)
          * must be declared in the `NgModule` `entryComponents` (in addition to `declarations`) */
@@ -234,6 +330,7 @@ export class Schema {
         const COMPONENT_TYPE_EXPORTED = `Exported component`;
         const COMPONENT_TYPE_ENTRY    = `Entry component`;
 
+        /* Default component types */
         const shortcutTypes: ShortcutTypes = new Map();
 
         shortcutTypes.set(COMPONENT_TYPE_DEFAULT, {
@@ -288,6 +385,7 @@ export class Schema {
             ]),
         });
 
+        /* Angular non-Ivy */
         if (entryComponentsRequired) {
 
             shortcutTypes.set(COMPONENT_TYPE_ENTRY, {
@@ -304,13 +402,16 @@ export class Schema {
 
         }
 
-        for (const customType of await this.getCustomTypes()) {
+        /* Custom component types */
+        for (const customType of this.getCustomTypes()) {
 
+            /* Remove entry components option and info if it's not needed anymore */
             if (!entryComponentsRequired) {
                 customType.description = customType.description?.replace('--entry-component', '').replace('--entryComponent', '');
                 customType.options = customType.options?.filter(([name]) => !['entry-component', 'entryComponent'].includes(name));
             }
 
+            /* Automatically add `type` option and info if the suffix exists in `tslint.json` */
             if (customType.suffix && this.tslintConfig.hasSuffix(customType.suffix)) {
                 customType.description = `${customType.description ?? ''} --type ${customType.suffix}`;
                 customType.options = customType.options ?? [];
@@ -332,67 +433,9 @@ export class Schema {
 
     }
 
-    private async getCustomTypes(): Promise<ComponentType[]> {
-
-        /* `Map` is used to avoid duplicates */
-        const customTypes = new Map<string, ComponentType>();
-
-        for (const defaultType of defaultComponentTypes) {
-
-            if (defaultType.suffix && this.tslintConfig.hasSuffix(defaultType.suffix)) {
-
-                customTypes.set(defaultType.label, defaultType);
-
-            }
-            
-            if (defaultType.packages) {
-
-                for (const packageName of defaultType.packages) {
-
-                    const packageFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', packageName);
-
-                    if (await FileSystem.isReadable(packageFsPath)) {
-
-                        defaultType.detail = `${packageName} custom component type`;
-
-                        customTypes.set(defaultType.label, defaultType);
-
-                        // TODO: check it only breaks current loop
-                        break;
-
-                    }
-
-                }
-
-            }
-            
-        }
-
-        // TODO: Check it get the current workspace config
-        // TODO: validate user input with JSON schema (or check if it's already done by vs code)
-        let userTypes = vscode.workspace.getConfiguration().get<ComponentType[]>('ngschematics.componentTypes', []);
-
-        /* Info about configuration change in version >= 4 of the extension */
-        if (!Array.isArray(userTypes)) {
-
-            Output.logError(`"ngschematics.componentTypes" option has changed in version >= 4. See the changelog to update it.`);
-
-            userTypes = [];
-
-        } else {
-
-            for (const userType of userTypes) {
-
-                customTypes.set(userType.label, userType);
-
-            }
-
-        }
-
-        return Array.from(customTypes.values());
-
-    }
-
+    /**
+     * Cache module types choices
+     */
     private setModuleTypesChoices(): void {
 
         /* `MODULE_TYPE_LAZY` is defined globally as we need it in another method */
@@ -412,6 +455,7 @@ export class Schema {
 
         /* Angular >= 8.1 */
         if (this.hasOption('route')) {
+
             shortcutTypes.set(MODULE_TYPE_LAZY, {
                 choice: {
                     label: MODULE_TYPE_LAZY,
@@ -424,6 +468,7 @@ export class Schema {
                     ['module', 'app'],
                 ]),
             });
+
         }
 
         shortcutTypes.set(MODULE_TYPE_ROUTING, {
@@ -442,6 +487,9 @@ export class Schema {
 
     }
 
+    /**
+     * Cache options choices
+     */
     private setOptionsChoices(): void {
 
         const choices: vscode.QuickPickItem[] = [];

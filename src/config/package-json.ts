@@ -5,7 +5,7 @@ import { FileSystem, Watchers } from '../utils';
 
 interface PackageJsonSchema {
     dependencies?: {
-        '@angular/core'?: string;
+        [key: string]: string;
     };
 }
 
@@ -52,6 +52,15 @@ export class PackageJsonConfig {
      */
     getAngularMajorVersion(): number | undefined {
         return this.angularMajorVersion;
+    }
+
+    /**
+     * Tells if a package is installed in `package.json`
+     */
+    hasDependency(name: string): boolean {
+
+        return (name in (this.config?.dependencies ?? {}));
+
     }
 
     /**

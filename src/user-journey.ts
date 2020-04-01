@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Collection } from './schematics/collection';
-import { GenerationCommand, GenerationOptions } from './generation-command';
-import { Schematics } from './schematics/schematics';
-import { AngularConfig } from './config/angular';
 import { Workspaces, WorkspaceExtended } from './config/workspaces';
-import { Schema } from './schematics/schema';
+import { AngularConfig } from './config';
+import { Schematics, Collection, Schema } from './schematics';
+
+import { GenerationCommand, GenerationOptions } from './generation-command';
 
 
 export class UserJourney {

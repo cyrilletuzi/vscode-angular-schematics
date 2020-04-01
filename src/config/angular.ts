@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem, Watchers } from '../utils';
+
 import { PackageJsonConfig } from './package-json';
 import { TypescriptConfig } from './typescript';
 

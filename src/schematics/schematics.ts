@@ -1,41 +1,67 @@
 import * as vscode from 'vscode';
 
-import { AngularConfig } from '../config/angular';
-import { Watchers } from '../utils/watchers';
 import { defaultSchematicsNames } from '../defaults';
+import { Watchers } from '../utils/watchers';
+import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
+
 import { Collection } from './collection';
-import { TslintConfig } from '../config/tslint';
 
 export class Schematics {
 
+    /**
+     * List of collections existing in the workspace
+     */
     private collections = new Map<string, Collection | undefined>();
+    private initialized = false;
 
     constructor(
         private workspace: vscode.WorkspaceFolder,
+        private packageJsonConfig: PackageJsonConfig,
         private angularConfig: AngularConfig,
         private tslintConfig: TslintConfig,
     ) {}
 
+    /**
+     * Initializes schematics collections.
+     * **Must** be called after each `new Schematics()`
+     * (delegated because `async` is not possible on a constructor).
+     */
     async init(): Promise<void> {
 
-        await this.setConfig();
+        /* Watcher must be set just once */
+        if (!this.initialized) {
 
-        Watchers.watchCodePreferences(() => {
-            this.setConfig();
-        });
+            this.initialized = true;
+
+            Watchers.watchCodePreferences(() => {
+                this.setCollections();
+            });
+
+        }
+
+        await this.setCollections();
 
     }
 
+    /**
+     * Get all collections' names.
+     */
     getCollectionsNames(): string[] {
         return Array.from(this.collections.keys());
     }
 
     // TODO: watcher on collection
+    /**
+     * Get collection from cache, or load it.
+     * @param name 
+     */
     async getCollection(name: string): Promise<Collection | undefined> {
 
         /* Not all collections are preloaded */
-        if (!this.collections.has(name)) {
-            const collectionInstance = new Collection(name, this.workspace, this.angularConfig, this.tslintConfig);
+        if (!this.collections.get(name)) {
+
+            const collectionInstance = new Collection(name, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
+        
             try {
                 await collectionInstance.init();
                 this.collections.set(name, collectionInstance);
@@ -47,14 +73,12 @@ export class Schematics {
 
     }
 
-    private async setConfig(): Promise<void> {
-
-        await this.setCollections();
-
-    }
-
+    /**
+     * Set schematics collections names and preload official collections.
+     */
     private async setCollections(): Promise<void> {
 
+        // TODO: check VS Code is verifying JSON schema
         /* Configuration key is configured in `package.json` */
         const userSchematicsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
@@ -70,10 +94,10 @@ export class Schematics {
             /* Preload only defaut schematics for performance */
             if (this.angularConfig.getDefaultCollections().includes(name)) {
 
-                const collectionInstance = new Collection(name, this.workspace, this.angularConfig, this.tslintConfig);
+                const collectionInstance = new Collection(name, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
                 
                 try {
-                    await collectionInstance.init({ silent: true });
+                    await collectionInstance.init();
                     collection = collectionInstance;
                 } catch {}
 

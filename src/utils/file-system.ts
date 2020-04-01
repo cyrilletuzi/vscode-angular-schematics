@@ -56,7 +56,7 @@ export class FileSystem {
      * Check if a file exists and is readable.
      * Otherwise, log an error message in output channel if `silent` is not set to `true`.
      */
-    static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder, silent = false): Promise<boolean> {
+    static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder): Promise<boolean> {
 
         try {
 
@@ -66,9 +66,7 @@ export class FileSystem {
         } catch (error) {
 
             // TODO: type of error and check against a constant
-            if (!silent) {
-                this.showError(fsPath, (error.code === 'ENOENT') ? `found` : `read`, workspace);
-            }
+            this.showError(fsPath, (error.code === 'ENOENT') ? `found` : `read`, workspace);
             
             return false;
 

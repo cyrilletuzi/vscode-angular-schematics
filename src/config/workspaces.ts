@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 
+import { Schematics } from '../schematics/schematics';
+import { AngularSchematicsProvider } from '../view';
+
 import { PackageJsonConfig } from './package-json';
 import { TypescriptConfig } from './typescript';
 import { AngularConfig } from './angular';
 import { TslintConfig } from './tslint';
-import { Schematics } from '../schematics/schematics';
-import { AngularSchematicsProvider } from '../view';
 
 export interface WorkspaceExtended extends vscode.WorkspaceFolder {
     angularConfig: AngularConfig;
@@ -113,7 +114,7 @@ export class Workspaces {
         const tsLintConfig = new TslintConfig(workspace);
         await tsLintConfig.init();
 
-        const schematics = new Schematics(workspace, angularConfig, tsLintConfig);
+        const schematics = new Schematics(workspace, packageJsonConfig, angularConfig, tsLintConfig);
         await schematics.init();
 
         this.workspaces.set(workspace.name, {
@@ -126,7 +127,7 @@ export class Workspaces {
         });
 
         // TODO: do a class to init, and check if it should be removed on deactivate
-        vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider(angularConfig, tsLintConfig));
+        vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider(packageJsonConfig, angularConfig, tsLintConfig));
 
     }
 

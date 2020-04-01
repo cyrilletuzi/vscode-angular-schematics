@@ -6,6 +6,7 @@ import { Workspaces } from './config/workspaces';
 import { AngularConfig } from './config/angular';
 import { TslintConfig } from './config/tslint';
 import { FileSystem } from './utils/file-system';
+import { PackageJsonConfig } from './config';
 
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -39,6 +40,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
     private materialIconsNotExisting = new Set<string>();
 
     constructor(
+        private packageJsonConfig: PackageJsonConfig,
         private angularConfig: AngularConfig,
         private tslintConfig: TslintConfig,
     ) {
@@ -73,7 +75,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         if (!element) {
 
-            const schematics = new Schematics(Workspaces.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
+            const schematics = new Schematics(Workspaces.getFirstWorkspace(), this.packageJsonConfig, this.angularConfig, this.tslintConfig);
 
             await schematics.init();
 
@@ -81,7 +83,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         } else {
 
-            const collection = new Collection(element.label as string, Workspaces.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
+            const collection = new Collection(element.label as string, Workspaces.getFirstWorkspace(), this.packageJsonConfig, this.angularConfig, this.tslintConfig);
             const items: vscode.TreeItem[] = [];
 
             try {

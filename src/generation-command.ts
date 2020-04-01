@@ -5,7 +5,7 @@ import * as childProcess from 'child_process';
 
 import { FileSystem, Output } from './utils';
 import { WorkspaceExtended, AngularConfig } from './config';
-import { Schema } from './schematics/schema';
+import { Schema } from './schematics';
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');
