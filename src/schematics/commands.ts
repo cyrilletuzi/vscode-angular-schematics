@@ -238,7 +238,7 @@ export class Commands {
 
     }
 
-    async askModuleOptions(nameAsFirstArg: string): Promise<GenerationOptions | undefined> {
+    private async askModuleOptions(nameAsFirstArg: string): Promise<GenerationOptions | undefined> {
 
         /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
         const routeName = path.posix.basename(nameAsFirstArg);
@@ -259,7 +259,7 @@ export class Commands {
 
     }
 
-    async askComponentOptions(): Promise<GenerationOptions | undefined> {
+    private async askComponentOptions(): Promise<GenerationOptions | undefined> {
 
         const types = this.schema.getComponentTypesChoices();
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
@@ -277,7 +277,7 @@ export class Commands {
 
     }
 
-    async askShortcutConfirmation(): Promise<boolean | undefined> {
+    private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
         const CONFIRM: vscode.QuickPickItem = {
             label: `Confirm`,
@@ -303,22 +303,21 @@ export class Commands {
 
     }
 
-    async askOptions(): Promise<GenerationOptions> {
+    private async askOptions(): Promise<GenerationOptions> {
 
         const selectedOptionsNames = await this.askOptionsNames();
 
         if (selectedOptionsNames) {
 
-            return await this.schema.askOptionsValues(selectedOptionsNames);
+            return await this.askOptionsValues(selectedOptionsNames);
 
         }
 
         return new Map();
 
-
     }
 
-    async askOptionsNames(): Promise<string[]> {
+    private async askOptionsNames(): Promise<string[]> {
 
         const optionsChoices = this.schema.getOptionsChoices();
 
@@ -333,6 +332,96 @@ export class Commands {
         }) || [];
 
         return selectedOptions.map((selectedOption) => selectedOption.label);
+
+    }
+
+    private async askOptionsValues(optionsNames: string[]): Promise<GenerationOptions> {
+
+        /* Force required options, otherwise the schematic will fail */
+        const options = [...this.schema.getRequiredOptions(), ...this.schema.getSomeOptions(optionsNames)];
+
+        const filledOptions: GenerationOptions = new Map();
+    
+        for (let [optionName, option] of options) {
+
+            let choice: string | string[] | undefined = '';
+
+            const promptSchema = option?.['x-prompt'];
+
+            /* Some schematics have a prompt message already defined, otherwise we use the description */
+            const prompt = promptSchema?.message ?? option.description;
+    
+            if (option.enum !== undefined) {
+    
+                // TODO: Put default value last in choices
+                // TODO: Take user defaults in angular.json into account in ordering
+                choice = await this.askOptionEnum(optionName, option.enum, prompt);
+    
+            } else if (option.type === 'boolean') {
+    
+                // TODO: Take user defaults in angular.json into account in ordering
+                /* Put the non-default value first */
+                const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
+    
+                choice = await this.askOptionEnum(optionName, choices, prompt);
+    
+            }
+            /* Only makes sense if the option is an array AND have suggestions,
+             * otherwise the user must manually type the value in a classic text input box */
+            else if ((option.type === 'array')) {
+
+                /* Angular >= 8.3 */
+                if (option.items?.enum) {
+                    choice = await this.askOptionMultiselect(optionName, option.items.enum, prompt);
+                }
+                /* Angular < 8.3 (guard schematics) */
+                else if (promptSchema?.multiselect && promptSchema?.items) {
+                    choice = await this.askOptionMultiselect(optionName, promptSchema.items, prompt);
+                } else {
+                    choice = await this.askOptionText(optionName, prompt);
+                }
+    
+            } else {
+    
+                choice = await this.askOptionText(optionName, prompt);
+    
+            }
+    
+            if (choice) {
+                filledOptions.set(optionName, choice);
+            }
+
+        }
+    
+        return filledOptions;
+    
+    }
+
+    private async askOptionText(optionName: string, prompt: string): Promise<string | undefined> {
+
+        return vscode.window.showInputBox({
+            prompt: `--${optionName}: ${prompt}`,
+            ignoreFocusOut: true,
+        });
+
+    }
+
+    private async askOptionEnum(optionName: string, choices: string[], placeholder: string): Promise<string | undefined> {
+
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}: ${placeholder}`,
+            ignoreFocusOut: true,
+        });
+
+    }
+
+    private async askOptionMultiselect(optionName: string, choices: string[], placeholder: string): Promise<string[] | undefined> {
+
+        return vscode.window.showQuickPick(choices, {
+            placeHolder: `--${optionName}: ${placeholder}`,
+            canPickMany: true,
+            ignoreFocusOut: true,
+        });
 
     }
 

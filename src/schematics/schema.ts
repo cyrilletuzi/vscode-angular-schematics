@@ -64,7 +64,7 @@ export class Schema {
     private fsPath: string;
     private config!: SchemaData;
     private options = new Map<string, SchemaDataOptions>();
-    private requiredOptions: string[] = [];
+    private requiredOptionsNames: string[] = [];
     private shortcutTypesChoices: ShortcutTypes = new Map();
     private optionsChoices: vscode.QuickPickItem[] = [];
     
@@ -121,6 +121,23 @@ export class Schema {
         return this.name;
     }
 
+    getSomeOptions(names: string[]): Map<string, SchemaDataOptions> {
+
+        return new Map(names
+            .filter((name) => this.options.has(name))
+            .map((name) => [name, this.options.get(name)!])
+        );
+
+    }
+
+    getRequiredOptions(): Map<string, SchemaDataOptions> {
+
+        return new Map(this.requiredOptionsNames
+            .map((name) => [name, this.options.get(name)!])
+        );
+
+    }
+
     getComponentTypesChoices(): ShortcutTypes {
 
         return this.shortcutTypesChoices;
@@ -175,87 +192,6 @@ export class Schema {
     
     }
 
-    async askOptionsValues(optionsNames: string[]): Promise<Map<string, string | string[]>> {
-
-        const options = this.filterSelectedOptions(optionsNames);
-
-        const filledOptions = new Map<string, string | string[]>();
-    
-        for (let [optionName, option] of options) {
-
-            let choice: string | string[] | undefined = '';
-            const promptSchema = option['x-prompt'];
-            const prompt = (promptSchema && promptSchema.message) ? promptSchema.message : option.description;
-    
-            if (option.enum !== undefined) {
-    
-                /** @todo Put default value last in choices */
-                /** @todo Take user defaults in angular.json into account in ordering */
-                choice = await this.askEnumOption(optionName, option.enum, prompt);
-    
-            } else if (option.type === 'boolean') {
-    
-                /** @todo Take user defaults in angular.json into account in ordering */
-                const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
-    
-                choice = await this.askEnumOption(optionName, choices, prompt);
-    
-            }
-            /* Only makes sense if the option is an array AND have suggestions,
-             * otherwise the user must manually type the value in a classic text input box */
-            else if ((option.type === 'array')) {
-
-                if (promptSchema && promptSchema.multiselect && promptSchema.items) {
-                    choice = await this.askMultiselectOption(optionName, promptSchema.items, prompt);
-                } else if (option.items && option.items.enum) {
-                    choice = await this.askMultiselectOption(optionName, option.items.enum, prompt);
-                } else {
-                    choice = await vscode.window.showInputBox({
-                        placeHolder: `--${optionName}`,
-                        prompt,
-                        ignoreFocusOut: true,
-                    });
-                }
-    
-            } else {
-    
-                choice = await vscode.window.showInputBox({
-                    placeHolder: `--${optionName}`,
-                    prompt,
-                    ignoreFocusOut: true,
-                });
-    
-            }
-    
-            if (choice) {
-                filledOptions.set(optionName, choice);
-            }
-
-        }
-    
-        return filledOptions;
-    
-    }
-
-    protected async askEnumOption(optionName: string, choices: string[], placeholder = ''): Promise<string | undefined> {
-
-        return vscode.window.showQuickPick(choices, {
-            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
-            ignoreFocusOut: true,
-        });
-
-    }
-
-    protected async askMultiselectOption(optionName: string, choices: string[], placeholder = ''): Promise<string[] | undefined> {
-
-        return vscode.window.showQuickPick(choices, {
-            placeHolder: `--${optionName}${placeholder ? `: ${placeholder}` : ''}`,
-            canPickMany: true,
-            ignoreFocusOut: true,
-        });
-
-    }
-
     private async setOptions(): Promise<void> {
 
         const options = Object.entries(this.config.properties);
@@ -264,7 +200,9 @@ export class Schema {
             this.options.set(name, option);
         }
 
-        this.requiredOptions = this.config.required ?? [];
+        this.requiredOptionsNames = (this.config.required ?? [])
+            /* Options which have a `$default` will be taken care by the CLI, so they are not required */
+            .filter((name) => !(('$default') in this.options.get(name)!));
         
         if (this.collectionName === AngularConfig.defaultAngularCollection) {
             if (this.name === 'module') {
@@ -455,32 +393,6 @@ export class Schema {
 
     }
 
-    protected filterSelectedOptions(selectedOptionsNames: string[]): Map<string, SchemaDataOptions> {
-
-        const selectedOptions = new Map<string, SchemaDataOptions>();
-
-        selectedOptionsNames.forEach((selectedOptionName) => {
-            const option = this.options.get(selectedOptionName);
-            if (option) {
-                selectedOptions.set(selectedOptionName, option);
-            }
-        });
-
-        this.requiredOptions.forEach((requiredOptionName) => {
-
-            const requiredOptionData = this.options.get(requiredOptionName);
-
-            /* Filter options with $default values already managed by the CLI */
-            if (requiredOptionName !== 'name' && requiredOptionData && !('$default' in requiredOptionData)) {
-                selectedOptions.set(requiredOptionName, this.options.get(requiredOptionName) as SchemaDataOptions);
-            }
-
-        });
-
-        return selectedOptions;
-
-    }
-
     private setModuleTypesChoices(): void {
 
         /* `MODULE_TYPE_LAZY` is defined globally as we need it in another method */
@@ -553,7 +465,7 @@ export class Schema {
             if (!('$default' in option)) {
 
                 /* Required options */
-                if (this.requiredOptions.includes(label)) {
+                if (this.requiredOptionsNames.includes(label)) {
                     picked = true;
                     requiredOrSuggestedInfo = `(required) `;
                 }
