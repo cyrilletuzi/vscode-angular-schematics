@@ -1,11 +1,20 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as os from 'os';
+import * as childProcess from 'child_process';
 
-import { Utils } from './utils';
 import { AngularConfig } from './config-angular';
 import { WorkspaceExtended } from './config-workspaces';
 import { Output } from './output';
 import { FileSystem } from './file-system';
+
+const osList = new Map<string, string>();
+osList.set('darwin', 'osx');
+osList.set('win32', 'windows');
+
+const userOs = osList.get(os.platform()) || 'linux';
+// TODO: Manage custom shell for Windows
+const userShell = (userOs === 'windows') ? undefined : vscode.workspace.getConfiguration().get(`terminal.integrated.shell.${userOs}`) as string;
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
@@ -142,25 +151,13 @@ export class CurrentGeneration {
 
     }
 
-    async askConfirmation(): Promise<boolean> {
-
-        const confirmationText = `Confirm`;
-        const cancellationText = `Cancel`;
-
-        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
-            placeHolder: this.command,
-            ignoreFocusOut: true,
-        });
-
-        return (choice === confirmationText) ? true : false;
-
-    }
-
-    async isCliLocal(cwd: string): Promise<boolean> {
+    async isCliLocal(): Promise<boolean> {
 
         if (this.cliLocal === null) {
 
-            this.cliLocal = await Utils.existsAsync(Utils.getNodeModulesPath(cwd, '.bin', 'ng'));
+            const cliLocalFsPath = path.join(this.workspaceExtended.uri.fsPath, '.bin', 'ng');
+
+            this.cliLocal = await FileSystem.isReadable(cliLocalFsPath);
 
         }
 
@@ -168,9 +165,9 @@ export class CurrentGeneration {
 
     }
 
-    async getExecCommand(workspaceUri: vscode.Uri): Promise<string> {
+    private async getExecCommand(): Promise<string> {
 
-        return (await this.isCliLocal(workspaceUri.fsPath)) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
+        return (await this.isCliLocal()) ? `"./node_modules/.bin/ng"${this.command.substr(2)}` : this.command;
 
     }
 
@@ -253,7 +250,7 @@ export class CurrentGeneration {
 
         try {
 
-            const stdout = await Utils.execAsync(await this.getExecCommand(this.workspaceExtended.uri), this.workspaceExtended.uri);
+            const stdout = await this.execAsync(await this.getExecCommand(), this.workspaceExtended.uri);
 
             Output.channel.appendLine(stdout);
 
@@ -273,6 +270,24 @@ export class CurrentGeneration {
             vscode.window.showErrorMessage(`Schematics failed, see Output.`);
 
         }
+    
+    }
+
+    private async execAsync(command: string, workspaceUri?: vscode.Uri): Promise<string> {
+
+        return new Promise((resolve, reject) => {
+    
+            childProcess.exec(command, { cwd: workspaceUri?.fsPath, shell: userShell }, (error, stdout, stderr) => {
+    
+                if (error) {
+                    reject([stdout, stderr]);
+                } else {
+                    resolve(stdout);
+                }
+    
+            });
+    
+        });
     
     }
 

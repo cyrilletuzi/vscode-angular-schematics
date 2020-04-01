@@ -167,7 +167,7 @@ export class Commands {
             this.generation.addOptions(filledOptions);
 
             /* Ask final confirmation */
-            const confirm = await this.generation.askConfirmation();
+            const confirm = await this.askConfirmation();
 
             /* "Cancel" choice */
             if (!confirm) {
@@ -422,6 +422,20 @@ export class Commands {
             canPickMany: true,
             ignoreFocusOut: true,
         });
+
+    }
+
+    private async askConfirmation(): Promise<boolean> {
+
+        const confirmationText = `Confirm`;
+        const cancellationText = `Cancel`;
+
+        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
+            placeHolder: this.generation.command,
+            ignoreFocusOut: true,
+        });
+
+        return (choice === confirmationText) ? true : false;
 
     }
 

@@ -2,10 +2,10 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Collection } from './collection';
 import { Schematics } from './schematics';
-import { Utils } from './utils';
 import { WorkspacesConfig } from './config-workspaces';
 import { AngularConfig } from './config-angular';
 import { TSLintConfig } from './config-tslint';
+import { FileSystem } from './file-system';
 
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -131,7 +131,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
                 if (this.materialIconsExisting.has(materialIconPath)) {
                     iconPath = materialIconPath;
-                } else if (!this.materialIconsNotExisting.has(materialIconPath) && await Utils.existsAsync(materialIconPath)) {
+                } else if (!this.materialIconsNotExisting.has(materialIconPath) && await FileSystem.isReadable(materialIconPath)) {
                     this.materialIconsExisting.add(materialIconPath);
                     iconPath = materialIconPath;
                 } else {
