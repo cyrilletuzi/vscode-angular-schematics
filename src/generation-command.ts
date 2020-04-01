@@ -24,7 +24,6 @@ interface ContextPath {
     relativeToSource: string;
 }
 
-// TODO: check if it's the right place for this
 /** List of options */
 export type GenerationOptions = Map<string, string | string[]>;
 
