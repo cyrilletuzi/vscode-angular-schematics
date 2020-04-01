@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
 
+import { Watchers, Output } from './utils';
+import { Workspaces } from './config';
 import { UserJourney } from './user-journey';
-import { Output } from './utils/output';
-import { Workspaces } from './config/workspaces';
-import { Watchers } from './utils/watchers';
 
 
 /**
@@ -15,6 +14,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // TODO: check if it's really useful
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
+    /* Initializes all configurations, which are relative to each workspace */
     Workspaces.init();
 
     /* 
@@ -28,26 +28,26 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('ngschematics.generateComponent', (context?: vscode.Uri) => {
 
-            const command = new UserJourney();
-            command.start(context, 'component');
+            const journey = new UserJourney();
+            journey.start(context, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
 
-            const command = new UserJourney();
-            command.start(context, 'service');
+            const journey = new UserJourney();
+            journey.start(context, 'service');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
 
-            const command = new UserJourney();
-            command.start(context, 'module');
+            const journey = new UserJourney();
+            journey.start(context, 'module');
     
         }),
         vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, schemaName?: string, collectionName?: string) => {
 
-            const command = new UserJourney();
-            command.start(context, schemaName, collectionName);
+            const journey = new UserJourney();
+            journey.start(context, schemaName, collectionName);
     
         }),
     );

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Collection } from './schematics/collection';
-import { CurrentGeneration, GenerationOptions } from './schematics/current-generation';
+import { GenerationCommand, GenerationOptions } from './generation-command';
 import { Schematics } from './schematics/schematics';
 import { AngularConfig } from './config/angular';
 import { Workspaces, WorkspaceExtended } from './config/workspaces';
@@ -14,7 +14,7 @@ export class UserJourney {
     private static shortcutSchemas = ['component', 'service', 'module'];
 
     workspace!: WorkspaceExtended;
-    generation!: CurrentGeneration;
+    generation!: GenerationCommand;
     schematics!: Schematics;
     collection!: Collection;
     schema!: Schema;
@@ -35,7 +35,7 @@ export class UserJourney {
         this.workspace = workspaceExtended;
         this.schematics = this.workspace.schematics;
 
-        this.generation = new CurrentGeneration(workspaceExtended, context);
+        this.generation = new GenerationCommand(workspaceExtended, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
@@ -91,7 +91,7 @@ export class UserJourney {
 
         }
 
-        this.generation.setSchema(schemaName);
+        this.generation.setSchemaName(schemaName);
 
         const schema = await this.collection.getSchema(schemaName);
 
@@ -99,6 +99,8 @@ export class UserJourney {
             vscode.window.showErrorMessage(`Cannot load "${schemaName}" schematics schema in "${collectionName}" collection.`);
             return;
         }
+
+        this.generation.setSchema(schema);
 
         this.schema = schema;
 
@@ -211,15 +213,14 @@ export class UserJourney {
     private async askNameAsFirstArg(): Promise<string | undefined> {
 
         const project = this.generation.getProject();
+        const contextPath = this.generation.getContextForNameAsFirstArg();
 
         let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
 
         /* Pro-tip to educate users that it is easier to launch the command from a right-click in Explorer */
-        if (this.workspace.angularConfig.isRootProject(project) && !this.generation.hasContextPath()) {
+        if (this.workspace.angularConfig.isRootProject(project) && !contextPath) {
             prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
         }
-
-        const contextPath = this.generation.getContextForNameAsFirstArg();
 
         const nameInput = await vscode.window.showInputBox({
             prompt,
@@ -290,7 +291,7 @@ export class UserJourney {
         const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
 
         const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
-            placeHolder: this.generation.command,
+            placeHolder: this.generation.getCommand(),
             ignoreFocusOut: true,
         });
 
@@ -431,7 +432,7 @@ export class UserJourney {
         const cancellationText = `Cancel`;
 
         const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
-            placeHolder: this.generation.command,
+            placeHolder: this.generation.getCommand(),
             ignoreFocusOut: true,
         });
 
