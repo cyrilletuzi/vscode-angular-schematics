@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem } from '../utils';
-import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
+import { WorkspaceExtended } from '../config';
 
 import { Schema, SchemaConfig } from './schema';
 
@@ -40,10 +40,7 @@ export class Collection {
 
     constructor(
         name: string,
-        private workspace: vscode.WorkspaceFolder,
-        private packageJsonConfig: PackageJsonConfig,
-        private angularConfig: AngularConfig,
-        private tslintConfig: TslintConfig,
+        private workspace: Omit<WorkspaceExtended, 'schematics'>,
     ) {
         this.name = name;
     }
@@ -103,7 +100,7 @@ export class Collection {
         /* Schemas are not preloaded */
         if (!this.schemas.has(fullName)) {
 
-            const schemaInstance = new Schema(schemaConfig, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
+            const schemaInstance = new Schema(schemaConfig, this.workspace);
 
             try {
                 await schemaInstance.init();

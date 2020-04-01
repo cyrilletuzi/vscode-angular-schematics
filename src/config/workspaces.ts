@@ -1,20 +1,12 @@
 import * as vscode from 'vscode';
 
-import { Schematics } from '../schematics/schematics';
-import { AngularSchematicsProvider } from '../view';
+import { Schematics } from '../schematics';
 
 import { PackageJsonConfig } from './package-json';
 import { TypescriptConfig } from './typescript';
 import { AngularConfig } from './angular';
 import { TslintConfig } from './tslint';
-
-export interface WorkspaceExtended extends vscode.WorkspaceFolder {
-    angularConfig: AngularConfig;
-    typescriptConfig: TypescriptConfig;
-    packageJsonConfig: PackageJsonConfig;
-    tsLintConfig: TslintConfig;
-    schematics: Schematics;
-}
+import { WorkspaceExtended } from './workspace-extended';
 
 export class Workspaces {
 
@@ -108,26 +100,23 @@ export class Workspaces {
         const typescriptConfig = new TypescriptConfig(workspace);
         await typescriptConfig.init();
 
-        const angularConfig = new AngularConfig(workspace, packageJsonConfig, typescriptConfig);
+        const tslintConfig = new TslintConfig(workspace);
+        await tslintConfig.init();
+
+        const workspaceExtented1 = { ...workspace, packageJsonConfig, typescriptConfig, tslintConfig };
+
+        const angularConfig = new AngularConfig(workspaceExtented1);
         await angularConfig.init();
 
-        const tsLintConfig = new TslintConfig(workspace);
-        await tsLintConfig.init();
+        const workspaceExtented2 = { ...workspaceExtented1, angularConfig };
 
-        const schematics = new Schematics(workspace, packageJsonConfig, angularConfig, tsLintConfig);
+        const schematics = new Schematics(workspaceExtented2);
         await schematics.init();
 
         this.workspaces.set(workspace.name, {
-            ...workspace,
-            packageJsonConfig,
-            typescriptConfig,
-            angularConfig,
-            tsLintConfig,
+            ...workspaceExtented2,
             schematics,
         });
-
-        // TODO: do a class to init, and check if it should be removed on deactivate
-        vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider(packageJsonConfig, angularConfig, tsLintConfig));
 
     }
 

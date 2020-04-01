@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { defaultSchematicsNames } from '../defaults';
 import { Watchers } from '../utils/watchers';
-import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
+import { WorkspaceExtended } from '../config';
 
 import { Collection } from './collection';
 
@@ -14,12 +14,7 @@ export class Schematics {
     private collections = new Map<string, Collection | undefined>();
     private initialized = false;
 
-    constructor(
-        private workspace: vscode.WorkspaceFolder,
-        private packageJsonConfig: PackageJsonConfig,
-        private angularConfig: AngularConfig,
-        private tslintConfig: TslintConfig,
-    ) {}
+    constructor(private workspace: Omit<WorkspaceExtended, 'schematics'>) {}
 
     /**
      * Initializes schematics collections.
@@ -60,7 +55,7 @@ export class Schematics {
         /* Not all collections are preloaded */
         if (!this.collections.get(name)) {
 
-            const collectionInstance = new Collection(name, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
+            const collectionInstance = new Collection(name, this.workspace);
         
             try {
                 await collectionInstance.init();
@@ -84,7 +79,7 @@ export class Schematics {
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
-        const collectionsNames = Array.from(new Set([...this.angularConfig.getDefaultCollections(), ...defaultSchematicsNames, ...userSchematicsNames]));
+        const collectionsNames = Array.from(new Set([...this.workspace.angularConfig.getDefaultCollections(), ...defaultSchematicsNames, ...userSchematicsNames]));
         
         /* `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
@@ -92,9 +87,9 @@ export class Schematics {
             let collection: Collection | undefined = undefined;
 
             /* Preload only defaut schematics for performance */
-            if (this.angularConfig.getDefaultCollections().includes(name)) {
+            if (this.workspace.angularConfig.getDefaultCollections().includes(name)) {
 
-                const collectionInstance = new Collection(name, this.workspace, this.packageJsonConfig, this.angularConfig, this.tslintConfig);
+                const collectionInstance = new Collection(name, this.workspace);
                 
                 try {
                     await collectionInstance.init();

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { ComponentType, defaultComponentTypes } from '../defaults';
 import { FileSystem, Watchers, Output } from '../utils';
-import { AngularConfig, TslintConfig, PackageJsonConfig } from '../config';
+import { AngularConfig, WorkspaceExtended } from '../config';
 
 const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
 const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
@@ -77,10 +77,7 @@ export class Schema {
 
     constructor(
         config: SchemaConfig,
-        private workspace: vscode.WorkspaceFolder,
-        private packageJsonConfig: PackageJsonConfig,
-        private angularConfig: AngularConfig,
-        private tslintConfig: TslintConfig,
+        private workspace: Omit<WorkspaceExtended, 'schematics'>,
     ) {
 
         this.name = config.name;
@@ -226,7 +223,7 @@ export class Schema {
         for (const defaultType of defaultComponentTypes) {
 
             /* If the `suffix` exists in `tslint.json`, enables the type */
-            if (defaultType.suffix && this.tslintConfig.hasSuffix(defaultType.suffix)) {
+            if (defaultType.suffix && this.workspace.tslintConfig.hasSuffix(defaultType.suffix)) {
 
                 customTypes.set(defaultType.label, defaultType);
 
@@ -237,7 +234,7 @@ export class Schema {
 
                 for (const packageName of defaultType.packages) {
 
-                    if (this.packageJsonConfig.hasDependency(packageName)) {
+                    if (this.workspace.packageJsonConfig.hasDependency(packageName)) {
 
                         defaultType.detail = `${packageName} custom component type`;
 
@@ -316,10 +313,10 @@ export class Schema {
 
         /* Prior to new Ivy engine, components instanciated at runtime (modals, dialogs...)
          * must be declared in the `NgModule` `entryComponents` (in addition to `declarations`) */
-        const entryComponentsRequired = !this.angularConfig.isIvy() && this.hasOption('entryComponent');
+        const entryComponentsRequired = !this.workspace.angularConfig.isIvy() && this.hasOption('entryComponent');
 
         /* `type` CLI option is new in Angular >= 9 */
-        const hasPageSuffix = this.hasOption('type') && this.tslintConfig.hasSuffix('Page');
+        const hasPageSuffix = this.hasOption('type') && this.workspace.tslintConfig.hasSuffix('Page');
 
         const COMPONENT_TYPE_DEFAULT  = `Default component`;
         /* If `entryComponent` is not required, dialogs / modals are generated as pages,
@@ -412,7 +409,7 @@ export class Schema {
             }
 
             /* Automatically add `type` option and info if the suffix exists in `tslint.json` */
-            if (customType.suffix && this.tslintConfig.hasSuffix(customType.suffix)) {
+            if (customType.suffix && this.workspace.tslintConfig.hasSuffix(customType.suffix)) {
                 customType.description = `${customType.description ?? ''} --type ${customType.suffix}`;
                 customType.options = customType.options ?? [];
                 customType.options.push(['type', customType.suffix]);

@@ -1,10 +1,8 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem, Watchers } from '../utils';
 
-import { PackageJsonConfig } from './package-json';
-import { TypescriptConfig } from './typescript';
+import { WorkspaceExtended } from './workspace-extended';
 
 export type AngularProjectType = 'application' | 'library';
 
@@ -65,11 +63,7 @@ export class AngularConfig {
     /** Tells if Angular is in Ivy mode */
     private ivy = false;
     
-    constructor(
-        private workspace: vscode.WorkspaceFolder,
-        private packageJsonConfig: PackageJsonConfig,
-        private typescriptConfig: TypescriptConfig,
-    ) {}
+    constructor(private workspace: Omit<WorkspaceExtended, 'angularConfig' | 'schematics'>) {}
 
     /**
      * Initializes `angular.json` configuration.
@@ -210,10 +204,10 @@ export class AngularConfig {
         let ivy = false;
 
         /* Get major version of `@angular/core` package */
-        const angularMajorVersion = this.packageJsonConfig.getAngularMajorVersion() ?? 0;
+        const angularMajorVersion = this.workspace.packageJsonConfig.getAngularMajorVersion() ?? 0;
 
         /* Ivy can be manually enabled/disabled with `enableIvy` in `tsconfig.json` */
-        const enableIvy = this.typescriptConfig.getEnableIvy();
+        const enableIvy = this.workspace.typescriptConfig.getEnableIvy();
         
         /* Ivy exists since Angular 8, but disabled by default */
         if ((angularMajorVersion === 8) && (enableIvy === true)) {
