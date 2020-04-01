@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem } from '../utils';
+import { FileSystem, Watchers } from '../utils';
 import { WorkspaceExtended } from '../config';
 
 import { Schema, SchemaConfig } from './schema';
@@ -37,6 +37,7 @@ export class Collection {
     private schemasConfigs = new Map<string, SchemaConfig>();
     private schemas = new Map<string, Schema | undefined>();
     private schemasChoices: vscode.QuickPickItem[] = [];
+    private watcher: vscode.FileSystemWatcher | undefined;
 
     constructor(
         name: string,
@@ -65,6 +66,15 @@ export class Collection {
 
         await this.setSchemas();
 
+        /* Watcher must be set just once */
+        if (!this.watcher) {
+
+            this.watcher = Watchers.watchFile(this.fsPath, () => {
+                this.init();
+            });
+
+        }
+
     }
 
     // TODO: use only by view, check it's still usefull
@@ -83,7 +93,6 @@ export class Collection {
         return Array.from(this.schemasConfigs.keys()).sort();
     }
 
-    // TODO: watcher on collection
     /**
      * Get a schema from cache, or load it.
      */

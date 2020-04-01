@@ -240,7 +240,6 @@ export class Schema {
 
                         customTypes.set(defaultType.label, defaultType);
 
-                        // TODO: check it only breaks current loop
                         break;
 
                     }

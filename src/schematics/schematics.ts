@@ -23,6 +23,8 @@ export class Schematics {
      */
     async init(): Promise<void> {
 
+        await this.setCollections();
+
         /* Watcher must be set just once */
         if (!this.watcher) {
 
@@ -31,8 +33,6 @@ export class Schematics {
             });
 
         }
-
-        await this.setCollections();
 
     }
 
@@ -43,7 +43,6 @@ export class Schematics {
         return Array.from(this.collections.keys());
     }
 
-    // TODO: watcher on collection
     /**
      * Get collection from cache, or load it. Can throw.
      * @param name 
