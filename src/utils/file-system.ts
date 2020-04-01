@@ -8,7 +8,7 @@ export class FileSystem {
 
     /**
      * Check if a JSON file exists and is readable, and if so, parse it.
-     * Otherwise, display an error message to the user.
+     * Otherwise, log an error message in output channel.
      */
     static async parseJsonFile<T>(fsPath: string, workspace?: vscode.WorkspaceFolder): Promise<T | undefined> {
 
@@ -20,10 +20,18 @@ export class FileSystem {
                 
                 let data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
 
-                // TODO: check if it's still required, and if it's done the best bay
                 /* Angular Material schematics have comments, we remove them as it's not JSON compliant */
                 if (fsPath.includes('@angular/material')) {
+
+                    /* Split the file by line, and if a line is a comment, remove it.
+                     * RegExp explanation:
+                     * - `^`    starts with
+                     * - ` *`   none or multiple spaces
+                     * - `\/\/` start of a comment (//), backslashed as they are special RegExp characters
+                     * - `.*`   any number of any character
+                     */
                     data = data.split('\n').map((line) => line.replace(/^ *\/\/.*/, '')).join('\n');
+
                 }
         
                 json = JSON.parse(data) as T;
@@ -46,6 +54,7 @@ export class FileSystem {
 
     /**
      * Check if a file exists and is readable.
+     * Otherwise, log an error message in output channel if `silent` is not set to `true`.
      */
     static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder, silent = false): Promise<boolean> {
 
@@ -69,6 +78,10 @@ export class FileSystem {
 
     }
 
+    /**
+     * Removes the file name inside a path.
+     * Eg. `/path/to/file.ts` => `/path/to`
+     */
     static removeFilename(partialPath: string): string {
 
         /* Usage of `posix` is important here as we are working with path with Linux separators `/` */

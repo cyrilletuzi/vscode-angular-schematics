@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Collection } from './collection';
-import { CurrentGeneration, GenerationOptions } from './current-generation';
-import { Schematics } from './schematics';
-import { AngularConfig } from './config-angular';
-import { WorkspacesConfig, WorkspaceExtended } from './config-workspaces';
-import { Schema } from './schema';
+import { Collection } from './schematics/collection';
+import { CurrentGeneration, GenerationOptions } from './schematics/current-generation';
+import { Schematics } from './schematics/schematics';
+import { AngularConfig } from './config/angular';
+import { Workspaces, WorkspaceExtended } from './config/workspaces';
+import { Schema } from './schematics/schema';
 
 
-export class Commands {
+export class UserJourney {
 
     private static shortcutSchemas = ['component', 'service', 'module'];
 
@@ -19,15 +19,15 @@ export class Commands {
     collection!: Collection;
     schema!: Schema;
 
-    async generate(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
+    async start(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
 
         /* Resolve the current workspace config */
-        const workspace = await WorkspacesConfig.getCurrentWorkspace(context);
+        const workspace = await Workspaces.getCurrent(context);
         if (!workspace) {
             return;
         }
 
-        const workspaceExtended = WorkspacesConfig.getWorkspaceExtended(workspace);
+        const workspaceExtended = Workspaces.get(workspace);
         if (!workspaceExtended) {
             vscode.window.showErrorMessage(`Cannot find the workspace config of the provided workspace name.`);
             return;
@@ -119,7 +119,7 @@ export class Commands {
         let shortcutConfirm: boolean | undefined = false;
 
         /* Quicker scenario for basic schematics (component, service, module of official schematics) */
-        if (Commands.shortcutSchemas.includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
+        if (UserJourney.shortcutSchemas.includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
 
             let shortcutOptions: GenerationOptions | undefined;
 

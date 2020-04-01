@@ -3,10 +3,10 @@ import * as path from 'path';
 import * as os from 'os';
 import * as childProcess from 'child_process';
 
-import { AngularConfig } from './config-angular';
-import { WorkspaceExtended } from './config-workspaces';
-import { Output } from './output';
-import { FileSystem } from './file-system';
+import { AngularConfig } from '../config/angular';
+import { WorkspaceExtended } from '../config/workspaces';
+import { Output } from '../utils/output';
+import { FileSystem } from '../utils/file-system';
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');

@@ -2,10 +2,10 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Collection } from './collection';
 import { Schematics } from './schematics';
-import { WorkspacesConfig } from './config-workspaces';
-import { AngularConfig } from './config-angular';
-import { TSLintConfig } from './config-tslint';
-import { FileSystem } from './file-system';
+import { Workspaces } from '../config/workspaces';
+import { AngularConfig } from '../config/angular';
+import { TslintConfig } from '../config/tslint';
+import { FileSystem } from '../utils/file-system';
 
 
 export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -40,7 +40,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
     constructor(
         private angularConfig: AngularConfig,
-        private tslintConfig: TSLintConfig,
+        private tslintConfig: TslintConfig,
     ) {
 
         // TODO: schematics could be different in each workspace...
@@ -73,7 +73,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         if (!element) {
 
-            const schematics = new Schematics(WorkspacesConfig.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
+            const schematics = new Schematics(Workspaces.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
 
             await schematics.init();
 
@@ -81,7 +81,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         } else {
 
-            const collection = new Collection(element.label as string, WorkspacesConfig.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
+            const collection = new Collection(element.label as string, Workspaces.getFirstWorkspace(), this.angularConfig, this.tslintConfig);
             const items: vscode.TreeItem[] = [];
 
             try {

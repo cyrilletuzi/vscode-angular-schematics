@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem } from './file-system';
-import { AngularConfig } from './config-angular';
-import { TSLintConfig } from './config-tslint';
+import { FileSystem } from '../utils/file-system';
+import { AngularConfig } from '../config/angular';
+import { TslintConfig } from '../config/tslint';
 import { GenerationOptions } from './current-generation';
 import { ComponentType, defaultComponentTypes } from './defaults';
-import { Watchers } from './watchers';
-import { Output } from './output';
+import { Watchers } from '../utils/watchers';
+import { Output } from '../utils/output';
 
 const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
 const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
@@ -76,7 +76,7 @@ export class Schema {
         config: SchemaConfig,
         private workspace: vscode.WorkspaceFolder,
         private angularConfig: AngularConfig,
-        private tslintConfig: TSLintConfig,
+        private tslintConfig: TslintConfig,
     ) {
 
         this.name = config.name;

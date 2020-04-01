@@ -1,23 +1,26 @@
 import * as vscode from 'vscode';
 
-import { AngularConfig } from './config-angular';
-import { TypescriptConfig } from './config-typescript';
-import { PackageJsonConfig } from './config-package-json';
-import { TSLintConfig } from './config-tslint';
-import { Schematics } from './schematics';
-import { AngularSchematicsProvider } from './view';
+import { PackageJsonConfig } from './package-json';
+import { TypescriptConfig } from './typescript';
+import { AngularConfig } from './angular';
+import { TslintConfig } from './tslint';
+import { Schematics } from '../schematics/schematics';
+import { AngularSchematicsProvider } from '../schematics/view';
 
 export interface WorkspaceExtended extends vscode.WorkspaceFolder {
     angularConfig: AngularConfig;
     typescriptConfig: TypescriptConfig;
     packageJsonConfig: PackageJsonConfig;
-    tsLintConfig: TSLintConfig;
+    tsLintConfig: TslintConfig;
     schematics: Schematics;
 }
 
-export class WorkspacesConfig {
+export class Workspaces {
 
-    /** Map of all the opened workspaces. The map key is the workspace's name. */
+    /**
+     * List of all the opened workspaces.
+     * The map key is the workspace's name.
+     */
     private static workspaces = new Map<string, WorkspaceExtended>();
 
     // TODO: manage async
@@ -47,7 +50,10 @@ export class WorkspacesConfig {
 
     }
 
-    static getWorkspaceExtended(workspace: vscode.WorkspaceFolder): WorkspaceExtended | undefined {
+    /**
+     * Get a workspace configuration, or `undefined`.
+     */
+    static get(workspace: vscode.WorkspaceFolder): WorkspaceExtended | undefined {
 
         return this.workspaces.get(workspace.name);
 
@@ -57,7 +63,7 @@ export class WorkspacesConfig {
      * Try to resolve the current workspace directory, or ask the user for it.
      * @param contextPath Uri of any file in the current workspace
      */
-    static async getCurrentWorkspace(contextPath?: vscode.Uri): Promise<vscode.WorkspaceFolder | undefined> {
+    static async getCurrent(contextPath?: vscode.Uri): Promise<vscode.WorkspaceFolder | undefined> {
 
         let workspace: vscode.WorkspaceFolder | undefined;
 
@@ -101,10 +107,10 @@ export class WorkspacesConfig {
         const typescriptConfig = new TypescriptConfig(workspace);
         await typescriptConfig.init();
 
-        const angularConfig = new AngularConfig(workspace, typescriptConfig, packageJsonConfig);
+        const angularConfig = new AngularConfig(workspace, packageJsonConfig, typescriptConfig);
         await angularConfig.init();
 
-        const tsLintConfig = new TSLintConfig(workspace);
+        const tsLintConfig = new TslintConfig(workspace);
         await tsLintConfig.init();
 
         const schematics = new Schematics(workspace, angularConfig, tsLintConfig);

@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Schema, SchemaConfig } from './schema';
-import { FileSystem } from './file-system';
-import { AngularConfig } from './config-angular';
-import { TSLintConfig } from './config-tslint';
+import { FileSystem } from '../utils/file-system';
+import { AngularConfig } from '../config/angular';
+import { TslintConfig } from '../config/tslint';
 
 interface PackageJsonSchema {
     schematics?: string;
@@ -36,7 +36,7 @@ export class Collection {
         private name: string,
         private workspace: vscode.WorkspaceFolder,
         private angularConfig: AngularConfig,
-        private tslintConfig: TSLintConfig,
+        private tslintConfig: TslintConfig,
     ) {
 
     }

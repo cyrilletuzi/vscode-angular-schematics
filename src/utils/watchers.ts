@@ -30,11 +30,11 @@ export class Watchers {
     }
 
     /**
-     * Stop all existing watchers
+     * Stop all existing watchers.
      */
     static disposeAll(): void {
 
-        for (const watcher of this.activeWatchers.values()) {
+        for (const watcher of this.activeWatchers) {
             watcher.dispose();
         }
 

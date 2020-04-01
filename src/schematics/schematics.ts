@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
-import { AngularConfig } from './config-angular';
-import { Watchers } from './watchers';
+import { AngularConfig } from '../config/angular';
+import { Watchers } from '../utils/watchers';
 import { defaultSchematicsNames } from './defaults';
 import { Collection } from './collection';
-import { TSLintConfig } from './config-tslint';
+import { TslintConfig } from '../config/tslint';
 
 export class Schematics {
 
@@ -13,7 +13,7 @@ export class Schematics {
     constructor(
         private workspace: vscode.WorkspaceFolder,
         private angularConfig: AngularConfig,
-        private tslintConfig: TSLintConfig,
+        private tslintConfig: TslintConfig,
     ) {}
 
     async init(): Promise<void> {
