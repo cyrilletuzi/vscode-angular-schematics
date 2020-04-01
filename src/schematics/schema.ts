@@ -65,7 +65,8 @@ export class Schema {
     private config!: SchemaData;
     private options = new Map<string, SchemaDataOptions>();
     private requiredOptions: string[] = [];
-    private shortcutTypes: ShortcutTypes = new Map();
+    private shortcutTypesChoices: ShortcutTypes = new Map();
+    private optionsChoices: vscode.QuickPickItem[] = [];
     
     get optionsNames(): string[] {
         return Array.from(this.options.keys()).sort();
@@ -91,7 +92,7 @@ export class Schema {
         /* Component types can have custom types from user configuration */
         if ((this.collectionName === AngularConfig.defaultAngularCollection) && (this.name === 'component')) {
             Watchers.watchCodePreferences(() => {
-                this.setComponentTypes();
+                this.setComponentTypesChoices();
             });
         }
 
@@ -120,15 +121,15 @@ export class Schema {
         return this.name;
     }
 
-    getComponentTypes(): ShortcutTypes {
+    getComponentTypesChoices(): ShortcutTypes {
 
-        return this.shortcutTypes;
+        return this.shortcutTypesChoices;
         
     }
 
     getModuleTypes(routeName: string): ShortcutTypes {
 
-        const lazyModule = this.shortcutTypes.get(MODULE_TYPE_LAZY)!;
+        const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY)!;
 
         /* Add `route` option */
         lazyModule.options.set('route', routeName);
@@ -136,10 +137,14 @@ export class Schema {
         /* Replace placeholder for `route` option in choice description */
         lazyModule.choice.description = lazyModule.choice.description!.replace(MODULE_ROUTE_NAME_PLACEHOLDER, routeName);
 
-        this.shortcutTypes.set(MODULE_TYPE_LAZY, lazyModule)!;
+        this.shortcutTypesChoices.set(MODULE_TYPE_LAZY, lazyModule)!;
 
-        return this.shortcutTypes;
+        return this.shortcutTypesChoices;
         
+    }
+
+    getOptionsChoices(): vscode.QuickPickItem[] {
+        return this.optionsChoices;
     }
 
     hasOption(name: string): boolean {
@@ -168,63 +173,6 @@ export class Schema {
 
         return this.options.has('path');
     
-    }
-
-    async askOptions(): Promise<string[]> {
-
-        const choices: vscode.QuickPickItem[] = [];
-
-        this.options.forEach((option, optionName) => {
-
-            /* Do not keep:
-             * - options marked as not visible (internal options for the CLI)
-             * - deprecated options
-             * - option already managed by command line args (like name)
-             */
-            if (option.visible !== false && !('x-deprecated' in option) &&
-                !(option.$default && option.$default.$source === 'argv')) {
-
-                const picked = !!
-                /* Do not pre-select options with defaults values, as the CLI will take care of them */
-                (!('$default' in option) && (
-                    /* Pre-select required and suggested (x-prompt) properties */
-                    (this.requiredOptions.includes(optionName)) || ('x-prompt' in option)
-                ));
-
-                /* UX: inform the user why some options are pre-select */
-                const requiredTip = (!('$default' in option) && (this.requiredOptions.includes(optionName))) ? '(required) ' : '';
-                const suggestedTip = (!('$default' in option) && !requiredTip && ('x-prompt' in option)) ? '(suggested) ' : '';
-
-                choices.push({
-                    label: optionName,
-                    description: `${requiredTip}${suggestedTip}${option.description}`,
-                    picked
-                });
-
-            }
-
-        });
-
-        /* Sort in alphabetical order */
-        const sortedPickedChoices = choices
-        .filter((choice) => choice.picked)
-        .sort((a, b) => a.label.localeCompare(b.label));
-
-        const sortedOptionalChoices = choices
-        .filter((choice) => !choice.picked)
-        .sort((a, b) => a.label.localeCompare(b.label));
-
-        /* Required and suggested options first */
-        const sortedChoices = [...sortedPickedChoices, ...sortedOptionalChoices];
-
-        const selectedOptions = await vscode.window.showQuickPick(sortedChoices, {
-            canPickMany: true,
-            placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
-            ignoreFocusOut: true,
-        }) || [];
-
-        return selectedOptions.map((selectedOption) => selectedOption.label);
-
     }
 
     async askOptionsValues(optionsNames: string[]): Promise<Map<string, string | string[]>> {
@@ -317,18 +265,20 @@ export class Schema {
         }
 
         this.requiredOptions = this.config.required ?? [];
-
+        
         if (this.collectionName === AngularConfig.defaultAngularCollection) {
             if (this.name === 'module') {
-                this.setModuleTypes();
+                this.setModuleTypesChoices();
             } else if (this.name === 'component') {
-                await this.setComponentTypes();
+                await this.setComponentTypesChoices();
             }
         }
+        
+        this.setOptionsChoices();
 
     }
 
-    private async setComponentTypes(): Promise<void> {
+    private async setComponentTypesChoices(): Promise<void> {
 
         /* Prior to new Ivy engine, components instanciated at runtime (modals, dialogs...)
          * must be declared in the `NgModule` `entryComponents` (in addition to `declarations`) */
@@ -440,7 +390,7 @@ export class Schema {
 
         }
         
-        this.shortcutTypes = shortcutTypes;
+        this.shortcutTypesChoices = shortcutTypes;
 
     }
 
@@ -531,7 +481,7 @@ export class Schema {
 
     }
 
-    private setModuleTypes(): void {
+    private setModuleTypesChoices(): void {
 
         /* `MODULE_TYPE_LAZY` is defined globally as we need it in another method */
         const MODULE_TYPE_CLASSIC = `Module of components`;
@@ -576,9 +526,65 @@ export class Schema {
             ]),
         });
 
-        this.shortcutTypes = shortcutTypes;
-
+        this.shortcutTypesChoices = shortcutTypes;
 
     }
+
+    private setOptionsChoices(): void {
+
+        const choices: vscode.QuickPickItem[] = [];
+
+        const filteredOptionsNames = Array.from(this.options.entries())
+            /* Do not keep options marked as not visible (internal options for the CLI) */
+            .filter(([_, option]) => (option.visible !== false))
+            /* Do not keep deprecated options */
+            .filter(([_, option]) => !('x-deprecated' in option))
+            /* Do not keep option already managed by first command line arg (name) */
+            .filter(([_, option]) => !(option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)));
+
+        for (const [label, option] of filteredOptionsNames) {
+
+            let picked = false;
+
+            /* UX: inform the user why some options are pre-select */
+            let requiredOrSuggestedInfo = '';
+
+            /* Do not pre-select options with defaults values, as the CLI will take care of them */
+            if (!('$default' in option)) {
+
+                /* Required options */
+                if (this.requiredOptions.includes(label)) {
+                    picked = true;
+                    requiredOrSuggestedInfo = `(required) `;
+                }
+                /* Suggested options (because they have a prompt) */
+                else if ('x-prompt' in option) {
+                    picked = true;
+                    requiredOrSuggestedInfo = `(suggested) `;
+                }
+
+            }
+
+            choices.push({
+                label,
+                description: `${requiredOrSuggestedInfo}${option.description}`,
+                picked
+            });
+
+        }
+
+        /* Sort required first, then in alphabetical order */
+        const sortedPickedChoices = choices
+            .filter((choice) => choice.picked)
+            .sort((a, b) => a.label.localeCompare(b.label));
+
+        const sortedOptionalChoices = choices
+            .filter((choice) => !choice.picked)
+            .sort((a, b) => a.label.localeCompare(b.label));
+
+        /* Required and suggested options first */
+        this.optionsChoices = [...sortedPickedChoices, ...sortedOptionalChoices];
+
+    } 
 
 }

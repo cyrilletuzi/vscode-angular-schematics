@@ -146,7 +146,7 @@ export class Commands {
             }
 
             /* Ask direct confirmation or adding more options or cancel */
-            shortcutConfirm = await this.generation.askShortcutConfirmation(this.generation);
+            shortcutConfirm = await this.askShortcutConfirmation();
 
             /* "Cancel" choice */
             if (shortcutConfirm === undefined) {
@@ -158,9 +158,7 @@ export class Commands {
         /* Ask for advanced options if user didn't choose a direct confirmation */
         if (!shortcutConfirm) {
 
-            let filledOptions: Map<string, string | string[]> | undefined;
-
-            filledOptions = await this.generation.askOptions(schema);
+            const filledOptions = await this.askOptions();
 
             if (!filledOptions) {
                 return;
@@ -263,7 +261,7 @@ export class Commands {
 
     async askComponentOptions(): Promise<GenerationOptions | undefined> {
 
-        const types = this.schema.getComponentTypes();
+        const types = this.schema.getComponentTypesChoices();
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         if (typesChoices.length === 0) {
@@ -276,6 +274,65 @@ export class Commands {
         });
 
         return typeChoice ? types.get(typeChoice.label)!.options : undefined;
+
+    }
+
+    async askShortcutConfirmation(): Promise<boolean | undefined> {
+
+        const CONFIRM: vscode.QuickPickItem = {
+            label: `Confirm`,
+            description: `Pro-tip: take a minute to check the command above is really what you want`,
+        };
+        const MORE_OPTIONS: vscode.QuickPickItem = {
+            label: `Add more options`,
+            description: `Pro-tip: you can set default values to schematics options in angular.json`,
+        };
+        const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
+
+        const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
+            placeHolder: this.generation.command,
+            ignoreFocusOut: true,
+        });
+
+        if (choice?.label === CONFIRM.label) {
+            return true;
+        } else if (choice?.label === MORE_OPTIONS.label) {
+            return false;
+        }
+        return undefined;
+
+    }
+
+    async askOptions(): Promise<GenerationOptions> {
+
+        const selectedOptionsNames = await this.askOptionsNames();
+
+        if (selectedOptionsNames) {
+
+            return await this.schema.askOptionsValues(selectedOptionsNames);
+
+        }
+
+        return new Map();
+
+
+    }
+
+    async askOptionsNames(): Promise<string[]> {
+
+        const optionsChoices = this.schema.getOptionsChoices();
+
+        if (optionsChoices.length === 0) {
+            return [];
+        }
+        
+        const selectedOptions = await vscode.window.showQuickPick(this.schema.getOptionsChoices(), {
+            canPickMany: true,
+            placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
+            ignoreFocusOut: true,
+        }) || [];
+
+        return selectedOptions.map((selectedOption) => selectedOption.label);
 
     }
 

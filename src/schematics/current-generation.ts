@@ -5,7 +5,6 @@ import { Utils } from './utils';
 import { AngularConfig } from './config-angular';
 import { WorkspaceExtended } from './config-workspaces';
 import { Output } from './output';
-import { Schema } from './schema';
 import { FileSystem } from './file-system';
 
 interface ContextPath {
@@ -295,47 +294,6 @@ export class CurrentGeneration {
             await vscode.window.showTextDocument(document);
 
         }
-
-    }
-
-    async askShortcutConfirmation(generate: CurrentGeneration): Promise<boolean | undefined> {
-
-        const CONFIRM: vscode.QuickPickItem = {
-            label: `Confirm`,
-            description: `Pro-tip: take a minute to check the command above is really what you want`,
-        };
-        const MORE_OPTIONS: vscode.QuickPickItem = {
-            label: `Add more options`,
-            description: `Pro-tip: you can set default values to schematics options in angular.json`,
-        };
-        const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
-
-        const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
-            placeHolder: generate.command,
-            ignoreFocusOut: true,
-        });
-
-        if (choice?.label === CONFIRM.label) {
-            return true;
-        } else if (choice?.label === MORE_OPTIONS.label) {
-            return false;
-        }
-        return undefined;
-
-    }
-
-    async askOptions(schema: Schema): Promise<Map<string, string | string[]>> {
-
-        const selectedOptionsNames = await schema.askOptions();
-
-        if (selectedOptionsNames) {
-
-            return await schema.askOptionsValues(selectedOptionsNames);
-
-        }
-
-        return new Map();
-
 
     }
 
