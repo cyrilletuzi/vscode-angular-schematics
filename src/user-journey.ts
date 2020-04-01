@@ -73,7 +73,7 @@ export class UserJourney {
         const collection = await this.schematics.getCollection(collectionName);
 
         if (!collection) {
-            vscode.window.showErrorMessage(`Cannot load "${collectionName}" schematics collection.`);
+            vscode.window.showErrorMessage(`Cannot load "${collectionName}" collection.`);
             return;
         }
 

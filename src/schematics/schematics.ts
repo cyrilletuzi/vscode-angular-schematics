@@ -47,7 +47,7 @@ export class Schematics {
 
     // TODO: watcher on collection
     /**
-     * Get collection from cache, or load it.
+     * Get collection from cache, or load it. Can throw.
      * @param name 
      */
     async getCollection(name: string): Promise<Collection | undefined> {
@@ -55,12 +55,9 @@ export class Schematics {
         /* Not all collections are preloaded */
         if (!this.collections.get(name)) {
 
-            const collectionInstance = new Collection(name, this.workspace);
-        
-            try {
-                await collectionInstance.init();
-                this.collections.set(name, collectionInstance);
-            } catch {}
+            const collection = await this.loadCollection(name);
+
+            this.collections.set(name, collection);
             
         }
         
@@ -89,18 +86,30 @@ export class Schematics {
             /* Preload only defaut schematics for performance */
             if (this.workspace.angularConfig.getDefaultCollections().includes(name)) {
 
-                const collectionInstance = new Collection(name, this.workspace);
-                
-                try {
-                    await collectionInstance.init();
-                    collection = collectionInstance;
-                } catch {}
+                collection = await this.loadCollection(name);
 
             }
 
             this.collections.set(name, collection);
 
         }
+
+    }
+
+    /**
+     * Load a collection
+     */
+    private async loadCollection(name: string): Promise<Collection | undefined> {
+
+        const collectionInstance = new Collection(name, this.workspace);
+                
+        try {
+            await collectionInstance.init();
+        } catch {
+            return undefined;
+        }
+
+        return collectionInstance;
 
     }
 
