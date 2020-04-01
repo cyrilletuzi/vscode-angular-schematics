@@ -98,45 +98,44 @@
                         "default": [],
                         "description": "Add other schematics (for example: \"@angular/material\")"
                     },
-                    "ngschematics.componentTypes.exported": {
+                    "ngschematics.componentTypes": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "label": {
+                                    "type": "string",
+                                    "description": "Required component type's name, must be unique"
+                                },
+                                "options": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "minItems": 2,
+                                        "maxItems": 2
+                                    },
+                                    "description": "Required list of custom options for this component type, eg. \"[[\"changeDetection\", \"OnPush\"], [\"export\", \"true\"]]\""
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "description": "Required description of this component type's options, eg. \"--change-detection OnPush --export\""
+                                },
+                                "detail": {
+                                    "type": "string",
+                                    "description": "Optional human description of this component type"
+                                },
+                                "suffix": {
+                                    "type": "string",
+                                    "description": "Optional corresponding suffix in tslint.json which, if existing, will be automatically added as `--type <suffix>`"
+                                }
+                            },
+                            "required": ["label", "options", "description"]
                         },
                         "default": [],
-                        "description": "Add custom exported component suffixes (for example: \"UI\")"
-                    },
-                    "ngschematics.componentTypes.pure": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "default": [],
-                        "description": "Add custom pure component suffixes (for example: \"Presentation\")"
-                    },
-                    "ngschematics.componentTypes.page": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "default": [],
-                        "description": "Add custom page component suffixes (for example: \"Page\")"
-                    },
-                    "ngschematics.componentTypes.runtime": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "default": [],
-                        "description": "Add custom runtime component suffixes (for example: \"Modal\")"
-                    },
-                    "ngschematics.componentTypes.element": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "default": [],
-                        "description": "Add custom Angular Element suffixes (for example: \"Native\")"
+                        "description": "Add custom component types"
                     }
                 }
             }

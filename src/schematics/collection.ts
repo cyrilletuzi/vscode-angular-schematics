@@ -3,7 +3,8 @@ import * as path from 'path';
 
 import { Schema, SchemaConfig } from './schema';
 import { FileSystem } from './file-system';
-import { basename } from 'path';
+import { AngularConfig } from './config-angular';
+import { TSLintConfig } from './config-tslint';
 
 interface PackageJsonSchema {
     schematics?: string;
@@ -34,6 +35,8 @@ export class Collection {
     constructor(
         private name: string,
         private workspace: vscode.WorkspaceFolder,
+        private angularConfig: AngularConfig,
+        private tslintConfig: TSLintConfig,
     ) {
 
     }
@@ -80,7 +83,8 @@ export class Collection {
         /* Schemas are not preloaded */
         if (!this.schemas.has(fullName)) {
 
-            const schemaInstance = new Schema(schemaConfig, this.workspace);
+            const schemaInstance = new Schema(schemaConfig, this.workspace, this.angularConfig, this.tslintConfig);
+
             try {
                 await schemaInstance.init();
                 this.schemas.set(fullName, schemaInstance);
@@ -125,7 +129,7 @@ export class Collection {
 
         for (const [schemaName, schemaConfig] of schemas) {
 
-            const schemaFsPath = path.join(basename(this.fsPath), schemaConfig.schema);
+            const schemaFsPath = path.join(path.basename(this.fsPath), schemaConfig.schema);
 
             if (await FileSystem.isReadable(schemaFsPath)) {
 

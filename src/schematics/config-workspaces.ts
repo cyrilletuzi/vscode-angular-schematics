@@ -104,10 +104,10 @@ export class WorkspacesConfig {
         const angularConfig = new AngularConfig(workspace, typescriptConfig, packageJsonConfig);
         await angularConfig.init();
 
-        const tsLintConfig = new TSLintConfig(workspace, angularConfig);
+        const tsLintConfig = new TSLintConfig(workspace);
         await tsLintConfig.init();
 
-        const schematics = new Schematics(workspace, angularConfig);
+        const schematics = new Schematics(workspace, angularConfig, tsLintConfig);
         await schematics.init();
 
         this.workspaces.set(workspace.name, {
@@ -120,7 +120,7 @@ export class WorkspacesConfig {
         });
 
         // TODO: do a class to init, and check if it should be removed on deactivate
-        vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider(angularConfig));
+        vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider(angularConfig, tsLintConfig));
 
     }
 

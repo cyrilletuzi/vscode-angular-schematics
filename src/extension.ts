@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import { Commands } from './schematics/commands';
 import { Output } from './schematics/output';
-import { Preferences } from './schematics/preferences';
 import { WorkspacesConfig } from './schematics/config-workspaces';
 import { Watchers } from './schematics/watchers';
 
@@ -17,9 +16,6 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
     WorkspacesConfig.init();
-
-    // TODO: refactor
-    Preferences.init();
 
     /* 
      * Register new commands. Important things:

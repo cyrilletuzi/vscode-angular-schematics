@@ -1,5 +1,4 @@
-import { ComponentTypes } from './preferences';
-
+// TODO: add more defaults
 
 /**
  * Default third-party schematics.
@@ -19,18 +18,91 @@ export const defaultSchematicsNames: string[] = [
     './schematics/collection.json'
 ];
 
-/**
- * Default component types.
- */
-export const defaultComponentTypes: ComponentTypes = {
-    /* Options: `--change-detection OnPush` */
-    pure: ['pure', 'ui', 'presentation', 'presentational', 'dumb'],
-    /* Options: `--skip-selector` */
-    page: ['page', 'container', 'smart', 'routed', 'route'],
-    /* Options: `--entry --skip-selector` */
-    runtime: ['dialog', 'snackbar', 'bottomsheet', 'modal', 'popover', 'entry'],
-    /* Options: `--export --change-detection OnPush` */
-    exported: ['exported', 'lib'],
-    /* Options: `--entry --view-encapsulation ShadowDom` */
-    element: ['element'],
-};
+export interface ComponentType {
+    /** Required component type's name, must be unique */
+    label: string;
+    /** Required list of custom options for this component type, eg. `[['changeDetection', 'OnPush'], ['export', 'true']]` */
+    options: [string, string][];
+    /** Required description of this component type's options, eg. `--change-detection OnPush --export` */
+    description: string;
+    /** Optional human description of this component type */
+    detail?: string;
+    /** Optional corresponding suffix in tslint.json which, if existing, will be automatically added as `--type <suffix>` */
+    suffix?: string;
+    /** Optional list of package name of libraries which used this component type */
+    packages?: string[];
+}
+
+export const defaultComponentTypes: ComponentType[] = [
+    {
+        label: `Dialog`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `Dialog`,
+        packages: ['@angular/material'],
+    },
+    {
+        label: `Snackbar`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `Snackbar`,
+        packages: ['@angular/material'],
+    },
+    {
+        label: `Bottomsheet`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `Bottomsheet`,
+        packages: ['@angular/material'],
+    },
+    {
+        label: `Modal`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `Modal`,
+        packages: ['@ionic/angular'],
+    },
+    {
+        label: `Popover`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `Popover`,
+        packages: ['@ionic/angular'],
+    },
+    {
+        label: `Dynamic Dialog`,
+        options: [
+            ['entryComponent', 'true'],
+            ['skipSelector', 'true'],
+        ],
+        description: `--entry-component --skip-selector`,
+        suffix: `DynamicDialog`,
+        packages: ['primeng'],
+    },
+    {
+        label: `Angular Element`,
+        options: [
+            ['entryComponent', 'true'],
+            ['viewEncapsulation', 'ShadowDom'],
+        ],
+        description: `--entry-component --view-encapsulation ShadowDom`,
+        suffix: `Element`,
+        detail: 'Interoperable native Web component (does not work in Internet Explorer)',
+    },
+];
+

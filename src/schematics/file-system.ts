@@ -71,11 +71,13 @@ export class FileSystem {
 
     static removeFilename(partialPath: string): string {
 
+        /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
+
         /* Basename, ie. last directory if a directory, or `file.extension` if a file */
-        const basename = path.basename(partialPath);
+        const basename = path.posix.basename(partialPath);
 
         /* If a file: remove the file name, otherwise it is a directory so keep it */
-        return basename.includes('.') ? path.dirname(partialPath) : partialPath;
+        return basename.includes('.') ? path.posix.dirname(partialPath) : partialPath;
 
     }
 

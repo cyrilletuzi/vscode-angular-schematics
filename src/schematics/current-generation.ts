@@ -6,7 +6,6 @@ import { AngularConfig } from './config-angular';
 import { WorkspaceExtended } from './config-workspaces';
 import { Output } from './output';
 import { Schema } from './schema';
-import { Preferences } from './preferences';
 import { FileSystem } from './file-system';
 
 interface ContextPath {
@@ -18,6 +17,8 @@ interface ContextPath {
     relativeToSource: string;
 }
 
+export type GenerationOptions = Map<string, string | string[]>;
+
 export class CurrentGeneration {
 
     static readonly sourceFolders: string[] = ['app', 'lib'];
@@ -27,11 +28,12 @@ export class CurrentGeneration {
         relativeToWorkspace: '',
         relativeToSource: '',
     };
-    path = '';
     private collectionName = AngularConfig.defaultAngularCollection;
     private schemaName = '';
     private project = '';
     private nameAsFirstArg = '';
+    private options: GenerationOptions = new Map();
+
     get command(): string {
 
         return [
@@ -43,7 +45,6 @@ export class CurrentGeneration {
 
     }
     protected base = 'ng g';
-    protected options = new Map<string, string | string[]>();
     protected cliLocal: boolean | null = null;
 
     constructor(
@@ -124,9 +125,15 @@ export class CurrentGeneration {
 
     }
 
-    addOption(optionName: string, optionValue: string | string[]): void {
+    /**
+     * Add options
+     */
+    addOptions(options: GenerationOptions): void {
 
-        this.options.set(optionName, optionValue);
+        for (const [name, option] of options) {
+            // TODO: check if option exists in schema
+            this.options.set(name, option);
+        }
 
     }
 
@@ -329,199 +336,6 @@ export class CurrentGeneration {
 
         return new Map();
 
-
-    }
-
-    async askComponentOptions(): Promise<Map<string, string | string[]> | undefined> {
-
-        const componentOptions = new Map<string, string | string[]>();
-
-        const entryRequired = !this.workspaceExtended.angularConfig.isIvy() && this.options.get('entryComponent');
-        const hasPageSuffix = this.options.get('type') && (this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('Page') || this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes('page'));
-
-        const TYPE_BASIC = `Basic component`;
-        const TYPE_PAGE = `Page${(!entryRequired && !hasPageSuffix) ? ` (or dialog / modal)` : ''}`;
-        const TYPE_PURE = `Pure component`;
-        const TYPE_EXPORTED = `Exported component`;
-        const TYPE_ENTRY = `Entry component`;
-
-        const componentTypes: vscode.QuickPickItem[] = [];
-
-        componentTypes.push({
-            label: TYPE_BASIC,
-            description: `No pre-filled option`,
-            detail: `Component with no special behavior (pro-tip: learn about component types in our documentation)`,
-        });
-
-        componentTypes.push({
-            label: TYPE_PAGE,
-            description: `--skip-selector${hasPageSuffix ? ` --type page` : ''}`,
-            detail: `Component associated to a route${(!entryRequired && !hasPageSuffix) ? ` or a dialog / modal` : ''}`,
-        });
-
-        componentTypes.push({
-            label: TYPE_PURE,
-            description: `--change-detection OnPush`,
-            detail: `UI / presentation component, used only in its own feature module`,
-        });
-
-        componentTypes.push({
-            label: TYPE_EXPORTED,
-            description: `--export --change-detection OnPush`,
-            detail: `UI / presentation component, declared in a shared UI module and used in multiple feature modules`,
-        });
-
-        if (entryRequired) {
-            componentTypes.push({
-                label: TYPE_ENTRY,
-                description: `--entry-component --skip-selector`,
-                detail: `Component instanciated at runtime, like a dialog or modal`,
-            });
-        }
-
-        const userComponentTypes = this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().filter((type) => !['Component', 'Page'].includes(type));
-        const pageComponentTypes: string[] = Preferences.getComponentTypes('page');
-        const pureComponentTypes: string[] = Preferences.getComponentTypes('pure');
-        const exportedComponentTypes: string[] = Preferences.getComponentTypes('exported');
-        const runtimeComponentTypes: string[] = Preferences.getComponentTypes('runtime');
-
-        if (userComponentTypes.length > 0) {
-
-            for (const userComponentType of userComponentTypes) {
-
-                const userComponentTypeLowerCased = userComponentType.toLocaleLowerCase();
-                let description = '';
-
-                if ([...pageComponentTypes, ...runtimeComponentTypes].includes(userComponentTypeLowerCased)) {
-                    description = `--skip-selector`;
-                } else if ([...pureComponentTypes, ...exportedComponentTypes].includes(userComponentTypeLowerCased)) {
-                    description = `--change-detection OnPush`;
-                } else if (exportedComponentTypes.includes(userComponentTypeLowerCased)) {
-                    description = `--export --change-detection OnPush`;
-                } else if (entryRequired && runtimeComponentTypes.includes(userComponentTypeLowerCased)) {
-                    description = `--entry-component --skip-selector`;
-                }
-                if (this.options.get('type')) {
-                    description += ` --type ${userComponentTypeLowerCased}`;
-                }
-
-                componentTypes.push({
-                    label: userComponentType,
-                    description,
-                    detail: `Custom component type`,
-                });
-
-            }
-
-        }
-
-        const componentTypeChoice = await vscode.window.showQuickPick(componentTypes, {
-            placeHolder: `What type of component do you want?`,
-            ignoreFocusOut: true,
-        });
-
-        if (componentTypeChoice) {
-
-            const componentType = componentTypeChoice.label;
-            const componentTypeLowerCased = componentType.toLowerCase();
-
-            /* Not required anymore in Ivy */
-            if (entryRequired
-            && ((componentType === TYPE_ENTRY) || runtimeComponentTypes.includes(componentTypeLowerCased))) {
-                componentOptions.set('entryComponent', 'true');
-            }
-            /* --skip-selector was added in Angular CLI 8.1 */
-            if (this.options.get('skipSelector') &&
-            ([TYPE_PAGE, TYPE_ENTRY].includes(componentType) || [...pageComponentTypes, ...runtimeComponentTypes].includes(componentTypeLowerCased))) {
-                componentOptions.set('skipSelector', 'true');
-            }
-            if (this.options.get('export') &&
-            ((componentType === TYPE_EXPORTED) || exportedComponentTypes.includes(componentTypeLowerCased))) {
-                componentOptions.set('export', 'true');
-            }
-            if (this.options.get('changeDetection') &&
-            ([TYPE_PURE, TYPE_EXPORTED].includes(componentType)
-            || [...pureComponentTypes, ...exportedComponentTypes].includes(componentTypeLowerCased))) {
-                componentOptions.set('changeDetection', 'OnPush');
-            }
-            /* --type was added in Angular CLI 9.0 */
-            if (this.options.get('type')) {
-                if (hasPageSuffix && (componentType === TYPE_PAGE)) {
-                    componentOptions.set('type', 'page');
-                } else if (this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes(componentType)
-                || this.workspaceExtended.tsLintConfig.getUserComponentSuffixes().includes(componentTypeLowerCased)) {
-                    componentOptions.set('type', componentTypeLowerCased);
-                } 
-             }
-
-        }
-
-        return componentOptions;
-
-    }
-    
-    async askModuleOptions(_: Schema, moduleName?: string): Promise<Map<string, string> | undefined> {
-
-        const TYPE_CLASSIC = `Module of components`;
-        const TYPE_LAZY = `Lazy-loaded module of pages`;
-        const TYPE_ROUTING = `Classic module of pages`;
-
-        const moduleTypes: vscode.QuickPickItem[] = [
-            {
-                label: TYPE_CLASSIC,
-                description: `No pre-filled option`,
-                detail: `Module of UI / presentation components, don't forget to import it somewhere`,
-            },
-        ];
-
-        let routeName = '';
-        if (moduleName && this.options.get('route')) {
-            routeName = moduleName.split('/').pop() || moduleName;
-            moduleTypes.push({
-                label: TYPE_LAZY,
-                description: `--route ${routeName} --module app`,
-                detail: `Module with routing, lazy-loaded`,
-            });
-        }
-
-        moduleTypes.push({
-            label: TYPE_ROUTING,
-            description: `--routing --module app`,
-            detail: `Module with routing${this.options.get('route') ? `, immediately loaded` : ''}`,
-        },);
-
-        const moduleType = await vscode.window.showQuickPick(moduleTypes, {
-            placeHolder: `What type of module do you want?`,
-            ignoreFocusOut: true,
-        });
-
-        if (!moduleType) {
-            return undefined;
-        }
-
-        let moduleOptions = new Map();
-
-        if (moduleType.label === TYPE_ROUTING) {
-
-            if (this.options.get('routing')) {
-                moduleOptions.set('routing', 'true');
-            }
-            if (this.options.get('module')) {
-                moduleOptions.set('module', 'app');
-            }
-
-        } else if (moduleType.label === TYPE_LAZY) {
-
-            if (this.options.get('route')) {
-                moduleOptions.set('route', routeName);
-            }
-            if (this.options.get('module')) {
-                moduleOptions.set('module', 'app');
-            }
-
-        }
-
-        return moduleOptions;
 
     }
 

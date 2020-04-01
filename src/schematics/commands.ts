@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { Collection } from './collection';
-import { CurrentGeneration } from './current-generation';
+import { CurrentGeneration, GenerationOptions } from './current-generation';
 import { Schematics } from './schematics';
 import { AngularConfig } from './config-angular';
 import { WorkspacesConfig, WorkspaceExtended } from './config-workspaces';
@@ -9,6 +10,8 @@ import { Schema } from './schema';
 
 
 export class Commands {
+
+    private static shortcutSchemas = ['component', 'service', 'module'];
 
     workspace!: WorkspaceExtended;
     generation!: CurrentGeneration;
@@ -99,54 +102,47 @@ export class Commands {
 
         this.schema = schema;
 
-        let defaultOption: string | undefined;
+        let nameAsFirstArg: string | undefined;
 
         if (this.schema.hasNameAsFirstArg()) {
 
-            defaultOption = await this.askNameAsFirstArg();
+            nameAsFirstArg = await this.askNameAsFirstArg();
 
-            if (!defaultOption) {
+            if (!nameAsFirstArg) {
                 return;
             }
 
-            this.generation.setNameAsFirstArg(defaultOption);
+            this.generation.setNameAsFirstArg(nameAsFirstArg);
 
         }
 
         let shortcutConfirm: boolean | undefined = false;
 
-        /* Quicker scenario for basic schematics (component, service, module) */
-        if (['component', 'service', 'module'].includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
+        /* Quicker scenario for basic schematics (component, service, module of official schematics) */
+        if (Commands.shortcutSchemas.includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
 
-            let shortcutOptions: Map<string, string | string[]> | undefined;
+            let shortcutOptions: GenerationOptions | undefined;
 
-            // TODO: check if this check is relevant
-            if (collectionName === AngularConfig.defaultAngularCollection) {
+            /* Special scenario for component types */
+            if (schemaName === 'component') {
 
-                /* Special scenario for component types */
-                if (schemaName === 'component') {
+                shortcutOptions = await this.askComponentOptions();
+                if (!shortcutOptions) {
+                    return;
+                }
 
-                    shortcutOptions = await this.generation.askComponentOptions();
-                    if (!shortcutOptions) {
-                        return;
-                    }
+            /* Special scenario for module types */
+            } else if (schemaName === 'module') {
 
-                /* Special scenario for module types */
-                } else if (schemaName === 'module') {
-
-                    shortcutOptions = await this.generation.askModuleOptions(schema, defaultOption);
-                    if (!shortcutOptions) {
-                        return;
-                    }
-
+                shortcutOptions = await this.askModuleOptions(nameAsFirstArg!);
+                if (!shortcutOptions) {
+                    return;
                 }
 
             }
 
             if (shortcutOptions) {
-                shortcutOptions.forEach((option, optionName) => {
-                    this.generation.addOption(optionName, option);
-                });
+                this.generation.addOptions(shortcutOptions);
             }
 
             /* Ask direct confirmation or adding more options or cancel */
@@ -170,9 +166,7 @@ export class Commands {
                 return;
             }
 
-            filledOptions.forEach((option, optionName) => {
-                this.generation.addOption(optionName, option);
-            });
+            this.generation.addOptions(filledOptions);
 
             /* Ask final confirmation */
             const confirm = await this.generation.askConfirmation();
@@ -243,6 +237,45 @@ export class Commands {
         const name = nameInput?.endsWith(suffix) ? nameInput.replace(suffix, '') : nameInput;
 
         return name;
+
+    }
+
+    async askModuleOptions(nameAsFirstArg: string): Promise<GenerationOptions | undefined> {
+
+        /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
+        const routeName = path.posix.basename(nameAsFirstArg);
+
+        const types = this.schema.getModuleTypes(routeName);
+        const typesChoices = Array.from(types.values()).map((type) => type.choice);
+
+        if (typesChoices.length === 0) {
+            return new Map();
+        }
+
+        const typeChoice = await vscode.window.showQuickPick(typesChoices, {
+            placeHolder: `What type of module do you want?`,
+            ignoreFocusOut: true,
+        });
+
+        return typeChoice ? types.get(typeChoice.label)!.options : undefined;
+
+    }
+
+    async askComponentOptions(): Promise<GenerationOptions | undefined> {
+
+        const types = this.schema.getComponentTypes();
+        const typesChoices = Array.from(types.values()).map((type) => type.choice);
+
+        if (typesChoices.length === 0) {
+            return new Map();
+        }
+
+        const typeChoice = await vscode.window.showQuickPick(typesChoices, {
+            placeHolder: `What type of component do you want?`,
+            ignoreFocusOut: true,
+        });
+
+        return typeChoice ? types.get(typeChoice.label)!.options : undefined;
 
     }
 

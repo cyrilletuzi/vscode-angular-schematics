@@ -4,6 +4,7 @@ import { AngularConfig } from './config-angular';
 import { Watchers } from './watchers';
 import { defaultSchematicsNames } from './defaults';
 import { Collection } from './collection';
+import { TSLintConfig } from './config-tslint';
 
 export class Schematics {
 
@@ -12,6 +13,7 @@ export class Schematics {
     constructor(
         private workspace: vscode.WorkspaceFolder,
         private angularConfig: AngularConfig,
+        private tslintConfig: TSLintConfig,
     ) {}
 
     async init(): Promise<void> {
@@ -33,7 +35,7 @@ export class Schematics {
 
         /* Not all collections are preloaded */
         if (!this.collections.has(name)) {
-            const collectionInstance = new Collection(name, this.workspace);
+            const collectionInstance = new Collection(name, this.workspace, this.angularConfig, this.tslintConfig);
             try {
                 await collectionInstance.init();
                 this.collections.set(name, collectionInstance);
@@ -68,7 +70,7 @@ export class Schematics {
             /* Preload only defaut schematics for performance */
             if (this.angularConfig.getDefaultCollections().includes(name)) {
 
-                const collectionInstance = new Collection(name, this.workspace);
+                const collectionInstance = new Collection(name, this.workspace, this.angularConfig, this.tslintConfig);
                 
                 try {
                     await collectionInstance.init({ silent: true });
