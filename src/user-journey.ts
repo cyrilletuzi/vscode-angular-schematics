@@ -12,7 +12,7 @@ export class UserJourney {
     private static shortcutSchemas = ['component', 'service', 'module'];
 
     workspace!: WorkspaceExtended;
-    generation!: GenerationCommand;
+    generationCommand!: GenerationCommand;
     schematics!: Schematics;
     collection!: Collection;
     schema!: Schema;
@@ -25,6 +25,14 @@ export class UserJourney {
             return;
         }
 
+        /* As the configurations are loaded in an async way, they may not be ready */
+        try {
+            await Workspaces.whenStable();
+        } catch {
+            vscode.window.showErrorMessage(`Loading configurations needed for Angular schematics was too long. Operation cancelled.`);
+            return;
+        }
+
         const workspaceExtended = Workspaces.get(workspace);
         if (!workspaceExtended) {
             vscode.window.showErrorMessage(`Cannot find the workspace config of the provided workspace name.`);
@@ -33,7 +41,7 @@ export class UserJourney {
         this.workspace = workspaceExtended;
         this.schematics = this.workspace.schematics;
 
-        this.generation = new GenerationCommand(workspaceExtended, context);
+        this.generationCommand = new GenerationCommand(workspaceExtended, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
@@ -68,7 +76,7 @@ export class UserJourney {
         
         }
 
-        this.generation.setCollectionName(collectionName);
+        this.generationCommand.setCollectionName(collectionName);
 
         const collection = await this.schematics.getCollection(collectionName);
 
@@ -89,7 +97,7 @@ export class UserJourney {
 
         }
 
-        this.generation.setSchemaName(schemaName);
+        this.generationCommand.setSchemaName(schemaName);
 
         const schema = await this.collection.getSchema(schemaName);
 
@@ -98,7 +106,7 @@ export class UserJourney {
             return;
         }
 
-        this.generation.setSchema(schema);
+        this.generationCommand.setSchema(schema);
 
         this.schema = schema;
 
@@ -112,7 +120,7 @@ export class UserJourney {
                 return;
             }
 
-            this.generation.setNameAsFirstArg(nameAsFirstArg);
+            this.generationCommand.setNameAsFirstArg(nameAsFirstArg);
 
         }
 
@@ -142,7 +150,7 @@ export class UserJourney {
             }
 
             if (shortcutOptions) {
-                this.generation.addOptions(shortcutOptions);
+                this.generationCommand.addOptions(shortcutOptions);
             }
 
             /* Ask direct confirmation or adding more options or cancel */
@@ -164,7 +172,7 @@ export class UserJourney {
                 return;
             }
 
-            this.generation.addOptions(filledOptions);
+            this.generationCommand.addOptions(filledOptions);
 
             /* Ask final confirmation */
             const confirm = await this.askConfirmation();
@@ -176,7 +184,7 @@ export class UserJourney {
 
         }
 
-        await this.generation.launchCommand();
+        await this.generationCommand.launchCommand();
 
     }
 
@@ -210,8 +218,8 @@ export class UserJourney {
 
     private async askNameAsFirstArg(): Promise<string | undefined> {
 
-        const project = this.generation.getProject();
-        const contextPath = this.generation.getContextForNameAsFirstArg();
+        const project = this.generationCommand.getProject();
+        const contextPath = this.generationCommand.getContextForNameAsFirstArg();
 
         let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
 
@@ -289,7 +297,7 @@ export class UserJourney {
         const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
 
         const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
-            placeHolder: this.generation.getCommand(),
+            placeHolder: this.generationCommand.getCommand(),
             ignoreFocusOut: true,
         });
 
@@ -430,7 +438,7 @@ export class UserJourney {
         const cancellationText = `Cancel`;
 
         const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
-            placeHolder: this.generation.getCommand(),
+            placeHolder: this.generationCommand.getCommand(),
             ignoreFocusOut: true,
         });
 

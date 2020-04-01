@@ -15,8 +15,8 @@ export class Workspaces {
      * The map key is the workspace's name.
      */
     private static workspaces = new Map<string, WorkspaceExtended>();
+    private static stable = false;
 
-    // TODO: manage async
     /**
      * Initialize configuration of all opened workspaces.
      */
@@ -92,6 +92,48 @@ export class Workspaces {
         return vscode.workspace.workspaceFolders![0];
     }
 
+    /**
+     * Wait for the config to be fully loaded.
+     * Throw if it takes more than 10 seconds.
+     */
+    static async whenStable(): Promise<unknown> {
+
+        if (!this.stable) {
+
+            const isStable = new Promise<void>((resolve) => {
+                this.isStable(resolve);
+            });
+
+            const timeout = new Promise<void>((_, reject) => {
+                setTimeout(() => {
+                    reject();
+                }, 10000);
+            });
+
+            return Promise.race([isStable, timeout]);
+
+        } else {
+            return;
+        }
+
+    }
+
+    /**
+     * Check if the config is fully loaded, or retry every 1 second.
+     * **Must be used with something to stop the loop.**
+     */
+    private static isStable(resolve: () => void): void {
+
+        if (this.stable) {
+            resolve();
+        } else {
+            setTimeout(() => {
+                this.isStable(resolve);
+            }, 1000);
+        }
+
+    }
+
     private static async add(workspace: vscode.WorkspaceFolder): Promise<void> {
 
         const packageJsonConfig = new PackageJsonConfig(workspace);
@@ -117,6 +159,8 @@ export class Workspaces {
             ...workspaceExtented2,
             schematics,
         });
+
+        this.stable = true;
 
     }
 
