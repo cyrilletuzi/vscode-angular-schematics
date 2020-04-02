@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { Watchers, Output } from './utils';
-import { Workspaces } from './config';
+import { Workspaces, AngularConfig } from './config';
 import { UserJourney } from './generation';
 
 // import { AngularSchematicsProvider } from './view';
@@ -37,7 +37,11 @@ export function activate(context: vscode.ExtensionContext): void {
             Output.logInfo(`Starting journey to generate a component.`);
 
             const journey = new UserJourney();
-            journey.start(context, 'component');
+
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            journey.start(context, AngularConfig.defaultAngularCollection, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
@@ -45,7 +49,11 @@ export function activate(context: vscode.ExtensionContext): void {
             Output.logInfo(`Starting journey to generate a service.`);
 
             const journey = new UserJourney();
-            journey.start(context, 'service');
+
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            journey.start(context, AngularConfig.defaultAngularCollection, 'service');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
@@ -53,15 +61,19 @@ export function activate(context: vscode.ExtensionContext): void {
             Output.logInfo(`Starting journey to generate a module.`);
 
             const journey = new UserJourney();
-            journey.start(context, 'module');
+
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            journey.start(context, AngularConfig.defaultAngularCollection, 'module');
     
         }),
-        vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, schemaName?: string, collectionName?: string) => {
+        vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, collectionName?: string, schematicName?: string) => {
 
             Output.logInfo(`Starting journey to generate a schematics.`);
 
             const journey = new UserJourney();
-            journey.start(context, schemaName, collectionName);
+            journey.start(context, collectionName, schematicName);
     
         }),
     );

@@ -17,7 +17,7 @@ export class UserJourney {
     collection!: Collection;
     schematic!: Schematic;
 
-    async start(context?: vscode.Uri, schematicName?: string, collectionName?: string): Promise<void> {
+    async start(context?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
 
         /* Resolve the current workspace config */
         const workspace = await Workspaces.getCurrent(context);
@@ -53,35 +53,22 @@ export class UserJourney {
 
         this.cliCommand = new CliCommand(workspaceConfig, context);
 
-        /* Collection will already be set when coming from Angular schematics panel */
+        /* Collection may be already defined (from shortcut command or from view) */
         if (!collectionName) {
 
-            /* Schematic will already be set when coming from generation shortcuts like "Generate a component" */
-            if (schematicName) {
-
-                /* For shortcuts, always use default official collection
-                 * (default user collection can be set to something else,
-                 * and this can be an issue when they are buggy like the Ionic ones) */
-                collectionName = AngularConfig.defaultAngularCollection;
-
-                Output.logInfo(`Shortcut generation command has been used (component, service or module).`);
-
-            } else {
-
-                try {
-                    collectionName = await this.askCollectionName();
-                } catch (error) {
-                    /* Happens if `@schematics/angular` is not installed */
-                    Output.showError(`Command canceled: ${error.message}`);
-                    return;
-                }
-
-                if (!collectionName) {
-                    Output.logInfo(`You have canceled the collection choice.`);
-                    return;
-                }
-
+            try {
+                collectionName = await this.askCollectionName();
+            } catch (error) {
+                /* Happens if `@schematics/angular` is not installed */
+                Output.showError(`Command canceled: ${error.message}`);
+                return;
             }
+
+            if (!collectionName) {
+                Output.logInfo(`You have canceled the collection choice.`);
+                return;
+            }
+
         
         }
 
@@ -102,6 +89,7 @@ export class UserJourney {
 
         this.collection = collection;
 
+        /* Schematic may be already defined (from shortcut command or from view) */
         if (!schematicName) {
 
             schematicName = await this.askSchematicName();

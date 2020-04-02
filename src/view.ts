@@ -88,7 +88,7 @@
 //                 item.command = {
 //                     title: `Generate ${schemaName}`,
 //                     command: 'ngschematics.generate',
-//                     arguments: [undefined, schemaName, collection.getName()]
+//                     arguments: [undefined, collection.getName(), schemaName]
 //                 };
 //                 item.iconPath = await this.getIconPath(collection.getName(), schemaName);
 //                 items.push(item);
