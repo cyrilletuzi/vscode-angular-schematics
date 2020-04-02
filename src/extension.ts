@@ -2,10 +2,9 @@ import * as vscode from 'vscode';
 
 import { Watchers, Output } from './utils';
 import { Workspaces } from './config';
+import { UserJourney } from './generation';
 
-import { UserJourney } from './user-journey';
 import { AngularSchematicsProvider } from './view';
-
 
 /**
  * Function called when the extension is activated, to register new commands.

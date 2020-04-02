@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Workspaces, WorkspaceConfig, AngularConfig } from './config';
-import { Schematics, Collection, Schema } from './schematics';
+import { Workspaces, WorkspaceConfig, AngularConfig } from '../config';
+import { Schematics, Collection, Schema } from '../schematics';
 
-import { GenerationCommand, GenerationOptions } from './generation-command';
+import { CliCommand, CliCommandOptions } from './cli-command';
 
 
 export class UserJourney {
@@ -12,7 +12,7 @@ export class UserJourney {
     private static shortcutSchemas = ['component', 'service', 'module'];
 
     workspace!: WorkspaceConfig;
-    generationCommand!: GenerationCommand;
+    generationCommand!: CliCommand;
     schematics!: Schematics;
     collection!: Collection;
     schema!: Schema;
@@ -41,7 +41,7 @@ export class UserJourney {
         this.workspace = workspaceExtended;
         this.schematics = this.workspace.schematics;
 
-        this.generationCommand = new GenerationCommand(workspaceExtended, context);
+        this.generationCommand = new CliCommand(workspaceExtended, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
@@ -129,7 +129,7 @@ export class UserJourney {
         /* Quicker scenario for basic schematics (component, service, module of official schematics) */
         if (UserJourney.shortcutSchemas.includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
 
-            let shortcutOptions: GenerationOptions | undefined;
+            let shortcutOptions: CliCommandOptions | undefined;
 
             /* Special scenario for component types */
             if (schemaName === 'component') {
@@ -245,7 +245,7 @@ export class UserJourney {
 
     }
 
-    private async askModuleOptions(nameAsFirstArg: string): Promise<GenerationOptions | undefined> {
+    private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
 
         /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
         const routeName = path.posix.basename(nameAsFirstArg);
@@ -266,7 +266,7 @@ export class UserJourney {
 
     }
 
-    private async askComponentOptions(): Promise<GenerationOptions | undefined> {
+    private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
         const types = this.schema.getComponentTypesChoices();
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
@@ -310,7 +310,7 @@ export class UserJourney {
 
     }
 
-    private async askOptions(): Promise<GenerationOptions> {
+    private async askOptions(): Promise<CliCommandOptions> {
 
         const selectedOptionsNames = await this.askOptionsNames();
 
@@ -342,12 +342,12 @@ export class UserJourney {
 
     }
 
-    private async askOptionsValues(optionsNames: string[]): Promise<GenerationOptions> {
+    private async askOptionsValues(optionsNames: string[]): Promise<CliCommandOptions> {
 
         /* Force required options, otherwise the schematic will fail */
         const options = [...this.schema.getRequiredOptions(), ...this.schema.getSomeOptions(optionsNames)];
 
-        const filledOptions: GenerationOptions = new Map();
+        const filledOptions: CliCommandOptions = new Map();
     
         for (let [optionName, option] of options) {
 

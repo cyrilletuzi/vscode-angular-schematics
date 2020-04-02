@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as os from 'os';
 import * as childProcess from 'child_process';
 
-import { FileSystem, Output } from './utils';
-import { WorkspaceConfig, AngularConfig } from './config';
-import { Schema } from './schematics';
+import { FileSystem, Output } from '../utils';
+import { WorkspaceConfig, AngularConfig } from '../config';
+import { Schema } from '../schematics';
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');
@@ -25,9 +25,9 @@ interface ContextPath {
 }
 
 /** List of options */
-export type GenerationOptions = Map<string, string | string[]>;
+export type CliCommandOptions = Map<string, string | string[]>;
 
-export class GenerationCommand {
+export class CliCommand {
 
     /* Path details of the right-clicked file or directory */
     private contextPath: ContextPath = {
@@ -41,7 +41,7 @@ export class GenerationCommand {
     private schemaName = '';
     private schema!: Schema;
     private nameAsFirstArg = '';
-    private options: GenerationOptions = new Map();
+    private options: CliCommandOptions = new Map();
     private cliLocal: boolean | null = null;
 
     constructor(
@@ -139,7 +139,7 @@ export class GenerationCommand {
     /**
      * Add options
      */
-    addOptions(options: GenerationOptions): void {
+    addOptions(options: CliCommandOptions): void {
 
         for (const [name, option] of options) {
 
