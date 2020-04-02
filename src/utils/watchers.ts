@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+
+import { Output } from './output';
 
 export class Watchers {
 
@@ -14,7 +17,10 @@ export class Watchers {
 
         this.activeWatchers.push(watcher);
 
-        watcher.onDidChange(onDidChangeListener);
+        watcher.onDidChange(() => {
+            Output.logInfo(`Reloading "${path.basename(fsPath)}" configuration.`);
+            onDidChangeListener();
+        });
 
         return watcher;
 

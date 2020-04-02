@@ -1,9 +1,9 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
 import { Output } from './output';
+import { Workspaces } from '../config';
 
 export class FileSystem {
 
@@ -11,7 +11,7 @@ export class FileSystem {
      * Check if a JSON file exists and is readable, and if so, parse it.
      * Otherwise, log an error message in output channel.
      */
-    static async parseJsonFile<T>(fsPath: string, workspace?: vscode.WorkspaceFolder): Promise<T | undefined> {
+    static async parseJsonFile<T>(fsPath: string): Promise<T | undefined> {
 
         if (await this.isReadable(fsPath)) {
 
@@ -39,7 +39,7 @@ export class FileSystem {
         
             } catch (error) {
 
-                this.showError(fsPath, `parsed`, workspace);
+                this.showError(fsPath, `parsed`);
 
                 return undefined;
 
@@ -57,7 +57,7 @@ export class FileSystem {
      * Check if a file exists and is readable.
      * Otherwise, log an error message in output channel if `silent` is not set to `true`.
      */
-    static async isReadable(fsPath: string, workspace?: vscode.WorkspaceFolder): Promise<boolean> {
+    static async isReadable(fsPath: string): Promise<boolean> {
 
         try {
 
@@ -67,7 +67,7 @@ export class FileSystem {
         } catch (error) {
 
             // TODO: check the constant works
-            this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`, workspace);
+            this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
             
             return false;
 
@@ -97,9 +97,11 @@ export class FileSystem {
      * Display an error message to the user.
      * @param actionFailed Past form of a verb about what fails (eg. `found`)
      */
-    private static showError(fsPath: string, failedAction: string, workspace?: vscode.WorkspaceFolder): void {
+    private static showError(fsPath: string, failedAction: string): void {
 
-        const message = `${path.basename(fsPath)} can not be ${failedAction} in${workspace ? ` in "${workspace.name}" workspace` : ''}.`;
+        const workspace = Workspaces.getWorkspaceFromPath(fsPath);
+
+        const message = `"${path.basename(fsPath)}" can not be ${failedAction}${workspace ? ` in "${workspace.name}" workspace` : ''}.`;
 
         Output.logError(message);
 

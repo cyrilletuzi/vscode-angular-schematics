@@ -146,6 +146,8 @@ export class CliCommand {
             /* Check they exist in schema */
             if (this.schema.hasOption(name)) {
                 this.options.set(name, option);
+            } else {
+                Output.logError(`"--${name}" option has been chosen but does not exist in this schematics, so it won't be used.`);
             }
 
         }
@@ -192,14 +194,19 @@ export class CliCommand {
     private setContextPathAndProject(context?: vscode.Uri): void {
 
         if (!context?.path) {
+            Output.logInfo(`No context path detected.`);
             return;
         }
 
         this.contextPath.full = context.path;
 
+        Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
+
         /* Remove workspace path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
         this.contextPath.relativeToWorkspace = this.contextPath.full.substr(this.workspace.uri.path.length + 1);
+
+        Output.logInfo(`Workspace-relative context path detected: ${this.contextPath.relativeToWorkspace}`);
 
         for (const [projectName, projectConfig] of this.workspace.angularConfig.getProjects()) {
 
@@ -208,9 +215,13 @@ export class CliCommand {
 
                 this.project = projectName;
 
+                Output.logInfo(`Angular project detected from context path: "${this.project}"`);
+
                 /* Remove source path from workspace relative path,
                  * eg. `src/app/some-module` => `some-module` */
                 this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.sourcePath.length + 1);
+
+                Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSource}`);
 
                 return;
 
@@ -221,6 +232,8 @@ export class CliCommand {
         /* Default values */
         this.contextPath.relativeToSource = '';
         this.project = '';
+
+        Output.logInfo(`No Angular project detected from context path.`);
 
     }
 

@@ -93,7 +93,7 @@ export class Schema {
      */
     async init(): Promise<void> {
 
-        const config = await FileSystem.parseJsonFile<SchemaJsonSchema>(this.fsPath, this.workspace);
+        const config = await FileSystem.parseJsonFile<SchemaJsonSchema>(this.fsPath);
 
         if (!config) {
             throw new Error(`"${this.collectionName}:${this.name}" schema can not be loaded.`);
@@ -163,7 +163,9 @@ export class Schema {
         /* Lazy-loaded module type has an option that can only be set based on user input */
         const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY);
 
-        if (lazyModule) { 
+        if (lazyModule) {
+
+            Output.logInfo(`Route name detected: "${routeName}"`);
 
             /* Add `route` option */
             lazyModule.options.set('route', routeName);
@@ -280,6 +282,8 @@ export class Schema {
 
         const options = Object.entries(this.config.properties);
 
+        Output.logInfo(`All options detected for "${this.name}" schematics: ${options.map(([name]) => name).join(', ')}`);
+
         /* Set all options */
         for (const [name, option] of options) {
             this.options.set(name, option);
@@ -289,6 +293,8 @@ export class Schema {
         this.requiredOptionsNames = (this.config.required ?? [])
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
             .filter((name) => !(('$default') in this.options.get(name)!));
+
+        Output.logInfo(`Required options detected for "${this.name}" schematics: ${this.requiredOptionsNames.join(', ')}`);
         
         /* Prepare choices for special schemas with shortcut */
         if (this.collectionName === AngularConfig.defaultAngularCollection) {

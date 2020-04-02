@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { FileSystem, Watchers } from '../utils';
+import { FileSystem, Watchers, Output } from '../utils';
 
 interface TslintJsonSchema {
     rules?: {
@@ -26,6 +26,8 @@ export class TslintConfig {
      */
     async init(workspaceFsPath: string): Promise<void> {
 
+        Output.logInfo(`Loading "tslint.json" configuration.`);
+
         const fsPath = path.join(workspaceFsPath, TslintConfig.fileName);
 
         this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath);
@@ -36,6 +38,7 @@ export class TslintConfig {
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
+                Output.logInfo(`Loading "tslint.json" configuration.`);
                 this.init(workspaceFsPath);
             });
 

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { defaultSchematicsNames } from '../defaults';
-import { Watchers } from '../utils/watchers';
+import { Output, Watchers } from '../utils';
 import { WorkspaceConfig } from '../config';
 
 import { Collection } from './collection';
@@ -67,13 +67,19 @@ export class Schematics {
      */
     private async setCollections(): Promise<void> {
 
+        Output.logInfo(`Loading the list of schematics collections.`);
+
         // TODO: check VS Code is verifying JSON schema
         /* Configuration key is configured in `package.json` */
         const userSchematicsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
+        Output.logInfo(`User collections defined in Code preferences detected: ${userSchematicsNames.join(', ')}`);
+
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
         const collectionsNames = Array.from(new Set([...this.workspace.angularConfig.getDefaultCollections(), ...defaultSchematicsNames, ...userSchematicsNames]));
+
+        Output.logInfo(`All collections detected: ${userSchematicsNames.join(', ')}`);
         
         /* `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
@@ -82,6 +88,8 @@ export class Schematics {
 
             /* Preload only defaut schematics for performance */
             if (this.workspace.angularConfig.getDefaultCollections().includes(name)) {
+
+                Output.logInfo(`Preloading some default schematics.`);
 
                 collection = await this.loadCollection(name);
 
@@ -98,11 +106,14 @@ export class Schematics {
      */
     private async loadCollection(name: string): Promise<Collection | undefined> {
 
+        Output.logInfo(`Loading "${name}" collection.`);
+
         const collectionInstance = new Collection(name, this.workspace);
                 
         try {
             await collectionInstance.init();
         } catch {
+            Output.logError(`Loading of "${name}" collection failed.`);
             return undefined;
         }
 

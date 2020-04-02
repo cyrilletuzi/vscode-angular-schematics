@@ -21,6 +21,15 @@ export class Output {
     }
 
     /**
+     * Log an info in output channel.
+     */
+    static logInfo(message: string): void {
+
+        this.channel.appendLine(`[Info - ${(new Date().toTimeString())}] ${message}`);
+
+    }
+
+    /**
      * Log an error in output channel.
      */
     static logError(message: string): void {

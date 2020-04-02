@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Watchers } from '../utils';
+import { FileSystem, Watchers, Output } from '../utils';
 import { WorkspaceConfig } from '../config';
 
 import { Schema, SchemaConfig } from './schema';
@@ -56,7 +56,9 @@ export class Collection {
         /* Can throw */
         this.fsPath = await this.getSchematicsFsPath(this.name);
 
-        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath, this.workspace);
+        Output.logInfo(`"${this.name}" collection path detected: ${this.fsPath}`);
+
+        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath);
 
         if (!config) {
             throw new Error(`"${this.name}" collection can not be loaded.`);
@@ -100,7 +102,10 @@ export class Collection {
 
         const fullName = this.getFullSchemaName(name);
 
+        Output.logInfo(`Loading "${fullName}" schematics`);
+
         if (!this.schemasConfigs.has(fullName)) {
+            Output.logError(`"${fullName}" schematics configuration not found.`);
             return undefined;
         }
 
@@ -114,7 +119,9 @@ export class Collection {
             try {
                 await schemaInstance.init();
                 this.schemas.set(fullName, schemaInstance);
-            } catch {}
+            } catch {
+                Output.logError(`"${fullName}" schematics loading failed.`);
+            }
 
         }
         
@@ -136,23 +143,32 @@ export class Collection {
 
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
+
+            Output.logInfo(`"${name}" collection has been detected as a local user collection.`);
+
             return path.join(this.workspace.uri.fsPath, name);
+    
         }
-        
+
         /* Package schematics */
+        else {
 
-        // TODO: handle custom node_modules folder
-        /* `collection.json` path is defined in `package.json` */
-        const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
+            Output.logInfo(`"${name}" collection has been detected as a library, looking in "node_modules".`);
 
-        const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, this.workspace);
+            // TODO: handle custom node_modules folder
+            /* `collection.json` path is defined in `package.json` */
+            const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
 
-        /* `package.json` should have a `schematics` property with relative path to `collection.json` */
-        if (!packageJsonConfig?.schematics) {
-            throw new Error(`${this.name} schematics collection can not be found or read.`);
+            const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath);
+
+            /* `package.json` should have a `schematics` property with relative path to `collection.json` */
+            if (!packageJsonConfig?.schematics) {
+                throw new Error(`${this.name} schematics collection can not be found or read.`);
+            }
+
+            return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
+
         }
-
-        return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
 
     }
 
@@ -168,15 +184,23 @@ export class Collection {
      */
     private async setSchemas(): Promise<void> {
 
-        const schemas = Object.entries(this.config.schematics)
+        const allSchemas = Object.entries(this.config.schematics);
+
+        Output.logInfo(`All schematics detected for "${this.name}" collection: ${allSchemas.map(([name]) => name).join(', ')}`);
+
+        const schemas = allSchemas
             /* Remove internal schematics */
             .filter(([_, config]) => !config.hidden)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
 
+        Output.logInfo(`Filtered schematics keeped for "${this.name}" collection: ${schemas.map(([name]) => name).join(', ')}`);
+
         for (const [name, config] of schemas) {
 
             const fsPath = path.join(path.basename(this.fsPath), config.schema);
+
+            Output.logInfo(`"${this.name}:${name}" path detected: ${fsPath}`);
 
             // TODO: manage `extends`
             this.schemasConfigs.set(this.getFullSchemaName(name), {

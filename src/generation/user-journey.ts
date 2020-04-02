@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { Output } from '../utils';
 import { Workspaces, WorkspaceConfig, AngularConfig } from '../config';
 import { Schematics, Collection, Schema } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
-
 
 export class UserJourney {
 
@@ -22,6 +22,7 @@ export class UserJourney {
         /* Resolve the current workspace config */
         const workspace = await Workspaces.getCurrent(context);
         if (!workspace) {
+            Output.logInfo(`You have canceled the workspace choice.`);
             return;
         }
 
@@ -29,19 +30,20 @@ export class UserJourney {
         try {
             await Workspaces.whenStable();
         } catch {
-            vscode.window.showErrorMessage(`Loading configurations needed for Angular schematics was too long. Operation cancelled.`);
+            vscode.window.showErrorMessage(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
             return;
         }
 
-        const workspaceExtended = Workspaces.get(workspace);
-        if (!workspaceExtended) {
-            vscode.window.showErrorMessage(`Cannot find the workspace config of the provided workspace name.`);
+        const workspaceConfig = Workspaces.get(workspace);
+        /* Not supposed to happen */
+        if (!workspaceConfig) {
+            vscode.window.showErrorMessage(`Command canceled: cannot find the configuration of the chosen workspace.`);
             return;
         }
-        this.workspace = workspaceExtended;
+        this.workspace = workspaceConfig;
         this.schematics = this.workspace.schematics;
 
-        this.generationCommand = new CliCommand(workspaceExtended, context);
+        this.generationCommand = new CliCommand(workspaceConfig, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
@@ -54,34 +56,35 @@ export class UserJourney {
                  * and this can be an issue when they are buggy like the Ionic ones) */
                 collectionName = AngularConfig.defaultAngularCollection;
 
+                Output.logInfo(`Shortcut generation command has been used (component, service or module).`);
+
             } else {
 
+                try {
+                    collectionName = await this.askCollectionName();
+                } catch (error) {
+                    /* Happens if `@schematics/angular` is not installed */
+                    vscode.window.showErrorMessage(`Command canceled: ${error.message}`);
+                    return;
+                }
+
                 if (!collectionName) {
-
-                    try {
-                        collectionName = await this.askSchematic();
-                    } catch (error) {
-                        /* Happens if `@schematics/angular` is not installed */
-                        vscode.window.showErrorMessage(error.message);
-                        return;
-                    }
-
-                    if (!collectionName) {
-                        return;
-                    }
-
+                    Output.logInfo(`You have canceled the collection choice.`);
+                    return;
                 }
 
             }
         
         }
 
+        Output.logInfo(`Collection used: ${collectionName}.`);
+
         this.generationCommand.setCollectionName(collectionName);
 
         const collection = await this.schematics.getCollection(collectionName);
 
         if (!collection) {
-            vscode.window.showErrorMessage(`Cannot load "${collectionName}" collection.`);
+            vscode.window.showErrorMessage(`Command canceled: cannot load "${collectionName}" collection.`);
             return;
         }
 
@@ -89,20 +92,23 @@ export class UserJourney {
 
         if (!schemaName) {
 
-            schemaName = await this.askSchema();
+            schemaName = await this.askSchemaName();
 
             if (!schemaName) {
+                Output.logInfo(`You have canceled the schema choice.`);
                 return;
             }
 
         }
+
+        Output.logInfo(`Schema used: ${schemaName}.`);
 
         this.generationCommand.setSchemaName(schemaName);
 
         const schema = await this.collection.getSchema(schemaName);
 
         if (!schema) {
-            vscode.window.showErrorMessage(`Cannot load "${schemaName}" schematics schema in "${collectionName}" collection.`);
+            vscode.window.showErrorMessage(`Command canceled: cannot load "${schemaName}" schema in "${collectionName}" collection.`);
             return;
         }
 
@@ -114,9 +120,12 @@ export class UserJourney {
 
         if (this.schema.hasNameAsFirstArg()) {
 
+            Output.logInfo(`This schematics have a default argument to set the path and name.`);
+
             nameAsFirstArg = await this.askNameAsFirstArg();
 
             if (!nameAsFirstArg) {
+                Output.logInfo(`You have canceled the default argument input.`);
                 return;
             }
 
@@ -136,6 +145,7 @@ export class UserJourney {
 
                 shortcutOptions = await this.askComponentOptions();
                 if (!shortcutOptions) {
+                    Output.logInfo(`You have canceled the component type choice.`);
                     return;
                 }
 
@@ -144,6 +154,7 @@ export class UserJourney {
 
                 shortcutOptions = await this.askModuleOptions(nameAsFirstArg!);
                 if (!shortcutOptions) {
+                    Output.logInfo(`You have canceled the module type choice.`);
                     return;
                 }
 
@@ -158,6 +169,7 @@ export class UserJourney {
 
             /* "Cancel" choice */
             if (shortcutConfirm === undefined) {
+                Output.logInfo(`You have canceled the generation.`);
                 return;
             }
             
@@ -168,10 +180,6 @@ export class UserJourney {
 
             const filledOptions = await this.askOptions();
 
-            if (!filledOptions) {
-                return;
-            }
-
             this.generationCommand.addOptions(filledOptions);
 
             /* Ask final confirmation */
@@ -179,33 +187,48 @@ export class UserJourney {
 
             /* "Cancel" choice */
             if (!confirm) {
+                Output.logInfo(`You have canceled the generation.`);
                 return;
             }
 
         }
 
+        Output.logInfo(`Launching command.`);
+
         await this.generationCommand.launchCommand();
 
     }
 
-    private async askSchematic(): Promise<string | undefined> {
+    private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.schematics.getCollectionsNames().length === 0) {
             throw new Error('Cannot find any schematics.');
         }
+        
+        else if  (this.schematics.getCollectionsNames().length === 1) {
 
-        if  (this.schematics.getCollectionsNames().length === 1) {
-            return AngularConfig.defaultAngularCollection;
+            const collectionName = this.schematics.getCollectionsNames()[0];
+
+            Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
+
+            return collectionName;
+
         }
 
-        return vscode.window.showQuickPick(this.schematics.getCollectionsNames(), {
-            placeHolder: `From which schematics collection?`,
-            ignoreFocusOut: true,
-        });
+        else {
+
+            Output.logInfo(`Multiple collections detected: ask the user which one to use.`);
+
+            return vscode.window.showQuickPick(this.schematics.getCollectionsNames(), {
+                placeHolder: `From which schematics collection?`,
+                ignoreFocusOut: true,
+            });
+
+        }
 
     }
 
-    private async askSchema(): Promise<string | undefined> {
+    private async askSchemaName(): Promise<string | undefined> {
 
         const choice = await vscode.window.showQuickPick(this.collection.getSchemasChoices(), {
             placeHolder: `What do you want to generate?`,
@@ -220,6 +243,8 @@ export class UserJourney {
 
         const project = this.generationCommand.getProject();
         const contextPath = this.generationCommand.getContextForNameAsFirstArg();
+
+        Output.logInfo(`Context path detected for first argument: ${contextPath}`);
 
         let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
 
@@ -254,6 +279,7 @@ export class UserJourney {
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         if (typesChoices.length === 0) {
+            Output.logError(`No module types detected.`);
             return new Map();
         }
 
@@ -262,7 +288,7 @@ export class UserJourney {
             ignoreFocusOut: true,
         });
 
-        return typeChoice ? types.get(typeChoice.label)!.options : undefined;
+        return typeChoice ? types.get(typeChoice.label)?.options : undefined;
 
     }
 
@@ -272,6 +298,7 @@ export class UserJourney {
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         if (typesChoices.length === 0) {
+            Output.logError(`No component types detected.`);
             return new Map();
         }
 
@@ -280,12 +307,13 @@ export class UserJourney {
             ignoreFocusOut: true,
         });
 
-        return typeChoice ? types.get(typeChoice.label)!.options : undefined;
+        return typeChoice ? types.get(typeChoice.label)?.options : undefined;
 
     }
 
     private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
+        // TODO: cache these choices
         const CONFIRM: vscode.QuickPickItem = {
             label: `Confirm`,
             description: `Pro-tip: take a minute to check the command above is really what you want`,
@@ -435,9 +463,8 @@ export class UserJourney {
     private async askConfirmation(): Promise<boolean> {
 
         const confirmationText = `Confirm`;
-        const cancellationText = `Cancel`;
 
-        const choice = await vscode.window.showQuickPick([confirmationText, cancellationText], {
+        const choice = await vscode.window.showQuickPick([confirmationText, `Cancel`], {
             placeHolder: this.generationCommand.getCommand(),
             ignoreFocusOut: true,
         });

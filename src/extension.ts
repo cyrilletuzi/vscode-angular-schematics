@@ -12,6 +12,8 @@ import { UserJourney } from './generation';
  */
 export function activate(context: vscode.ExtensionContext): void {
 
+    Output.logInfo(`Angular schematics extension has been activated.`);
+
     // TODO: check if it's really useful
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
@@ -32,11 +34,15 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.commands.registerCommand('ngschematics.generateComponent', (context?: vscode.Uri) => {
 
+            Output.logInfo(`Starting journey to generate a component.`);
+
             const journey = new UserJourney();
             journey.start(context, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
+
+            Output.logInfo(`Starting journey to generate a service.`);
 
             const journey = new UserJourney();
             journey.start(context, 'service');
@@ -44,11 +50,15 @@ export function activate(context: vscode.ExtensionContext): void {
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
 
+            Output.logInfo(`Starting journey to generate a module.`);
+
             const journey = new UserJourney();
             journey.start(context, 'module');
     
         }),
         vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, schemaName?: string, collectionName?: string) => {
+
+            Output.logInfo(`Starting journey to generate a schematics.`);
 
             const journey = new UserJourney();
             journey.start(context, schemaName, collectionName);

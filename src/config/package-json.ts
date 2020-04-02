@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Watchers } from '../utils';
+import { FileSystem, Watchers, Output } from '../utils';
 
 interface PackageJsonSchema {
     dependencies?: {
@@ -69,6 +69,8 @@ export class PackageJsonConfig {
         const angularVersion = this.config?.dependencies?.['@angular/core']?.replace('^', '').replace('~', '').substr(0, 1);
 
         this.angularMajorVersion = angularVersion ? Number.parseInt(angularVersion, 10) : undefined;
+
+        Output.logInfo(`Angular version ${this.angularMajorVersion} detected.`);
 
     }
 

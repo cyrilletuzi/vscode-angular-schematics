@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { Output } from '../utils';
 import { Schematics } from '../schematics';
 
 import { PackageJsonConfig } from './package-json';
@@ -35,20 +36,30 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
      */
     async init(): Promise<void> {
 
+        Output.logInfo(`Loading "package.json" configuration.`);
+
         const packageJsonConfig = new PackageJsonConfig();
         await packageJsonConfig.init(this.uri.fsPath);
+
+        Output.logInfo(`Loading TypeScript configuration.`);
 
         const typescriptConfig = new TypescriptConfig();
         await typescriptConfig.init(this.uri.fsPath);
 
+        Output.logInfo(`Loading TSLint configuration.`);
+
         const tslintConfig = new TslintConfig();
         await tslintConfig.init(this.uri.fsPath);
+
+        Output.logInfo(`Loading Angular configuration.`);
 
         const angularConfig = new AngularConfig();
         await angularConfig.init(this.uri.fsPath);
 
         // TODO: should be retrigger if package.json or tsconfig.json change
         this.setIvy();
+
+        Output.logInfo(`Loading schematics configuration.`);
 
         const schematics = new Schematics(this);
         await schematics.init();
@@ -86,6 +97,8 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
         }
 
         this.ivy = ivy;
+
+        Output.logInfo(`Angular Ivy detected as ${this.ivy ? `enabled` : `disabled`}.`);
 
     }
 

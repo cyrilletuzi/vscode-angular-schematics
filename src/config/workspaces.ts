@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 
+import { Output } from '../utils';
+
 import { WorkspaceConfig } from './workspace';
 
 export class Workspaces {
@@ -16,23 +18,31 @@ export class Workspaces {
      */
     static async init(): Promise<void> {
 
+        const workspaces = vscode.workspace.workspaceFolders ?? [];
+
+        Output.logInfo(`Loading configuration of ${workspaces.length} workspace(s).`);
+
         // TODO: check if non-Angular workspaces are included or not
         /* Default array is just for type-safety, it cannot happen as the extension can only be activated inside a workspace */
-        for (const workspace of (vscode.workspace.workspaceFolders ?? [])) {
+        for (const workspace of workspaces) {
             await this.add(workspace);
         }
 
         /* All configuration is ready */
         this.stable = true;
 
+        Output.logInfo(`Configurations of all workspaces are now ready.`);
+
         /* Listen if a workspace is added or removed */
         vscode.workspace.onDidChangeWorkspaceFolders((event) => {
 
             for (const workspace of event.added) {
+                Output.logInfo(`Loading configuration of new "${workspace.name}" workspace.`);
                 this.add(workspace);
             }
 
             for (const workspace of event.removed) {
+                Output.logInfo(`Unloading configuration of removed "${workspace.name}" workspace.`);
                 this.workspaces.delete(workspace.name);
             }
 
@@ -50,6 +60,17 @@ export class Workspaces {
     }
 
     /**
+     * Get a workspace based on a file system path configuration, or `undefined`.
+     */
+    static getWorkspaceFromPath(fsPath: string): vscode.WorkspaceFolder | undefined {
+        
+        const contextPathUri = vscode.Uri.file(fsPath);
+
+        return vscode.workspace.getWorkspaceFolder(contextPathUri);
+
+    }
+
+    /**
      * Try to resolve the current workspace directory, or ask the user for it.
      * @param contextPath Uri of any file in the current workspace
      */
@@ -58,6 +79,8 @@ export class Workspaces {
         let workspace: vscode.WorkspaceFolder | undefined;
 
         if (contextPath) {
+
+            Output.logInfo(`Context path detected: resolving current workspace from it.`);
 
             /* If there is a context path, current workspace can be resolved from it */
             workspace = vscode.workspace.getWorkspaceFolder(contextPath);
@@ -68,10 +91,14 @@ export class Workspaces {
         
             if (vscode.workspace.workspaceFolders?.length === 1) {
 
+                Output.logInfo(`There is only one workspace opened, default to it.`);
+
                 /* If there is just one workspace, take it directly */
                 workspace = vscode.workspace.workspaceFolders[0];
 
             } else {
+
+                Output.logInfo(`There are multiple workspaces opened, ask the user which one we should use.`);
 
                 /* Otherwise the user must be asked */
                 workspace = await vscode.window.showWorkspaceFolderPick();
@@ -135,6 +162,8 @@ export class Workspaces {
      * Initialize a workspace configuration
      */
     private static async add(workspace: vscode.WorkspaceFolder): Promise<void> {
+
+        Output.logInfo(`Loading configuration of "${workspace.name}" workspace.`);
 
         const workspaceConfig = new WorkspaceConfig(workspace);
 
