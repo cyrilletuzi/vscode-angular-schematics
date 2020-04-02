@@ -3,8 +3,6 @@ import * as path from 'path';
 
 import { FileSystem, Watchers } from '../utils';
 
-import { WorkspaceExtended } from './workspace-extended';
-
 export type AngularProjectType = 'application' | 'library';
 
 export interface AngularProject {
@@ -66,27 +64,23 @@ export class AngularConfig {
     private defaultCollections: string[] = [];
     /** List of projects registered in Angular config file */
     private projects = new Map<string, AngularProject>();
-    /** Tells if Angular is in Ivy mode */
-    private ivy = false;
     private watcher: vscode.FileSystemWatcher | undefined;
     
-    constructor(private workspace: Omit<WorkspaceExtended, 'angularConfig' | 'schematics'>) {}
-
     /**
      * Initializes `angular.json` configuration.
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init(workspaceFsPath: string): Promise<void> {
 
         let fsPath = '';
 
         /* Try the different possible file names */
         for (const fileName of this.fileNames) {
 
-            fsPath = path.join(this.workspace.uri.fsPath, fileName);
+            fsPath = path.join(workspaceFsPath, fileName);
 
-            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath, this.workspace);
+            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath);
 
             if (this.config) {
                 /* Keep only the right file name */
@@ -102,14 +96,11 @@ export class AngularConfig {
 
         this.setProjects();
 
-        // TODO: should be retrigger if package.json or tsconfig.json change
-        this.setIvy();
-
         /* Watcher must be set just once */
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init();
+                this.init(workspaceFsPath);
             });
 
         }
@@ -135,13 +126,6 @@ export class AngularConfig {
      */
     getProjects(): Map<string, AngularProject> {
         return this.projects;
-    }
-
-    /**
-     * Tells if Angular is in Ivy mode (default in Angular >= 9)
-     */
-    isIvy(): boolean {
-        return this.ivy;
     }
 
     /**
@@ -214,33 +198,6 @@ export class AngularConfig {
         });
 
         this.projects = new Map(projects);
-
-    }
-
-    /**
-     * Try to resolve if Angular is in Ivy mode (default in Angular >= 9).
-     * If it cannot be resolved, it will default to `false` for compatibility.
-     */
-    private setIvy(): void {
-
-        let ivy = false;
-
-        /* Get major version of `@angular/core` package */
-        const angularMajorVersion = this.workspace.packageJsonConfig.getAngularMajorVersion() ?? 0;
-
-        /* Ivy can be manually enabled/disabled with `enableIvy` in `tsconfig.json` */
-        const enableIvy = this.workspace.typescriptConfig.getEnableIvy();
-        
-        /* Ivy exists since Angular 8, but disabled by default */
-        if ((angularMajorVersion === 8) && (enableIvy === true)) {
-            ivy = true;
-        }
-        /* Ivy is enabled by default in Angular >= 9 */
-        else if ((angularMajorVersion >= 9) && (enableIvy !== false)) {
-            ivy = true;
-        }
-
-        this.ivy = ivy;
 
     }
 

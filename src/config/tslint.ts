@@ -19,18 +19,16 @@ export class TslintConfig {
     private componentSuffixes: string[] = [];
     private watcher: vscode.FileSystemWatcher | undefined;
 
-    constructor(private workspace: vscode.WorkspaceFolder) {}
-
     /**
      * Initializes `tslint.json` configuration.
      * **Must** be called after each `new TslintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init(workspaceFsPath: string): Promise<void> {
 
-        const fsPath = path.join(this.workspace.uri.fsPath, TslintConfig.fileName);
+        const fsPath = path.join(workspaceFsPath, TslintConfig.fileName);
 
-        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, this.workspace);
+        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath);
 
         this.setComponentSuffixes();
 
@@ -38,7 +36,7 @@ export class TslintConfig {
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init();
+                this.init(workspaceFsPath);
             });
 
         }

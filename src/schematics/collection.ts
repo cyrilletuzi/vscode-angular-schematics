@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem, Watchers } from '../utils';
-import { WorkspaceExtended } from '../config';
+import { WorkspaceConfig } from '../config';
 
 import { Schema, SchemaConfig } from './schema';
 
@@ -41,7 +41,7 @@ export class Collection {
 
     constructor(
         name: string,
-        private workspace: Omit<WorkspaceExtended, 'schematics'>,
+        private workspace: Omit<WorkspaceConfig, 'schematics'>,
     ) {
         this.name = name;
     }

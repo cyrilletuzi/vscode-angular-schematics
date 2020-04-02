@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { ComponentType, defaultComponentTypes } from '../defaults';
 import { FileSystem, Watchers, Output } from '../utils';
-import { AngularConfig, WorkspaceExtended } from '../config';
+import { AngularConfig, WorkspaceConfig } from '../config';
 
 const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
 const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
@@ -77,7 +77,7 @@ export class Schema {
 
     constructor(
         config: SchemaConfig,
-        private workspace: Omit<WorkspaceExtended, 'schematics'>,
+        private workspace: Omit<WorkspaceConfig, 'schematics'>,
     ) {
 
         this.name = config.name;
@@ -312,7 +312,7 @@ export class Schema {
 
         /* Prior to new Ivy engine, components instanciated at runtime (modals, dialogs...)
          * must be declared in the `NgModule` `entryComponents` (in addition to `declarations`) */
-        const entryComponentsRequired = !this.workspace.angularConfig.isIvy() && this.hasOption('entryComponent');
+        const entryComponentsRequired = !this.workspace.isIvy() && this.hasOption('entryComponent');
 
         /* `type` CLI option is new in Angular >= 9 */
         const hasPageSuffix = this.hasOption('type') && this.workspace.tslintConfig.hasSuffix('Page');

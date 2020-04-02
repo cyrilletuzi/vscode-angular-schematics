@@ -1,12 +1,6 @@
 import * as vscode from 'vscode';
 
-import { Schematics } from '../schematics';
-
-import { PackageJsonConfig } from './package-json';
-import { TypescriptConfig } from './typescript';
-import { AngularConfig } from './angular';
-import { TslintConfig } from './tslint';
-import { WorkspaceExtended } from './workspace-extended';
+import { WorkspaceConfig } from './workspace';
 
 export class Workspaces {
 
@@ -14,19 +8,22 @@ export class Workspaces {
      * List of all the opened workspaces.
      * The map key is the workspace's name.
      */
-    private static workspaces = new Map<string, WorkspaceExtended>();
+    private static workspaces = new Map<string, WorkspaceConfig>();
     private static stable = false;
 
     /**
      * Initialize configuration of all opened workspaces.
      */
-    static init(): void {
+    static async init(): Promise<void> {
 
         // TODO: check if non-Angular workspaces are included or not
         /* Default array is just for type-safety, it cannot happen as the extension can only be activated inside a workspace */
         for (const workspace of (vscode.workspace.workspaceFolders ?? [])) {
-            this.add(workspace);
+            await this.add(workspace);
         }
+
+        /* All configuration is ready */
+        this.stable = true;
 
         /* Listen if a workspace is added or removed */
         vscode.workspace.onDidChangeWorkspaceFolders((event) => {
@@ -46,7 +43,7 @@ export class Workspaces {
     /**
      * Get a workspace configuration, or `undefined`.
      */
-    static get(workspace: vscode.WorkspaceFolder): WorkspaceExtended | undefined {
+    static get(workspace: vscode.WorkspaceFolder): WorkspaceConfig | undefined {
 
         return this.workspaces.get(workspace.name);
 
@@ -134,33 +131,14 @@ export class Workspaces {
 
     }
 
+    /**
+     * Initialize a workspace configuration
+     */
     private static async add(workspace: vscode.WorkspaceFolder): Promise<void> {
 
-        const packageJsonConfig = new PackageJsonConfig(workspace);
-        await packageJsonConfig.init();
+        const workspaceConfig = new WorkspaceConfig(workspace);
 
-        const typescriptConfig = new TypescriptConfig(workspace);
-        await typescriptConfig.init();
-
-        const tslintConfig = new TslintConfig(workspace);
-        await tslintConfig.init();
-
-        const workspaceExtented1 = { ...workspace, packageJsonConfig, typescriptConfig, tslintConfig };
-
-        const angularConfig = new AngularConfig(workspaceExtented1);
-        await angularConfig.init();
-
-        const workspaceExtented2 = { ...workspaceExtented1, angularConfig };
-
-        const schematics = new Schematics(workspaceExtented2);
-        await schematics.init();
-
-        this.workspaces.set(workspace.name, {
-            ...workspaceExtented2,
-            schematics,
-        });
-
-        this.stable = true;
+        await workspaceConfig.init();
 
     }
 

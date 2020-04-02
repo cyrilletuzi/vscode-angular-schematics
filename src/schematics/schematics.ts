@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { defaultSchematicsNames } from '../defaults';
 import { Watchers } from '../utils/watchers';
-import { WorkspaceExtended } from '../config';
+import { WorkspaceConfig } from '../config';
 
 import { Collection } from './collection';
 
@@ -14,7 +14,7 @@ export class Schematics {
     private collections = new Map<string, Collection | undefined>();
     private watcher: vscode.Disposable | undefined;
 
-    constructor(private workspace: Omit<WorkspaceExtended, 'schematics'>) {}
+    constructor(private workspace: Omit<WorkspaceConfig, 'schematics'>) {}
 
     /**
      * Initializes schematics collections.

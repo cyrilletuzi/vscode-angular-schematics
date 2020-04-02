@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Collection } from './schematics/collection';
 import { Schematics } from './schematics/schematics';
-import { Workspaces, WorkspaceExtended } from './config';
+import { Workspaces, WorkspaceConfig } from './config';
 import { FileSystem } from './utils/file-system';
 
 
@@ -68,7 +68,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         if (!element) {
 
-            const schematics = new Schematics(Workspaces.getFirstWorkspace() as Omit<WorkspaceExtended, 'schematics'>);
+            const schematics = new Schematics(Workspaces.getFirstWorkspace() as Omit<WorkspaceConfig, 'schematics'>);
 
             await schematics.init();
 
@@ -76,7 +76,7 @@ export class AngularSchematicsProvider implements vscode.TreeDataProvider<vscode
 
         } else {
 
-            const collection = new Collection(element.label as string, Workspaces.getFirstWorkspace()  as Omit<WorkspaceExtended, 'schematics'>);
+            const collection = new Collection(element.label as string, Workspaces.getFirstWorkspace()  as Omit<WorkspaceConfig, 'schematics'>);
             const items: vscode.TreeItem[] = [];
 
             try {

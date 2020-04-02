@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Workspaces, WorkspaceExtended, AngularConfig } from './config';
+import { Workspaces, WorkspaceConfig, AngularConfig } from './config';
 import { Schematics, Collection, Schema } from './schematics';
 
 import { GenerationCommand, GenerationOptions } from './generation-command';
@@ -11,7 +11,7 @@ export class UserJourney {
 
     private static shortcutSchemas = ['component', 'service', 'module'];
 
-    workspace!: WorkspaceExtended;
+    workspace!: WorkspaceConfig;
     generationCommand!: GenerationCommand;
     schematics!: Schematics;
     collection!: Collection;

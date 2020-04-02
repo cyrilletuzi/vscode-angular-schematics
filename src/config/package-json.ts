@@ -19,19 +19,17 @@ export class PackageJsonConfig {
     /** Angular major version */
     private angularMajorVersion: number | undefined;
     private watcher: vscode.FileSystemWatcher | undefined;
-    
-    constructor(private workspace: vscode.WorkspaceFolder) {}
 
     /**
      * Initializes `package.json` configuration.
      * **Must** be called after each `new PackageJsonConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init(workspaceFsPath: string): Promise<void> {
 
-        const fsPath = path.join(this.workspace.uri.fsPath, PackageJsonConfig.fileName);
+        const fsPath = path.join(workspaceFsPath, PackageJsonConfig.fileName);
 
-        this.config = await FileSystem.parseJsonFile<PackageJsonSchema>(fsPath, this.workspace);
+        this.config = await FileSystem.parseJsonFile<PackageJsonSchema>(fsPath);
 
         this.setAngularMajorVersion();
 
@@ -39,7 +37,7 @@ export class PackageJsonConfig {
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init();
+                this.init(workspaceFsPath);
             });
 
         }

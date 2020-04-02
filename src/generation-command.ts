@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as childProcess from 'child_process';
 
 import { FileSystem, Output } from './utils';
-import { WorkspaceExtended, AngularConfig } from './config';
+import { WorkspaceConfig, AngularConfig } from './config';
 import { Schema } from './schematics';
 
 const osList = new Map<string, string>();
@@ -45,7 +45,7 @@ export class GenerationCommand {
     private cliLocal: boolean | null = null;
 
     constructor(
-        private workspace: WorkspaceExtended,
+        private workspace: WorkspaceConfig,
         context?: vscode.Uri,
     ) {
 
