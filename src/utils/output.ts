@@ -25,7 +25,7 @@ export class Output {
      */
     static logInfo(message: string): void {
 
-        this.channel.appendLine(`[Info - ${(new Date().toTimeString())}] ${message}`);
+        this.channel.appendLine(`[Info - ${(new Date().toLocaleTimeString())}] ${message}`);
 
     }
 
@@ -34,8 +34,18 @@ export class Output {
      */
     static logError(message: string): void {
 
-        // TODO: check time format
-        this.channel.appendLine(`[Error - ${(new Date().toTimeString())}] ${message}`);
+        this.channel.appendLine(`[Error - ${(new Date().toLocaleTimeString())}] ${message}`);
+
+    }
+
+    /**
+     * Log an error in output channel and show it to the user.
+     */
+    static showError(message: string): void {
+
+        this.logError(message);
+
+        vscode.window.showErrorMessage(message);
 
     }
 

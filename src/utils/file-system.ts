@@ -57,7 +57,7 @@ export class FileSystem {
      * Check if a file exists and is readable.
      * Otherwise, log an error message in output channel if `silent` is not set to `true`.
      */
-    static async isReadable(fsPath: string): Promise<boolean> {
+    static async isReadable(fsPath: string, { silent = false } = {}): Promise<boolean> {
 
         try {
 
@@ -66,8 +66,10 @@ export class FileSystem {
 
         } catch (error) {
 
-            // TODO: check the constant works
-            this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
+            if (!silent) {
+                // TODO: check the constant works
+                this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
+            }
             
             return false;
 
@@ -101,7 +103,7 @@ export class FileSystem {
 
         const workspace = Workspaces.getFromPath(fsPath);
 
-        const message = `"${path.basename(fsPath)}" can not be ${failedAction}${workspace ? ` in "${workspace.name}" workspace` : ''}.`;
+        const message = `"${fsPath}" can not be ${failedAction}${workspace ? ` in "${workspace.name}" workspace` : ''}.`;
 
         Output.logError(message);
 

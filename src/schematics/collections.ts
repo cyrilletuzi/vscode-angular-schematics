@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { defaultCollectionsNames } from '../defaults';
-import { Output, Watchers } from '../utils';
+import { Output, Watchers, FileSystem } from '../utils';
 import { WorkspaceConfig } from '../config';
 
 import { Collection } from './collection';
 
+// TODO: should be static, like Workspaces
 export class Collections {
 
     /**
@@ -73,23 +75,39 @@ export class Collections {
         /* Configuration key is configured in `package.json` */
         const userCollectionsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
-        Output.logInfo(`User collections defined in Code preferences detected: ${userCollectionsNames.join(', ')}`);
+        Output.logInfo(`${userCollectionsNames.length} user collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
+
+        const userDefaultCollections = this.workspace.angularConfig.getDefaultCollections();
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
-        const collectionsNames = Array.from(new Set([...this.workspace.angularConfig.getDefaultCollections(), ...defaultCollectionsNames, ...userCollectionsNames]));
+        const collectionsNames = Array.from(new Set([...userDefaultCollections, ...defaultCollectionsNames, ...userCollectionsNames]));
 
-        Output.logInfo(`All collections detected: ${userCollectionsNames.join(', ')}`);
+        const existingCollectionsNames = [];
+
+        /* Check the collections exist.
+         * `.filter()` is not possible here as there is an async operation */
+        for (const name of collectionsNames) {
+            if (await this.isCollectionExisting(name)) {
+                existingCollectionsNames.push(name);
+            }
+        }
+
+        if (existingCollectionsNames.length > 0) {
+            Output.logInfo(`${existingCollectionsNames.length} installed collection(s) detected: ${existingCollectionsNames.join(', ')}`);
+        } else {
+            Output.logInfo(`No collection found.`);
+        }
         
         /* `.filter()` is not possible here as there is an async operation */
-        for (const name of collectionsNames) {
+        for (const name of existingCollectionsNames) {
 
             let collection: Collection | undefined = undefined;
 
             /* Preload only defaut collections for performance */
-            if (this.workspace.angularConfig.getDefaultCollections().includes(name)) {
+            if (userDefaultCollections.includes(name)) {
 
-                Output.logInfo(`Preloading some default collections.`);
+                Output.logInfo(`Preloading default collection(s).`);
 
                 collection = await this.loadCollection(name);
 
@@ -98,6 +116,32 @@ export class Collections {
             this.collections.set(name, collection);
 
         }
+
+    }
+
+    /**
+     * Check if a collection exists
+     */
+    private async isCollectionExisting(name: string): Promise<boolean> {
+
+        let fsPath = '';
+
+        /* Local schematics */
+        if (name.startsWith('.') && name.endsWith('.json')) {
+
+            fsPath = path.join(this.workspace.uri.fsPath, name);
+
+        }
+        /* Package schematics */
+        else {
+            
+            // TODO: handle custom node_modules folder
+            fsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name);
+
+        }
+
+        /* It's normal that not all collections exist, so we want to be silent here */
+        return await FileSystem.isReadable(fsPath, { silent: true });
 
     }
 

@@ -87,7 +87,7 @@ export class AngularConfig {
                 /* Keep only the right file name */
                 this.fileNames = [fileName];
 
-                Output.logInfo(`${fileName} config file detected.`);
+                Output.logInfo(`Angular config file name detected: "${fileName}"`);
 
                 /* Stop the iteration, we have a config */
                 break;
@@ -149,7 +149,7 @@ export class AngularConfig {
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
         this.defaultUserCollection = this.config?.cli?.defaultCollection ?? AngularConfig.defaultAngularCollection;
 
-        Output.logInfo(`${this.defaultUserCollection} default schematics collection detected.`);
+        Output.logInfo(`Default schematics collection detected in ${this.fileNames[0]}: ${this.defaultUserCollection}`);
 
         /* `Set` removes duplicates */
         this.defaultCollections = Array.from(new Set([this.defaultUserCollection, AngularConfig.defaultAngularCollection]));
@@ -164,17 +164,13 @@ export class AngularConfig {
         /* Get `projects` in `angular.json`*/
         const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
 
-        Output.logInfo(`${projectsFromConfig.length} Angular projects detected.`);
+        Output.logInfo(`${projectsFromConfig.length} Angular project(s) detected.`);
 
         /* Transform Angular config with more convenient information for this extension */
         const projects: [string, AngularProject][] = projectsFromConfig.map(([name, config]) => {
 
-            Output.logInfo(`Loading configuration of "${name}" project.`);
-
             /* `projectType` is supposed to be required, but default to `application` for safety */
             const type = config.projectType ? config.projectType : 'application';
-
-            Output.logInfo(`"${name}" project's type: ${type}.`);
             
             /* These folders are imposed by Angular CLI.
              * See https://github.com/angular/angular-cli/blob/9190f622365b8eb85b7d8828f170959ded643518/packages/schematics/angular/utility/project.ts#L17 */
@@ -198,7 +194,7 @@ export class AngularConfig {
              * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
             const sourcePath = path.posix.join(sourceRoot, fixedFolder);
 
-            Output.logInfo(`"${name}" project source path: ${sourcePath}.`);
+            Output.logInfo(`"${name}" project is of type "${type}" and its source path is: ${sourcePath}.`);
 
             /* If the project is in `/src/`, it's the root project */
             const isRoot = ((config.root === '') && (sourceRoot === 'src'));

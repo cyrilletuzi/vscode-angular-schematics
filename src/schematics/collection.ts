@@ -55,8 +55,6 @@ export class Collection {
         /* Can throw */
         this.fsPath = await this.getFsPath(this.name);
 
-        Output.logInfo(`"${this.name}" collection path detected: ${this.fsPath}`);
-
         const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath);
 
         if (!config) {
@@ -101,8 +99,6 @@ export class Collection {
 
         const fullName = this.getFullSchematicName(name);
 
-        Output.logInfo(`Loading "${fullName}" schematic`);
-
         if (!this.schematicsConfigs.has(fullName)) {
             Output.logError(`"${fullName}" schematic configuration not found.`);
             return undefined;
@@ -112,6 +108,8 @@ export class Collection {
 
         /* Schematics are not preloaded */
         if (!this.schematics.has(fullName)) {
+
+            Output.logInfo(`Loading "${fullName}" schematic`);
 
             const schematicInstance = new Schematic(schematicConfig, this.workspace);
 
@@ -143,16 +141,12 @@ export class Collection {
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
 
-            Output.logInfo(`"${name}" collection has been detected as a local user collection.`);
-
             return path.join(this.workspace.uri.fsPath, name);
     
         }
 
         /* Package schematics */
         else {
-
-            Output.logInfo(`"${name}" collection has been detected as a library, looking in "node_modules".`);
 
             // TODO: handle custom node_modules folder
             /* `collection.json` path is defined in `package.json` */
@@ -185,7 +179,7 @@ export class Collection {
 
         const allSchematics = Object.entries(this.config.schematics);
 
-        Output.logInfo(`All schematics detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
 
         const schematics = allSchematics
             /* Remove internal schematics */
@@ -193,13 +187,11 @@ export class Collection {
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
 
-        Output.logInfo(`Filtered schematics keeped for "${this.name}" collection: ${schematics.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`${schematics.length} filtered schematic(s) keeped for "${this.name}" collection: ${schematics.map(([name]) => name).join(', ')}`);
 
         for (const [name, config] of schematics) {
 
-            const fsPath = path.join(path.basename(this.fsPath), config.schema);
-
-            Output.logInfo(`"${this.name}:${name}" path detected: ${fsPath}`);
+            const fsPath = path.join(path.dirname(this.fsPath), config.schema);
 
             // TODO: manage `extends`
             this.schematicsConfigs.set(this.getFullSchematicName(name), {

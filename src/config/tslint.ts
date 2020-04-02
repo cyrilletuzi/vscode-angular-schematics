@@ -26,8 +26,6 @@ export class TslintConfig {
      */
     async init(workspaceFsPath: string): Promise<void> {
 
-        Output.logInfo(`Loading "tslint.json" configuration.`);
-
         const fsPath = path.join(workspaceFsPath, TslintConfig.fileName);
 
         this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath);
@@ -92,6 +90,8 @@ export class TslintConfig {
 
         /* `Set` removes duplicates */
         this.componentSuffixes = Array.from(new Set(suffixes));
+
+        Output.logInfo(`${this.componentSuffixes.length} component suffixes detected: ${this.componentSuffixes.join(', ')}`);
 
     }
 

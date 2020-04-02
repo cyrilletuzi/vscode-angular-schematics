@@ -120,8 +120,8 @@ export class CliCommand {
         /* Otherwise we remove the file part */
         const context = FileSystem.removeFilename(this.contextPath.relativeToSource);
 
-        /* Add  trailing slash so the user can just write the name directly*/
-        const contextWithTrailingSlash = (context !== '') ? `${context}/` : '';
+        /* Add  trailing slash so the user can just write the name directly */
+        const contextWithTrailingSlash = !(['', '.'].includes(context)) ? `${context}/` : '';
 
         return contextWithTrailingSlash;
 
@@ -159,7 +159,7 @@ export class CliCommand {
 
         Output.channel.show();
 
-        Output.channel.appendLine(this.getCommand());
+        Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
         try {
 
@@ -182,7 +182,7 @@ export class CliCommand {
             Output.channel.append(error[0]);
             Output.channel.appendLine(error[1]);
 
-            vscode.window.showErrorMessage(`Schematic failed, see Output.`);
+            Output.showError(`Schematic failed, see Output.`);
 
         }
     
@@ -215,13 +215,12 @@ export class CliCommand {
 
                 this.project = projectName;
 
-                Output.logInfo(`Angular project detected from context path: "${this.project}"`);
-
                 /* Remove source path from workspace relative path,
                  * eg. `src/app/some-module` => `some-module` */
                 this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.sourcePath.length + 1);
 
                 Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSource}`);
+                Output.logInfo(`Angular project detected from context path: "${this.project}"`);
 
                 return;
 

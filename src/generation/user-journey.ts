@@ -26,18 +26,20 @@ export class UserJourney {
             return;
         }
 
+        Output.logInfo(`Workspace selected: "${workspace.name}"`);
+
         /* As the configurations are loaded in an async way, they may not be ready */
         try {
             await Workspaces.whenStable();
         } catch {
-            vscode.window.showErrorMessage(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
+            Output.showError(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
             return;
         }
 
-        const workspaceConfig = Workspaces.get(workspace);
+        const workspaceConfig = Workspaces.getConfig(workspace);
         /* Not supposed to happen */
         if (!workspaceConfig) {
-            vscode.window.showErrorMessage(`Command canceled: cannot find the configuration of the chosen workspace.`);
+            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace.`);
             return;
         }
         this.workspace = workspaceConfig;
@@ -64,7 +66,7 @@ export class UserJourney {
                     collectionName = await this.askCollectionName();
                 } catch (error) {
                     /* Happens if `@schematics/angular` is not installed */
-                    vscode.window.showErrorMessage(`Command canceled: ${error.message}`);
+                    Output.showError(`Command canceled: ${error.message}`);
                     return;
                 }
 
@@ -77,14 +79,14 @@ export class UserJourney {
         
         }
 
-        Output.logInfo(`Collection used: ${collectionName}.`);
+        Output.logInfo(`Collection used: "${collectionName}"`);
 
         this.cliCommand.setCollectionName(collectionName);
 
         const collection = await this.collections.get(collectionName);
 
         if (!collection) {
-            vscode.window.showErrorMessage(`Command canceled: cannot load "${collectionName}" collection.`);
+            Output.showError(`Command canceled: cannot load "${collectionName}" collection.`);
             return;
         }
 
@@ -101,14 +103,14 @@ export class UserJourney {
 
         }
 
-        Output.logInfo(`Schematic used: "${collectionName}:${schematicName}".`);
+        Output.logInfo(`Schematic used: "${collectionName}:${schematicName}"`);
 
         this.cliCommand.setSchematicName(schematicName);
 
         const schematic = await this.collection.getSchematic(schematicName);
 
         if (!schematic) {
-            vscode.window.showErrorMessage(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
+            Output.showError(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
             return;
         }
 
@@ -120,7 +122,7 @@ export class UserJourney {
 
         if (this.schematic.hasNameAsFirstArg()) {
 
-            Output.logInfo(`This schematics have a default argument to set the path and name.`);
+            Output.logInfo(`This schematic has a default argument to set the path and name.`);
 
             nameAsFirstArg = await this.askNameAsFirstArg();
 
@@ -194,8 +196,6 @@ export class UserJourney {
 
         }
 
-        Output.logInfo(`Launching command.`);
-
         await this.cliCommand.launchCommand();
 
     }
@@ -245,7 +245,7 @@ export class UserJourney {
         const project = this.cliCommand.getProject();
         const contextPath = this.cliCommand.getContextForNameAsFirstArg();
 
-        Output.logInfo(`Context path detected for first argument: ${contextPath}`);
+        Output.logInfo(`Context path detected for default argument: "${contextPath}"`);
 
         let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
 

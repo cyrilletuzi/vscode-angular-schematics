@@ -280,7 +280,7 @@ export class Schematic {
 
         const options = Object.entries(this.config.properties);
 
-        Output.logInfo(`All options detected for "${this.name}" schematic: ${options.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`${options.length} options detected for "${this.name}" schematic: ${options.map(([name]) => name).join(', ')}`);
 
         /* Set all options */
         for (const [name, option] of options) {
@@ -292,7 +292,7 @@ export class Schematic {
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
             .filter((name) => !(('$default') in this.options.get(name)!));
 
-        Output.logInfo(`Required options detected for "${this.name}" schematic: ${this.requiredOptionsNames.join(', ')}`);
+        Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
         
         /* Prepare choices for special schematics with shortcut */
         if (this.collectionName === AngularConfig.defaultAngularCollection) {

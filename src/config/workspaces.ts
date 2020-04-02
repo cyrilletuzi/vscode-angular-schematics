@@ -18,9 +18,11 @@ export class Workspaces {
      */
     static async init(): Promise<void> {
 
+        const startTime = Date.now();
+
         const workspaces = vscode.workspace.workspaceFolders ?? [];
 
-        Output.logInfo(`Loading configuration of ${workspaces.length} workspace(s).`);
+        Output.logInfo(`${workspaces.length} workspace(s) detected.`);
 
         // TODO: check if non-Angular workspaces are included or not
         /* Default array is just for type-safety, it cannot happen as the extension can only be activated inside a workspace */
@@ -31,7 +33,10 @@ export class Workspaces {
         /* All configuration is ready */
         this.stable = true;
 
-        Output.logInfo(`Configurations of all workspaces are now ready.`);
+        const endTime = Date.now();
+        const durationTime = (endTime - startTime);
+
+        Output.logInfo(`Configurations of all workspaces are now ready. Duration: ${durationTime}ms.`);
 
         /* Listen if a workspace is added or removed */
         vscode.workspace.onDidChangeWorkspaceFolders((event) => {
@@ -53,7 +58,7 @@ export class Workspaces {
     /**
      * Get a workspace configuration, or `undefined`.
      */
-    static get(workspace: vscode.WorkspaceFolder): WorkspaceConfig | undefined {
+    static getConfig(workspace: vscode.WorkspaceFolder): WorkspaceConfig | undefined {
 
         return this.workspaces.get(workspace.name);
 
@@ -116,6 +121,7 @@ export class Workspaces {
         return vscode.workspace.workspaceFolders![0];
     }
 
+    // TODO: show loader
     /**
      * Wait for the config to be fully loaded.
      * Throw if it takes more than 10 seconds.
@@ -168,6 +174,8 @@ export class Workspaces {
         const workspaceConfig = new WorkspaceConfig(workspace);
 
         await workspaceConfig.init();
+
+        this.workspaces.set(workspace.name, workspaceConfig);
 
     }
 
