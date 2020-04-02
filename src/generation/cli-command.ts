@@ -1,19 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as os from 'os';
-import * as childProcess from 'child_process';
 
-import { FileSystem, Output } from '../utils';
+import { FileSystem, Output, Terminal } from '../utils';
 import { WorkspaceConfig, AngularConfig } from '../config';
 import { Schematic } from '../schematics';
-
-const osList = new Map<string, string>();
-osList.set('darwin', 'osx');
-osList.set('win32', 'windows');
-
-const userOs = osList.get(os.platform()) || 'linux';
-// TODO: Manage custom shell for Windows
-const userShell = (userOs === 'windows') ? undefined : vscode.workspace.getConfiguration().get(`terminal.integrated.shell.${userOs}`) as string;
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
@@ -42,7 +32,6 @@ export class CliCommand {
     private schematic!: Schematic;
     private nameAsFirstArg = '';
     private options: CliCommandOptions = new Map();
-    private cliLocal: boolean | null = null;
 
     constructor(
         private workspace: WorkspaceConfig,
@@ -154,37 +143,43 @@ export class CliCommand {
 
     }
 
-    // TODO: Move to Terminal API
-    async launchCommand(): Promise<void> {
-
-        Output.channel.show();
+    /**
+     * Launch command in a terminal
+     * @returns A `Promise` with the possible fsPaths of the generated file
+     */
+    launchCommand(): string[] {
 
         Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
-        try {
+        Terminal.send(this.getCommand());
 
-            const exexCommand = (await this.isCliLocal()) ? `"./node_modules/.bin/ng"${this.getCommand().substr(2)}` : this.getCommand();
+        /* Try to resolve the path of the generated file */
+        const possibleFsPaths: string[] = [];
 
-            const stdout = await this.execAsync(exexCommand, this.workspace.uri);
+        /* Without a default argument, we cannot know the possible path */
+        if (this.nameAsFirstArg) {
 
-            Output.channel.appendLine(stdout);
+            /* Get the project path, or defaut to `src/app` */
+            const projectSourcePath = this.project ?
+                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.getProjects().get(this.project)!.sourcePath) :
+                path.join(this.workspace.uri.fsPath, 'src/app');
 
-            await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+            /* Default file's suffix is the schematic name (eg. `service`),
+            * except for Angular component schematic which can have a specific suffix with the `--type` option */
+            const suffix = ((this.collectionName === AngularConfig.defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
+                this.options.get('type')! : this.schematicName;
 
-            vscode.window.setStatusBarMessage(`Schematic worked!`, 5000);
+            const fileName = `${this.nameAsFirstArg}.${suffix}.ts`;
+            
+            /* Schematics are created with or without an intermediate folder, depending on CLI or user defaults */
+            const fsPathFlat = path.join(projectSourcePath, fileName);
+            const fsPathNotFlat = path.join(projectSourcePath, this.nameAsFirstArg, fileName);
 
-            try {
-                await this.jumpToFile(stdout);
-            } catch (error) {}
-
-        } catch (error) {
-
-            Output.channel.append(error[0]);
-            Output.channel.appendLine(error[1]);
-
-            Output.showError(`Schematic failed, see Output.`);
+            possibleFsPaths.push(fsPathFlat, fsPathNotFlat);
 
         }
+
+        return possibleFsPaths;
     
     }
 
@@ -272,62 +267,6 @@ export class CliCommand {
                 return `--${key} ${value}`;
             }
         });
-
-    }
-
-    // TODO: will be removed once we move to Terminal API
-    private async isCliLocal(): Promise<boolean> {
-
-        if (this.cliLocal === null) {
-
-            const cliLocalFsPath = path.join(this.workspace.uri.fsPath, '.bin', 'ng');
-
-            this.cliLocal = await FileSystem.isReadable(cliLocalFsPath);
-
-        }
-
-        return this.cliLocal;
-
-    }
-
-    // TODO: will be removed once we move to Terminal API
-    private async execAsync(command: string, workspaceUri?: vscode.Uri): Promise<string> {
-
-        return new Promise((resolve, reject) => {
-    
-            childProcess.exec(command, { cwd: workspaceUri?.fsPath, shell: userShell }, (error, stdout, stderr) => {
-    
-                if (error) {
-                    reject([stdout, stderr]);
-                } else {
-                    resolve(stdout);
-                }
-    
-            });
-    
-        });
-    
-    }
-
-    // TODO: will be refactored once we move to Terminal API
-    private async jumpToFile(stdout: string): Promise<void> {
-
-        const name = this.nameAsFirstArg.includes('/') ? this.nameAsFirstArg.substr(this.nameAsFirstArg.lastIndexOf('/') + 1) : this.nameAsFirstArg;
-
-        const suffix = (this.schematicName === 'component') ? this.options.get('type') : '';
-        const suffixTest = suffix ? `|${suffix}` : '';
-
-        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${this.schematicName}${suffixTest}))?\.ts)`);
-
-        let stdoutMatches = stdout.match(stdoutRegExp);
-
-        if (stdoutMatches) {
-
-            const document = await vscode.workspace.openTextDocument(path.join(this.workspace.uri.fsPath, stdoutMatches[1]));
-
-            await vscode.window.showTextDocument(document);
-
-        }
 
     }
 

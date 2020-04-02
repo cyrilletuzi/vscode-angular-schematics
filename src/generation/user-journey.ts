@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Output } from '../utils';
+import { Output, FileSystem } from '../utils';
 import { Workspaces, WorkspaceConfig, AngularConfig } from '../config';
 import { Collections, Collection, Schematic } from '../schematics';
 
@@ -196,7 +196,12 @@ export class UserJourney {
 
         }
 
-        await this.cliCommand.launchCommand();
+        const filePossiblefsPaths = this.cliCommand.launchCommand();
+
+        /* Refresh Explorer, otherwise you may not see the generated files */
+        await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+
+        this.jumpToFile(filePossiblefsPaths);
 
     }
 
@@ -474,6 +479,57 @@ export class UserJourney {
         });
 
         return (choice === confirmationText) ? true : false;
+
+    }
+
+    /**
+     * Automatically open the generated file
+     */
+    private async jumpToFile(possibleFsPaths: string[], counter = 0): Promise<void> {
+
+        /* If we don't know the generated file path, we can't know if the command succeeded or not,
+         * as we can't react on Terminal output */
+        if (possibleFsPaths.length === 0) {
+
+            Output.logInfo(`Command launched, check terminal to know its status.`);
+
+        } else {
+
+            for (const fsPath of possibleFsPaths) {
+
+                /* If the file exists, open it */
+                if (await FileSystem.isReadable(fsPath, { silent: true })) {
+
+                    const document = await vscode.workspace.openTextDocument(fsPath);
+
+                    await vscode.window.showTextDocument(document);
+        
+                    Output.logInfo(`Command has succeeded! Check terminal for more details.`);
+
+                    return;
+
+                }
+
+            }
+
+            /* Otherwise retry every half second, 6 times (so 3 seconds maximum) */
+            if (counter < 6) {
+
+                counter += 1;
+
+                setTimeout(() => {
+                    this.jumpToFile(possibleFsPaths, counter);
+                }, 500);
+
+            }
+            /* After 6 failures */
+            else {
+
+                Output.logInfo(`Command launched, check terminal to know its status.`);
+
+            }
+
+        }
 
     }
 
