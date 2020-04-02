@@ -30,7 +30,13 @@ export class UserJourney {
 
         /* As the configurations are loaded in an async way, they may not be ready */
         try {
-            await Workspaces.whenStable();
+
+            /* Show progress to the user */
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Window,
+                title: `Angular Schematics: loading configuration, please wait...`,
+            }, () => Workspaces.whenStable());
+
         } catch {
             Output.showError(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
             return;
@@ -82,8 +88,12 @@ export class UserJourney {
         Output.logInfo(`Collection used: "${collectionName}"`);
 
         this.cliCommand.setCollectionName(collectionName);
-
-        const collection = await this.collections.get(collectionName);
+        
+        /* Show progress to the user */
+        const collection = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Window,
+            title: `Angular Schematics: collection "${collectionName}" is loading, please wait...`,
+        }, () => this.collections.get(collectionName!));
 
         if (!collection) {
             Output.showError(`Command canceled: cannot load "${collectionName}" collection.`);
@@ -107,7 +117,11 @@ export class UserJourney {
 
         this.cliCommand.setSchematicName(schematicName);
 
-        const schematic = await this.collection.getSchematic(schematicName);
+        /* Show progress to the user */
+        const schematic = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Window,
+            title: `Angular Schematics: "${collectionName}:${schematicName}" schematic is loading, please wait...`,
+        }, () => this.collection.getSchematic(schematicName!));
 
         if (!schematic) {
             Output.showError(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
