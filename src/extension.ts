@@ -4,7 +4,7 @@ import { Watchers, Output } from './utils';
 import { Workspaces } from './config';
 import { UserJourney } from './generation';
 
-import { AngularSchematicsProvider } from './view';
+// import { AngularSchematicsProvider } from './view';
 
 /**
  * Function called when the extension is activated, to register new commands.
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext): void {
     Workspaces.init();
 
     // TODO: do a class to init, and check if it should be removed on deactivate
-    vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
+    // vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
 
     /* 
      * Register new commands. Important things:
