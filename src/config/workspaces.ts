@@ -62,7 +62,7 @@ export class Workspaces {
     /**
      * Get a workspace based on a file system path configuration, or `undefined`.
      */
-    static getWorkspaceFromPath(fsPath: string): vscode.WorkspaceFolder | undefined {
+    static getFromPath(fsPath: string): vscode.WorkspaceFolder | undefined {
         
         const contextPathUri = vscode.Uri.file(fsPath);
 
@@ -112,7 +112,7 @@ export class Workspaces {
     }
 
     // TODO: find another solution for view
-    static getFirstWorkspace(): vscode.WorkspaceFolder {
+    static getFirst(): vscode.WorkspaceFolder {
         return vscode.workspace.workspaceFolders![0];
     }
 

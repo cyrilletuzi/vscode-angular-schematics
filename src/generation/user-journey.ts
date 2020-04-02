@@ -3,21 +3,21 @@ import * as path from 'path';
 
 import { Output } from '../utils';
 import { Workspaces, WorkspaceConfig, AngularConfig } from '../config';
-import { Schematics, Collection, Schema } from '../schematics';
+import { Collections, Collection, Schematic } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 
 export class UserJourney {
 
-    private static shortcutSchemas = ['component', 'service', 'module'];
+    private static shortcutSchematics = ['component', 'service', 'module'];
 
     workspace!: WorkspaceConfig;
-    generationCommand!: CliCommand;
-    schematics!: Schematics;
+    cliCommand!: CliCommand;
+    collections!: Collections;
     collection!: Collection;
-    schema!: Schema;
+    schematic!: Schematic;
 
-    async start(context?: vscode.Uri, schemaName?: string, collectionName?: string): Promise<void> {
+    async start(context?: vscode.Uri, schematicName?: string, collectionName?: string): Promise<void> {
 
         /* Resolve the current workspace config */
         const workspace = await Workspaces.getCurrent(context);
@@ -41,15 +41,15 @@ export class UserJourney {
             return;
         }
         this.workspace = workspaceConfig;
-        this.schematics = this.workspace.schematics;
+        this.collections = this.workspace.collections;
 
-        this.generationCommand = new CliCommand(workspaceConfig, context);
+        this.cliCommand = new CliCommand(workspaceConfig, context);
 
         /* Collection will already be set when coming from Angular schematics panel */
         if (!collectionName) {
 
-            /* Schema will already be set when coming from generation shortcuts like "Generate a component" */
-            if (schemaName) {
+            /* Schematic will already be set when coming from generation shortcuts like "Generate a component" */
+            if (schematicName) {
 
                 /* For shortcuts, always use default official collection
                  * (default user collection can be set to something else,
@@ -79,9 +79,9 @@ export class UserJourney {
 
         Output.logInfo(`Collection used: ${collectionName}.`);
 
-        this.generationCommand.setCollectionName(collectionName);
+        this.cliCommand.setCollectionName(collectionName);
 
-        const collection = await this.schematics.getCollection(collectionName);
+        const collection = await this.collections.get(collectionName);
 
         if (!collection) {
             vscode.window.showErrorMessage(`Command canceled: cannot load "${collectionName}" collection.`);
@@ -90,35 +90,35 @@ export class UserJourney {
 
         this.collection = collection;
 
-        if (!schemaName) {
+        if (!schematicName) {
 
-            schemaName = await this.askSchemaName();
+            schematicName = await this.askSchematicName();
 
-            if (!schemaName) {
-                Output.logInfo(`You have canceled the schema choice.`);
+            if (!schematicName) {
+                Output.logInfo(`You have canceled the schematic choice.`);
                 return;
             }
 
         }
 
-        Output.logInfo(`Schema used: ${schemaName}.`);
+        Output.logInfo(`Schematic used: "${collectionName}:${schematicName}".`);
 
-        this.generationCommand.setSchemaName(schemaName);
+        this.cliCommand.setSchematicName(schematicName);
 
-        const schema = await this.collection.getSchema(schemaName);
+        const schematic = await this.collection.getSchematic(schematicName);
 
-        if (!schema) {
-            vscode.window.showErrorMessage(`Command canceled: cannot load "${schemaName}" schema in "${collectionName}" collection.`);
+        if (!schematic) {
+            vscode.window.showErrorMessage(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
             return;
         }
 
-        this.generationCommand.setSchema(schema);
+        this.cliCommand.setSchematic(schematic);
 
-        this.schema = schema;
+        this.schematic = schematic;
 
         let nameAsFirstArg: string | undefined;
 
-        if (this.schema.hasNameAsFirstArg()) {
+        if (this.schematic.hasNameAsFirstArg()) {
 
             Output.logInfo(`This schematics have a default argument to set the path and name.`);
 
@@ -129,19 +129,20 @@ export class UserJourney {
                 return;
             }
 
-            this.generationCommand.setNameAsFirstArg(nameAsFirstArg);
+            this.cliCommand.setNameAsFirstArg(nameAsFirstArg);
 
         }
 
         let shortcutConfirm: boolean | undefined = false;
 
         /* Quicker scenario for basic schematics (component, service, module of official schematics) */
-        if (UserJourney.shortcutSchemas.includes(schemaName) && (collectionName === AngularConfig.defaultAngularCollection)) {
+        if ((collectionName === AngularConfig.defaultAngularCollection)
+        && UserJourney.shortcutSchematics.includes(schematicName)) {
 
             let shortcutOptions: CliCommandOptions | undefined;
 
             /* Special scenario for component types */
-            if (schemaName === 'component') {
+            if (schematicName === 'component') {
 
                 shortcutOptions = await this.askComponentOptions();
                 if (!shortcutOptions) {
@@ -150,7 +151,7 @@ export class UserJourney {
                 }
 
             /* Special scenario for module types */
-            } else if (schemaName === 'module') {
+            } else if (schematicName === 'module') {
 
                 shortcutOptions = await this.askModuleOptions(nameAsFirstArg!);
                 if (!shortcutOptions) {
@@ -161,7 +162,7 @@ export class UserJourney {
             }
 
             if (shortcutOptions) {
-                this.generationCommand.addOptions(shortcutOptions);
+                this.cliCommand.addOptions(shortcutOptions);
             }
 
             /* Ask direct confirmation or adding more options or cancel */
@@ -180,7 +181,7 @@ export class UserJourney {
 
             const filledOptions = await this.askOptions();
 
-            this.generationCommand.addOptions(filledOptions);
+            this.cliCommand.addOptions(filledOptions);
 
             /* Ask final confirmation */
             const confirm = await this.askConfirmation();
@@ -195,19 +196,19 @@ export class UserJourney {
 
         Output.logInfo(`Launching command.`);
 
-        await this.generationCommand.launchCommand();
+        await this.cliCommand.launchCommand();
 
     }
 
     private async askCollectionName(): Promise<string | undefined> {
 
-        if  (this.schematics.getCollectionsNames().length === 0) {
-            throw new Error('Cannot find any schematics.');
+        if  (this.collections.getNames().length === 0) {
+            throw new Error('Cannot find any collections.');
         }
         
-        else if  (this.schematics.getCollectionsNames().length === 1) {
+        else if  (this.collections.getNames().length === 1) {
 
-            const collectionName = this.schematics.getCollectionsNames()[0];
+            const collectionName = this.collections.getNames()[0];
 
             Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
 
@@ -219,7 +220,7 @@ export class UserJourney {
 
             Output.logInfo(`Multiple collections detected: ask the user which one to use.`);
 
-            return vscode.window.showQuickPick(this.schematics.getCollectionsNames(), {
+            return vscode.window.showQuickPick(this.collections.getNames(), {
                 placeHolder: `From which schematics collection?`,
                 ignoreFocusOut: true,
             });
@@ -228,9 +229,9 @@ export class UserJourney {
 
     }
 
-    private async askSchemaName(): Promise<string | undefined> {
+    private async askSchematicName(): Promise<string | undefined> {
 
-        const choice = await vscode.window.showQuickPick(this.collection.getSchemasChoices(), {
+        const choice = await vscode.window.showQuickPick(this.collection.getSchematicsChoices(), {
             placeHolder: `What do you want to generate?`,
             ignoreFocusOut: true,
         });
@@ -241,8 +242,8 @@ export class UserJourney {
 
     private async askNameAsFirstArg(): Promise<string | undefined> {
 
-        const project = this.generationCommand.getProject();
-        const contextPath = this.generationCommand.getContextForNameAsFirstArg();
+        const project = this.cliCommand.getProject();
+        const contextPath = this.cliCommand.getContextForNameAsFirstArg();
 
         Output.logInfo(`Context path detected for first argument: ${contextPath}`);
 
@@ -263,38 +264,16 @@ export class UserJourney {
         });
 
         /* Remove suffix (like `.component`) as Angular CLI will already add it */
-        const suffix = `.${this.schema.getName()}`;
+        const suffix = `.${this.schematic.getName()}`;
         const name = nameInput?.endsWith(suffix) ? nameInput.replace(suffix, '') : nameInput;
 
         return name;
 
     }
 
-    private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
-
-        /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
-        const routeName = path.posix.basename(nameAsFirstArg);
-
-        const types = this.schema.getModuleTypes(routeName);
-        const typesChoices = Array.from(types.values()).map((type) => type.choice);
-
-        if (typesChoices.length === 0) {
-            Output.logError(`No module types detected.`);
-            return new Map();
-        }
-
-        const typeChoice = await vscode.window.showQuickPick(typesChoices, {
-            placeHolder: `What type of module do you want?`,
-            ignoreFocusOut: true,
-        });
-
-        return typeChoice ? types.get(typeChoice.label)?.options : undefined;
-
-    }
-
     private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
-        const types = this.schema.getComponentTypesChoices();
+        const types = this.schematic.getComponentTypesChoices();
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         if (typesChoices.length === 0) {
@@ -311,6 +290,28 @@ export class UserJourney {
 
     }
 
+    private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
+
+        /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
+        const routeName = path.posix.basename(nameAsFirstArg);
+
+        const types = this.schematic.getModuleTypes(routeName);
+        const typesChoices = Array.from(types.values()).map((type) => type.choice);
+
+        if (typesChoices.length === 0) {
+            Output.logError(`No module types detected.`);
+            return new Map();
+        }
+
+        const typeChoice = await vscode.window.showQuickPick(typesChoices, {
+            placeHolder: `What type of module do you want?`,
+            ignoreFocusOut: true,
+        });
+
+        return typeChoice ? types.get(typeChoice.label)?.options : undefined;
+
+    }
+
     private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
         // TODO: cache these choices
@@ -320,12 +321,15 @@ export class UserJourney {
         };
         const MORE_OPTIONS: vscode.QuickPickItem = {
             label: `Add more options`,
-            description: `Pro-tip: you can set default values to schematics options in angular.json`,
+            description: `Pro-tip: you can set default values to "schematics" options in angular.json`,
         };
-        const CANCEL: vscode.QuickPickItem = { label: `Cancel` };
 
-        const choice = await vscode.window.showQuickPick([CONFIRM, MORE_OPTIONS, CANCEL], {
-            placeHolder: this.generationCommand.getCommand(),
+        const choice = await vscode.window.showQuickPick([
+            CONFIRM,
+            MORE_OPTIONS,
+            { label: `Cancel` }
+        ], {
+            placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
 
@@ -354,13 +358,13 @@ export class UserJourney {
 
     private async askOptionsNames(): Promise<string[]> {
 
-        const optionsChoices = this.schema.getOptionsChoices();
+        const optionsChoices = this.schematic.getOptionsChoices();
 
         if (optionsChoices.length === 0) {
             return [];
         }
         
-        const selectedOptions = await vscode.window.showQuickPick(this.schema.getOptionsChoices(), {
+        const selectedOptions = await vscode.window.showQuickPick(this.schematic.getOptionsChoices(), {
             canPickMany: true,
             placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
             ignoreFocusOut: true,
@@ -373,7 +377,7 @@ export class UserJourney {
     private async askOptionsValues(optionsNames: string[]): Promise<CliCommandOptions> {
 
         /* Force required options, otherwise the schematic will fail */
-        const options = [...this.schema.getRequiredOptions(), ...this.schema.getSomeOptions(optionsNames)];
+        const options = [...this.schematic.getRequiredOptions(), ...this.schematic.getSomeOptions(optionsNames)];
 
         const filledOptions: CliCommandOptions = new Map();
     
@@ -465,7 +469,7 @@ export class UserJourney {
         const confirmationText = `Confirm`;
 
         const choice = await vscode.window.showQuickPick([confirmationText, `Cancel`], {
-            placeHolder: this.generationCommand.getCommand(),
+            placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
 

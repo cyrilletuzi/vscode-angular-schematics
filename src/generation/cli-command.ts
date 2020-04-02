@@ -5,7 +5,7 @@ import * as childProcess from 'child_process';
 
 import { FileSystem, Output } from '../utils';
 import { WorkspaceConfig, AngularConfig } from '../config';
-import { Schema } from '../schematics';
+import { Schematic } from '../schematics';
 
 const osList = new Map<string, string>();
 osList.set('darwin', 'osx');
@@ -38,8 +38,8 @@ export class CliCommand {
     private baseCommand = 'ng g';
     private project = '';
     private collectionName = AngularConfig.defaultAngularCollection;
-    private schemaName = '';
-    private schema!: Schema;
+    private schematicName = '';
+    private schematic!: Schematic;
     private nameAsFirstArg = '';
     private options: CliCommandOptions = new Map();
     private cliLocal: boolean | null = null;
@@ -60,7 +60,7 @@ export class CliCommand {
 
         return [
             this.baseCommand,
-            this.formatCollectionAndSchemaForCommand(),
+            this.formatSchematicNameForCommand(),
             this.nameAsFirstArg,
             ...this.formatOptionsForCommand(),
         ].join(' ');
@@ -77,23 +77,23 @@ export class CliCommand {
     }
 
     /**
-     * Set schema's name
+     * Set schematic's name
      */
-    setSchemaName(name: string): void {
+    setSchematicName(name: string): void {
 
-        this.schemaName = name;
+        this.schematicName = name;
 
     }
 
     /**
-     * Set schema, and project if relevant.
+     * Set schematic, and project if relevant.
      */
-    setSchema(schema: Schema): void {
+    setSchematic(schematic: Schematic): void {
 
-        this.schema = schema;
+        this.schematic = schematic;
 
-        /* If a project was detected, the schema supports it and it's not the root project, add the project */
-        if (this.project && schema.hasOption('project') && !this.workspace.angularConfig.isRootProject(this.project)) {
+        /* If a project was detected, the schematic supports it and it's not the root project, add the project */
+        if (this.project && schematic.hasOption('project') && !this.workspace.angularConfig.isRootProject(this.project)) {
             this.options.set('project', this.project);
         }
 
@@ -143,11 +143,11 @@ export class CliCommand {
 
         for (const [name, option] of options) {
 
-            /* Check they exist in schema */
-            if (this.schema.hasOption(name)) {
+            /* Check they exist in schematic */
+            if (this.schematic.hasOption(name)) {
                 this.options.set(name, option);
             } else {
-                Output.logError(`"--${name}" option has been chosen but does not exist in this schematics, so it won't be used.`);
+                Output.logError(`"--${name}" option has been chosen but does not exist in this schematic, so it won't be used.`);
             }
 
         }
@@ -171,7 +171,7 @@ export class CliCommand {
 
             await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
 
-            vscode.window.setStatusBarMessage(`Schematics worked!`, 5000);
+            vscode.window.setStatusBarMessage(`Schematic worked!`, 5000);
 
             try {
                 await this.jumpToFile(stdout);
@@ -182,7 +182,7 @@ export class CliCommand {
             Output.channel.append(error[0]);
             Output.channel.appendLine(error[1]);
 
-            vscode.window.showErrorMessage(`Schematics failed, see Output.`);
+            vscode.window.showErrorMessage(`Schematic failed, see Output.`);
 
         }
     
@@ -238,15 +238,15 @@ export class CliCommand {
     }
 
     /**
-     * Format collection and schema for the generation command:
-     * - just the schema if the collection is already the user default's one (eg. `component`)
-     * - otherwise the full collection scheme (eg. `@schematics/angular:component`)
+     * Format collection and schematic name for the generation command:
+     * - just the schematic name if the collection is already the user default's one (eg. `component`)
+     * - otherwise the full scheme (eg. `@schematics/angular:component`)
      */
-    private formatCollectionAndSchemaForCommand(): string {
+    private formatSchematicNameForCommand(): string {
 
         return (this.collectionName !== this.workspace.angularConfig.getDefaultUserCollection()) ?
-            `${this.collectionName}:${this.schemaName}` :
-            this.schemaName;
+            `${this.collectionName}:${this.schematicName}` :
+            this.schematicName;
 
     }
 
@@ -315,10 +315,10 @@ export class CliCommand {
 
         const name = this.nameAsFirstArg.includes('/') ? this.nameAsFirstArg.substr(this.nameAsFirstArg.lastIndexOf('/') + 1) : this.nameAsFirstArg;
 
-        const suffix = (this.schemaName === 'component') ? this.options.get('type') : '';
+        const suffix = (this.schematicName === 'component') ? this.options.get('type') : '';
         const suffixTest = suffix ? `|${suffix}` : '';
 
-        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${this.schemaName}${suffixTest}))?\.ts)`);
+        const stdoutRegExp = new RegExp(`CREATE (.*${name}(?:\.(${this.schematicName}${suffixTest}))?\.ts)`);
 
         let stdoutMatches = stdout.match(stdoutRegExp);
 

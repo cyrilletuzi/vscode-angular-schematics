@@ -1,7 +1,7 @@
 /**
- * Default third-party schematics.
+ * Default third-party schematics collections.
  */
-export const defaultSchematicsNames: string[] = [
+export const defaultCollectionsNames: string[] = [
     '@angular/material',
     '@ionic/angular-toolkit',
     '@ngrx/schematics',

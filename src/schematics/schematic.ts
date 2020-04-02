@@ -7,22 +7,22 @@ import { AngularConfig, WorkspaceConfig } from '../config';
 const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
 const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
 
-export interface ShortcutType {
+export interface SchematicShortcutType {
     options: Map<string, string | string[]>;
     choice: vscode.QuickPickItem;
 }
 
-export type ShortcutTypes = Map<string, ShortcutType>;
+export type SchematicShortcutTypes = Map<string, SchematicShortcutType>;
 
-/** Configuration needed to load a schema */
-export interface SchemaConfig {
+/** Configuration needed to load a schematic */
+export interface SchematicConfig {
     name: string;
     collectionName: string;
     description: string;
     fsPath: string;
 }
 
-export interface SchemaOptionJsonSchema {
+export interface SchematicOptionJsonSchema {
     type: 'string' | 'boolean' | 'array';
     description: string;
     enum?: string[];
@@ -54,49 +54,47 @@ export interface SchemaOptionJsonSchema {
     };
 }
 
-interface SchemaJsonSchema {
+interface SchematicJsonSchema {
     properties: {
         /** Key is the option's name */
-        [key: string]: SchemaOptionJsonSchema;
+        [key: string]: SchematicOptionJsonSchema;
     };
     /** Some options may be required */
     required?: string[];
 }
 
-export class Schema {
+export class Schematic {
 
     private name: string;
     private collectionName: string;
     private fsPath: string;
-    private config!: SchemaJsonSchema;
-    private options = new Map<string, SchemaOptionJsonSchema>();
+    private config!: SchematicJsonSchema;
+    private options = new Map<string, SchematicOptionJsonSchema>();
     private requiredOptionsNames: string[] = [];
-    private shortcutTypesChoices: ShortcutTypes = new Map();
+    private shortcutTypesChoices: SchematicShortcutTypes = new Map();
     private optionsChoices: vscode.QuickPickItem[] = [];
     private watcher: vscode.Disposable | undefined;
 
     constructor(
-        config: SchemaConfig,
-        private workspace: Omit<WorkspaceConfig, 'schematics'>,
+        config: SchematicConfig,
+        private workspace: WorkspaceConfig,
     ) {
-
         this.name = config.name;
         this.collectionName = config.collectionName;
         this.fsPath = config.fsPath;
-
     }
 
     /**
-     * Load the schema.
+     * Load the schematic.
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
     async init(): Promise<void> {
 
-        const config = await FileSystem.parseJsonFile<SchemaJsonSchema>(this.fsPath);
+        const config = await FileSystem.parseJsonFile<SchematicJsonSchema>(this.fsPath);
 
         if (!config) {
-            throw new Error(`"${this.collectionName}:${this.name}" schema can not be loaded.`);
+            throw new Error(`"${this.collectionName}:${this.name}" schematic can not be loaded.`);
         }
 
         this.config = config;
@@ -126,7 +124,7 @@ export class Schema {
     /**
      * Get options' details from their names
      */
-    getSomeOptions(names: string[]): Map<string, SchemaOptionJsonSchema> {
+    getSomeOptions(names: string[]): Map<string, SchematicOptionJsonSchema> {
 
         return new Map(names
             .filter((name) => this.options.has(name))
@@ -138,7 +136,7 @@ export class Schema {
     /**
      * Get required options details
      */
-    getRequiredOptions(): Map<string, SchemaOptionJsonSchema> {
+    getRequiredOptions(): Map<string, SchematicOptionJsonSchema> {
 
         return new Map(this.requiredOptionsNames
             .map((name) => [name, this.options.get(name)!])
@@ -149,7 +147,7 @@ export class Schema {
     /**
      * Get component types choices from cache
      */
-    getComponentTypesChoices(): ShortcutTypes {
+    getComponentTypesChoices(): SchematicShortcutTypes {
 
         return this.shortcutTypesChoices;
         
@@ -158,7 +156,7 @@ export class Schema {
     /**
      * Get component types choices from cache
      */
-    getModuleTypes(routeName: string): ShortcutTypes {
+    getModuleTypes(routeName: string): SchematicShortcutTypes {
 
         /* Lazy-loaded module type has an option that can only be set based on user input */
         const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY);
@@ -189,14 +187,14 @@ export class Schema {
     }
 
     /**
-     * Tells if an option exists in the schema.
+     * Tells if an option exists in the schematic.
      */
     hasOption(name: string): boolean {
         return this.options.has(name);
     }
 
     /**
-     * Tells if the schema requires a path/to/name as first command line argument
+     * Tells if the schematic requires a path/to/name as first command line argument
      */
     hasNameAsFirstArg(): boolean {
 
@@ -282,7 +280,7 @@ export class Schema {
 
         const options = Object.entries(this.config.properties);
 
-        Output.logInfo(`All options detected for "${this.name}" schematics: ${options.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`All options detected for "${this.name}" schematic: ${options.map(([name]) => name).join(', ')}`);
 
         /* Set all options */
         for (const [name, option] of options) {
@@ -294,9 +292,9 @@ export class Schema {
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
             .filter((name) => !(('$default') in this.options.get(name)!));
 
-        Output.logInfo(`Required options detected for "${this.name}" schematics: ${this.requiredOptionsNames.join(', ')}`);
+        Output.logInfo(`Required options detected for "${this.name}" schematic: ${this.requiredOptionsNames.join(', ')}`);
         
-        /* Prepare choices for special schemas with shortcut */
+        /* Prepare choices for special schematics with shortcut */
         if (this.collectionName === AngularConfig.defaultAngularCollection) {
 
             if (this.name === 'module') {
@@ -333,7 +331,7 @@ export class Schema {
         const COMPONENT_TYPE_ENTRY    = `Entry component`;
 
         /* Default component types */
-        const shortcutTypes: ShortcutTypes = new Map();
+        const shortcutTypes: SchematicShortcutTypes = new Map();
 
         shortcutTypes.set(COMPONENT_TYPE_DEFAULT, {
             choice: {
@@ -444,7 +442,7 @@ export class Schema {
         const MODULE_TYPE_CLASSIC = `Module of components`;
         const MODULE_TYPE_ROUTING = `Classic module of pages`;
 
-        const shortcutTypes: ShortcutTypes = new Map();
+        const shortcutTypes: SchematicShortcutTypes = new Map();
 
         shortcutTypes.set(MODULE_TYPE_CLASSIC, {
             choice: {

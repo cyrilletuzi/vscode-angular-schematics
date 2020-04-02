@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { Output } from '../utils';
-import { Schematics } from '../schematics';
+import { Collections } from '../schematics';
 
 import { PackageJsonConfig } from './package-json';
 import { TslintConfig } from './tslint';
@@ -18,7 +18,7 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
     tslintConfig!: TslintConfig;
     typescriptConfig!: TypescriptConfig;
     angularConfig!: AngularConfig;
-    schematics!: Schematics;
+    collections!: Collections;
 
     /** Tells if Angular is in Ivy mode */
     private ivy = false;
@@ -40,29 +40,34 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
 
         const packageJsonConfig = new PackageJsonConfig();
         await packageJsonConfig.init(this.uri.fsPath);
+        this.packageJsonConfig = packageJsonConfig;
 
         Output.logInfo(`Loading TypeScript configuration.`);
 
         const typescriptConfig = new TypescriptConfig();
         await typescriptConfig.init(this.uri.fsPath);
+        this.typescriptConfig = typescriptConfig;
 
         Output.logInfo(`Loading TSLint configuration.`);
 
         const tslintConfig = new TslintConfig();
         await tslintConfig.init(this.uri.fsPath);
+        this.tslintConfig = tslintConfig;
 
         Output.logInfo(`Loading Angular configuration.`);
 
         const angularConfig = new AngularConfig();
         await angularConfig.init(this.uri.fsPath);
+        this.angularConfig = angularConfig;
 
         // TODO: should be retrigger if package.json or tsconfig.json change
         this.setIvy();
 
         Output.logInfo(`Loading schematics configuration.`);
 
-        const schematics = new Schematics(this);
-        await schematics.init();
+        const collections = new Collections(this);
+        await collections.init();
+        this.collections = collections;
 
     }
 

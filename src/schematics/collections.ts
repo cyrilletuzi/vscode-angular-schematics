@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
-import { defaultSchematicsNames } from '../defaults';
+import { defaultCollectionsNames } from '../defaults';
 import { Output, Watchers } from '../utils';
 import { WorkspaceConfig } from '../config';
 
 import { Collection } from './collection';
 
-export class Schematics {
+export class Collections {
 
     /**
      * List of collections existing in the workspace
@@ -14,22 +14,22 @@ export class Schematics {
     private collections = new Map<string, Collection | undefined>();
     private watcher: vscode.Disposable | undefined;
 
-    constructor(private workspace: Omit<WorkspaceConfig, 'schematics'>) {}
+    constructor(private workspace: WorkspaceConfig) {}
 
     /**
-     * Initializes schematics collections.
-     * **Must** be called after each `new Schematics()`
+     * Initialize collections.
+     * **Must** be called after each `new Collections()`
      * (delegated because `async` is not possible on a constructor).
      */
     async init(): Promise<void> {
 
-        await this.setCollections();
+        await this.set();
 
         /* Watcher must be set just once */
         if (!this.watcher) {
 
             this.watcher = Watchers.watchCodePreferences(() => {
-                this.setCollections();
+                this.set();
             });
 
         }
@@ -39,7 +39,7 @@ export class Schematics {
     /**
      * Get all collections' names.
      */
-    getCollectionsNames(): string[] {
+    getNames(): string[] {
         return Array.from(this.collections.keys());
     }
 
@@ -47,7 +47,7 @@ export class Schematics {
      * Get collection from cache, or load it. Can throw.
      * @param name 
      */
-    async getCollection(name: string): Promise<Collection | undefined> {
+    async get(name: string): Promise<Collection | undefined> {
 
         /* Not all collections are preloaded */
         if (!this.collections.get(name)) {
@@ -63,33 +63,33 @@ export class Schematics {
     }
 
     /**
-     * Set schematics collections names and preload official collections.
+     * Set collections names and preload official collections.
      */
-    private async setCollections(): Promise<void> {
+    private async set(): Promise<void> {
 
-        Output.logInfo(`Loading the list of schematics collections.`);
+        Output.logInfo(`Loading the list of collections.`);
 
         // TODO: check VS Code is verifying JSON schema
         /* Configuration key is configured in `package.json` */
-        const userSchematicsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+        const userCollectionsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
-        Output.logInfo(`User collections defined in Code preferences detected: ${userSchematicsNames.join(', ')}`);
+        Output.logInfo(`User collections defined in Code preferences detected: ${userCollectionsNames.join(', ')}`);
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
-        const collectionsNames = Array.from(new Set([...this.workspace.angularConfig.getDefaultCollections(), ...defaultSchematicsNames, ...userSchematicsNames]));
+        const collectionsNames = Array.from(new Set([...this.workspace.angularConfig.getDefaultCollections(), ...defaultCollectionsNames, ...userCollectionsNames]));
 
-        Output.logInfo(`All collections detected: ${userSchematicsNames.join(', ')}`);
+        Output.logInfo(`All collections detected: ${userCollectionsNames.join(', ')}`);
         
         /* `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
 
             let collection: Collection | undefined = undefined;
 
-            /* Preload only defaut schematics for performance */
+            /* Preload only defaut collections for performance */
             if (this.workspace.angularConfig.getDefaultCollections().includes(name)) {
 
-                Output.logInfo(`Preloading some default schematics.`);
+                Output.logInfo(`Preloading some default collections.`);
 
                 collection = await this.loadCollection(name);
 

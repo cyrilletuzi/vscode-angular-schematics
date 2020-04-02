@@ -99,7 +99,7 @@ export class FileSystem {
      */
     private static showError(fsPath: string, failedAction: string): void {
 
-        const workspace = Workspaces.getWorkspaceFromPath(fsPath);
+        const workspace = Workspaces.getFromPath(fsPath);
 
         const message = `"${path.basename(fsPath)}" can not be ${failedAction}${workspace ? ` in "${workspace.name}" workspace` : ''}.`;
 

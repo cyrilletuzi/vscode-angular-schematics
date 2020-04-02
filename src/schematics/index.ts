@@ -1,3 +1,3 @@
-export { Schematics } from './schematics';
+export { Collections } from './collections';
 export { Collection } from './collection';
-export { Schema, SchemaOptionJsonSchema, ShortcutType } from './schema';
+export { Schematic, SchematicConfig, SchematicOptionJsonSchema, SchematicShortcutType, SchematicShortcutTypes } from './schematic';

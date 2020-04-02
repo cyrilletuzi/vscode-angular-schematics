@@ -4,26 +4,25 @@ import * as path from 'path';
 import { FileSystem, Watchers, Output } from '../utils';
 import { WorkspaceConfig } from '../config';
 
-import { Schema, SchemaConfig } from './schema';
+import { Schematic, SchematicConfig } from './schematic';
 
 interface PackageJsonSchema {
     /**
-     * Schematics `package.json` should have a `schematics` property
-     * with the relative path to `collection.json`
+     * `package.json` should have a `schematics` property with the relative path to `collection.json`
      */
     schematics?: string;
 }
 
 interface CollectionJsonSchema {
     schematics: {
-        /** Key is the schema's name */
+        /** Key is the schematic's name */
         [key: string]: {
             /** Relative path to `schema.json` */
             schema: string;
             description: string;
-            /** Some schemas are internal for Angular CLI */
+            /** Some schematics are internal for Angular CLI */
             hidden?: boolean;
-            /** Some schemas extend another one */
+            /** Some schematics extend another one */
             extends?: string;
         };
     };
@@ -34,14 +33,14 @@ export class Collection {
     private name: string;
     private fsPath!: string;
     private config!: CollectionJsonSchema;
-    private schemasConfigs = new Map<string, SchemaConfig>();
-    private schemas = new Map<string, Schema | undefined>();
-    private schemasChoices: vscode.QuickPickItem[] = [];
+    private schematicsConfigs = new Map<string, SchematicConfig>();
+    private schematics = new Map<string, Schematic | undefined>();
+    private schematicsChoices: vscode.QuickPickItem[] = [];
     private watcher: vscode.FileSystemWatcher | undefined;
 
     constructor(
         name: string,
-        private workspace: Omit<WorkspaceConfig, 'schematics'>,
+        private workspace: WorkspaceConfig,
     ) {
         this.name = name;
     }
@@ -54,7 +53,7 @@ export class Collection {
     async init(): Promise<void> {
 
         /* Can throw */
-        this.fsPath = await this.getSchematicsFsPath(this.name);
+        this.fsPath = await this.getFsPath(this.name);
 
         Output.logInfo(`"${this.name}" collection path detected: ${this.fsPath}`);
 
@@ -66,7 +65,7 @@ export class Collection {
 
         this.config = config;
 
-        await this.setSchemas();
+        await this.setSchematicsConfigs();
 
         /* Watcher must be set just once */
         if (!this.watcher) {
@@ -89,57 +88,57 @@ export class Collection {
 
     // TODO: use only by view, check it's still usefull
     /**
-     * Get all collection's schemas' names
+     * Get all collection's schematics' names
      */
-    getSchemasNames(): string[] {
-        return Array.from(this.schemasConfigs.keys()).sort();
+    getSchematicsNames(): string[] {
+        return Array.from(this.schematicsConfigs.keys()).sort();
     }
 
     /**
-     * Get a schema from cache, or load it.
+     * Get a schematic from cache, or load it.
      */
-    async getSchema(name: string): Promise<Schema | undefined> {
+    async getSchematic(name: string): Promise<Schematic | undefined> {
 
-        const fullName = this.getFullSchemaName(name);
+        const fullName = this.getFullSchematicName(name);
 
-        Output.logInfo(`Loading "${fullName}" schematics`);
+        Output.logInfo(`Loading "${fullName}" schematic`);
 
-        if (!this.schemasConfigs.has(fullName)) {
-            Output.logError(`"${fullName}" schematics configuration not found.`);
+        if (!this.schematicsConfigs.has(fullName)) {
+            Output.logError(`"${fullName}" schematic configuration not found.`);
             return undefined;
         }
 
-        const schemaConfig = this.schemasConfigs.get(fullName)!;
+        const schematicConfig = this.schematicsConfigs.get(fullName)!;
 
-        /* Schemas are not preloaded */
-        if (!this.schemas.has(fullName)) {
+        /* Schematics are not preloaded */
+        if (!this.schematics.has(fullName)) {
 
-            const schemaInstance = new Schema(schemaConfig, this.workspace);
+            const schematicInstance = new Schematic(schematicConfig, this.workspace);
 
             try {
-                await schemaInstance.init();
-                this.schemas.set(fullName, schemaInstance);
+                await schematicInstance.init();
+                this.schematics.set(fullName, schematicInstance);
             } catch {
-                Output.logError(`"${fullName}" schematics loading failed.`);
+                Output.logError(`"${fullName}" schematic loading failed.`);
             }
 
         }
         
-        return this.schemas.get(fullName);
+        return this.schematics.get(fullName);
 
     }
 
     /**
-     * Get schemas choices
+     * Get schematics choices
      */
-    getSchemasChoices(): vscode.QuickPickItem[] {
-        return this.schemasChoices;
+    getSchematicsChoices(): vscode.QuickPickItem[] {
+        return this.schematicsChoices;
     }
 
     /**
      * Get the collection filesystem path.
      */
-    private async getSchematicsFsPath(name: string): Promise<string> {
+    private async getFsPath(name: string): Promise<string> {
 
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
@@ -163,7 +162,7 @@ export class Collection {
 
             /* `package.json` should have a `schematics` property with relative path to `collection.json` */
             if (!packageJsonConfig?.schematics) {
-                throw new Error(`${this.name} schematics collection can not be found or read.`);
+                throw new Error(`"${this.name}" collection can not be found or read.`);
             }
 
             return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
@@ -173,37 +172,37 @@ export class Collection {
     }
 
     /**
-     * Get full schema name (eg. `@schematics/angular:component`)
+     * Get full schematic name (eg. `@schematics/angular:component`)
      */
-    private getFullSchemaName(name: string): string {
+    private getFullSchematicName(name: string): string {
         return `${this.name}:${name}`;
     }
 
     /**
-     * Set all schemas of the collection.
+     * Set all schematics' configuration of the collection.
      */
-    private async setSchemas(): Promise<void> {
+    private async setSchematicsConfigs(): Promise<void> {
 
-        const allSchemas = Object.entries(this.config.schematics);
+        const allSchematics = Object.entries(this.config.schematics);
 
-        Output.logInfo(`All schematics detected for "${this.name}" collection: ${allSchemas.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`All schematics detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
 
-        const schemas = allSchemas
+        const schematics = allSchematics
             /* Remove internal schematics */
             .filter(([_, config]) => !config.hidden)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
 
-        Output.logInfo(`Filtered schematics keeped for "${this.name}" collection: ${schemas.map(([name]) => name).join(', ')}`);
+        Output.logInfo(`Filtered schematics keeped for "${this.name}" collection: ${schematics.map(([name]) => name).join(', ')}`);
 
-        for (const [name, config] of schemas) {
+        for (const [name, config] of schematics) {
 
             const fsPath = path.join(path.basename(this.fsPath), config.schema);
 
             Output.logInfo(`"${this.name}:${name}" path detected: ${fsPath}`);
 
             // TODO: manage `extends`
-            this.schemasConfigs.set(this.getFullSchemaName(name), {
+            this.schematicsConfigs.set(this.getFullSchematicName(name), {
                 name,
                 collectionName: this.name,
                 description: config.description,
@@ -212,16 +211,16 @@ export class Collection {
 
         }
 
-        this.setSchemasChoices();
+        this.setSchematicsChoices();
 
     }
 
     /**
-     * Set schemas choice (for caching)
+     * Set schematics choice (for caching)
      */
-    private setSchemasChoices(): void {
+    private setSchematicsChoices(): void {
 
-        this.schemasChoices = Array.from(this.schemasConfigs).map(([label, config]) => ({
+        this.schematicsChoices = Array.from(this.schematicsConfigs).map(([label, config]) => ({
             label,
             description: config.description,
         }));
