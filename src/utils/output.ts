@@ -5,11 +5,10 @@ export class Output {
     private static readonly channelName = 'Angular schematics';
     private static _channel: vscode.OutputChannel | undefined;
 
-    // TODO: should be private
     /**
      * Get the output channel
      */
-    static get channel(): vscode.OutputChannel {
+    private static get channel(): vscode.OutputChannel {
 
         /* Create the channel just once */
         if (!this._channel) {

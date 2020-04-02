@@ -45,7 +45,6 @@ export class AngularConfig {
 
     /** Official default collection of Angular CLI */
     static readonly defaultAngularCollection = '@schematics/angular';
-    // TODO: could be in a subdirectory
     /** 
      * Possible basenames of official Angular config file
      * From https://github.com/angular/angular-cli/blob/master/packages/angular/cli/utilities/project.ts

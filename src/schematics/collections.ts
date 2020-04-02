@@ -71,7 +71,6 @@ export class Collections {
 
         Output.logInfo(`Loading the list of collections.`);
 
-        // TODO: check VS Code is verifying JSON schema
         /* Configuration key is configured in `package.json` */
         const userCollectionsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
@@ -135,7 +134,6 @@ export class Collections {
         /* Package schematics */
         else {
             
-            // TODO: handle custom node_modules folder
             fsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name);
 
         }

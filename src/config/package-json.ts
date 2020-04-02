@@ -11,7 +11,6 @@ interface PackageJsonSchema {
 
 export class PackageJsonConfig {
 
-    // TODO: could be in a subdirectory
     /** Basename of the package manager config file */
     private static readonly fileName = 'package.json';
     /** Values from the package manager config file */

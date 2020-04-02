@@ -148,7 +148,6 @@ export class Collection {
         /* Package schematics */
         else {
 
-            // TODO: handle custom node_modules folder
             /* `collection.json` path is defined in `package.json` */
             const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
 

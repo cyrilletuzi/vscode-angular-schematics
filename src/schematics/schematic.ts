@@ -250,8 +250,7 @@ export class Schematic {
             
         }
 
-        // TODO: Check it get the current workspace config
-        // TODO: validate user input with JSON schema (or check if it's already done by vs code)
+        // TODO: Check it get the current workspace config and validate user input with JSON schema (or check if it's already done by vs code)
         /* User custom types */
         let userTypes = vscode.workspace.getConfiguration().get<ComponentType[]>('ngschematics.componentTypes', []);
 

@@ -38,8 +38,6 @@
 
 //     constructor() {
 
-//         // TODO: schematics could be different in each workspace...
-
 //         const schematicsExtension = vscode.extensions.getExtension('cyrilletuzi.angular-schematics') as vscode.Extension<unknown>;
 
 //         this.defaultIconPath = path.join(schematicsExtension.extensionPath, 'angular.svg');

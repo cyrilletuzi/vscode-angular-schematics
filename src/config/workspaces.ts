@@ -116,12 +116,11 @@ export class Workspaces {
 
     }
 
-    // TODO: find another solution for view
+    // TODO: only used by view, may not be useful anymore
     static getFirst(): vscode.WorkspaceFolder {
         return vscode.workspace.workspaceFolders![0];
     }
 
-    // TODO: show loader
     /**
      * Wait for the config to be fully loaded.
      * Throw if it takes more than 10 seconds.

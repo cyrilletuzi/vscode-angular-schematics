@@ -411,8 +411,7 @@ export class UserJourney {
     
             if (option.enum !== undefined) {
     
-                // TODO: Put default value last in choices
-                // TODO: Take user defaults in angular.json into account in ordering
+                // TODO: Put default value last in choices or take user defaults in angular.json into account in ordering
                 choice = await this.askOptionEnum(optionName, option.enum, prompt);
     
             } else if (option.type === 'boolean') {

@@ -11,7 +11,6 @@ interface TsconfigJsonSchema {
 
 export class TypescriptConfig {
 
-    // TODO: could be in a subdirectory
     /** Basename of TypeScript config file */
     private static readonly fileName = 'tsconfig.json';
     /** Values from TypeScript config file */

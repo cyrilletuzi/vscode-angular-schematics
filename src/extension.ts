@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext): void {
     /* Initializes all configurations, which are relative to each workspace */
     Workspaces.init();
 
-    // TODO: do a class to init, and check if it should be removed on deactivate
+    // TODO: add view back
     // vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
 
     /* 
