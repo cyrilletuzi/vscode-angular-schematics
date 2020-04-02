@@ -87,7 +87,7 @@ export class Collections {
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
-            if (await this.isCollectionExisting(name)) {
+            if (this.workspace.packageJsonConfig.hasDependency(name) || await this.isCollectionExisting(name)) {
                 existingCollectionsNames.push(name);
             }
         }
