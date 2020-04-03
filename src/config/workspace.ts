@@ -29,8 +29,8 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
      */
     async init(): Promise<void> {
 
-        // TODO: configs could be in parent or subdirectories
-        // TODO: handle custom node_modules folder
+        // TODO: [feature] configs could be in parent or subdirectories
+        // TODO: [feature] handle custom node_modules folder
 
         Output.logInfo(`Loading Angular configuration.`);
 

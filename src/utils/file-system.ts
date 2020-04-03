@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 
 import { Output } from './output';
@@ -29,8 +28,7 @@ export class FileSystem {
         } catch (error) {
 
             if (!silent) {
-                // TODO: check the constant works
-                this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
+                this.showError(fsPath, (error?.code === 'ENOENT') ? `found` : `read`);
             }
             
             return false;

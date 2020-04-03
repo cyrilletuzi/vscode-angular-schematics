@@ -72,7 +72,6 @@ export class Collection {
 
     }
 
-    // TODO: use only by view, check it's still usefull
     /**
      * Get collection's name
      */
@@ -80,7 +79,6 @@ export class Collection {
         return this.name;
     }
 
-    // TODO: use only by view, check it's still usefull
     /**
      * Get all collection's schematics' names
      */

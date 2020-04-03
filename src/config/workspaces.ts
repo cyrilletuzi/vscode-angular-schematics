@@ -28,7 +28,6 @@ export class Workspaces {
             Output.logError(`No Code workspace detected.`);
         }
 
-        // TODO: check if non-Angular workspaces are included or not
         /* Default array is just for type-safety, it cannot happen as the extension can only be activated inside a workspace */
         for (const workspace of workspaces) {
             await this.add(workspace);
@@ -118,11 +117,6 @@ export class Workspaces {
 
         return workspace;
 
-    }
-
-    // TODO: only used by view, may not be useful anymore
-    static getFirst(): vscode.WorkspaceFolder {
-        return vscode.workspace.workspaceFolders![0];
     }
 
     /**

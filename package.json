@@ -90,7 +90,7 @@
         },
         "configuration": [
             {
-                "title": "Angular schematics configuration",
+                "title": "Angular Schematics",
                 "properties": {
                     "ngschematics.schematics": {
                         "type": "array",
@@ -98,7 +98,8 @@
                             "type": "string"
                         },
                         "default": [],
-                        "description": "Add other schematics (for example: \"@angular/material\")"
+                        "description": "Add other schematics (for example: \"@angular/material\")",
+                        "scope": "resource"
                     },
                     "ngschematics.componentTypes": {
                         "type": "array",
@@ -132,7 +133,8 @@
                             ]
                         },
                         "default": [],
-                        "description": "Add custom component types"
+                        "description": "Add custom component types",
+                        "scope": "resource"
                     }
                 }
             }

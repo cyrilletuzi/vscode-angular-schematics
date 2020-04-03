@@ -56,6 +56,33 @@ export class Shortcuts {
     }
 
     /**
+     * Validate "ngschematics.componentTypes" user preference
+     */
+    private validateUserComponentType(userPreference: unknown): boolean {
+
+        if ((typeof userPreference === 'object')
+        && (userPreference !== null)
+        && ('label' in userPreference)
+        && (!('detail' in userPreference) || typeof (userPreference as { detail: unknown }).detail === 'string')
+        && ('options' in userPreference)
+        && Array.isArray((userPreference as { options: unknown }).options)
+        ) {
+            for (const option of (userPreference as { options: unknown[] }).options) {
+                if (!Array.isArray(option)
+                || (option.length !== 2)
+                || (typeof option[0] !== 'string')
+                && (typeof option[1] !== 'string')) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
      * Get custom types (active defaults + user ones)
      */
     private async getCustomComponentTypes(workspaceFsPath: string): Promise<ComponentType[]> {
@@ -77,14 +104,17 @@ export class Shortcuts {
             
         }
 
-        // TODO: Check it get the current workspace config and validate user input with JSON schema (or check if it's already done by vs code)
         /* User custom types */
-        let userTypes = vscode.workspace.getConfiguration().get<ComponentType[]>('ngschematics.componentTypes', []);
+        let userTypes = vscode.workspace.getConfiguration('ngschematics', vscode.Uri.file(workspaceFsPath)).get<unknown>('componentTypes', []);
+
+        if (userTypes === '') {
+            userTypes = [];
+        }
 
         /* Info about configuration change in version >= 4 of the extension */
         if (!Array.isArray(userTypes)) {
 
-            Output.logError(`"ngschematics.componentTypes" option has changed in version >= 4. See the changelog to update it.`);
+            Output.logWarning(`"ngschematics.componentTypes" option has changed in version >= 4. See the changelog to update it.`);
 
             userTypes = [];
 
@@ -92,7 +122,15 @@ export class Shortcuts {
 
             for (const userType of userTypes) {
 
-                customTypes.set(userType.label, userType);
+                if (this.validateUserComponentType(userType)) {
+
+                    customTypes.set(userType.label, userType as ComponentType);
+
+                } else {
+
+                    Output.logWarning(`Your "ngschematics.componentTypes" preference is invalid.`);
+
+                }
 
             }
 

@@ -61,6 +61,32 @@ export class Collections {
     }
 
     /**
+     * Validate "ngschematics.schematics" user preference
+     */
+    private validateSchematicsPreference(values: unknown): string[] {
+
+        const errorMessage = `Your "ngschematics.schematics" preference is invalid.`;
+
+        if (values === '') {
+            return [];
+        }
+
+        if (!Array.isArray(values)) {
+            Output.logWarning(errorMessage);
+            return [];
+        }
+        for (const value of values) {
+            if (typeof value !== 'string') {
+                Output.logWarning(errorMessage);
+                return [];
+            }
+        }
+
+        return values;
+
+    }
+
+    /**
      * Set collections names and preload official collections.
      */
     private async set(workspaceFsPath: string, userDefaultCollections: string[]): Promise<void> {
@@ -68,7 +94,10 @@ export class Collections {
         Output.logInfo(`Loading the list of collections.`);
 
         /* Configuration key is configured in `package.json` */
-        const userCollectionsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
+        const userPreference = vscode.workspace.getConfiguration('ngschematics', vscode.Uri.file(workspaceFsPath)).get<string[]>(`schematics`, []);
+
+        /* Validate user input */
+        const userCollectionsNames = this.validateSchematicsPreference(userPreference);
 
         Output.logInfo(`${userCollectionsNames.length} user collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
 
