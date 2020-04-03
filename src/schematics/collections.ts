@@ -26,9 +26,9 @@ export class Collections {
      * **Must** be called after each `new Collections()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init(userDefaultCollections: string[]): Promise<void> {
 
-        await this.set();
+        await this.set(userDefaultCollections);
 
         this.setShortcuts();
 
@@ -36,7 +36,7 @@ export class Collections {
         if (!this.watcher) {
 
             this.watcher = Watchers.watchCodePreferences(() => {
-                this.init();
+                this.init(userDefaultCollections);
             });
 
         }
@@ -72,7 +72,7 @@ export class Collections {
     /**
      * Set collections names and preload official collections.
      */
-    private async set(): Promise<void> {
+    private async set(userDefaultCollections: string[]): Promise<void> {
 
         Output.logInfo(`Loading the list of collections.`);
 
@@ -80,10 +80,6 @@ export class Collections {
         const userCollectionsNames = vscode.workspace.getConfiguration().get<string[]>(`ngschematics.schematics`, []);
 
         Output.logInfo(`${userCollectionsNames.length} user collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
-
-        // TODO: reintroduce default collections
-        // const userDefaultCollections = this.workspace.angularConfig.getDefaultCollections();
-        const userDefaultCollections = ['@schematics/angular'];
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
