@@ -197,7 +197,7 @@ export class CliCommand {
 
             /* Get the project path, or defaut to `src/app` */
             const projectSourcePath = this.project ?
-                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.projects.get(this.project)!.sourcePath) :
+                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.projects.get(this.project)!.getSourcePath()) :
                 path.join(this.workspace.uri.fsPath, 'src/app');
 
             /* Default file's suffix is the schematic name (eg. `service`),
@@ -242,13 +242,13 @@ export class CliCommand {
         for (const [projectName, projectConfig] of this.workspace.angularConfig.projects) {
 
             /* If the relative path starts with the project path */
-            if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.sourcePath)) {
+            if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.getSourcePath())) {
 
                 this.project = projectName;
 
                 /* Remove source path from workspace relative path,
                  * eg. `src/app/some-module` => `some-module` */
-                this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.sourcePath.length + 1);
+                this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.getSourcePath().length + 1);
 
                 Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSource}`);
                 Output.logInfo(`Angular project detected from context path: "${this.project}"`);

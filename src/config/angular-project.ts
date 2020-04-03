@@ -17,16 +17,16 @@ export interface AngularJsonProjectSchema {
 
 export class AngularProject {
 
-    name: string;
-    /** Angular projects are `application` by default, but can be `library` too */
-    type: AngularProjectType;
-    /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
-    rootPath: string;
-    /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
-    sourcePath: string;
     /** Is it the root project? */
     isRoot: boolean;
     tslintConfig!: TslintConfig;
+    private name: string;
+    /** Angular projects are `application` by default, but can be `library` too */
+    private type: AngularProjectType;
+    /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
+    private rootPath: string;
+    /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
+    private sourcePath: string;
 
     constructor(name: string, config: AngularJsonProjectSchema) {
 
@@ -82,6 +82,13 @@ export class AngularProject {
         await tslintConfig.init(tslintFsPath);
         this.tslintConfig = tslintConfig;
 
+    }
+
+    /**
+     * Get project's source path
+     */
+    getSourcePath(): string {
+        return this.sourcePath;
     }
 
 }
