@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { defaultAngularCollection } from '../defaults';
 import { Output, FileSystem } from '../utils';
-import { Workspaces, WorkspaceConfig } from '../config';
+import { Workspaces, WorkspaceConfig, AngularProject } from '../config';
 import { Collections, Collection, Schematic, MODULE_TYPE } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
@@ -11,12 +11,12 @@ import { CliCommand, CliCommandOptions } from './cli-command';
 export class UserJourney {
 
     private static shortcutSchematics = ['component', 'service', 'module'];
-
-    workspace!: WorkspaceConfig;
-    cliCommand!: CliCommand;
-    collections!: Collections;
-    collection!: Collection;
-    schematic!: Schematic;
+    private workspace!: WorkspaceConfig;
+    private cliCommand!: CliCommand;
+    private project: AngularProject | undefined;
+    private collections!: Collections;
+    private collection!: Collection;
+    private schematic!: Schematic;
 
     async start(context?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
 
@@ -53,6 +53,26 @@ export class UserJourney {
         this.collections = this.workspace.collections;
 
         this.cliCommand = new CliCommand(workspaceConfig, context);
+
+        /* If there is more than one Angular project in angular.json
+         * and if the project has not been already resolved via context path (in `CliCommand` constructor) */
+        if ((this.workspace.angularConfig.projects.size > 1) && !this.cliCommand.getProject()) {
+
+            const projectName = await this.askProjectName();
+
+            if (!projectName) {
+                Output.logInfo(`You have canceled the project choice.`);
+                return;
+            }
+
+            this.cliCommand.setProject(projectName);
+
+        }
+
+        /* If a project name is present, save a reference to the project */
+        if (this.cliCommand.getProject()) {
+            this.project = this.workspace.angularConfig.projects.get(this.cliCommand.getProject());
+        }
 
         /* Collection may be already defined (from shortcut command or from view) */
         if (!collectionName) {
@@ -208,6 +228,15 @@ export class UserJourney {
 
     }
 
+    private async askProjectName(): Promise<string | undefined> {
+
+        return vscode.window.showQuickPick(this.workspace.angularConfig.getProjectsNames(), {
+            placeHolder: `In which Angular project?`,
+            ignoreFocusOut: true,
+        });
+
+    }
+
     private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.collections.getNames().length === 0) {
@@ -286,10 +315,24 @@ export class UserJourney {
 
         /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
         for (const [, config] of types) {
-            if (config.options.has('type')
-            && (!this.schematic.hasOption('type') || !this.workspace.tslintConfig.hasSuffix(config.options.get('type') as string))) {
-                config.options.delete('type');
+
+            if (config.options.has('type')) {
+
+                const suffix = config.options.get('type') as string;
+                
+                /* Suffixes can be defined at, in order of priority:
+                 * 1. project level
+                 * 2. workspace level */
+                const hasSuffix = ((this.project?.tslintConfig.getComponentSuffixes().length ?? 0) > 0) ?
+                this.project!.tslintConfig.hasSuffix(suffix) :
+                this.workspace.tslintConfig.hasSuffix(suffix);
+
+                if (!this.schematic.hasOption('type') || !hasSuffix) {
+                    config.options.delete('type');
+                }
+
             }
+
         }
 
         const typesChoices = Array.from(types.values()).map((type) => type.choice).map((choice) => ({

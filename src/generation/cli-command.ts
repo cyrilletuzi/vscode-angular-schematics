@@ -123,6 +123,13 @@ export class CliCommand {
     }
 
     /**
+     * Set the project
+     */
+    setProject(name: string): void {
+        this.project = name;
+    }
+
+    /**
      * Get context path with a trailing slash to prefill first argument option.
      * With a trailing slash so the user can just write the name directly.
      */
@@ -190,7 +197,7 @@ export class CliCommand {
 
             /* Get the project path, or defaut to `src/app` */
             const projectSourcePath = this.project ?
-                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.getProjects().get(this.project)!.sourcePath) :
+                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.projects.get(this.project)!.sourcePath) :
                 path.join(this.workspace.uri.fsPath, 'src/app');
 
             /* Default file's suffix is the schematic name (eg. `service`),
@@ -232,7 +239,7 @@ export class CliCommand {
 
         Output.logInfo(`Workspace-relative context path detected: ${this.contextPath.relativeToWorkspace}`);
 
-        for (const [projectName, projectConfig] of this.workspace.angularConfig.getProjects()) {
+        for (const [projectName, projectConfig] of this.workspace.angularConfig.projects) {
 
             /* If the relative path starts with the project path */
             if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.sourcePath)) {

@@ -24,11 +24,11 @@ export class TslintConfig {
      * **Must** be called after each `new TslintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFsPath: string): Promise<void> {
+    async init(workspaceFsPath: string, { silent = false } = {}): Promise<void> {
 
         const fsPath = path.join(workspaceFsPath, TslintConfig.fileName);
 
-        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath);
+        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, { silent });
 
         this.setComponentSuffixes();
 
@@ -36,7 +36,6 @@ export class TslintConfig {
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                Output.logInfo(`Loading "tslint.json" configuration.`);
                 this.init(workspaceFsPath);
             });
 
@@ -52,7 +51,7 @@ export class TslintConfig {
     }
 
     /**
-     * Tells if a suffix has been defined by the user in `tslint.json`
+     * Tells if a suffix is authorized in tslint.json
      */
     hasSuffix(suffix: string): boolean {
 
@@ -66,8 +65,7 @@ export class TslintConfig {
      */
     private setComponentSuffixes(): void {
 
-        /* `Component` is always authorized as it's the default in Angular CLI */
-        const suffixes = ['Component'];
+        const suffixes = [];
 
         /* 
          * Can be:
@@ -91,7 +89,9 @@ export class TslintConfig {
         /* `Set` removes duplicates */
         this.componentSuffixes = Array.from(new Set(suffixes));
 
-        Output.logInfo(`${this.componentSuffixes.length} component suffixes detected: ${this.componentSuffixes.join(', ')}`);
+        if (this.componentSuffixes.length > 1) { 
+            Output.logInfo(`${this.componentSuffixes.length} component suffixes detected: ${this.componentSuffixes.join(', ')}`);
+        }
 
     }
 
