@@ -28,7 +28,6 @@ export interface SchematicOptionJsonSchema {
         /** Will be `0` for the first argument of command line */
         index?: number;
     };
-    extends?: string;
     items?: {
         enum?: string[];
     };

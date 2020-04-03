@@ -59,7 +59,7 @@ export class Collection {
 
         this.config = config;
 
-        await this.setSchematicsConfigs();
+        await this.setSchematicsConfigs(workspaceFsPath);
 
         /* Watcher must be set just once */
         if (!this.watcher) {
@@ -163,7 +163,7 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematicsConfigs(): Promise<void> {
+    private async setSchematicsConfigs(workspaceFsPath: string): Promise<void> {
 
         const allSchematics = Object.entries(this.config.schematics);
 
@@ -179,15 +179,39 @@ export class Collection {
 
         for (const [name, config] of schematics) {
 
-            const fsPath = path.join(path.dirname(this.fsPath), config.schema);
+            /* Some collection extends another one */
+            if (config.extends) {
 
-            // TODO: manage `extends`
-            this.schematicsConfigs.set(this.getFullSchematicName(name), {
-                name,
-                collectionName: this.name,
-                description: config.description,
-                fsPath,
-            });
+                try {
+
+                    /* Can fail */
+                    const fsPath = await this.getFsPath(workspaceFsPath, name);
+
+                    const fullSchematicName = `${config.extends}:${name}`;
+
+                    this.schematicsConfigs.set(fullSchematicName, {
+                        name,
+                        collectionName: config.extends,
+                        description: `Schematic herited from "${fullSchematicName}"`,
+                        fsPath,
+                    });
+
+                } catch {
+                    Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
+                }
+
+            } else {
+
+                const fsPath = path.join(path.dirname(this.fsPath), config.schema);
+
+                this.schematicsConfigs.set(this.getFullSchematicName(name), {
+                    name,
+                    collectionName: this.name,
+                    description: config.description,
+                    fsPath,
+                });
+
+            }
 
         }
 
