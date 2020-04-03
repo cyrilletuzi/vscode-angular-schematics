@@ -11,9 +11,9 @@ export class FileSystem {
      * Check if a JSON file exists and is readable, and if so, parse it.
      * Otherwise, log an error message in output channel.
      */
-    static async parseJsonFile<T>(fsPath: string): Promise<T | undefined> {
+    static async parseJsonFile<T>(fsPath: string, { silent = false } = {}): Promise<T | undefined> {
 
-        if (await this.isReadable(fsPath)) {
+        if (await this.isReadable(fsPath, { silent })) {
 
             let json;
     
@@ -39,7 +39,11 @@ export class FileSystem {
         
             } catch (error) {
 
-                this.showError(fsPath, `parsed`);
+                if (!silent) {
+
+                    this.showError(fsPath, `parsed`);
+
+                }
 
                 return undefined;
 

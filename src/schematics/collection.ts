@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { FileSystem, Watchers, Output } from '../utils';
-import { WorkspaceConfig } from '../config';
 
 import { Schematic, SchematicConfig } from './schematic';
 
@@ -30,18 +29,15 @@ interface CollectionJsonSchema {
 
 export class Collection {
 
+    schematicsChoices: vscode.QuickPickItem[] = [];
     private name: string;
     private fsPath!: string;
     private config!: CollectionJsonSchema;
     private schematicsConfigs = new Map<string, SchematicConfig>();
     private schematics = new Map<string, Schematic | undefined>();
-    private schematicsChoices: vscode.QuickPickItem[] = [];
     private watcher: vscode.FileSystemWatcher | undefined;
 
-    constructor(
-        name: string,
-        private workspace: WorkspaceConfig,
-    ) {
+    constructor(name: string) {
         this.name = name;
     }
 
@@ -50,10 +46,10 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init(workspaceFsPath: string): Promise<void> {
 
         /* Can throw */
-        this.fsPath = await this.getFsPath(this.name);
+        this.fsPath = await this.getFsPath(workspaceFsPath, this.name);
 
         const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath);
 
@@ -69,7 +65,7 @@ export class Collection {
         if (!this.watcher) {
 
             this.watcher = Watchers.watchFile(this.fsPath, () => {
-                this.init();
+                this.init(workspaceFsPath);
             });
 
         }
@@ -111,7 +107,7 @@ export class Collection {
 
             Output.logInfo(`Loading "${fullName}" schematic`);
 
-            const schematicInstance = new Schematic(schematicConfig, this.workspace);
+            const schematicInstance = new Schematic(schematicConfig);
 
             try {
                 await schematicInstance.init();
@@ -127,21 +123,14 @@ export class Collection {
     }
 
     /**
-     * Get schematics choices
-     */
-    getSchematicsChoices(): vscode.QuickPickItem[] {
-        return this.schematicsChoices;
-    }
-
-    /**
      * Get the collection filesystem path.
      */
-    private async getFsPath(name: string): Promise<string> {
+    private async getFsPath(workspaceFsPath: string, name: string): Promise<string> {
 
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
 
-            return path.join(this.workspace.uri.fsPath, name);
+            return path.join(workspaceFsPath, name);
     
         }
 
@@ -149,7 +138,7 @@ export class Collection {
         else {
 
             /* `collection.json` path is defined in `package.json` */
-            const packageJsonFsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name, 'package.json');
+            const packageJsonFsPath = path.join(workspaceFsPath, 'node_modules', name, 'package.json');
 
             const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath);
 

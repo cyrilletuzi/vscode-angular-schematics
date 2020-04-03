@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { defaultAngularCollection } from '../defaults';
 import { Output, FileSystem } from '../utils';
-import { Workspaces, WorkspaceConfig, AngularConfig } from '../config';
-import { Collections, Collection, Schematic } from '../schematics';
+import { Workspaces, WorkspaceConfig } from '../config';
+import { Collections, Collection, Schematic, MODULE_TYPE } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 
@@ -60,7 +61,7 @@ export class UserJourney {
                 collectionName = await this.askCollectionName();
             } catch (error) {
                 /* Happens if `@schematics/angular` is not installed */
-                Output.showError(`Command canceled: ${error.message}`);
+                Output.showError(error.message);
                 return;
             }
 
@@ -140,7 +141,7 @@ export class UserJourney {
         let shortcutConfirm: boolean | undefined = false;
 
         /* Quicker scenario for basic schematics (component, service, module of official schematics) */
-        if ((collectionName === AngularConfig.defaultAngularCollection)
+        if ((collectionName === defaultAngularCollection)
         && UserJourney.shortcutSchematics.includes(schematicName)) {
 
             let shortcutOptions: CliCommandOptions | undefined;
@@ -210,7 +211,7 @@ export class UserJourney {
     private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.collections.getNames().length === 0) {
-            throw new Error('Cannot find any collections.');
+            throw new Error('No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.');
         }
         
         else if  (this.collections.getNames().length === 1) {
@@ -238,7 +239,7 @@ export class UserJourney {
 
     private async askSchematicName(): Promise<string | undefined> {
 
-        const choice = await vscode.window.showQuickPick(this.collection.getSchematicsChoices(), {
+        const choice = await vscode.window.showQuickPick(this.collection.schematicsChoices, {
             placeHolder: `What do you want to generate?`,
             ignoreFocusOut: true,
         });
@@ -280,13 +281,22 @@ export class UserJourney {
 
     private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
-        const types = this.schematic.getComponentTypesChoices();
-        const typesChoices = Array.from(types.values()).map((type) => type.choice);
+        /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
+        const types = new Map(this.collections.shortcuts.componentTypesChoices.entries());
 
-        if (typesChoices.length === 0) {
-            Output.logError(`No component types detected.`);
-            return new Map();
+        /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
+        for (const [, config] of types) {
+            if (config.options.has('type')
+            && (!this.schematic.hasOption('type') || !this.workspace.tslintConfig.hasSuffix(config.options.get('type') as string))) {
+                config.options.delete('type');
+            }
         }
+
+        const typesChoices = Array.from(types.values()).map((type) => type.choice).map((choice) => ({
+            ...choice,
+            /* Add description based on options */
+            description: this.cliCommand.formatOptionsForCommand(types.get(choice.label)!.options).join(' '),
+        }));
 
         const typeChoice = await vscode.window.showQuickPick(typesChoices, {
             placeHolder: `What type of component do you want?`,
@@ -299,16 +309,28 @@ export class UserJourney {
 
     private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
 
-        /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
-        const routeName = path.posix.basename(nameAsFirstArg);
+        /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
+        const types = new Map(this.collections.shortcuts.moduleTypesChoices.entries());
 
-        const types = this.schematic.getModuleTypes(routeName);
-        const typesChoices = Array.from(types.values()).map((type) => type.choice);
-
-        if (typesChoices.length === 0) {
-            Output.logError(`No module types detected.`);
-            return new Map();
+        /* Lazy-loaded module schematic is support in Angular >= 8.1 only */
+        if (!this.schematic.hasOption('route')) {
+            types.delete(MODULE_TYPE.LAZY);
         }
+        /* Lazy-loaded module type need the route name based on previously entered name */
+        else {
+            /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
+            const routeName = path.posix.basename(nameAsFirstArg);
+
+            types.get(MODULE_TYPE.LAZY)?.options.set('route', routeName);
+        }
+
+        const typesChoices = Array.from(types.values()).map((type) => type.choice).map((choice) => ({
+            ...choice,
+            /* Add description based on options */
+            description: (types.get(choice.label)!.options.size > 0) ?
+                this.cliCommand.formatOptionsForCommand(types.get(choice.label)!.options).join(' ') :
+                `No pre-filled option`,
+        }));
 
         const typeChoice = await vscode.window.showQuickPick(typesChoices, {
             placeHolder: `What type of module do you want?`,
@@ -365,13 +387,13 @@ export class UserJourney {
 
     private async askOptionsNames(): Promise<string[]> {
 
-        const optionsChoices = this.schematic.getOptionsChoices();
+        const optionsChoices = this.schematic.optionsChoices;
 
         if (optionsChoices.length === 0) {
             return [];
         }
         
-        const selectedOptions = await vscode.window.showQuickPick(this.schematic.getOptionsChoices(), {
+        const selectedOptions = await vscode.window.showQuickPick(optionsChoices, {
             canPickMany: true,
             placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
             ignoreFocusOut: true,

@@ -22,7 +22,11 @@ export class Workspaces {
 
         const workspaces = vscode.workspace.workspaceFolders ?? [];
 
-        Output.logInfo(`${workspaces.length} workspace(s) detected.`);
+        if (workspaces.length > 0) {
+            Output.logInfo(`${workspaces.length} Code workspace(s) detected.`);
+        } else {
+            Output.logError(`No Code workspace detected.`);
+        }
 
         // TODO: check if non-Angular workspaces are included or not
         /* Default array is just for type-safety, it cannot happen as the extension can only be activated inside a workspace */
@@ -42,12 +46,12 @@ export class Workspaces {
         vscode.workspace.onDidChangeWorkspaceFolders((event) => {
 
             for (const workspace of event.added) {
-                Output.logInfo(`Loading configuration of new "${workspace.name}" workspace.`);
+                Output.logInfo(`Loading configuration of new "${workspace.name}" Code workspace.`);
                 this.add(workspace);
             }
 
             for (const workspace of event.removed) {
-                Output.logInfo(`Unloading configuration of removed "${workspace.name}" workspace.`);
+                Output.logInfo(`Unloading configuration of removed "${workspace.name}" Code workspace.`);
                 this.workspaces.delete(workspace.name);
             }
 
@@ -85,7 +89,7 @@ export class Workspaces {
 
         if (contextPath) {
 
-            Output.logInfo(`Context path detected: resolving current workspace from it.`);
+            Output.logInfo(`Context path detected: resolving current Code workspace from it.`);
 
             /* If there is a context path, current workspace can be resolved from it */
             workspace = vscode.workspace.getWorkspaceFolder(contextPath);
@@ -96,14 +100,14 @@ export class Workspaces {
         
             if (vscode.workspace.workspaceFolders?.length === 1) {
 
-                Output.logInfo(`There is only one workspace opened, default to it.`);
+                Output.logInfo(`There is only one Code workspace opened, default to it.`);
 
                 /* If there is just one workspace, take it directly */
                 workspace = vscode.workspace.workspaceFolders[0];
 
             } else {
 
-                Output.logInfo(`There are multiple workspaces opened, ask the user which one we should use.`);
+                Output.logInfo(`There are multiple Code workspaces opened, ask the user which one we should use.`);
 
                 /* Otherwise the user must be asked */
                 workspace = await vscode.window.showWorkspaceFolderPick();
@@ -168,7 +172,7 @@ export class Workspaces {
      */
     private static async add(workspace: vscode.WorkspaceFolder): Promise<void> {
 
-        Output.logInfo(`Loading configuration of "${workspace.name}" workspace.`);
+        Output.logInfo(`Loading configuration of "${workspace.name}" Code workspace.`);
 
         const workspaceConfig = new WorkspaceConfig(workspace);
 

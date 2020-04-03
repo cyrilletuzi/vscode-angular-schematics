@@ -1,22 +1,25 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultCollectionsNames } from '../defaults';
+import { defaultCollectionsNames, defaultAngularCollection } from '../defaults';
 import { Output, Watchers, FileSystem } from '../utils';
-import { WorkspaceConfig } from '../config';
 
 import { Collection } from './collection';
+import { Shortcuts } from './shortcuts';
 
-// TODO: should be static, like Workspaces
 export class Collections {
 
+    /**
+     * List of shortchuts
+     */
+    shortcuts!: Shortcuts;
     /**
      * List of collections existing in the workspace
      */
     private collections = new Map<string, Collection | undefined>();
     private watcher: vscode.Disposable | undefined;
 
-    constructor(private workspace: WorkspaceConfig) {}
+    constructor(private workspaceFsPath: string) {}
 
     /**
      * Initialize collections.
@@ -27,11 +30,13 @@ export class Collections {
 
         await this.set();
 
+        this.setShortcuts();
+
         /* Watcher must be set just once */
         if (!this.watcher) {
 
             this.watcher = Watchers.watchCodePreferences(() => {
-                this.set();
+                this.init();
             });
 
         }
@@ -76,7 +81,9 @@ export class Collections {
 
         Output.logInfo(`${userCollectionsNames.length} user collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
 
-        const userDefaultCollections = this.workspace.angularConfig.getDefaultCollections();
+        // TODO: reintroduce default collections
+        // const userDefaultCollections = this.workspace.angularConfig.getDefaultCollections();
+        const userDefaultCollections = ['@schematics/angular'];
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
@@ -87,7 +94,7 @@ export class Collections {
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
-            if (this.workspace.packageJsonConfig.hasDependency(name) || await this.isCollectionExisting(name)) {
+            if (await this.isCollectionExisting(name)) {
                 existingCollectionsNames.push(name);
             }
         }
@@ -95,7 +102,7 @@ export class Collections {
         if (existingCollectionsNames.length > 0) {
             Output.logInfo(`${existingCollectionsNames.length} installed collection(s) detected: ${existingCollectionsNames.join(', ')}`);
         } else {
-            Output.logInfo(`No collection found.`);
+            Output.logWarning(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
         /* `.filter()` is not possible here as there is an async operation */
@@ -119,6 +126,15 @@ export class Collections {
     }
 
     /**
+     * Set shortcuts for component and module types
+     */
+    private setShortcuts(): void {
+
+        this.shortcuts = new Shortcuts(this.getNames());
+
+    }
+
+    /**
      * Check if a collection exists
      */
     private async isCollectionExisting(name: string): Promise<boolean> {
@@ -128,13 +144,13 @@ export class Collections {
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
 
-            fsPath = path.join(this.workspace.uri.fsPath, name);
+            fsPath = path.join(this.workspaceFsPath, name);
 
         }
         /* Package schematics */
         else {
             
-            fsPath = path.join(this.workspace.uri.fsPath, 'node_modules', name);
+            fsPath = path.join(this.workspaceFsPath, 'node_modules', name);
 
         }
 
@@ -150,10 +166,10 @@ export class Collections {
 
         Output.logInfo(`Loading "${name}" collection.`);
 
-        const collectionInstance = new Collection(name, this.workspace);
+        const collectionInstance = new Collection(name);
                 
         try {
-            await collectionInstance.init();
+            await collectionInstance.init(this.workspaceFsPath);
         } catch {
             Output.logError(`Loading of "${name}" collection failed.`);
             return undefined;

@@ -29,6 +29,15 @@ export class Output {
     }
 
     /**
+     * Log an warning in output channel.
+     */
+    static logWarning(message: string): void {
+
+        this.channel.appendLine(`[Warning - ${(new Date().toLocaleTimeString())}] ${message}`);
+
+    }
+
+    /**
      * Log an error in output channel.
      */
     static logError(message: string): void {

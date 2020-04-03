@@ -52,7 +52,7 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
         await typescriptConfig.init(this.uri.fsPath);
         this.typescriptConfig = typescriptConfig;
 
-        Output.logInfo(`Loading TSLint configuration.`);
+        Output.logInfo(`Loading global TSLint configuration.`);
 
         const tslintConfig = new TslintConfig();
         await tslintConfig.init(this.uri.fsPath);
@@ -69,7 +69,7 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
 
         Output.logInfo(`Loading schematics configuration.`);
 
-        const collections = new Collections(this);
+        const collections = new Collections(this.uri.fsPath);
         await collections.init();
         this.collections = collections;
 

@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { defaultAngularCollection } from '../defaults';
 import { FileSystem, Output, Terminal } from '../utils';
-import { WorkspaceConfig, AngularConfig } from '../config';
+import { WorkspaceConfig } from '../config';
 import { Schematic } from '../schematics';
 
 interface ContextPath {
@@ -27,7 +28,7 @@ export class CliCommand {
     };
     private baseCommand = 'ng g';
     private project = '';
-    private collectionName = AngularConfig.defaultAngularCollection;
+    private collectionName = defaultAngularCollection;
     private schematicName = '';
     private schematic!: Schematic;
     private nameAsFirstArg = '';
@@ -51,8 +52,34 @@ export class CliCommand {
             this.baseCommand,
             this.formatSchematicNameForCommand(),
             this.nameAsFirstArg,
-            ...this.formatOptionsForCommand(),
+            ...this.formatOptionsForCommand(this.options),
         ].join(' ');
+
+    }
+
+    /**
+     * Format options for the generation command.
+     */
+    formatOptionsForCommand(options: CliCommandOptions): string[] {
+
+        /* Format the values. The goal is to be shortest as possible,
+         * so the user can see the full command, as VS Code input box has a fixed size */
+        return Array.from(options.entries()).map(([key, value]) => {
+
+            /* Boolean options are always true by default,
+                * ie. `--export` is equivalent to just `--export` */
+            if (value === 'true') {
+                return `--${key}`;
+            }
+            /* Some options can have multiple values (eg. `ng g guard --implements CanActivate CanLoad`) */
+            else if (Array.isArray(value)) {
+                return value.map((valueItem) => `--${key} ${valueItem}`).join(' ');
+            }
+            /* Otherwise we print the full option (eg. `--changeDetection OnPush`) */
+            else {
+                return `--${key} ${value}`;
+            }
+        });
 
     }
 
@@ -134,9 +161,11 @@ export class CliCommand {
 
             /* Check they exist in schematic */
             if (this.schematic.hasOption(name)) {
+
                 this.options.set(name, option);
+
             } else {
-                Output.logError(`"--${name}" option has been chosen but does not exist in this schematic, so it won't be used.`);
+                Output.logWarning(`"--${name}" option has been chosen but does not exist in this schematic, so it won't be used.`);
             }
 
         }
@@ -166,7 +195,7 @@ export class CliCommand {
 
             /* Default file's suffix is the schematic name (eg. `service`),
             * except for Angular component schematic which can have a specific suffix with the `--type` option */
-            const suffix = ((this.collectionName === AngularConfig.defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
+            const suffix = ((this.collectionName === defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
                 this.options.get('type')! : this.schematicName;
 
             const fileName = `${this.nameAsFirstArg}.${suffix}.ts`;
@@ -241,32 +270,6 @@ export class CliCommand {
         return (this.collectionName !== this.workspace.angularConfig.getDefaultUserCollection()) ?
             `${this.collectionName}:${this.schematicName}` :
             this.schematicName;
-
-    }
-
-    /**
-     * Format options for the generation command.
-     */
-    private formatOptionsForCommand(): string[] {
-
-        /* Format the values. The goal is to be shortest as possible,
-         * so the user can see the full command, as VS Code input box has a fixed size */
-        return Array.from(this.options.entries()).map(([key, value]) => {
-
-            /* Boolean options are always true by default,
-                * ie. `--export` is equivalent to just `--export` */
-            if (value === 'true') {
-                return `--${key}`;
-            }
-            /* Some options can have multiple values (eg. `ng g guard --implements CanActivate CanLoad`) */
-            else if (Array.isArray(value)) {
-                return value.map((valueItem) => `--${key} ${valueItem}`).join(' ');
-            }
-            /* Otherwise we print the full option (eg. `--changeDetection OnPush`) */
-            else {
-                return `--${key} ${value}`;
-            }
-        });
 
     }
 

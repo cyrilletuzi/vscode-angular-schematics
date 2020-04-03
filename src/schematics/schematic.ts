@@ -1,18 +1,6 @@
 import * as vscode from 'vscode';
 
-import { ComponentType, defaultComponentTypes } from '../defaults';
-import { FileSystem, Watchers, Output } from '../utils';
-import { AngularConfig, WorkspaceConfig } from '../config';
-
-const MODULE_TYPE_LAZY    = `Lazy-loaded module of pages`;
-const MODULE_ROUTE_NAME_PLACEHOLDER = `<route-name>`;
-
-export interface SchematicShortcutType {
-    options: Map<string, string | string[]>;
-    choice: vscode.QuickPickItem;
-}
-
-export type SchematicShortcutTypes = Map<string, SchematicShortcutType>;
+import { FileSystem, Output } from '../utils';
 
 /** Configuration needed to load a schematic */
 export interface SchematicConfig {
@@ -65,20 +53,15 @@ interface SchematicJsonSchema {
 
 export class Schematic {
 
+    optionsChoices: vscode.QuickPickItem[] = [];
     private name: string;
     private collectionName: string;
     private fsPath: string;
     private config!: SchematicJsonSchema;
     private options = new Map<string, SchematicOptionJsonSchema>();
     private requiredOptionsNames: string[] = [];
-    private shortcutTypesChoices: SchematicShortcutTypes = new Map();
-    private optionsChoices: vscode.QuickPickItem[] = [];
-    private watcher: vscode.Disposable | undefined;
 
-    constructor(
-        config: SchematicConfig,
-        private workspace: WorkspaceConfig,
-    ) {
+    constructor(config: SchematicConfig) {
         this.name = config.name;
         this.collectionName = config.collectionName;
         this.fsPath = config.fsPath;
@@ -100,17 +83,6 @@ export class Schematic {
         this.config = config;
 
         await this.setOptions();
-
-        /* Watcher must be set just once */
-        if (!this.watcher
-        /* Component types can have custom types from user configuration */
-        && (this.collectionName === AngularConfig.defaultAngularCollection) && (this.name === 'component')) {
-
-            this.watcher = Watchers.watchCodePreferences(() => {
-                this.setComponentTypesChoices();
-            });
-            
-        }
 
     }
 
@@ -145,48 +117,6 @@ export class Schematic {
     }
 
     /**
-     * Get component types choices from cache
-     */
-    getComponentTypesChoices(): SchematicShortcutTypes {
-
-        return this.shortcutTypesChoices;
-        
-    }
-
-    /**
-     * Get component types choices from cache
-     */
-    getModuleTypes(routeName: string): SchematicShortcutTypes {
-
-        /* Lazy-loaded module type has an option that can only be set based on user input */
-        const lazyModule = this.shortcutTypesChoices.get(MODULE_TYPE_LAZY);
-
-        if (lazyModule) {
-
-            Output.logInfo(`Route name detected: "${routeName}"`);
-
-            /* Add `route` option */
-            lazyModule.options.set('route', routeName);
-
-            /* Replace placeholder for `route` option in choice description */
-            lazyModule.choice.description = lazyModule.choice.description?.replace(MODULE_ROUTE_NAME_PLACEHOLDER, routeName);
-
-            this.shortcutTypesChoices.set(MODULE_TYPE_LAZY, lazyModule);
-
-        }
-
-        return this.shortcutTypesChoices;
-        
-    }
-
-    /**
-     * Get options' choices from cache.
-     */
-    getOptionsChoices(): vscode.QuickPickItem[] {
-        return this.optionsChoices;
-    }
-
-    /**
      * Tells if an option exists in the schematic.
      */
     hasOption(name: string): boolean {
@@ -211,70 +141,6 @@ export class Schematic {
     
     }
 
-    /**
-     * Get custom types (active defaults + user ones)
-     */
-    private getCustomTypes(): ComponentType[] {
-
-        /* `Map` is used to avoid duplicates */
-        const customTypes = new Map<string, ComponentType>();
-
-        /* Default custom types */
-        for (const defaultType of defaultComponentTypes) {
-
-            /* If the `suffix` exists in `tslint.json`, enables the type */
-            if (defaultType.suffix && this.workspace.tslintConfig.hasSuffix(defaultType.suffix)) {
-
-                customTypes.set(defaultType.label, defaultType);
-
-            }
-            
-            /* If the package exists, enable the type and adds info about the library */
-            if (defaultType.packages) {
-
-                for (const packageName of defaultType.packages) {
-
-                    if (this.workspace.packageJsonConfig.hasDependency(packageName)) {
-
-                        defaultType.detail = `${packageName} custom component type`;
-
-                        customTypes.set(defaultType.label, defaultType);
-
-                        break;
-
-                    }
-
-                }
-
-            }
-            
-        }
-
-        // TODO: Check it get the current workspace config and validate user input with JSON schema (or check if it's already done by vs code)
-        /* User custom types */
-        let userTypes = vscode.workspace.getConfiguration().get<ComponentType[]>('ngschematics.componentTypes', []);
-
-        /* Info about configuration change in version >= 4 of the extension */
-        if (!Array.isArray(userTypes)) {
-
-            Output.logError(`"ngschematics.componentTypes" option has changed in version >= 4. See the changelog to update it.`);
-
-            userTypes = [];
-
-        } else {
-
-            for (const userType of userTypes) {
-
-                customTypes.set(userType.label, userType);
-
-            }
-
-        }
-
-        return Array.from(customTypes.values());
-
-    }
-
     private async setOptions(): Promise<void> {
 
         const options = Object.entries(this.config.properties);
@@ -293,196 +159,7 @@ export class Schematic {
 
         Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
         
-        /* Prepare choices for special schematics with shortcut */
-        if (this.collectionName === AngularConfig.defaultAngularCollection) {
-
-            if (this.name === 'module') {
-                this.setModuleTypesChoices();
-            } else if (this.name === 'component') {
-                this.setComponentTypesChoices();
-            }
-
-        }
-        
         this.setOptionsChoices();
-
-    }
-
-    /**
-     * Cache component types choices.
-     */
-    private setComponentTypesChoices(): void {
-
-        /* Prior to new Ivy engine, components instanciated at runtime (modals, dialogs...)
-         * must be declared in the `NgModule` `entryComponents` (in addition to `declarations`) */
-        const entryComponentsRequired = !this.workspace.isIvy() && this.hasOption('entryComponent');
-
-        /* `type` CLI option is new in Angular >= 9 */
-        const hasPageSuffix = this.hasOption('type') && this.workspace.tslintConfig.hasSuffix('Page');
-
-        const COMPONENT_TYPE_DEFAULT  = `Default component`;
-        /* If `entryComponent` is not required, dialogs / modals are generated as pages,
-         * but if the user has set specific suffixes (`Page`, `Dialog`, `Modal`...),
-         * dialogs / modals will be proposed as a distinct choice */
-        const COMPONENT_TYPE_PAGE     = `Page${(!entryComponentsRequired && !hasPageSuffix) ? ` (or dialog / modal)` : ''}`;
-        const COMPONENT_TYPE_PURE     = `Pure component`;
-        const COMPONENT_TYPE_EXPORTED = `Exported component`;
-        const COMPONENT_TYPE_ENTRY    = `Entry component`;
-
-        /* Default component types */
-        const shortcutTypes: SchematicShortcutTypes = new Map();
-
-        shortcutTypes.set(COMPONENT_TYPE_DEFAULT, {
-            choice: {
-                label: COMPONENT_TYPE_DEFAULT,
-                description: `No pre-filled option`,
-                detail: `Component with no special behavior (pro-tip: learn about component types in our documentation)`,
-            },
-            options: new Map(),
-        });
-
-        shortcutTypes.set(COMPONENT_TYPE_PAGE, {
-            choice: {
-                label: COMPONENT_TYPE_PAGE,
-                /* If user has set the `Page` suffix in `tslint.json`, prefill it automatically */
-                description: `--skip-selector${hasPageSuffix ? ` --type page` : ''}`,
-                /* If `entryComponent` is not required, dialogs / modals are generated as pages,
-                 * but if the user has set specific suffixes (`Page`, `Dialog`, `Modal`...),
-                 * dialogs / modals will be proposed as a distinct choice */
-                detail: `Component associated to a route${(!entryComponentsRequired && !hasPageSuffix) ? ` or a dialog / modal` : ''}`,
-            },
-            options: new Map([
-                ['skipSelector', 'true'],
-            ]),
-        });
-
-        /* If user has set the `Page` suffix in `tslint.json`, prefill it automatically */
-        if (hasPageSuffix) {
-            shortcutTypes.get(COMPONENT_TYPE_PAGE)!.options.set('type', 'page');
-        }
-
-        shortcutTypes.set(COMPONENT_TYPE_PURE, {
-            choice: {
-                label: COMPONENT_TYPE_PURE,
-                description: `--change-detection OnPush`,
-                detail: `UI / presentation component, used only in its own feature module`,
-            },
-            options: new Map([
-                ['changeDetection', 'OnPush'],
-            ]),
-        });
-
-        shortcutTypes.set(COMPONENT_TYPE_EXPORTED, {
-            choice: {
-                label: COMPONENT_TYPE_EXPORTED,
-                description: `--export --change-detection OnPush`,
-                detail: `UI / presentation component, declared in a shared UI module and used in multiple feature modules`,
-            },
-            options: new Map([
-                ['export', 'true'],
-                ['changeDetection', 'OnPush'],
-            ]),
-        });
-
-        /* Angular non-Ivy */
-        if (entryComponentsRequired) {
-
-            shortcutTypes.set(COMPONENT_TYPE_ENTRY, {
-                choice: {
-                    label: COMPONENT_TYPE_ENTRY,
-                    description: `--entry-component --skip-selector`,
-                    detail: `Component instanciated at runtime, like a dialog or modal`,
-                },
-                options: new Map([
-                    ['entryComponent', 'true'],
-                    ['skipSelector', 'true'],
-                ]),
-            });
-
-        }
-
-        /* Custom component types */
-        for (const customType of this.getCustomTypes()) {
-
-            /* Remove entry components option and info if it's not needed anymore */
-            if (!entryComponentsRequired) {
-                customType.description = customType.description?.replace('--entry-component', '').replace('--entryComponent', '');
-                customType.options = customType.options?.filter(([name]) => !['entry-component', 'entryComponent'].includes(name));
-            }
-
-            /* Automatically add `type` option and info if the suffix exists in `tslint.json` */
-            if (customType.suffix && this.workspace.tslintConfig.hasSuffix(customType.suffix)) {
-                customType.description = `${customType.description ?? ''} --type ${customType.suffix}`;
-                customType.options = customType.options ?? [];
-                customType.options.push(['type', customType.suffix]);
-            }
-
-            shortcutTypes.set(customType.label, {
-                choice: {
-                    label: customType.label,
-                    description: customType.description,
-                    detail: customType.detail,
-                },
-                options: new Map(customType.options),
-            });
-
-        }
-        
-        this.shortcutTypesChoices = shortcutTypes;
-
-    }
-
-    /**
-     * Cache module types choices
-     */
-    private setModuleTypesChoices(): void {
-
-        /* `MODULE_TYPE_LAZY` is defined globally as we need it in another method */
-        const MODULE_TYPE_CLASSIC = `Module of components`;
-        const MODULE_TYPE_ROUTING = `Classic module of pages`;
-
-        const shortcutTypes: SchematicShortcutTypes = new Map();
-
-        shortcutTypes.set(MODULE_TYPE_CLASSIC, {
-            choice: {
-                label: MODULE_TYPE_CLASSIC,
-                description: `No pre-filled option`,
-                detail: `Module of UI / presentation components, don't forget to import it somewhere`,
-            },
-            options: new Map(),
-        });
-
-        /* Angular >= 8.1 */
-        if (this.hasOption('route')) {
-
-            shortcutTypes.set(MODULE_TYPE_LAZY, {
-                choice: {
-                    label: MODULE_TYPE_LAZY,
-                    /* Placeholder will be set in `.getModuleTypes()` */
-                    description: `--route ${MODULE_ROUTE_NAME_PLACEHOLDER} --module app`,
-                    detail: `Module with routing, lazy-loaded`,
-                },
-                options: new Map([
-                    /* `route` option will be set in `.getModuleTypes()` as it needs the route name */
-                    ['module', 'app'],
-                ]),
-            });
-
-        }
-
-        shortcutTypes.set(MODULE_TYPE_ROUTING, {
-            choice: {
-                label: MODULE_TYPE_ROUTING,
-                description: `--routing --module app`,
-                detail: `Module with routing, immediately loaded`,
-            },
-            options: new Map([
-                ['routing', 'true'],
-                ['module', 'app'],
-            ]),
-        });
-
-        this.shortcutTypesChoices = shortcutTypes;
 
     }
 

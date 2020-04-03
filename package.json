@@ -107,7 +107,7 @@
                             "properties": {
                                 "label": {
                                     "type": "string",
-                                    "description": "Required component type's name, must be unique"
+                                    "description": "Required component type's name, must be unique. \"Page\", \"Pure component\", \"Exported component\" are already used and will be overrided if you use the same label."
                                 },
                                 "options": {
                                     "type": "array",
@@ -121,23 +121,14 @@
                                     },
                                     "description": "Required list of custom options for this component type, eg. \"[[\"changeDetection\", \"OnPush\"], [\"export\", \"true\"]]\""
                                 },
-                                "description": {
-                                    "type": "string",
-                                    "description": "Required description of this component type's options, eg. \"--change-detection OnPush --export\""
-                                },
                                 "detail": {
                                     "type": "string",
                                     "description": "Optional human description of this component type"
-                                },
-                                "suffix": {
-                                    "type": "string",
-                                    "description": "Optional corresponding suffix in tslint.json which, if existing, will be automatically added as `--type <suffix>`"
                                 }
                             },
                             "required": [
                                 "label",
-                                "options",
-                                "description"
+                                "options"
                             ]
                         },
                         "default": [],

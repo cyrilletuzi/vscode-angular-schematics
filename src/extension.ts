@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 
+import { defaultAngularCollection } from './defaults';
 import { Watchers, Output } from './utils';
-import { Workspaces, AngularConfig } from './config';
+import { Workspaces } from './config';
 import { UserJourney } from './generation';
 
 // import { AngularSchematicsProvider } from './view';
@@ -41,7 +42,7 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(context, AngularConfig.defaultAngularCollection, 'component');
+            journey.start(context, defaultAngularCollection, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (context?: vscode.Uri) => {
@@ -53,7 +54,7 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(context, AngularConfig.defaultAngularCollection, 'service');
+            journey.start(context, defaultAngularCollection, 'service');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (context?: vscode.Uri) => {
@@ -65,7 +66,7 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(context, AngularConfig.defaultAngularCollection, 'module');
+            journey.start(context, defaultAngularCollection, 'module');
     
         }),
         vscode.commands.registerCommand('ngschematics.generate', (context?: vscode.Uri, collectionName?: string, schematicName?: string) => {
