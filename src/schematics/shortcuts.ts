@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { ComponentType, defaultComponentTypes } from '../defaults';
-import { Output } from '../utils';
+import { Output, FileSystem } from '../utils';
 
 export interface ShortcutType {
     options: Map<string, string | string[]>;
@@ -46,27 +47,29 @@ export class Shortcuts {
         label: CONFIRMATION_LABEL.NO
     }];
 
-    constructor(existingCollections: string[]) {
+    async init(workspaceFsPath: string): Promise<void> {
 
         this.setModuleTypesChoices();
 
-        this.setComponentTypesChoices(existingCollections);
+        this.setComponentTypesChoices(workspaceFsPath);
 
     }
 
     /**
      * Get custom types (active defaults + user ones)
      */
-    private getCustomComponentTypes(existingCollections: string[]): ComponentType[] {
+    private async getCustomComponentTypes(workspaceFsPath: string): Promise<ComponentType[]> {
 
         /* `Map` is used to avoid duplicates */
         const customTypes = new Map<string, ComponentType>();
 
         /* Default custom types */
         for (const defaultType of defaultComponentTypes) {
+
+            const packageFsPath = path.join(workspaceFsPath, 'node_modules', defaultType.package);
             
             /* Enable defaults only if the package exists */
-            if (existingCollections.includes(defaultType.package)) {
+            if (await FileSystem.isReadable(packageFsPath)) {
 
                 customTypes.set(defaultType.label, defaultType);
 
@@ -102,7 +105,7 @@ export class Shortcuts {
     /**
      * Cache component types choices.
      */
-    private setComponentTypesChoices(existingCollections: string[]): void {
+    private async setComponentTypesChoices(workspaceFsPath: string): Promise<void> {
 
         /* Default component types */
         const shortcutTypes: ShortcutsTypes = new Map();
@@ -148,7 +151,7 @@ export class Shortcuts {
         });
 
         /* Custom component types */
-        for (const customType of this.getCustomComponentTypes(existingCollections)) {
+        for (const customType of await this.getCustomComponentTypes(workspaceFsPath)) {
 
             shortcutTypes.set(customType.label, {
                 choice: {

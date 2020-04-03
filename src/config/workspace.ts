@@ -46,8 +46,8 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
 
         Output.logInfo(`Loading schematics configuration.`);
 
-        const collections = new Collections(this.uri.fsPath);
-        await collections.init(angularConfig.getDefaultCollections());
+        const collections = new Collections();
+        await collections.init(this.uri.fsPath, angularConfig.getDefaultCollections());
         this.collections = collections;
 
     }

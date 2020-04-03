@@ -19,24 +19,24 @@ export class Collections {
     shortcuts!: Shortcuts;
     private watcher: vscode.Disposable | undefined;
 
-    constructor(private workspaceFsPath: string) {}
+    constructor() {}
 
     /**
      * Initialize collections.
      * **Must** be called after each `new Collections()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(userDefaultCollections: string[]): Promise<void> {
+    async init(workspaceFsPath: string, userDefaultCollections: string[]): Promise<void> {
 
-        await this.set(userDefaultCollections);
+        await this.set(workspaceFsPath, userDefaultCollections);
 
-        this.setShortcuts();
+        await this.setShortcuts(workspaceFsPath);
 
         /* Watcher must be set just once */
         if (!this.watcher) {
 
             this.watcher = Watchers.watchCodePreferences(() => {
-                this.init(userDefaultCollections);
+                this.init(workspaceFsPath, userDefaultCollections);
             });
 
         }
@@ -63,7 +63,7 @@ export class Collections {
     /**
      * Set collections names and preload official collections.
      */
-    private async set(userDefaultCollections: string[]): Promise<void> {
+    private async set(workspaceFsPath: string, userDefaultCollections: string[]): Promise<void> {
 
         Output.logInfo(`Loading the list of collections.`);
 
@@ -81,7 +81,7 @@ export class Collections {
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
-            if (await this.isCollectionExisting(name)) {
+            if (await this.isCollectionExisting(workspaceFsPath, name)) {
                 existingCollectionsNames.push(name);
             }
         }
@@ -100,7 +100,7 @@ export class Collections {
             const collection = new Collection(name);
                     
             try {
-                await collection.init(this.workspaceFsPath);
+                await collection.init(workspaceFsPath);
                 this.collections.set(name, collection);
             } catch {
                 Output.logError(`Loading of "${name}" collection failed.`);
@@ -113,29 +113,33 @@ export class Collections {
     /**
      * Set shortcuts for component and module types
      */
-    private setShortcuts(): void {
+    private async setShortcuts(workspaceFsPath: string): Promise<void> {
 
-        this.shortcuts = new Shortcuts(this.getNames());
+        const shortcuts = new Shortcuts();
+
+        await shortcuts.init(workspaceFsPath);
+
+        this.shortcuts = shortcuts;
 
     }
 
     /**
      * Check if a collection exists
      */
-    private async isCollectionExisting(name: string): Promise<boolean> {
+    private async isCollectionExisting(workspaceFsPath: string, name: string): Promise<boolean> {
 
         let fsPath = '';
 
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
 
-            fsPath = path.join(this.workspaceFsPath, name);
+            fsPath = path.join(workspaceFsPath, name);
 
         }
         /* Package schematics */
         else {
             
-            fsPath = path.join(this.workspaceFsPath, 'node_modules', name);
+            fsPath = path.join(workspaceFsPath, 'node_modules', name);
 
         }
 
