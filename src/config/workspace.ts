@@ -31,18 +31,18 @@ export class WorkspaceConfig implements vscode.WorkspaceFolder {
 
         // TODO: configs could be in parent or subdirectories
         // TODO: handle custom node_modules folder
-        
-        Output.logInfo(`Loading global TSLint configuration.`);
-
-        const tslintConfig = new TslintConfig();
-        await tslintConfig.init(this.uri.fsPath);
-        this.tslintConfig = tslintConfig;
 
         Output.logInfo(`Loading Angular configuration.`);
 
         const angularConfig = new AngularConfig();
         await angularConfig.init(this.uri.fsPath);
         this.angularConfig = angularConfig;
+        
+        Output.logInfo(`Loading global TSLint configuration.`);
+
+        const tslintConfig = new TslintConfig();
+        await tslintConfig.init(this.uri.fsPath);
+        this.tslintConfig = tslintConfig;
 
         Output.logInfo(`Loading schematics configuration.`);
 

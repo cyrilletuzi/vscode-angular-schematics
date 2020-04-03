@@ -176,9 +176,12 @@ export class Workspaces {
 
         const workspaceConfig = new WorkspaceConfig(workspace);
 
-        await workspaceConfig.init();
-
-        this.workspaces.set(workspace.name, workspaceConfig);
+        try {
+            await workspaceConfig.init();
+            this.workspaces.set(workspace.name, workspaceConfig);
+        } catch {
+            Output.logWarning(`"${workspace.name}" workspace configuration has not been loaded as it does not seem to be an Angular project. A "angular.json" file should be present at the root of the workspace.`);
+        }
 
     }
 

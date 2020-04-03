@@ -46,7 +46,7 @@ export class UserJourney {
         const workspaceConfig = Workspaces.getConfig(workspace);
         /* Not supposed to happen */
         if (!workspaceConfig) {
-            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace.`);
+            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace. It can happen if there is no "angular.json" at the root of your workspace.`);
             return;
         }
         this.workspace = workspaceConfig;

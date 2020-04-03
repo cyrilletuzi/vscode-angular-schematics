@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
     Output.logInfo(`Angular schematics extension has been activated.`);
 
-    // TODO: check if it's really useful
+    /* Enable context menus */
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
     /* Initializes all configurations, which are relative to each workspace */

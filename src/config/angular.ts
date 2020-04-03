@@ -62,9 +62,7 @@ export class AngularConfig {
 
             fsPath = path.join(workspaceFsPath, fileName);
 
-            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath);
-
-            if (this.config) {
+            if (await FileSystem.isReadable(fsPath, { silent: true })) {
 
                 /* Keep only the right file name */
                 this.fileNames = [fileName];
@@ -78,12 +76,19 @@ export class AngularConfig {
 
         }
 
+        /* Workspace should have an Angular config file */
+        if (this.fileNames.length !== 1) {
+            throw new Error();
+        }
+
+        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath);
+
         this.setDefaultCollections();
 
         await this.setProjects(workspaceFsPath);
 
         /* Watcher must be set just once */
-        if (this.config && !this.watcher) {
+        if (!this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
                 this.init(workspaceFsPath);
