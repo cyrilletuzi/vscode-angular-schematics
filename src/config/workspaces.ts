@@ -10,7 +10,7 @@ export class Workspaces {
      * List of all the opened workspaces.
      * The map key is the workspace's name.
      */
-    private static workspaces = new Map<string, WorkspaceConfig>();
+    static workspaces = new Map<string, WorkspaceConfig>();
     private static stable = false;
 
     /**

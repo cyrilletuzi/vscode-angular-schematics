@@ -4,8 +4,9 @@ import { defaultAngularCollection } from './defaults';
 import { Watchers, Output } from './utils';
 import { Workspaces } from './config';
 import { UserJourney } from './generation';
+import { SchematicsTreeDataProvider } from './view';
 
-// import { AngularSchematicsProvider } from './view';
+let treeDataProvider: vscode.TreeView<vscode.TreeItem> | undefined;
 
 /**
  * Function called when the extension is activated, to register new commands.
@@ -21,9 +22,19 @@ export function activate(context: vscode.ExtensionContext): void {
     /* Initializes all configurations, which are relative to each workspace */
     Workspaces.init();
 
-    // TODO: add view back
-    // vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
+    /* Add a new Code view with the list of all Angular schematics.
+     * Collections must be loaded to be able to load the view */
+    Workspaces.whenStable().then(() => {
 
+        treeDataProvider = vscode.window.createTreeView('angular-schematics', {
+            treeDataProvider: new SchematicsTreeDataProvider(),
+        });
+        treeDataProvider.message = `Hello! While this list is useful to see all the schematics available,
+        it is easier to launch a generation from a right-click on a folder in the Explorer,
+        as then the extension will automatically infer the workspace, the path and the project.`;
+
+    }).catch();
+    
     /* 
      * Register new commands. Important things:
      * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
@@ -89,5 +100,7 @@ export function deactivate(): void {
     Watchers.disposeAll();
 
     Output.dispose();
+
+    treeDataProvider?.dispose();
 
 }

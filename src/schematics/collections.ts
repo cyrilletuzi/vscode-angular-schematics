@@ -10,13 +10,13 @@ import { Shortcuts } from './shortcuts';
 export class Collections {
 
     /**
+     * List of collections existing in the workspace
+     */
+    collections = new Map<string, Collection>();
+    /**
      * List of shortchuts
      */
     shortcuts!: Shortcuts;
-    /**
-     * List of collections existing in the workspace
-     */
-    private collections = new Map<string, Collection | undefined>();
     private watcher: vscode.Disposable | undefined;
 
     constructor(private workspaceFsPath: string) {}
@@ -51,20 +51,11 @@ export class Collections {
     }
 
     /**
-     * Get collection from cache, or load it. Can throw.
+     * Get collection from cache.
      * @param name 
      */
-    async get(name: string): Promise<Collection | undefined> {
+    get(name: string): Collection | undefined {
 
-        /* Not all collections are preloaded */
-        if (!this.collections.get(name)) {
-
-            const collection = await this.loadCollection(name);
-
-            this.collections.set(name, collection);
-            
-        }
-        
         return this.collections.get(name);
 
     }
@@ -104,18 +95,16 @@ export class Collections {
         /* `.filter()` is not possible here as there is an async operation */
         for (const name of existingCollectionsNames) {
 
-            let collection: Collection | undefined = undefined;
+            Output.logInfo(`Loading "${name}" collection.`);
 
-            /* Preload only defaut collections for performance */
-            if (userDefaultCollections.includes(name)) {
-
-                Output.logInfo(`Preloading default collection(s).`);
-
-                collection = await this.loadCollection(name);
-
+            const collection = new Collection(name);
+                    
+            try {
+                await collection.init(this.workspaceFsPath);
+                this.collections.set(name, collection);
+            } catch {
+                Output.logError(`Loading of "${name}" collection failed.`);
             }
-
-            this.collections.set(name, collection);
 
         }
 
@@ -152,26 +141,6 @@ export class Collections {
 
         /* It's normal that not all collections exist, so we want to be silent here */
         return await FileSystem.isReadable(fsPath, { silent: true });
-
-    }
-
-    /**
-     * Load a collection
-     */
-    private async loadCollection(name: string): Promise<Collection | undefined> {
-
-        Output.logInfo(`Loading "${name}" collection.`);
-
-        const collectionInstance = new Collection(name);
-                
-        try {
-            await collectionInstance.init(this.workspaceFsPath);
-        } catch {
-            Output.logError(`Loading of "${name}" collection failed.`);
-            return undefined;
-        }
-
-        return collectionInstance;
 
     }
 

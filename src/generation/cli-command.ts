@@ -207,6 +207,7 @@ export class CliCommand {
 
             const fileName = `${this.nameAsFirstArg}.${suffix}.ts`;
             
+            // TODO: do that based on user preferences
             /* Schematics are created with or without an intermediate folder, depending on CLI or user defaults */
             const fsPathFlat = path.join(projectSourcePath, fileName);
             const fsPathNotFlat = path.join(projectSourcePath, this.nameAsFirstArg, fileName);

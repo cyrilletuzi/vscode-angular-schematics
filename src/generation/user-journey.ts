@@ -74,7 +74,7 @@ export class UserJourney {
 
             this.project = this.workspace.angularConfig.projects.get(this.cliCommand.getProject());
 
-            Output.logInfo(`Project used: "${this.cliCommand.getProject()}"`);
+            Output.logInfo(`Angular project used: "${this.cliCommand.getProject()}"`);
 
         }
 
@@ -101,14 +101,10 @@ export class UserJourney {
 
         this.cliCommand.setCollectionName(collectionName);
         
-        /* Show progress to the user */
-        const collection = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Window,
-            title: `Angular Schematics: collection "${collectionName}" is loading, please wait...`,
-        }, () => this.collections.get(collectionName!));
+        const collection = this.collections.get(collectionName);
 
         if (!collection) {
-            Output.showError(`Command canceled: cannot load "${collectionName}" collection.`);
+            Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspace.name}" workspace.`);
             return;
         }
 
