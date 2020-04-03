@@ -81,8 +81,7 @@ export const defaultComponentTypes: ComponentType[] = [
     {
         label: `Dynamic Dialog`,
         options: [
-            // TODO: check camel case
-            ['type', 'dynamic-dialog'],
+            ['type', 'dialog'],
             ['skipSelector', 'true'],
         ],
         package: 'primeng',
