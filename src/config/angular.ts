@@ -45,6 +45,7 @@ export class AngularConfig {
     private defaultUserCollection = defaultAngularCollection;
     /** User and official default collections */
     private defaultCollections: string[] = [];
+    private rootProjectName = '';
     private watcher: vscode.FileSystemWatcher | undefined;
     
     /**
@@ -118,7 +119,7 @@ export class AngularConfig {
      */
     isRootProject(name: string): boolean {
 
-        return this.projects.get(name)?.isRoot ?? false;
+        return (this.rootProjectName === name);
 
     }
 
@@ -158,6 +159,14 @@ export class AngularConfig {
             await project.init(workspaceFsPath);
 
             this.projects.set(name, project);
+
+            if (!this.rootProjectName && (config.root === '')) {
+
+                this.rootProjectName = name;
+
+                Output.logInfo(`"${name}" project is the root Angular project.`);
+
+            }
 
         }
 

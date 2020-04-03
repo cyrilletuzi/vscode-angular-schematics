@@ -71,7 +71,11 @@ export class UserJourney {
 
         /* If a project name is present, save a reference to the project */
         if (this.cliCommand.getProject()) {
+
             this.project = this.workspace.angularConfig.projects.get(this.cliCommand.getProject());
+
+            Output.logInfo(`Project used: "${this.cliCommand.getProject()}"`);
+
         }
 
         /* Collection may be already defined (from shortcut command or from view) */

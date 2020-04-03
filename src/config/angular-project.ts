@@ -17,8 +17,6 @@ export interface AngularJsonProjectSchema {
 
 export class AngularProject {
 
-    /** Is it the root project? */
-    isRoot: boolean;
     tslintConfig!: TslintConfig;
     private name: string;
     /** Angular projects are `application` by default, but can be `library` too */
@@ -61,13 +59,6 @@ export class AngularProject {
 
         if (!this.sourcePath.startsWith(this.rootPath)) {
             Output.logError(`"root" and "sourceRoot" of "${this.name}" project do not start by the same path in angular.json`);
-        }
-
-        /* If the project is in `/src/`, it's the root project */
-        this.isRoot = ((config.root === '') && (sourceRoot === 'src'));
-
-        if (this.isRoot) {
-            Output.logInfo(`"${name}" project is the root Angular project.`);
         }
 
     }
