@@ -69,7 +69,7 @@ export class Shortcuts {
             const packageFsPath = path.join(workspaceFsPath, 'node_modules', defaultType.package);
             
             /* Enable defaults only if the package exists */
-            if (await FileSystem.isReadable(packageFsPath)) {
+            if (await FileSystem.isReadable(packageFsPath, { silent: true })) {
 
                 customTypes.set(defaultType.label, defaultType);
 

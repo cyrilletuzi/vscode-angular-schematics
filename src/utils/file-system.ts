@@ -7,6 +7,43 @@ import { Workspaces } from '../config';
 
 export class FileSystem {
 
+    /** Cache for already checked files */
+    private static readableFiles = new Set<string>();
+
+    /**
+     * Check if a file exists and is readable.
+     * Otherwise, log an error message in output channel if `silent` is not set to `true`.
+     */
+    static async isReadable(fsPath: string, { silent = false } = {}): Promise<boolean> {
+
+        /* Check in cache */
+        if (this.readableFiles.has(fsPath)) {
+            return true;
+        }
+
+        try {
+
+            /* Check if the file exists (`F_OK`) and is readable (`R_OK`) */
+            await fs.promises.access(fsPath, fs.constants.F_OK | fs.constants.R_OK);
+
+        } catch (error) {
+
+            if (!silent) {
+                // TODO: check the constant works
+                this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
+            }
+            
+            return false;
+
+        }
+
+        /* Save in cache */
+        this.readableFiles.add(fsPath);
+
+        return true;
+
+    }
+
     /**
      * Check if a JSON file exists and is readable, and if so, parse it.
      * Otherwise, log an error message in output channel.
@@ -55,32 +92,6 @@ export class FileSystem {
 
         return undefined;
     
-    }
-
-    /**
-     * Check if a file exists and is readable.
-     * Otherwise, log an error message in output channel if `silent` is not set to `true`.
-     */
-    static async isReadable(fsPath: string, { silent = false } = {}): Promise<boolean> {
-
-        try {
-
-            /* Check if the file exists (`F_OK`) and is readable (`R_OK`) */
-            await fs.promises.access(fsPath, fs.constants.F_OK | fs.constants.R_OK);
-
-        } catch (error) {
-
-            if (!silent) {
-                // TODO: check the constant works
-                this.showError(fsPath, (error.errno === os.constants.errno.ENOENT) ? `found` : `read`);
-            }
-            
-            return false;
-
-        }
-
-        return true;
-
     }
 
     /**
