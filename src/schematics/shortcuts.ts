@@ -23,12 +23,28 @@ export enum COMPONENT_TYPE {
     EXPORTED = `Exported component`,
 }
 
+export enum CONFIRMATION_LABEL {
+    YES  = `Confirm`,
+    MORE_OPTIONS     = `Add more options`,
+    NO   = `Cancel`,
+}
+
 export class Shortcuts {
 
     /* Cache for component types choices */
     componentTypesChoices: ShortcutsTypes = new Map();
     /* Cache for module types choices */
     moduleTypesChoices: ShortcutsTypes = new Map();
+    /* Cache for shortcut confirmation choices */
+    confirmationChoices: vscode.QuickPickItem[] = [{
+        label: CONFIRMATION_LABEL.NO,
+        description: `Pro-tip: take a minute to check the command above is really what you want`,
+    }, {
+        label: CONFIRMATION_LABEL.MORE_OPTIONS,
+        description: `Pro-tip: you can set default values to "schematics" options in angular.json`,
+    }, {
+        label: CONFIRMATION_LABEL.NO
+    }];
 
     constructor(existingCollections: string[]) {
 

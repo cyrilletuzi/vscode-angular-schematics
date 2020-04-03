@@ -4,7 +4,7 @@ import * as path from 'path';
 import { defaultAngularCollection } from '../defaults';
 import { Output, FileSystem } from '../utils';
 import { Workspaces, WorkspaceConfig, AngularProject } from '../config';
-import { Collections, Collection, Schematic, MODULE_TYPE } from '../schematics';
+import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 
@@ -390,28 +390,14 @@ export class UserJourney {
 
     private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
-        // TODO: cache these choices
-        const CONFIRM: vscode.QuickPickItem = {
-            label: `Confirm`,
-            description: `Pro-tip: take a minute to check the command above is really what you want`,
-        };
-        const MORE_OPTIONS: vscode.QuickPickItem = {
-            label: `Add more options`,
-            description: `Pro-tip: you can set default values to "schematics" options in angular.json`,
-        };
-
-        const choice = await vscode.window.showQuickPick([
-            CONFIRM,
-            MORE_OPTIONS,
-            { label: `Cancel` }
-        ], {
+        const choice = await vscode.window.showQuickPick(this.collections.shortcuts.confirmationChoices, {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
 
-        if (choice?.label === CONFIRM.label) {
+        if (choice?.label === CONFIRMATION_LABEL.YES) {
             return true;
-        } else if (choice?.label === MORE_OPTIONS.label) {
+        } else if (choice?.label === CONFIRMATION_LABEL.MORE_OPTIONS) {
             return false;
         }
         return undefined;
