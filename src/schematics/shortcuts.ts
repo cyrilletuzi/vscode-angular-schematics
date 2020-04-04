@@ -37,7 +37,7 @@ export class Shortcuts {
     /* Cache for module types choices */
     moduleTypesChoices: ShortcutsTypes = new Map();
     /* Cache for shortcut confirmation choices */
-    confirmationChoices: vscode.QuickPickItem[] = [{
+    static confirmationChoices: vscode.QuickPickItem[] = [{
         label: CONFIRMATION_LABEL.NO,
         description: `Pro-tip: take a minute to check the command above is really what you want`,
     }, {
@@ -47,11 +47,11 @@ export class Shortcuts {
         label: CONFIRMATION_LABEL.NO
     }];
 
-    async init(workspaceFsPath: string): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         this.setModuleTypesChoices();
 
-        this.setComponentTypesChoices(workspaceFsPath);
+        this.setComponentTypesChoices(workspaceFolder);
 
     }
 
@@ -85,7 +85,7 @@ export class Shortcuts {
     /**
      * Get custom types (active defaults + user ones)
      */
-    private async getCustomComponentTypes(workspaceFsPath: string): Promise<ComponentType[]> {
+    private async getCustomComponentTypes(workspaceFolder: vscode.WorkspaceFolder): Promise<ComponentType[]> {
 
         /* `Map` is used to avoid duplicates */
         const customTypes = new Map<string, ComponentType>();
@@ -93,7 +93,7 @@ export class Shortcuts {
         /* Default custom types */
         for (const defaultType of defaultComponentTypes) {
 
-            const packageFsPath = path.join(workspaceFsPath, 'node_modules', defaultType.package);
+            const packageFsPath = path.join(workspaceFolder.uri.fsPath, 'node_modules', defaultType.package);
             
             /* Enable defaults only if the package exists */
             if (await FileSystem.isReadable(packageFsPath, { silent: true })) {
@@ -105,7 +105,7 @@ export class Shortcuts {
         }
 
         /* User custom types */
-        let userTypes = vscode.workspace.getConfiguration('ngschematics', vscode.Uri.file(workspaceFsPath)).get<unknown>('componentTypes', []);
+        let userTypes = vscode.workspace.getConfiguration('ngschematics', workspaceFolder.uri).get<unknown>('componentTypes', []);
 
         if (userTypes === '') {
             userTypes = [];
@@ -143,7 +143,7 @@ export class Shortcuts {
     /**
      * Cache component types choices.
      */
-    private async setComponentTypesChoices(workspaceFsPath: string): Promise<void> {
+    private async setComponentTypesChoices(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         /* Default component types */
         const shortcutTypes: ShortcutsTypes = new Map();
@@ -189,7 +189,7 @@ export class Shortcuts {
         });
 
         /* Custom component types */
-        for (const customType of await this.getCustomComponentTypes(workspaceFsPath)) {
+        for (const customType of await this.getCustomComponentTypes(workspaceFolder)) {
 
             shortcutTypes.set(customType.label, {
                 choice: {

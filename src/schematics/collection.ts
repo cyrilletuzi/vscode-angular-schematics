@@ -46,10 +46,10 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFsPath: string): Promise<void> {
+    async init(workspaceFolderFsPath: string): Promise<void> {
 
         /* Can throw */
-        this.fsPath = await this.getFsPath(workspaceFsPath, this.name);
+        this.fsPath = await this.getFsPath(workspaceFolderFsPath, this.name);
 
         const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath);
 
@@ -59,13 +59,13 @@ export class Collection {
 
         this.config = config;
 
-        await this.setSchematicsConfigs(workspaceFsPath);
+        await this.setSchematicsConfigs(workspaceFolderFsPath);
 
         /* Watcher must be set just once */
         if (!this.watcher) {
 
             this.watcher = Watchers.watchFile(this.fsPath, () => {
-                this.init(workspaceFsPath);
+                this.init(workspaceFolderFsPath);
             });
 
         }
@@ -123,12 +123,12 @@ export class Collection {
     /**
      * Get the collection filesystem path.
      */
-    private async getFsPath(workspaceFsPath: string, name: string): Promise<string> {
+    private async getFsPath(workspaceFolderFsPath: string, name: string): Promise<string> {
 
         /* Local schematics */
         if (name.startsWith('.') && name.endsWith('.json')) {
 
-            return path.join(workspaceFsPath, name);
+            return path.join(workspaceFolderFsPath, name);
     
         }
 
@@ -136,7 +136,7 @@ export class Collection {
         else {
 
             /* `collection.json` path is defined in `package.json` */
-            const packageJsonFsPath = path.join(workspaceFsPath, 'node_modules', name, 'package.json');
+            const packageJsonFsPath = path.join(workspaceFolderFsPath, 'node_modules', name, 'package.json');
 
             const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath);
 
@@ -161,7 +161,7 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematicsConfigs(workspaceFsPath: string): Promise<void> {
+    private async setSchematicsConfigs(workspaceFolderFsPath: string): Promise<void> {
 
         const allSchematics = Object.entries(this.config.schematics);
 
@@ -183,7 +183,7 @@ export class Collection {
                 try {
 
                     /* Can fail */
-                    const fsPath = await this.getFsPath(workspaceFsPath, name);
+                    const fsPath = await this.getFsPath(workspaceFolderFsPath, name);
 
                     const fullSchematicName = `${config.extends}:${name}`;
 

@@ -17,7 +17,7 @@ interface AngularJsonSchema {
     };
     /**
      * List of Angular projects.
-     * While it's optional in CLI JSON schema, a workspace should have at least one project.
+     * While it's optional in CLI JSON schema, a workspace folder should have at least one project.
      */
     projects?: {
         /** Name of the project */
@@ -29,6 +29,12 @@ export class AngularConfig {
 
     /** List of projects registered in Angular config file */
     projects = new Map<string, AngularProject>();
+    /** User default collection, otherwise official Angular CLI default collection */
+    defaultUserCollection = defaultAngularCollection;
+    /** User + official default collections */
+    defaultCollections: string[] = [];
+    /** Root project name */
+    rootProjectName = '';
     /** 
      * Possible basenames of official Angular config file
      * From https://github.com/angular/angular-cli/blob/master/packages/angular/cli/utilities/project.ts
@@ -41,11 +47,6 @@ export class AngularConfig {
     ];
     /** Values from the Angular config file */
     private config: AngularJsonSchema | undefined;
-    /** User default collection, otherwise official Angular CLI default collection */
-    private defaultUserCollection = defaultAngularCollection;
-    /** User and official default collections */
-    private defaultCollections: string[] = [];
-    private rootProjectName = '';
     private watcher: vscode.FileSystemWatcher | undefined;
     
     /**
@@ -53,14 +54,14 @@ export class AngularConfig {
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFsPath: string): Promise<void> {
+    async init(workspaceFolderFsPath: string): Promise<void> {
 
         let fsPath = '';
 
         /* Try the different possible file names */
         for (const fileName of this.fileNames) {
 
-            fsPath = path.join(workspaceFsPath, fileName);
+            fsPath = path.join(workspaceFolderFsPath, fileName);
 
             if (await FileSystem.isReadable(fsPath, { silent: true })) {
 
@@ -76,7 +77,7 @@ export class AngularConfig {
 
         }
 
-        /* Workspace should have an Angular config file */
+        /* Workspace folder should have an Angular config file */
         if (this.fileNames.length !== 1) {
             throw new Error();
         }
@@ -85,47 +86,17 @@ export class AngularConfig {
 
         this.setDefaultCollections();
 
-        await this.setProjects(workspaceFsPath);
+        await this.setProjects(workspaceFolderFsPath);
 
         /* Watcher must be set just once */
         if (!this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init(workspaceFsPath);
+                this.init(workspaceFolderFsPath);
             });
 
         }
         
-    }
-
-    /**
-     * Get user default collection, otherwise official Angular CLI default collection.
-     */
-    getDefaultUserCollection(): string {
-        return this.defaultUserCollection;
-    }
-
-    /**
-     * Get default collections (user one and official one)
-     */
-    getDefaultCollections(): string[] {
-        return this.defaultCollections;
-    }
-
-    /**
-     * Get all projects' names
-     */
-    getProjectsNames(): string[] {
-        return Array.from(this.projects.keys());
-    }
-
-    /**
-     * Tells if a project is the root application
-     */
-    isRootProject(name: string): boolean {
-
-        return (this.rootProjectName === name);
-
     }
 
     /**
@@ -146,7 +117,7 @@ export class AngularConfig {
     /**
      * Set all projects defined in `angular.json`
      */
-    private async setProjects(workspaceFsPath: string): Promise<void> {
+    private async setProjects(workspaceFolderFsPath: string): Promise<void> {
 
         /* Get `projects` in `angular.json`*/
         const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
@@ -161,7 +132,7 @@ export class AngularConfig {
         for (const [name, config] of projectsFromConfig) {
 
             const project = new AngularProject(name, config);
-            await project.init(workspaceFsPath);
+            await project.init(workspaceFolderFsPath);
 
             this.projects.set(name, project);
 

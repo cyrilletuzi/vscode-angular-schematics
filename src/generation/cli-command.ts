@@ -3,16 +3,16 @@ import * as path from 'path';
 
 import { defaultAngularCollection } from '../defaults';
 import { FileSystem, Output, Terminal } from '../utils';
-import { WorkspaceConfig } from '../config';
+import { WorkspaceFolderConfig } from '../config';
 import { Schematic } from '../schematics';
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
     full: string;
     /** Eg. `src/app/some-module` */
-    relativeToWorkspace: string;
+    relativeToWorkspaceFolder: string;
     /** Eg. `some-module` */
-    relativeToSource: string;
+    relativeToSourceFolder: string;
 }
 
 /** List of options */
@@ -23,11 +23,11 @@ export class CliCommand {
     /* Path details of the right-clicked file or directory */
     private contextPath: ContextPath = {
         full: '',
-        relativeToWorkspace: '',
-        relativeToSource: '',
+        relativeToWorkspaceFolder: '',
+        relativeToSourceFolder: '',
     };
     private baseCommand = 'ng g';
-    private project = '';
+    private projectName = '';
     private collectionName = defaultAngularCollection;
     private schematicName = '';
     private schematic!: Schematic;
@@ -35,11 +35,11 @@ export class CliCommand {
     private options: CliCommandOptions = new Map();
 
     constructor(
-        private workspace: WorkspaceConfig,
-        context?: vscode.Uri,
+        private workspaceFolder: WorkspaceFolderConfig,
+        contextUri?: vscode.Uri,
     ) {
 
-        this.setContextPathAndProject(context);
+        this.setContextPathAndProject(contextUri);
 
     }
 
@@ -93,24 +93,17 @@ export class CliCommand {
     }
 
     /**
-     * Set schematic's name
-     */
-    setSchematicName(name: string): void {
-
-        this.schematicName = name;
-
-    }
-
-    /**
      * Set schematic, and project if relevant.
      */
     setSchematic(schematic: Schematic): void {
 
+        this.schematicName = schematic.getName();
+
         this.schematic = schematic;
 
         /* If a project was detected, the schematic supports it and it's not the root project, add the project */
-        if (this.project && schematic.hasOption('project') && !this.workspace.angularConfig.isRootProject(this.project)) {
-            this.options.set('project', this.project);
+        if (this.projectName && schematic.hasOption('project') && !this.workspaceFolder.isRootAngularProject(this.projectName)) {
+            this.options.set('project', this.projectName);
         }
 
     }
@@ -118,15 +111,15 @@ export class CliCommand {
     /**
      * Get project (can be an empty string, in which case the command will be for the root project)
      */
-    getProject(): string {
-        return this.project;
+    getProjectName(): string {
+        return this.projectName;
     }
 
     /**
      * Set the project
      */
-    setProject(name: string): void {
-        this.project = name;
+    setProjectName(name: string): void {
+        this.projectName = name;
     }
 
     /**
@@ -137,11 +130,11 @@ export class CliCommand {
 
         /* `ngx-spec` schematics works on a file, and thus need the file part */
         if (this.collectionName === 'ngx-spec') {
-            return this.contextPath.relativeToSource;
+            return this.contextPath.relativeToSourceFolder;
         }
 
         /* Otherwise we remove the file part */
-        const context = FileSystem.removeFilename(this.contextPath.relativeToSource);
+        const context = FileSystem.removeFilename(this.contextPath.relativeToSourceFolder);
 
         /* Add  trailing slash so the user can just write the name directly */
         const contextWithTrailingSlash = !(['', '.'].includes(context)) ? `${context}/` : '';
@@ -196,9 +189,9 @@ export class CliCommand {
         if (this.nameAsFirstArg) {
 
             /* Get the project path, or defaut to `src/app` */
-            const projectSourcePath = this.project ?
-                path.join(this.workspace.uri.fsPath, this.workspace.angularConfig.projects.get(this.project)!.getSourcePath()) :
-                path.join(this.workspace.uri.fsPath, 'src/app');
+            const projectSourcePath = this.projectName ?
+                path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getSourcePath()) :
+                path.join(this.workspaceFolder.uri.fsPath, 'src/app');
 
             /* Default file's suffix is the schematic name (eg. `service`),
             * except for Angular component schematic which can have a specific suffix with the `--type` option */
@@ -234,25 +227,25 @@ export class CliCommand {
 
         Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
 
-        /* Remove workspace path from full path,
+        /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspace = this.contextPath.full.substr(this.workspace.uri.path.length + 1);
+        this.contextPath.relativeToWorkspaceFolder = this.contextPath.full.substr(this.workspaceFolder.uri.path.length + 1);
 
-        Output.logInfo(`Workspace-relative context path detected: ${this.contextPath.relativeToWorkspace}`);
+        Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
-        for (const [projectName, projectConfig] of this.workspace.angularConfig.projects) {
+        for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
 
             /* If the relative path starts with the project path */
-            if (this.contextPath.relativeToWorkspace.startsWith(projectConfig.getSourcePath())) {
+            if (this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getSourcePath())) {
 
-                this.project = projectName;
+                this.projectName = projectName;
 
-                /* Remove source path from workspace relative path,
+                /* Remove source path from workspace folder relative path,
                  * eg. `src/app/some-module` => `some-module` */
-                this.contextPath.relativeToSource = this.contextPath.relativeToWorkspace.substr(projectConfig.getSourcePath().length + 1);
+                this.contextPath.relativeToSourceFolder = this.contextPath.relativeToWorkspaceFolder.substr(projectConfig.getSourcePath().length + 1);
 
-                Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSource}`);
-                Output.logInfo(`Angular project detected from context path: "${this.project}"`);
+                Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSourceFolder}`);
+                Output.logInfo(`Angular project detected from context path: "${this.projectName}"`);
 
                 return;
 
@@ -261,8 +254,8 @@ export class CliCommand {
         }
 
         /* Default values */
-        this.contextPath.relativeToSource = '';
-        this.project = '';
+        this.contextPath.relativeToSourceFolder = '';
+        this.projectName = '';
 
         Output.logInfo(`No Angular project detected from context path.`);
 
@@ -275,7 +268,7 @@ export class CliCommand {
      */
     private formatSchematicNameForCommand(): string {
 
-        return (this.collectionName !== this.workspace.angularConfig.getDefaultUserCollection()) ?
+        return (this.collectionName !== this.workspaceFolder.getDefaultUserCollection()) ?
             `${this.collectionName}:${this.schematicName}` :
             this.schematicName;
 

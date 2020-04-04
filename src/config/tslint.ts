@@ -11,12 +11,12 @@ interface TslintJsonSchema {
 
 export class TslintConfig {
 
+    /** List of components suffixes defined in `tslint.json` */
+    componentSuffixes: string[] = [];
     /** Basename of TSLint config file */
     private static readonly fileName = 'tslint.json';
     /** Values from TSLint config file */
     private config: TslintJsonSchema | undefined;
-    /** List of components suffixes defined in `tslint.json` */
-    private componentSuffixes: string[] = [];
     private watcher: vscode.FileSystemWatcher | undefined;
 
     /**
@@ -24,9 +24,9 @@ export class TslintConfig {
      * **Must** be called after each `new TslintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFsPath: string, { silent = false } = {}): Promise<void> {
+    async init(workspaceFolderFsPath: string, { silent = false } = {}): Promise<void> {
 
-        const fsPath = path.join(workspaceFsPath, TslintConfig.fileName);
+        const fsPath = path.join(workspaceFolderFsPath, TslintConfig.fileName);
 
         this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, { silent });
 
@@ -36,7 +36,7 @@ export class TslintConfig {
         if (this.config && !this.watcher) {
 
             this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init(workspaceFsPath);
+                this.init(workspaceFolderFsPath);
             });
 
         }
@@ -44,16 +44,9 @@ export class TslintConfig {
     }
 
     /**
-     * Get component suffixes defined in `tslint.json`, or at least `Component` by default.
-     */
-    getComponentSuffixes(): string[] {
-        return this.componentSuffixes;
-    }
-
-    /**
      * Tells if a suffix is authorized in tslint.json
      */
-    hasSuffix(suffix: string): boolean {
+    hasComponentSuffix(suffix: string): boolean {
 
         /* Lowercase both values to be sure to match all styles */
         return this.componentSuffixes.map((suffix) => suffix.toLowerCase()).includes(suffix.toLowerCase());

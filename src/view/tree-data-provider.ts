@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Workspaces } from '../config';
+import { Workspace } from '../config';
 import { Collection } from '../schematics';
 
 export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
@@ -26,9 +26,9 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
         /* Primary level: collection's name */
         if (!element) {
 
-            for (const [, workspaceConfig] of Workspaces.workspaces) {
+            for (const [, workspaceFolderConfig] of Workspace.folders) {
 
-                for (const [name, collection] of workspaceConfig.collections.collections) {
+                for (const [name, collection] of workspaceFolderConfig.collections.collections) {
 
                     /* Avoid duplicates */
                     if (!this.collections.has(name)) {

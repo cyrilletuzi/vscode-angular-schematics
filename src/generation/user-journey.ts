@@ -3,31 +3,31 @@ import * as path from 'path';
 
 import { defaultAngularCollection } from '../defaults';
 import { Output, FileSystem } from '../utils';
-import { Workspaces, WorkspaceConfig, AngularProject } from '../config';
-import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL } from '../schematics';
+import { Workspace, WorkspaceFolderConfig } from '../config';
+import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 
 export class UserJourney {
 
     private static shortcutSchematics = ['component', 'service', 'module'];
-    private workspace!: WorkspaceConfig;
+    private workspaceFolder!: WorkspaceFolderConfig;
     private cliCommand!: CliCommand;
-    private project: AngularProject | undefined;
+    private projectName = '';
     private collections!: Collections;
     private collection!: Collection;
     private schematic!: Schematic;
 
-    async start(context?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
+    async start(contextUri?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
 
-        /* Resolve the current workspace config */
-        const workspace = await Workspaces.getCurrent(context);
-        if (!workspace) {
-            Output.logInfo(`You have canceled the workspace choice.`);
+        /* Resolve the current workspace folder */
+        const workspaceFolder = await Workspace.getCurrentFolder(contextUri);
+        if (!workspaceFolder) {
+            Output.logInfo(`You have canceled the workspace folder choice.`);
             return;
         }
 
-        Output.logInfo(`Workspace selected: "${workspace.name}"`);
+        Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
 
         /* As the configurations are loaded in an async way, they may not be ready */
         try {
@@ -36,46 +36,46 @@ export class UserJourney {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
                 title: `Angular Schematics: loading configuration, please wait...`,
-            }, () => Workspaces.whenStable());
+            }, () => Workspace.whenStable());
 
         } catch {
             Output.showError(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
             return;
         }
 
-        const workspaceConfig = Workspaces.getConfig(workspace);
+        /* Get workspace folder configuration */
+        const workspaceFolderConfig = Workspace.getFolderConfig(workspaceFolder);
         /* Not supposed to happen */
-        if (!workspaceConfig) {
-            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace. It can happen if there is no "angular.json" at the root of your workspace.`);
+        if (!workspaceFolderConfig) {
+            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace folder. It can happen if there is no "angular.json" at the root of your workspace folder.`);
             return;
         }
-        this.workspace = workspaceConfig;
-        this.collections = this.workspace.collections;
+        this.workspaceFolder = workspaceFolderConfig;
+        this.collections = this.workspaceFolder.collections;
 
-        this.cliCommand = new CliCommand(workspaceConfig, context);
+        this.cliCommand = new CliCommand(workspaceFolderConfig, contextUri);
 
         /* If there is more than one Angular project in angular.json
          * and if the project has not been already resolved via context path (in `CliCommand` constructor) */
-        if ((this.workspace.angularConfig.projects.size > 1) && !this.cliCommand.getProject()) {
+        if ((this.workspaceFolder.getAngularProjects().size > 1) && !this.cliCommand.getProjectName()) {
 
             const projectName = await this.askProjectName();
 
             if (!projectName) {
-                Output.logInfo(`You have canceled the project choice.`);
+                Output.logInfo(`You have canceled the Angular project choice.`);
                 return;
             }
 
-            this.cliCommand.setProject(projectName);
+            this.cliCommand.setProjectName(projectName);
 
         }
 
-        /* If a project name is present, save a reference to the project */
-        if (this.cliCommand.getProject()) {
+        this.projectName = this.cliCommand.getProjectName();
 
-            this.project = this.workspace.angularConfig.projects.get(this.cliCommand.getProject());
-
-            Output.logInfo(`Angular project used: "${this.cliCommand.getProject()}"`);
-
+        if (this.projectName) {
+            Output.logInfo(`Angular project used: "${this.cliCommand.getProjectName()}"`);
+        } else {
+            Output.logWarning(`No Angular project detected, the command will be generated in the root application.`);
         }
 
         /* Collection may be already defined (from shortcut command or from view) */
@@ -104,7 +104,7 @@ export class UserJourney {
         const collection = this.collections.get(collectionName);
 
         if (!collection) {
-            Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspace.name}" workspace.`);
+            Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
             return;
         }
 
@@ -123,9 +123,7 @@ export class UserJourney {
         }
 
         Output.logInfo(`Schematic used: "${collectionName}:${schematicName}"`);
-
-        this.cliCommand.setSchematicName(schematicName);
-
+        
         /* Show progress to the user */
         const schematic = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Window,
@@ -138,7 +136,6 @@ export class UserJourney {
         }
 
         this.cliCommand.setSchematic(schematic);
-
         this.schematic = schematic;
 
         let nameAsFirstArg: string | undefined;
@@ -178,6 +175,7 @@ export class UserJourney {
             /* Special scenario for module types */
             } else if (schematicName === 'module') {
 
+                /* We know that Angular module schematics has a name as first argument */
                 shortcutOptions = await this.askModuleOptions(nameAsFirstArg!);
                 if (!shortcutOptions) {
                     Output.logInfo(`You have canceled the module type choice.`);
@@ -230,8 +228,8 @@ export class UserJourney {
 
     private async askProjectName(): Promise<string | undefined> {
 
-        return vscode.window.showQuickPick(this.workspace.angularConfig.getProjectsNames(), {
-            placeHolder: `In which Angular project?`,
+        return vscode.window.showQuickPick(this.workspaceFolder.getAngularProjectsNames(), {
+            placeHolder: `In which your Angular projects do you want to generate?`,
             ignoreFocusOut: true,
         });
 
@@ -240,7 +238,7 @@ export class UserJourney {
     private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.collections.getNames().length === 0) {
-            throw new Error('No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.');
+            throw new Error(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
         else if  (this.collections.getNames().length === 1) {
@@ -258,7 +256,7 @@ export class UserJourney {
             Output.logInfo(`Multiple collections detected: ask the user which one to use.`);
 
             return vscode.window.showQuickPick(this.collections.getNames(), {
-                placeHolder: `From which schematics collection?`,
+                placeHolder: `What schematics collection do you want to use?`,
                 ignoreFocusOut: true,
             });
 
@@ -269,7 +267,7 @@ export class UserJourney {
     private async askSchematicName(): Promise<string | undefined> {
 
         const choice = await vscode.window.showQuickPick(this.collection.schematicsChoices, {
-            placeHolder: `What do you want to generate?`,
+            placeHolder: `What schematics do you want to generate?`,
             ignoreFocusOut: true,
         });
 
@@ -279,15 +277,15 @@ export class UserJourney {
 
     private async askNameAsFirstArg(): Promise<string | undefined> {
 
-        const project = this.cliCommand.getProject();
+        const projectName = this.cliCommand.getProjectName();
         const contextPath = this.cliCommand.getContextForNameAsFirstArg();
 
         Output.logInfo(`Context path detected for default argument: "${contextPath}"`);
 
-        let prompt = `Name or path/name ${project ? `in project '${project}'` : 'in default project'}?`;
+        let prompt = `Name or path/name ${projectName ? `in project '${projectName}'` : 'in default project'}?`;
 
         /* Pro-tip to educate users that it is easier to launch the command from a right-click in Explorer */
-        if (this.workspace.angularConfig.isRootProject(project) && !contextPath) {
+        if (this.workspaceFolder.isRootAngularProject(projectName) && !contextPath) {
             prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
         }
 
@@ -319,15 +317,8 @@ export class UserJourney {
             if (config.options.has('type')) {
 
                 const suffix = config.options.get('type') as string;
-                
-                /* Suffixes can be defined at, in order of priority:
-                 * 1. project level
-                 * 2. workspace level */
-                const hasSuffix = ((this.project?.tslintConfig.getComponentSuffixes().length ?? 0) > 0) ?
-                this.project!.tslintConfig.hasSuffix(suffix) :
-                this.workspace.tslintConfig.hasSuffix(suffix);
 
-                if (!this.schematic.hasOption('type') || !hasSuffix) {
+                if (!this.schematic.hasOption('type') || !this.workspaceFolder.hasComponentSuffix(suffix, this.projectName)) {
                     config.options.delete('type');
                 }
 
@@ -386,7 +377,7 @@ export class UserJourney {
 
     private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
-        const choice = await vscode.window.showQuickPick(this.collections.shortcuts.confirmationChoices, {
+        const choice = await vscode.window.showQuickPick(Shortcuts.confirmationChoices, {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });

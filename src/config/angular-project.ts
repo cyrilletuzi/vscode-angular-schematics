@@ -17,7 +17,6 @@ export interface AngularJsonProjectSchema {
 
 export class AngularProject {
 
-    tslintConfig!: TslintConfig;
     private name: string;
     /** Angular projects are `application` by default, but can be `library` too */
     private type: AngularProjectType;
@@ -25,6 +24,7 @@ export class AngularProject {
     private rootPath: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     private sourcePath: string;
+    private tslintConfig!: TslintConfig;
 
     constructor(name: string, config: AngularJsonProjectSchema) {
 
@@ -33,12 +33,12 @@ export class AngularProject {
         /* `projectType` is supposed to be required, but default to `application` for safety */
         this.type = config.projectType ? config.projectType : 'application';
 
-        /* Project's path relative to workspace (ie. where `angular.json` is).
-         * For the main application, it's empty as it's directly in the workspace.
+        /* Project's path relative to workspace folder (ie. where `angular.json` is).
+         * For the main application, it's empty as it's directly in the workspace folder.
          * For sub-applications/libraries, it's `<projects-root>/hello-world`. */
         this.rootPath = config.root ?? '';
 
-        /* Project's source path relative to workspace (ie. where `angular.json` is).
+        /* Project's source path relative to workspace folder (ie. where `angular.json` is).
          * For the main application, it's `src` by default but can be customized.
          * For sub-applications/libraries, it's `<projects-root>/hello-world/<src-or-something-else>`.
          * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
@@ -63,23 +63,37 @@ export class AngularProject {
 
     }
 
-    async init(fsPath: string): Promise<void> {
+    async init(workspaceFolderfsPath: string): Promise<void> {
 
         Output.logInfo(`Loading "${this.name}" Angular project's TSLint configuration.`);
 
-        const tslintFsPath = path.join(fsPath, this.rootPath);
+        const projectFsPath = path.join(workspaceFolderfsPath, this.rootPath);
 
         const tslintConfig = new TslintConfig();
-        await tslintConfig.init(tslintFsPath);
+        await tslintConfig.init(projectFsPath);
         this.tslintConfig = tslintConfig;
 
     }
 
     /**
-     * Get project's source path
+     * Get an Angular project's source path
      */
     getSourcePath(): string {
         return this.sourcePath;
+    }
+
+    /**
+     * Get authotorized component suffixes in Angular project's tslint.json
+     */
+    getComponentSuffixes(): string[] {
+        return this.tslintConfig.componentSuffixes;
+    }
+
+    /**
+     * Tells if a suffix is authorized in Angular project's tslint.json
+     */
+    hasComponentSuffix(suffix: string): boolean {
+        return this.tslintConfig.hasComponentSuffix(suffix);
     }
 
 }
