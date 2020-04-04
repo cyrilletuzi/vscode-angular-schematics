@@ -11,6 +11,7 @@ export class Workspace {
      * The map key is the workspace folder's name.
      */
     static folders = new Map<string, WorkspaceFolderConfig>();
+    static watcher: vscode.Disposable;
     /**
      * Tells if the initial configuration loading is complete.
      */
@@ -46,7 +47,7 @@ export class Workspace {
         Output.logInfo(`Configurations of all workspace folders are now ready. Duration: ${durationTime}ms.`);
 
         /* Listen if a workspace folder is added or removed */
-        vscode.workspace.onDidChangeWorkspaceFolders((event) => {
+        this.watcher = vscode.workspace.onDidChangeWorkspaceFolders((event) => {
 
             for (const folder of event.added) {
                 Output.logInfo(`Loading configuration of new "${folder.name}" workspace folder.`);

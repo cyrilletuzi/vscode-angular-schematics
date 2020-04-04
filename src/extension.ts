@@ -97,6 +97,8 @@ export function activate(context: vscode.ExtensionContext): void {
  */
 export function deactivate(): void {
 
+    Workspace.watcher.dispose();
+
     Watchers.disposeAll();
 
     Output.dispose();

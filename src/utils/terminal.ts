@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export class Terminal {
 
-    private static readonly terminalName = 'Angular schematics';
+    private static readonly terminalName = 'Angular Schematics';
     private static _terminal: vscode.Terminal | undefined;
 
     /**

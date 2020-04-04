@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export class Output {
 
-    private static readonly channelName = 'Angular schematics';
+    private static readonly channelName = 'Angular Schematics';
     private static _channel: vscode.OutputChannel | undefined;
 
     /**
