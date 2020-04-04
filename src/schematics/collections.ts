@@ -12,14 +12,12 @@ export class Collections {
     /**
      * List of collections existing in the workspace
      */
-    collections = new Map<string, Collection>();
+    list = new Map<string, Collection>();
     /**
      * List of shortchuts
      */
     shortcuts!: Shortcuts;
     private watcher: vscode.Disposable | undefined;
-
-    constructor() {}
 
     /**
      * Initialize collections.
@@ -46,17 +44,17 @@ export class Collections {
     /**
      * Get all collections' names.
      */
-    getNames(): string[] {
-        return Array.from(this.collections.keys());
+    getCollectionsNames(): string[] {
+        return Array.from(this.list.keys());
     }
 
     /**
      * Get collection from cache.
      * @param name 
      */
-    get(name: string): Collection | undefined {
+    getCollection(name: string): Collection | undefined {
 
-        return this.collections.get(name);
+        return this.list.get(name);
 
     }
 
@@ -130,7 +128,7 @@ export class Collections {
                     
             try {
                 await collection.init(workspaceFolder.uri.fsPath);
-                this.collections.set(name, collection);
+                this.list.set(name, collection);
             } catch {
                 Output.logError(`Loading of "${name}" collection failed.`);
             }

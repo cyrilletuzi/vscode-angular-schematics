@@ -101,7 +101,7 @@ export class UserJourney {
 
         this.cliCommand.setCollectionName(collectionName);
         
-        const collection = this.collections.get(collectionName);
+        const collection = this.collections.getCollection(collectionName);
 
         if (!collection) {
             Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
@@ -237,13 +237,13 @@ export class UserJourney {
 
     private async askCollectionName(): Promise<string | undefined> {
 
-        if  (this.collections.getNames().length === 0) {
+        if  (this.collections.getCollectionsNames().length === 0) {
             throw new Error(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
-        else if  (this.collections.getNames().length === 1) {
+        else if  (this.collections.getCollectionsNames().length === 1) {
 
-            const collectionName = this.collections.getNames()[0];
+            const collectionName = this.collections.getCollectionsNames()[0];
 
             Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
 
@@ -255,7 +255,7 @@ export class UserJourney {
 
             Output.logInfo(`Multiple collections detected: ask the user which one to use.`);
 
-            return vscode.window.showQuickPick(this.collections.getNames(), {
+            return vscode.window.showQuickPick(this.collections.getCollectionsNames(), {
                 placeHolder: `What schematics collection do you want to use?`,
                 ignoreFocusOut: true,
             });

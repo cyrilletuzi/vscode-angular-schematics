@@ -28,7 +28,7 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
 
             for (const [, workspaceFolderConfig] of Workspace.folders) {
 
-                for (const [name, collection] of workspaceFolderConfig.collections.collections) {
+                for (const [name, collection] of workspaceFolderConfig.collections.list) {
 
                     /* Avoid duplicates */
                     if (!this.collections.has(name)) {
