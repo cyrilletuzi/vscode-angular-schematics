@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
-import { defaultAngularCollection } from './defaults';
-import { Watchers, Output } from './utils';
+import { defaultAngularCollection, extensionName } from './defaults';
+import { Watchers, Output, Terminal } from './utils';
 import { Workspace } from './workspace';
 import { UserJourney } from './generation';
 import { SchematicsTreeDataProvider } from './view';
@@ -14,7 +14,7 @@ let treeDataProvider: vscode.TreeView<vscode.TreeItem> | undefined;
  */
 export function activate(context: vscode.ExtensionContext): void {
 
-    Output.logInfo(`Angular schematics extension has been activated.`);
+    Output.logInfo(`${extensionName} extension has been activated.`);
 
     /* Enable context menus */
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
@@ -93,6 +93,8 @@ export function deactivate(): void {
     Workspace.watcher.dispose();
 
     Watchers.disposeAll();
+
+    Terminal.disposeAll();
 
     Output.dispose();
 

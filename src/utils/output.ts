@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 
+import { extensionName } from '../defaults';
+
 export class Output {
 
-    private static readonly channelName = 'Angular Schematics';
     private static _channel: vscode.OutputChannel | undefined;
 
     /**
@@ -12,7 +13,7 @@ export class Output {
 
         /* Create the channel just once */
         if (!this._channel) {
-            this._channel =  vscode.window.createOutputChannel(this.channelName);
+            this._channel =  vscode.window.createOutputChannel(extensionName);
         }
 
         return this._channel;

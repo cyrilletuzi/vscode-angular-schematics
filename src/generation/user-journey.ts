@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultAngularCollection } from '../defaults';
+import { defaultAngularCollection, extensionName } from '../defaults';
 import { Output, FileSystem } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../workspace/schematics';
@@ -35,11 +35,11 @@ export class UserJourney {
             /* Show progress to the user */
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Window,
-                title: `Angular Schematics: loading configuration, please wait...`,
+                title: `${extensionName}: loading configuration, please wait...`,
             }, () => Workspace.whenStable());
 
         } catch {
-            Output.showError(`Command canceled: loading configurations needed for Angular Schematics extension was too long.`);
+            Output.showError(`Command canceled: loading configurations needed for ${extensionName} extension was too long.`);
             return;
         }
 
@@ -127,7 +127,7 @@ export class UserJourney {
         /* Show progress to the user */
         const schematic = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Window,
-            title: `Angular Schematics: "${collectionName}:${schematicName}" schematic is loading, please wait...`,
+            title: `"${collectionName}:${schematicName}" schematic is loading, please wait...`,
         }, () => this.collection.getSchematic(schematicName!));
 
         if (!schematic) {

@@ -179,7 +179,7 @@ export class CliCommand {
 
         Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
-        Terminal.send(this.getCommand());
+        Terminal.send(this.workspaceFolder, this.getCommand());
     
     }
 
