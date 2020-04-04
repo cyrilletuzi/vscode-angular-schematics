@@ -12,16 +12,16 @@ export interface ShortcutType {
 export type ShortcutsTypes = Map<string, ShortcutType>;
 
 export enum MODULE_TYPE {
-    DEFAULT = `Module of components`,
-    LAZY    = `Lazy-loaded module of pages`,
-    ROUTING = `Classic module of pages`,
+    DEFAULT = `$(extensions) Module of components`,
+    LAZY    = `$(zap) Lazy-loaded module of pages`,
+    ROUTING = `$(files) Classic module of pages`,
 }
 
 export enum COMPONENT_TYPE {
-    DEFAULT  = `Default component`,
-    PAGE     = `Page`,
-    PURE     = `Pure component`,
-    EXPORTED = `Exported component`,
+    DEFAULT  = `$(thumbsdown) Default component`,
+    PAGE     = `$(preview) Page`,
+    PURE     = `$(zap) Pure component`,
+    EXPORTED = `$(link-external) Exported component`,
 }
 
 export enum CONFIRMATION_LABEL {
