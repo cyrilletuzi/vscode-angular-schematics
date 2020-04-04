@@ -75,7 +75,7 @@ export class TslintConfig {
         /* `Set` removes duplicates */
         this.componentSuffixes = Array.from(new Set(suffixes));
 
-        if (this.componentSuffixes.length > 1) { 
+        if (this.componentSuffixes.length > 0) { 
             Output.logInfo(`${this.componentSuffixes.length} custom component suffixes detected: ${this.componentSuffixes.join(', ')}`);
         } else {
             Output.logInfo(`No custom component suffix detected.`);

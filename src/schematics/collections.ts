@@ -25,7 +25,7 @@ export class Collections {
      */
     async init(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
 
-        await this.set(workspaceFolder, userDefaultCollections);
+        await this.setList(workspaceFolder, userDefaultCollections);
 
         await this.setShortcuts(workspaceFolder);
 
@@ -81,9 +81,12 @@ export class Collections {
     /**
      * Set collections names and preload official collections.
      */
-    private async set(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
+    private async setList(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
 
         Output.logInfo(`Loading the list of collections.`);
+
+        /* Start from scratch as the function can be called again via watcher */
+        this.list = new Map();
 
         /* Configuration key is configured in `package.json` */
         const userPreference = vscode.workspace.getConfiguration('ngschematics', workspaceFolder.uri).get<string[]>(`schematics`, []);
