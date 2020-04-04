@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Output } from './output';
-import { Workspace } from '../config';
+import { Workspace } from '../workspace';
 
 export class FileSystem {
 

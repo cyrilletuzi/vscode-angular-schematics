@@ -3,8 +3,8 @@ import * as path from 'path';
 
 import { defaultAngularCollection } from '../defaults';
 import { FileSystem, Output, Terminal } from '../utils';
-import { WorkspaceFolderConfig } from '../config';
-import { Schematic } from '../config/schematics';
+import { WorkspaceFolderConfig } from '../workspace';
+import { Schematic } from '../workspace/schematics';
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
@@ -204,6 +204,7 @@ export class CliCommand {
             const suffix = ((this.collectionName === defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
                 this.options.get('type')! : this.schematicName;
 
+            /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
             const fileName = path.posix.basename(this.nameAsFirstArg);
             const fileWithSuffixName = `${fileName}.${suffix}.ts`;

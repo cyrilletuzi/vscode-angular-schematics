@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Workspace } from '../config';
-import { Collection } from '../config/schematics';
+import { Workspace } from '../workspace';
+import { Collection } from '../workspace/schematics';
 
 export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
 

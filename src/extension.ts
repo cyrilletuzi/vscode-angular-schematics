@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import { defaultAngularCollection } from './defaults';
 import { Watchers, Output } from './utils';
-import { Workspace } from './config';
+import { Workspace } from './workspace';
 import { UserJourney } from './generation';
 import { SchematicsTreeDataProvider } from './view';
 
