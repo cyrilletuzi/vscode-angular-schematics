@@ -204,7 +204,9 @@ export class CliCommand {
             const suffix = ((this.collectionName === defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
                 this.options.get('type')! : this.schematicName;
 
-            const fileName = `${this.nameAsFirstArg}.${suffix}.ts`;
+            const folderName = path.posix.dirname(this.nameAsFirstArg);
+            const fileName = path.posix.basename(this.nameAsFirstArg);
+            const fileWithSuffixName = `${fileName}.${suffix}.ts`;
 
             /* Schematics are created with or without an intermediate folder */
             let isFlat = true;
@@ -242,11 +244,15 @@ export class CliCommand {
             }
 
             /* If not flat, add a intermediate folder, which name is the same as the generated file */
-            const generatedFolderFsPath = isFlat ? projectSourcePath : path.join(projectSourcePath, this.nameAsFirstArg);
+            const generatedFolderFsPath = isFlat ?
+                path.join(projectSourcePath, folderName) :
+                path.join(projectSourcePath, folderName, fileName);
             
-            possibleFsPath = path.join(generatedFolderFsPath, fileName);
+            possibleFsPath = path.join(generatedFolderFsPath, fileWithSuffixName);
 
         }
+
+        Output.logInfo(`Guessed generated file path: ${possibleFsPath}`);
 
         return possibleFsPath;
 
