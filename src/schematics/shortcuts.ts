@@ -25,9 +25,9 @@ export enum COMPONENT_TYPE {
 }
 
 export enum CONFIRMATION_LABEL {
-    YES  = `Confirm`,
-    MORE_OPTIONS     = `Add more options`,
-    NO   = `Cancel`,
+    YES          = `$(check) Confirm`,
+    MORE_OPTIONS = `$(gear) Add more options`,
+    NO           = `$(close) Cancel`,
 }
 
 export class Shortcuts {
@@ -38,7 +38,7 @@ export class Shortcuts {
     moduleTypesChoices: ShortcutsTypes = new Map();
     /* Cache for shortcut confirmation choices */
     static confirmationChoices: vscode.QuickPickItem[] = [{
-        label: CONFIRMATION_LABEL.NO,
+        label: CONFIRMATION_LABEL.YES,
         description: `Pro-tip: take a minute to check the command above is really what you want`,
     }, {
         label: CONFIRMATION_LABEL.MORE_OPTIONS,

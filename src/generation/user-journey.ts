@@ -514,9 +514,10 @@ export class UserJourney {
 
     private async askConfirmation(): Promise<boolean> {
 
-        const confirmationText = `Confirm`;
+        const confirmationText = `$(check) Confirm`;
+        const cancelText = `$(close) Cancel`;
 
-        const choice = await vscode.window.showQuickPick([confirmationText, `Cancel`], {
+        const choice = await vscode.window.showQuickPick([confirmationText, cancelText], {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
