@@ -69,7 +69,7 @@ export class TslintConfig {
         const tslintRule = this.config?.rules?.['component-class-suffix'];
 
         /* Check we are in the 3rd case */
-        if (Array.isArray(tslintRule) && tslintRule.length > 2) {
+        if (Array.isArray(tslintRule) && tslintRule.length > 1) {
 
             /* Removes the first value (`true`)
              * Type cast is required as TypeScript cannot do it itself in this case */
@@ -83,7 +83,9 @@ export class TslintConfig {
         this.componentSuffixes = Array.from(new Set(suffixes));
 
         if (this.componentSuffixes.length > 1) { 
-            Output.logInfo(`${this.componentSuffixes.length} component suffixes detected: ${this.componentSuffixes.join(', ')}`);
+            Output.logInfo(`${this.componentSuffixes.length} custom component suffixes detected: ${this.componentSuffixes.join(', ')}`);
+        } else {
+            Output.logInfo(`No custom component suffix detected in ${TslintConfig.fileName}`);
         }
 
     }

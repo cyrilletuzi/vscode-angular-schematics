@@ -107,7 +107,7 @@ export class AngularConfig {
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
         this.defaultUserCollection = this.config?.cli?.defaultCollection ?? defaultAngularCollection;
 
-        Output.logInfo(`Default schematics collection detected in ${this.fileNames[0]}: ${this.defaultUserCollection}`);
+        Output.logInfo(`Default schematics collection detected in "${this.fileNames[0]}": ${this.defaultUserCollection}`);
 
         /* `Set` removes duplicates */
         this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
@@ -119,13 +119,17 @@ export class AngularConfig {
      */
     private async setProjects(workspaceFolderFsPath: string): Promise<void> {
 
+        /* Start from scratch (can be recalled via watcher) */
+        this.rootProjectName = '';
+        this.projects = new Map();
+
         /* Get `projects` in `angular.json`*/
         const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
 
         if (projectsFromConfig.length > 0) {
             Output.logInfo(`${projectsFromConfig.length} Angular project(s) detected.`);
         } else {
-            Output.logWarning(`No Angular project detected. Check your angular.json configuration.`);
+            Output.logWarning(`No Angular project detected. Check your "${this.fileNames[0]}" configuration.`);
         }
 
         /* Transform Angular config with more convenient information for this extension */
