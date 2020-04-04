@@ -1,28 +1,10 @@
 import * as path from 'path';
 
-import { defaultAngularCollection } from '../defaults';
-import { FileSystem, Watchers, Output } from '../utils';
+import { defaultAngularCollection } from '../../defaults';
+import { FileSystem, Watchers, Output } from '../../utils';
 
-import { AngularJsonProjectSchema, AngularProject } from './angular-project';
-
-/** Description of `angular.json` */
-interface AngularJsonSchema {
-    cli?: {
-        /**
-         * If set, Angular CLI will use this collection by default instead of the official one.
-         * For example, it is set to `@ionic/angular-toolkit` in Ionic projects.
-         */
-        defaultCollection?: string;
-    };
-    /**
-     * List of Angular projects.
-     * While it's optional in CLI JSON schema, a workspace folder should have at least one project.
-     */
-    projects?: {
-        /** Name of the project */
-        [key: string]: AngularJsonProjectSchema;
-    };
-}
+import { AngularProject } from './angular-project';
+import { AngularJsonSchema, AngularJsonProjectSchema } from './angular-json-schema';
 
 export class AngularConfig {
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import { defaultAngularCollection } from '../defaults';
 import { Output, FileSystem } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../config';
-import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../schematics';
+import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../config/schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 

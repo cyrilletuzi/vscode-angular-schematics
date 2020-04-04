@@ -4,7 +4,7 @@ import * as path from 'path';
 import { defaultAngularCollection } from '../defaults';
 import { FileSystem, Output, Terminal } from '../utils';
 import { WorkspaceFolderConfig } from '../config';
-import { Schematic } from '../schematics';
+import { Schematic } from '../config/schematics';
 
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */

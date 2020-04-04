@@ -1,11 +1,9 @@
 import * as vscode from 'vscode';
 
 import { Output } from '../utils';
-import { Collections } from '../schematics';
 
-import { TslintConfig } from './tslint';
-import { AngularConfig } from './angular';
-import { AngularProject } from './angular-project';
+import { Collections } from './schematics';
+import { AngularConfig, AngularProject, TslintConfig } from './angular';
 
 export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 

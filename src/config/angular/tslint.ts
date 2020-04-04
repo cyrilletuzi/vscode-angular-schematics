@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { FileSystem, Watchers, Output } from '../utils';
+import { FileSystem, Watchers, Output } from '../../utils';
 
 interface TslintJsonSchema {
     rules?: {
@@ -75,11 +75,7 @@ export class TslintConfig {
         /* `Set` removes duplicates */
         this.componentSuffixes = Array.from(new Set(suffixes));
 
-        if (this.componentSuffixes.length > 0) { 
-            Output.logInfo(`${this.componentSuffixes.length} custom component suffixes detected: ${this.componentSuffixes.join(', ')}`);
-        } else {
-            Output.logInfo(`No custom component suffix detected.`);
-        }
+        Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in TSLint config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
     }
 

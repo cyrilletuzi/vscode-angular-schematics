@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { ComponentType, defaultComponentTypes } from '../defaults';
-import { Output, FileSystem } from '../utils';
+import { ComponentType, defaultComponentTypes } from '../../defaults';
+import { Output, FileSystem } from '../../utils';
 
 export interface ShortcutType {
     options: Map<string, string | string[]>;

@@ -1,19 +1,9 @@
 import * as path from 'path';
 
-import { Output } from '../utils';
+import { Output } from '../../utils';
 
+import { AngularJsonProjectSchema, AngularProjectType } from './angular-json-schema';
 import { TslintConfig } from './tslint';
-
-export type AngularProjectType = 'application' | 'library';
-
-export interface AngularJsonProjectSchema {
-    /** Angular projects are `application` by default, but can be `library` too */
-    projectType: AngularProjectType;
-    /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
-    root: string;
-    /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
-    sourceRoot?: string;
-}
 
 export class AngularProject {
 

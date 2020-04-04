@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Watchers, Output } from '../utils';
+import { FileSystem, Watchers, Output } from '../../utils';
 
 import { Schematic, SchematicConfig } from './schematic';
 

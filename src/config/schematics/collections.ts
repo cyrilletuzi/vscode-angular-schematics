@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultCollectionsNames, defaultAngularCollection } from '../defaults';
-import { Output, Watchers, FileSystem } from '../utils';
+import { defaultCollectionsNames, defaultAngularCollection } from '../../defaults';
+import { Output, Watchers, FileSystem } from '../../utils';
 
 import { Collection } from './collection';
 import { Shortcuts } from './shortcuts';
@@ -83,7 +83,7 @@ export class Collections {
      */
     private async setList(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
 
-        Output.logInfo(`Loading the list of collections.`);
+        Output.logInfo(`Loading the list of schematics collections.`);
 
         /* Start from scratch as the function can be called again via watcher */
         this.list = new Map();
@@ -94,7 +94,7 @@ export class Collections {
         /* Validate user input */
         const userCollectionsNames = this.validateSchematicsPreference(userPreference);
 
-        Output.logInfo(`${userCollectionsNames.length} user collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
+        Output.logInfo(`${userCollectionsNames.length} user schematics collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
 
         /* `Set` removes duplicate.
          * Default collections are set first as they are the most used */
@@ -113,7 +113,7 @@ export class Collections {
         if (existingCollectionsNames.length > 0) {
             Output.logInfo(`${existingCollectionsNames.length} installed collection(s) detected: ${existingCollectionsNames.join(', ')}`);
         } else {
-            Output.logWarning(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
+            Output.logError(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
         /* `.filter()` is not possible here as there is an async operation */

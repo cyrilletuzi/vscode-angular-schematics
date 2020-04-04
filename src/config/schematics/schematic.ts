@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { FileSystem, Output } from '../utils';
+import { FileSystem, Output } from '../../utils';
 
 /** Configuration needed to load a schematic */
 export interface SchematicConfig {
