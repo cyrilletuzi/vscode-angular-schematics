@@ -4,7 +4,7 @@ import { defaultAngularCollection } from '../../defaults';
 import { FileSystem, Watchers, Output } from '../../utils';
 
 import { AngularProject } from './angular-project';
-import { AngularJsonSchema, AngularJsonProjectSchema } from './angular-json-schema';
+import { AngularJsonSchema, AngularJsonProjectSchema, AngularJsonSchematicsOptionsSchema } from './angular-json-schema';
 
 export class AngularConfig {
 
@@ -72,6 +72,14 @@ export class AngularConfig {
             this.init(workspaceFolderFsPath);
         });
         
+    }
+
+    /**
+     * Get the user default value for an option of a schematics
+     * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
+     */
+    getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
+        return this.config?.schematics?.[schematicsFullName]?.[optionName];
     }
 
     /**

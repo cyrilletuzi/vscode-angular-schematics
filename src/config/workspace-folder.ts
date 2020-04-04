@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { Output } from '../utils';
 
 import { Collections } from './schematics';
-import { AngularConfig, AngularProject, TslintConfig } from './angular';
+import { AngularConfig, AngularProject, AngularJsonSchematicsOptionsSchema, TslintConfig } from './angular';
 
 export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
@@ -108,6 +108,25 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     isRootAngularProject(name: string): boolean {
 
         return (this.angularConfig.rootProjectName === name);
+
+    }
+
+    /**
+     * Get the user default value for an option of a schematics
+     * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
+     */
+    getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(
+        angularProjectName: string,
+        schematicsFullName: string,
+        optionName: T,
+    ): AngularJsonSchematicsOptionsSchema[T] | undefined {
+
+        const projectDefault = this.getAngularProject(angularProjectName)?.getSchematicsOptionDefaultValue(schematicsFullName, optionName);
+
+        /* Suffixes can be defined at, in order of priority:
+         * 1. project level
+         * 2. workspace folder level */
+        return projectDefault ?? this.angularConfig.getSchematicsOptionDefaultValue(schematicsFullName, optionName);
 
     }
 

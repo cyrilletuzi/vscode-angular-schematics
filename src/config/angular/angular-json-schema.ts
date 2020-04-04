@@ -1,5 +1,15 @@
 export type AngularProjectType = 'application' | 'library';
 
+export interface AngularJsonSchematicsOptionsSchema {
+    /** Tells if the file be generated in a subfolder (not flat) or not (flat) */
+    flat?: boolean;
+}
+
+export interface AngularJsonSchematicsSchema {
+    /** Key will be the full schematics name (eg.: "@schematics/angular") */
+    [key: string]: AngularJsonSchematicsOptionsSchema;
+}
+
 export interface AngularJsonProjectSchema {
     /** Angular projects are `application` by default, but can be `library` too */
     projectType: AngularProjectType;
@@ -7,6 +17,8 @@ export interface AngularJsonProjectSchema {
     root: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     sourceRoot?: string;
+    /** Default values for schematics options */
+    schematics?: AngularJsonSchematicsSchema;
 }
 
 /** Description of `angular.json` */
@@ -18,6 +30,8 @@ export interface AngularJsonSchema {
          */
         defaultCollection?: string;
     };
+    /** Default values for schematics options */
+    schematics?: AngularJsonSchematicsSchema;
     /**
      * List of Angular projects.
      * While it's optional in CLI JSON schema, a workspace folder should have at least one project.

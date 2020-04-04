@@ -217,12 +217,12 @@ export class UserJourney {
 
         }
 
-        const filePossiblefsPaths = this.cliCommand.launchCommand();
+        this.cliCommand.launchCommand();
 
         /* Refresh Explorer, otherwise you may not see the generated files */
         await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
 
-        this.jumpToFile(filePossiblefsPaths);
+        this.jumpToFile(this.cliCommand.guessGereratedFileFsPath());
 
     }
 
@@ -529,49 +529,41 @@ export class UserJourney {
     /**
      * Automatically open the generated file
      */
-    private async jumpToFile(possibleFsPaths: string[], counter = 0): Promise<void> {
+    private async jumpToFile(possibleFsPath: string, counter = 0): Promise<void> {
 
         /* If we don't know the generated file path, we can't know if the command succeeded or not,
          * as we can't react on Terminal output */
-        if (possibleFsPaths.length === 0) {
+        if (possibleFsPath === '') {
 
             Output.logInfo(`Command launched, check terminal to know its status.`);
 
-        } else {
+        }
+        /* If the file exists, open it */
+        else if (await FileSystem.isReadable(possibleFsPath, { silent: true })) {
 
-            for (const fsPath of possibleFsPaths) {
+            const document = await vscode.workspace.openTextDocument(possibleFsPath);
 
-                /* If the file exists, open it */
-                if (await FileSystem.isReadable(fsPath, { silent: true })) {
+            await vscode.window.showTextDocument(document);
 
-                    const document = await vscode.workspace.openTextDocument(fsPath);
+            Output.logInfo(`Command has succeeded! Check terminal for more details.`);
 
-                    await vscode.window.showTextDocument(document);
-        
-                    Output.logInfo(`Command has succeeded! Check terminal for more details.`);
+            return;
 
-                    return;
+        }
+        /* Otherwise retry every half second, 6 times (so 3 seconds maximum) */
+        else if (counter < 6) {
 
-                }
+            counter += 1;
 
-            }
+            setTimeout(() => {
+                this.jumpToFile(possibleFsPath, counter);
+            }, 500);
 
-            /* Otherwise retry every half second, 6 times (so 3 seconds maximum) */
-            if (counter < 6) {
+        }
+        /* After 6 failures */
+        else {
 
-                counter += 1;
-
-                setTimeout(() => {
-                    this.jumpToFile(possibleFsPaths, counter);
-                }, 500);
-
-            }
-            /* After 6 failures */
-            else {
-
-                Output.logInfo(`Command launched, check terminal to know its status.`);
-
-            }
+            Output.logInfo(`Command launched, check terminal to know its status.`);
 
         }
 

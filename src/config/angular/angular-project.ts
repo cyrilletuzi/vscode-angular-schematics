@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { Output } from '../../utils';
 
-import { AngularJsonProjectSchema, AngularProjectType } from './angular-json-schema';
+import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './angular-json-schema';
 import { TslintConfig } from './tslint';
 
 export class AngularProject {
@@ -14,11 +14,15 @@ export class AngularProject {
     private rootPath: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     private sourcePath: string;
+    /** Default values for schematics options */
+    private schematicsDefaults: AngularJsonSchematicsSchema | undefined;
     private tslintConfig!: TslintConfig;
 
     constructor(name: string, config: AngularJsonProjectSchema) {
 
         this.name = name;
+
+        this.schematicsDefaults = config.schematics;
 
         /* `projectType` is supposed to be required, but default to `application` for safety */
         this.type = config.projectType ? config.projectType : 'application';
@@ -84,6 +88,14 @@ export class AngularProject {
      */
     hasComponentSuffix(suffix: string): boolean {
         return this.tslintConfig.hasComponentSuffix(suffix);
+    }
+
+    /**
+     * Get the user default value for an option of a schematics
+     * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
+     */
+    getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
+        return this.schematicsDefaults?.[schematicsFullName]?.[optionName];
     }
 
 }

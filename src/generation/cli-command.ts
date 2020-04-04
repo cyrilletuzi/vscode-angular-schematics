@@ -174,16 +174,22 @@ export class CliCommand {
 
     /**
      * Launch command in a terminal
-     * @returns A `Promise` with the possible fsPaths of the generated file
      */
-    launchCommand(): string[] {
+    launchCommand(): void {
 
         Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
         Terminal.send(this.getCommand());
+    
+    }
+
+    /** 
+     * Try to resolve the generated file fs path
+     */
+    guessGereratedFileFsPath(): string {
 
         /* Try to resolve the path of the generated file */
-        const possibleFsPaths: string[] = [];
+        let possibleFsPath = '';
 
         /* Without a default argument, we cannot know the possible path */
         if (this.nameAsFirstArg) {
@@ -199,18 +205,70 @@ export class CliCommand {
                 this.options.get('type')! : this.schematicName;
 
             const fileName = `${this.nameAsFirstArg}.${suffix}.ts`;
-            
-            // TODO: [feature] do that based on user preferences
-            /* Schematics are created with or without an intermediate folder, depending on CLI or user defaults */
-            const fsPathFlat = path.join(projectSourcePath, fileName);
-            const fsPathNotFlat = path.join(projectSourcePath, this.nameAsFirstArg, fileName);
 
-            possibleFsPaths.push(fsPathFlat, fsPathNotFlat);
+            /* Schematics are created with or without an intermediate folder */
+            let isFlat = true;
+
+            /* Priority 1: user has explicitly set it during the generation journey */
+            if (this.options.has('flat')) {
+
+                /* User values are registered as strings */
+                isFlat = (this.options.get('flat') === 'false') ? false : true;
+
+            } else {
+
+                /* Priority 2: user has set a default in angular.json */
+                const isUserDefaultFlat = this.workspaceFolder.getSchematicsOptionDefaultValue(this.projectName, this.getFullSchematicName(), 'flat');
+
+                if (isUserDefaultFlat !== undefined) {
+                    isFlat = isUserDefaultFlat;
+                } else {
+
+                    /* Priority 3: the schematic schema has a default */
+                    const isSchematicDefaultFlat = this.schematic.getOptionDefaultValue('flat') as boolean | undefined;
+
+                    if (isSchematicDefaultFlat !== undefined) {
+                        isFlat = isSchematicDefaultFlat;
+                    }
+                    /* Priority 4: use hard defaults known for Angular official schematics */
+                    else if ((this.collectionName === defaultAngularCollection) && ['component', 'module'].includes(this.schematicName)) {
+
+                        isFlat = false;
+
+                    }
+
+                }
+
+            }
+
+            /* If not flat, add a intermediate folder, which name is the same as the generated file */
+            const generatedFolderFsPath = isFlat ? projectSourcePath : path.join(projectSourcePath, this.nameAsFirstArg);
+            
+            possibleFsPath = path.join(generatedFolderFsPath, fileName);
 
         }
 
-        return possibleFsPaths;
-    
+        return possibleFsPath;
+
+    }
+
+    /**
+     * Get full schematic name (eg. `@schematics/angular:component`)
+     */
+    private getFullSchematicName(): string {
+        return `${this.collectionName}:${this.schematicName}`;
+    }
+
+    /**
+     * Format collection and schematic name for the generation command:
+     * - just the schematic name if the collection is already the user default's one (eg. `component`)
+     * - otherwise the full scheme (eg. `@schematics/angular:component`)
+     */
+    private formatSchematicNameForCommand(): string {
+
+        return (this.collectionName !== this.workspaceFolder.getDefaultUserCollection()) ?
+            this.getFullSchematicName() : this.schematicName;
+
     }
 
     /**
@@ -258,19 +316,6 @@ export class CliCommand {
         this.projectName = '';
 
         Output.logInfo(`No Angular project detected from context path.`);
-
-    }
-
-    /**
-     * Format collection and schematic name for the generation command:
-     * - just the schematic name if the collection is already the user default's one (eg. `component`)
-     * - otherwise the full scheme (eg. `@schematics/angular:component`)
-     */
-    private formatSchematicNameForCommand(): string {
-
-        return (this.collectionName !== this.workspaceFolder.getDefaultUserCollection()) ?
-            `${this.collectionName}:${this.schematicName}` :
-            this.schematicName;
 
     }
 

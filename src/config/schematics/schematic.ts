@@ -116,6 +116,13 @@ export class Schematic {
     }
 
     /**
+     * Get the default value of an option, or `undefined`.
+     */
+    getOptionDefaultValue(name: string): SchematicOptionJsonSchema['default'] {
+        return this.options.get(name)?.default;
+    }
+
+    /**
      * Tells if an option exists in the schematic.
      */
     hasOption(name: string): boolean {
