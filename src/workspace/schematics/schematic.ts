@@ -41,7 +41,7 @@ export class Schematic {
         /* Schematics extended from another collection needs to get back the schema path */
         if (!this.fsPath) {
             if (!this.collectionFsPath) {
-                throw new Error(`"${this.collectionName}:${this.name}" schematic can not be loaded.`);
+                throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be extended.`);
             }
             this.fsPath = await this.getFsPath(this.collectionFsPath);
         }
@@ -49,7 +49,7 @@ export class Schematic {
         const config = await FileSystem.parseJsonFile<SchematicJsonSchema>(this.fsPath);
 
         if (!config) {
-            throw new Error(`"${this.collectionName}:${this.name}" schematic can not be loaded.`);
+            throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be loaded.`);
         }
 
         this.config = config;
