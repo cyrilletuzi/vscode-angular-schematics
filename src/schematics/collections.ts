@@ -17,7 +17,6 @@ export class Collections {
      * List of shortchuts
      */
     shortcuts!: Shortcuts;
-    private watcher: vscode.Disposable | undefined;
 
     /**
      * Initialize collections.
@@ -30,14 +29,9 @@ export class Collections {
 
         await this.setShortcuts(workspaceFolder);
 
-        /* Watcher must be set just once */
-        if (!this.watcher) {
-
-            this.watcher = Watchers.watchCodePreferences(() => {
-                this.init(workspaceFolder, userDefaultCollections);
-            });
-
-        }
+        Watchers.watchCodePreferences('userCollections', () => {
+            this.init(workspaceFolder, userDefaultCollections);
+        });
 
     }
 

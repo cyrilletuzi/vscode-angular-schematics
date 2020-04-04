@@ -35,7 +35,6 @@ export class Collection {
     private config!: CollectionJsonSchema;
     private schematicsConfigs = new Map<string, SchematicConfig>();
     private schematics = new Map<string, Schematic | undefined>();
-    private watcher: vscode.FileSystemWatcher | undefined;
 
     constructor(name: string) {
         this.name = name;
@@ -61,14 +60,9 @@ export class Collection {
 
         await this.setSchematicsConfigs(workspaceFolderFsPath);
 
-        /* Watcher must be set just once */
-        if (!this.watcher) {
-
-            this.watcher = Watchers.watchFile(this.fsPath, () => {
-                this.init(workspaceFolderFsPath);
-            });
-
-        }
+        Watchers.watchFile(this.fsPath, () => {
+            this.init(workspaceFolderFsPath);
+        });
 
     }
 

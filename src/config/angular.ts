@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultAngularCollection } from '../defaults';
@@ -47,7 +46,6 @@ export class AngularConfig {
     ];
     /** Values from the Angular config file */
     private config: AngularJsonSchema | undefined;
-    private watcher: vscode.FileSystemWatcher | undefined;
     
     /**
      * Initializes `angular.json` configuration.
@@ -88,14 +86,9 @@ export class AngularConfig {
 
         await this.setProjects(workspaceFolderFsPath);
 
-        /* Watcher must be set just once */
-        if (!this.watcher) {
-
-            this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init(workspaceFolderFsPath);
-            });
-
-        }
+        Watchers.watchFile(fsPath, () => {
+            this.init(workspaceFolderFsPath);
+        });
         
     }
 

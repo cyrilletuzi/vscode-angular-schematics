@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as vscode from 'vscode';
 
 import { FileSystem, Watchers, Output } from '../utils';
 
@@ -17,7 +16,6 @@ export class TslintConfig {
     private static readonly fileName = 'tslint.json';
     /** Values from TSLint config file */
     private config: TslintJsonSchema | undefined;
-    private watcher: vscode.FileSystemWatcher | undefined;
 
     /**
      * Initializes `tslint.json` configuration.
@@ -32,14 +30,9 @@ export class TslintConfig {
 
         this.setComponentSuffixes();
 
-        /* Watcher must be set just once */
-        if (this.config && !this.watcher) {
-
-            this.watcher = Watchers.watchFile(fsPath, () => {
-                this.init(workspaceFolderFsPath);
-            });
-
-        }
+        Watchers.watchFile(fsPath, () => {
+            this.init(workspaceFolderFsPath);
+        });
 
     }
 
@@ -85,7 +78,7 @@ export class TslintConfig {
         if (this.componentSuffixes.length > 1) { 
             Output.logInfo(`${this.componentSuffixes.length} custom component suffixes detected: ${this.componentSuffixes.join(', ')}`);
         } else {
-            Output.logInfo(`No custom component suffix detected in ${TslintConfig.fileName}`);
+            Output.logInfo(`No custom component suffix detected.`);
         }
 
     }
