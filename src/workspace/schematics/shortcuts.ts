@@ -120,11 +120,17 @@ export class Shortcuts {
 
         } else {
 
+            Output.logWarning(`${userTypes.length} custom component type(s) detected in the preferences.`);
+
             for (const userType of userTypes) {
 
                 if (this.validateUserComponentType(userType)) {
 
-                    customTypes.set(userType.label, userType as ComponentType);
+                    const type = userType as ComponentType;
+
+                    customTypes.set(type.label, type);
+
+                    Output.logWarning(`Adding "${type.label}" custom component type.`);
 
                 } else {
 
