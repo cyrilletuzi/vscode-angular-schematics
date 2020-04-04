@@ -120,7 +120,7 @@ export class Shortcuts {
 
         } else {
 
-            Output.logWarning(`${userTypes.length} custom component type(s) detected in the preferences.`);
+            Output.logInfo(`${userTypes.length} custom component type(s) detected in the preferences.`);
 
             for (const userType of userTypes) {
 
@@ -128,9 +128,13 @@ export class Shortcuts {
 
                     const type = userType as ComponentType;
 
+                    if (customTypes.has(type.label)) {
+                        Output.logWarning(`"${type.label}" component type already exists.`);
+                    } 
+
                     customTypes.set(type.label, type);
 
-                    Output.logWarning(`Adding "${type.label}" custom component type.`);
+                    Output.logInfo(`Adding "${type.label}" custom component type.`);
 
                 } else {
 

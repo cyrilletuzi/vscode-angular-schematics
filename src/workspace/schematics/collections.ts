@@ -105,9 +105,14 @@ export class Collections {
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
         for (const name of collectionsNames) {
-            if (await this.isCollectionExisting(workspaceFolder.uri.fsPath, name)) {
+
+            /* Be silent on extension defaults, be not on user defined collections */
+            const silent = (userDefaultCollections.includes(name) || userCollectionsNames.includes(name)) ? false : true;
+
+            if (await this.isCollectionExisting(workspaceFolder.uri.fsPath, name, { silent })) {
                 existingCollectionsNames.push(name);
             }
+    
         }
 
         if (existingCollectionsNames.length > 0) {
@@ -150,7 +155,7 @@ export class Collections {
     /**
      * Check if a collection exists
      */
-    private async isCollectionExisting(workspaceFolderFsPath: string, name: string): Promise<boolean> {
+    private async isCollectionExisting(workspaceFolderFsPath: string, name: string, { silent = false }): Promise<boolean> {
 
         let fsPath = '';
 
@@ -168,7 +173,7 @@ export class Collections {
         }
 
         /* It's normal that not all collections exist, so we want to be silent here */
-        return await FileSystem.isReadable(fsPath, { silent: true });
+        return await FileSystem.isReadable(fsPath, { silent });
 
     }
 
