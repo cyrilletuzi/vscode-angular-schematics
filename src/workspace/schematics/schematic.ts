@@ -1,53 +1,16 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 import { FileSystem, Output } from '../../utils';
+import { SchematicJsonSchema, SchematicOptionJsonSchema, CollectionJsonSchema } from './json-schemas';
 
 /** Configuration needed to load a schematic */
 export interface SchematicConfig {
     name: string;
     collectionName: string;
     description: string;
-    fsPath: string;
-}
-
-export interface SchematicOptionJsonSchema {
-    type: 'string' | 'boolean' | 'array';
-    description: string;
-    enum?: string[];
-    /** Some option are internal to Angular CLI */
-    visible?: boolean;
-    /** Classic default value */
-    default?: string | boolean;
-    /** Default value calculated by Angular CLI */
-    $default?: {
-        /** 
-         * Can be from the first argument of command line,
-         * or some internals like `projectName` which defaults to defaut project
-         */
-        $source: 'argv' | 'projectName';
-        /** Will be `0` for the first argument of command line */
-        index?: number;
-    };
-    items?: {
-        enum?: string[];
-    };
-    'x-deprecated'?: string;
-    /** Some options can have a prompt for Angular CLI interactive mode */
-    'x-prompt'?: {
-        message?: string;
-        multiselect?: boolean;
-        /** Deprecated, Angular >= 8.3 uses `items.enum` instead */
-        items?: string[];
-    };
-}
-
-interface SchematicJsonSchema {
-    properties: {
-        /** Key is the option's name */
-        [key: string]: SchematicOptionJsonSchema;
-    };
-    /** Some options may be required */
-    required?: string[];
+    fsPath?: string;
+    collectionFsPath?: string;
 }
 
 export class Schematic {
@@ -55,7 +18,8 @@ export class Schematic {
     optionsChoices: vscode.QuickPickItem[] = [];
     private name: string;
     private collectionName: string;
-    private fsPath: string;
+    private fsPath: string | undefined;
+    private collectionFsPath: string | undefined;
     private config!: SchematicJsonSchema;
     private options = new Map<string, SchematicOptionJsonSchema>();
     private requiredOptionsNames: string[] = [];
@@ -64,6 +28,7 @@ export class Schematic {
         this.name = config.name;
         this.collectionName = config.collectionName;
         this.fsPath = config.fsPath;
+        this.collectionFsPath = config.collectionFsPath;
     }
 
     /**
@@ -73,6 +38,14 @@ export class Schematic {
      */
     async init(): Promise<void> {
 
+        /* Schematics extended from another collection needs to get back the schema path */
+        if (!this.fsPath) {
+            if (!this.collectionFsPath) {
+                throw new Error(`"${this.collectionName}:${this.name}" schematic can not be loaded.`);
+            }
+            this.fsPath = await this.getFsPath(this.collectionFsPath);
+        }
+        
         const config = await FileSystem.parseJsonFile<SchematicJsonSchema>(this.fsPath);
 
         if (!config) {
@@ -145,6 +118,24 @@ export class Schematic {
 
         return false;
     
+    }
+
+    /**
+     * Get the schema filesystem path.
+     */
+    private async getFsPath(collectionFsPath: string): Promise<string> {
+
+        const collectionJsonConfig = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
+
+        const schemaPath = collectionJsonConfig?.schematics?.[this.name]?.schema;
+
+        /* `package.json` should have a `schematics` property with relative path to `collection.json` */
+        if (!schemaPath) {
+            throw new Error(`"${this.collectionName}:${this.name}" can not be extended.`);
+        }
+
+        return path.join(path.dirname(collectionFsPath), schemaPath);
+
     }
 
     private async setOptions(): Promise<void> {

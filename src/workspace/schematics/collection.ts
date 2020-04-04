@@ -4,28 +4,7 @@ import * as path from 'path';
 import { FileSystem, Watchers, Output } from '../../utils';
 
 import { Schematic, SchematicConfig } from './schematic';
-
-interface PackageJsonSchema {
-    /**
-     * `package.json` should have a `schematics` property with the relative path to `collection.json`
-     */
-    schematics?: string;
-}
-
-interface CollectionJsonSchema {
-    schematics: {
-        /** Key is the schematic's name */
-        [key: string]: {
-            /** Relative path to `schema.json` */
-            schema: string;
-            description: string;
-            /** Some schematics are internal for Angular CLI */
-            hidden?: boolean;
-            /** Some schematics extend another one */
-            extends?: string;
-        };
-    };
-}
+import { PackageJsonSchema, CollectionJsonSchema } from './json-schemas';
 
 export class Collection {
 
@@ -174,18 +153,18 @@ export class Collection {
             /* Some collection extends another one */
             if (config.extends) {
 
+                const [collectionName] = config.extends.split(':');
+
                 try {
 
                     /* Can fail */
-                    const fsPath = await this.getFsPath(workspaceFolderFsPath, name);
+                    const collectionFsPath = await this.getFsPath(workspaceFolderFsPath, collectionName);
 
-                    const fullSchematicName = `${config.extends}:${name}`;
-
-                    this.schematicsConfigs.set(fullSchematicName, {
+                    this.schematicsConfigs.set(`${this.name}:${name}`, {
                         name,
-                        collectionName: config.extends,
-                        description: `Schematic herited from "${fullSchematicName}"`,
-                        fsPath,
+                        collectionName: this.name,
+                        description: `Schematic herited from "${collectionName}"`,
+                        collectionFsPath,
                     });
 
                 } catch {
