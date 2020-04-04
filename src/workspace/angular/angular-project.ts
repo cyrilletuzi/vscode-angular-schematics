@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { Output } from '../../utils';
 
-import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './angular-json-schema';
+import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
 import { TslintConfig } from './tslint';
 
 export class AngularProject {

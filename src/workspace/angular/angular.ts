@@ -4,7 +4,7 @@ import { defaultAngularCollection } from '../../defaults';
 import { FileSystem, Watchers, Output } from '../../utils';
 
 import { AngularProject } from './angular-project';
-import { AngularJsonSchema, AngularJsonProjectSchema, AngularJsonSchematicsOptionsSchema } from './angular-json-schema';
+import { AngularJsonSchema, AngularJsonProjectSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
 
 export class AngularConfig {
 

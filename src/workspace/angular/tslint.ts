@@ -2,11 +2,7 @@ import * as path from 'path';
 
 import { FileSystem, Watchers, Output } from '../../utils';
 
-interface TslintJsonSchema {
-    rules?: {
-        'component-class-suffix'?: boolean | [true, ...string[]];
-    };
-}
+import { TslintJsonSchema } from './json-schema';
 
 export class TslintConfig {
 

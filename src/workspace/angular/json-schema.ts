@@ -41,3 +41,9 @@ export interface AngularJsonSchema {
         [key: string]: AngularJsonProjectSchema;
     };
 }
+
+export interface TslintJsonSchema {
+    rules?: {
+        'component-class-suffix'?: boolean | [true, ...string[]];
+    };
+}
