@@ -77,7 +77,7 @@ export class Collection {
      * Get all collection's schematics' names
      */
     getSchematicsNames(): string[] {
-        return Array.from(this.schematicsConfigs.keys()).sort();
+        return Array.from(this.schematicsConfigs.values()).map((config) => config.name).sort();
     }
 
     /**
@@ -216,58 +216,11 @@ export class Collection {
      */
     private setSchematicsChoices(): void {
 
-        this.schematicsChoices = Array.from(this.schematicsConfigs).map(([label, config]) => ({
-            label,
+        this.schematicsChoices = Array.from(this.schematicsConfigs).map(([_, config]) => ({
+            label: config.name,
             description: config.description,
         }));
 
     }
-
-    // protected async initSchemasMap(collection: CollectionData): Promise<void> {
-
-    //     for (let schemaName in collection.schematics) {
-
-    //         if (collection.schematics.hasOwnProperty(schemaName)
-    //             && !collection.schematics[schemaName].hidden
-    //             && (schemaName !== 'ng-add')) {
-
-    //             const schema = collection.schematics[schemaName];
-
-    //             if (schema.extends) {
-
-    //                 const [parentCollectionName, parentSchemaName] = schema.extends.split(':');
-
-                    
-
-    //             } else {
-
-    //                 this.schemas.set(schemaName, collection.schematics[schemaName]);
-
-    //             }
-
-    //         }
-
-    //     }
-
-    // }
-
-        // async createSchema(name: string): Promise<Schema> {
-
-    //     let collection: Collection = this;
-
-    //     const schema = this.schemas.get(name) as CollectionDataSchema;
-
-    //     if (schema.extends) {
-
-    //         const [parentCollectionName] = schema.extends.split(':');
-
-    //         collection = new Collection(parentCollectionName, this.workspace);
-    //         await collection.init();
-
-    //     }
-
-    //     return new Schema(name, collection);
-
-    // }
 
 }

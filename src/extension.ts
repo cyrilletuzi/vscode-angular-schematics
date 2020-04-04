@@ -48,44 +48,37 @@ export function activate(context: vscode.ExtensionContext): void {
 
             Output.logInfo(`Starting journey to generate a component.`);
 
-            const journey = new UserJourney();
-
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(contextUri, defaultAngularCollection, 'component');
+            (new UserJourney()).start(contextUri, defaultAngularCollection, 'component');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (contextUri?: vscode.Uri) => {
 
             Output.logInfo(`Starting journey to generate a service.`);
 
-            const journey = new UserJourney();
-
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(contextUri, defaultAngularCollection, 'service');
+            (new UserJourney()).start(contextUri, defaultAngularCollection, 'service');
     
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (contextUri?: vscode.Uri) => {
 
             Output.logInfo(`Starting journey to generate a module.`);
 
-            const journey = new UserJourney();
-
             /* For shortcuts, always use default official collection
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
-            journey.start(contextUri, defaultAngularCollection, 'module');
+            (new UserJourney()).start(contextUri, defaultAngularCollection, 'module');
     
         }),
-        vscode.commands.registerCommand('ngschematics.generate', (contextUri?: vscode.Uri, collectionName?: string, schematicName?: string) => {
+        vscode.commands.registerCommand('ngschematics.generate', (contextUri?: vscode.Uri, options?: { collectionName?: string, schematicName?: string }) => {
 
             Output.logInfo(`Starting journey to generate a schematics.`);
 
-            const journey = new UserJourney();
-            journey.start(contextUri, collectionName, schematicName);
+            (new UserJourney()).start(contextUri, options?.collectionName, options?.schematicName);
     
         }),
     );

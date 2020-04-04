@@ -48,14 +48,14 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
             const collection = this.collections.get(element.label as string)!;
 
             return collection.getSchematicsNames()
-                .map((schemaName) => {
+                .map((schematicName) => {
 
-                    const item = new vscode.TreeItem(schemaName, vscode.TreeItemCollapsibleState.None);
+                    const item = new vscode.TreeItem(schematicName, vscode.TreeItemCollapsibleState.None);
 
                     item.command = {
-                        title: `Generate ${schemaName}`,
+                        title: `Generate ${schematicName}`,
                         command: 'ngschematics.generate',
-                        arguments: [undefined, collection.getName(), schemaName]
+                        arguments: [undefined, { collectionName: collection.getName(), schematicName }]
                     };
                     item.iconPath = this.iconPath;
 

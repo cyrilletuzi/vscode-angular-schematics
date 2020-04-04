@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Output } from './output';
-import { Workspace } from '../workspace';
 
 export class FileSystem {
 
@@ -114,9 +113,7 @@ export class FileSystem {
      */
     private static showError(fsPath: string, failedAction: string): void {
 
-        const workspaceFolder = Workspace.getFolderFromPath(fsPath);
-
-        const message = `"${fsPath}" can not be ${failedAction}${workspaceFolder ? ` in "${workspaceFolder.name}" workspace folder` : ''}.`;
+        const message = `"${fsPath}" can not be ${failedAction}.`;
 
         Output.logError(message);
 
