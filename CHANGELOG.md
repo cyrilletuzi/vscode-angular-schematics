@@ -8,7 +8,7 @@ it started small and messy, and then growed a lot. So it was time for a *full* r
 
 It took a full-time non-paid week (thanks to the current situation) to do so.
 Yet I still do not have any **[sponsor](https://github.com/sponsors/cyrilletuzi)**.
-So please consider to help, or to ask your enterprise, which makes money with it, to help. 
+So please consider to help, or to ask your enterprise, which makes money with this extension, to help. 
 
 ### Compatibility with all shells
 
@@ -35,14 +35,14 @@ Everything is now logged in `Angular Schematics` output channel (second tab left
 
 This is especially good news for **issues resolution**, as you can now
 detect and correct configurations issues based on logs, and
-copy/past the logs if creating a new GitHub issue is relevant.
+copy/past the logs when creating a new GitHub issue is relevant.
 
 ### Full compatibility with Code workspaces with multiple folders
 
 VS Code allows to use several projects (folders) in the same Code workspace.
 
 While the extension was already partially supporting that,
-it is something really difficult to manage this well,
+it is something really difficult to manage well,
 and there was a lot of issues here and there.
 
 Now every detail of the extension will be **aware of the workspace folder** you are working in.
@@ -55,8 +55,8 @@ but it can also be specific to the Angular project you are working in.
 Indeed, Angular CLI allows you to generate libraries (`ng g library`)
 and/or multiple applications (`ng g application`) in the same folder.
 
-And Angular projects can have different TSLint configurations
-(which is useful to manage components types in Angular >= 9).
+And Angular projects can have different configurations
+(for example TSLint, which is useful to manage components types in Angular >= 9).
 
 Now every detail of the extension will be **aware of the Angular project** you are working in.
 This is especially good news for users doing an **Angular monorepo**.
@@ -68,7 +68,7 @@ This is especially good news for users doing an **Angular monorepo**.
 Default component types proposed when doing "Generate a component" are now fully customizable.
 
 For example, in your VS Code preferences
-(preferably your workspace preferences, so all your team can benefit):
+(preferably your *workspace* preferences, so all your team can benefit):
 
 ```json
 {
@@ -80,7 +80,7 @@ For example, in your VS Code preferences
 }
 ```
 
-**Breaking change**: it means that the previous `ngschematics.componentTypes`
+**Breaking change**: it means the previous `ngschematics.componentTypes`
 setting's format is not supported anymore.
 
 #### Library specific component types
@@ -95,13 +95,13 @@ and propose these additional component types if the related libraries are instal
 - PrimeNG dynamic dialog
 
 Library authors are encouraged to create a Pull Request and
-easily add defaults components types in the `src/defaults.ts`.
+easily add defaults components types in `src/defaults.ts`.
 
 #### Removed entry component type
 
 Previously, default suggested component types had an "Entry component" type.
 It has been removed as it is now officially deprecated in Angular CLI >= 9,
-and because detecting if you were in an old configuration was (really) too complicated.
+and because detecting if your project has an old configuration was (really) too complicated and messy.
 
 Fortunately, with customizable component types explained above, you can still add it back
 (only needed if you have an Angular < 9 project or an Angular >= 9 project with Ivy manually disabled):
