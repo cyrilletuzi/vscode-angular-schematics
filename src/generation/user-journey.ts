@@ -53,9 +53,9 @@ export class UserJourney {
 
         this.cliCommand = new CliCommand(workspaceFolderConfig, contextUri);
 
-        /* If there is more than one Angular project in angular.json
-         * and if the project has not been already resolved via context path (in `CliCommand` constructor) */
-        if ((this.workspaceFolder.getAngularProjects().size > 1) && !this.cliCommand.getProjectName()) {
+        /* If the project has not been already resolved via context path (in `CliCommand` constructor)
+         * and if the Angular projects have been correctly resolved from config */
+        if (!this.cliCommand.getProjectName() && (this.workspaceFolder.getAngularProjects().size > 0)) {
 
             const projectName = await this.askProjectName();
 
@@ -226,10 +226,21 @@ export class UserJourney {
 
     private async askProjectName(): Promise<string | undefined> {
 
-        return vscode.window.showQuickPick(this.workspaceFolder.getAngularProjectsNames(), {
-            placeHolder: `In which your Angular projects do you want to generate?`,
-            ignoreFocusOut: true,
-        });
+        /* If there is only one Angular project, default to it */
+        if (this.workspaceFolder.getAngularProjects().size === 1) {
+
+            return Array.from(this.workspaceFolder.getAngularProjects().keys())[0];
+
+        }
+        /* Otherwise ask the user */
+        else {
+
+            return vscode.window.showQuickPick(this.workspaceFolder.getAngularProjectsNames(), {
+                placeHolder: `In which your Angular projects do you want to generate?`,
+                ignoreFocusOut: true,
+            });
+
+        } 
 
     }
 
@@ -280,11 +291,11 @@ export class UserJourney {
 
         Output.logInfo(`Context path detected for default argument: "${contextPath}"`);
 
-        let prompt = `Name or path/name ${projectName ? `in project '${projectName}'` : 'in default project'}?`;
+        let prompt = `Name or path/to/name ${projectName ? `in project '${projectName}'` : 'in default project'}?`;
 
         /* Pro-tip to educate users that it is easier to launch the command from a right-click in Explorer */
         if (this.workspaceFolder.isRootAngularProject(projectName) && !contextPath) {
-            prompt = `${prompt} Pro-tip: the path and project can be auto-inferred if you launch the command with a right-click on the directory where you want to generate.`;
+            prompt = `${prompt} Pro-tip: the path can be inferred if you right-click on the directory where you want to generate.`;
         }
 
         const nameInput = await vscode.window.showInputBox({

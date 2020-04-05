@@ -14,6 +14,12 @@ export class AngularProject {
     private rootPath: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     private sourcePath: string;
+    /** 
+     * Main application: `src/app`.
+     * Sub-application: `<projects-root>/hello/src/app`
+     * Library: `<projects-root>/hello/src/lib`
+     */
+    private appOrLibPath: string;
     /** Default values for schematics options */
     private schematicsDefaults: AngularJsonSchematicsSchema | undefined;
     private tslintConfig!: TslintConfig;
@@ -36,7 +42,7 @@ export class AngularProject {
          * For the main application, it's `src` by default but can be customized.
          * For sub-applications/libraries, it's `<projects-root>/hello-world/<src-or-something-else>`.
          * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
-        const sourceRoot = config.sourceRoot ?? path.posix.join(this.rootPath, 'src');
+        this.sourcePath = config.sourceRoot ?? path.posix.join(this.rootPath, 'src');
 
         /* These folders are imposed by Angular CLI.
          * See https://github.com/angular/angular-cli/blob/9190f622365b8eb85b7d8828f170959ded643518/packages/schematics/angular/utility/project.ts#L17 */
@@ -45,11 +51,11 @@ export class AngularProject {
         /* Default for:
          * - root application: `src/app`
          * - sub-application: `projects/hello-world/src/app`
-         * - sub-library: `projects/hello-world/src/lib`
+         * - library: `projects/hello-world/src/lib`
          * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
-        this.sourcePath = path.posix.join(sourceRoot, fixedFolder);
+        this.appOrLibPath = path.posix.join(this.sourcePath, fixedFolder);
 
-        Output.logInfo(`"${name}" Angular project is of type "${this.type}" and its source path is: ${this.sourcePath}.`);
+        Output.logInfo(`"${name}" Angular project is of type "${this.type}" and its path is: ${this.appOrLibPath}.`);
 
         if (!this.sourcePath.startsWith(this.rootPath)) {
             Output.logError(`"root" and "sourceRoot" of "${this.name}" project do not start by the same path in angular.json`);
@@ -70,10 +76,29 @@ export class AngularProject {
     }
 
     /**
+     * Get an Angular project's root path
+     * Main application: empty. Sub-applications/libraries: `<projects-root>/hello`
+     */
+    getRootPath(): string {
+        return this.rootPath;
+    }
+
+    /**
      * Get an Angular project's source path
+     * Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src`.
      */
     getSourcePath(): string {
         return this.sourcePath;
+    }
+
+    /**
+     * Get an Angular project's app or lib path:
+     * - main application: `src/app`.
+     * - sub-application: `<projects-root>/hello/src/app`
+     * - library: `<projects-root>/hello/src/lib`
+     */
+    getAppOrLibPath(): string {
+        return this.appOrLibPath;
     }
 
     /**

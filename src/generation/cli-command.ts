@@ -12,7 +12,7 @@ interface ContextPath {
     /** Eg. `src/app/some-module` */
     relativeToWorkspaceFolder: string;
     /** Eg. `some-module` */
-    relativeToSourceFolder: string;
+    relativeToProjectFolder: string;
 }
 
 /** List of options */
@@ -24,7 +24,7 @@ export class CliCommand {
     private contextPath: ContextPath = {
         full: '',
         relativeToWorkspaceFolder: '',
-        relativeToSourceFolder: '',
+        relativeToProjectFolder: '',
     };
     private baseCommand = 'ng g';
     private projectName = '';
@@ -130,11 +130,11 @@ export class CliCommand {
 
         /* `ngx-spec` schematics works on a file, and thus need the file part */
         if (this.collectionName === 'ngx-spec') {
-            return this.contextPath.relativeToSourceFolder;
+            return this.contextPath.relativeToProjectFolder;
         }
 
         /* Otherwise we remove the file part */
-        const context = FileSystem.removeFilename(this.contextPath.relativeToSourceFolder);
+        const context = FileSystem.removeFilename(this.contextPath.relativeToProjectFolder);
 
         /* Add  trailing slash so the user can just write the name directly */
         const contextWithTrailingSlash = !(['', '.'].includes(context)) ? `${context}/` : '';
@@ -196,7 +196,7 @@ export class CliCommand {
 
             /* Get the project path, or defaut to `src/app` */
             const projectSourcePath = this.projectName ?
-                path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getSourcePath()) :
+                path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
                 path.join(this.workspaceFolder.uri.fsPath, 'src/app');
 
             /* Default file's suffix is the schematic name (eg. `service`),
@@ -298,6 +298,7 @@ export class CliCommand {
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
+        /* First try by matching projects *source* path */
         for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
 
             /* If the relative path starts with the project path */
@@ -307,22 +308,38 @@ export class CliCommand {
 
                 /* Remove source path from workspace folder relative path,
                  * eg. `src/app/some-module` => `some-module` */
-                this.contextPath.relativeToSourceFolder = this.contextPath.relativeToWorkspaceFolder.substr(projectConfig.getSourcePath().length + 1);
+                this.contextPath.relativeToProjectFolder = this.contextPath.relativeToWorkspaceFolder.substr(projectConfig.getAppOrLibPath().length + 1);
 
-                Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToSourceFolder}`);
-                Output.logInfo(`Angular project detected from context path: "${this.projectName}"`);
-
-                return;
+                break;
 
             }
 
         }
 
-        /* Default values */
-        this.contextPath.relativeToSourceFolder = '';
-        this.projectName = '';
+        /* Second try by matching projects *root* path */
+        if (!this.projectName) {
 
-        Output.logInfo(`No Angular project detected from context path.`);
+            for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
+
+                /* If the relative path starts with the project path (but not empty) */
+                if ((projectConfig.getRootPath() !== '') && this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getRootPath())) {
+
+                    this.projectName = projectName;
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+        if (this.projectName) {
+            Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToProjectFolder}`);
+            Output.logInfo(`Angular project detected from context path: "${this.projectName}"`);
+        } else {
+            Output.logInfo(`No Angular project detected from context path.`);
+        }
 
     }
 
