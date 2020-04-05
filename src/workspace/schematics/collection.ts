@@ -136,6 +136,9 @@ export class Collection {
      */
     private async setSchematicsConfigs(workspaceFolderFsPath: string): Promise<void> {
 
+        /* Start from scratch as the function can be called again via watcher */
+        this.schematicsConfigs = new Map();
+
         const allSchematics = Object.entries(this.config.schematics);
 
         Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);

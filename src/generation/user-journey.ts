@@ -4,7 +4,7 @@ import * as path from 'path';
 import { defaultAngularCollection, extensionName } from '../defaults';
 import { Output, FileSystem } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
-import { Collections, Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../workspace/schematics';
+import { Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../workspace/schematics';
 
 import { CliCommand, CliCommandOptions } from './cli-command';
 
@@ -14,7 +14,6 @@ export class UserJourney {
     private workspaceFolder!: WorkspaceFolderConfig;
     private cliCommand!: CliCommand;
     private projectName = '';
-    private collections!: Collections;
     private collection!: Collection;
     private schematic!: Schematic;
 
@@ -51,7 +50,6 @@ export class UserJourney {
             return;
         }
         this.workspaceFolder = workspaceFolderConfig;
-        this.collections = this.workspaceFolder.collections;
 
         this.cliCommand = new CliCommand(workspaceFolderConfig, contextUri);
 
@@ -101,7 +99,7 @@ export class UserJourney {
 
         this.cliCommand.setCollectionName(collectionName);
         
-        const collection = this.collections.getCollection(collectionName);
+        const collection = this.workspaceFolder.collections.getCollection(collectionName);
 
         if (!collection) {
             Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
@@ -135,8 +133,8 @@ export class UserJourney {
             return;
         }
 
-        this.cliCommand.setSchematic(schematic);
         this.schematic = schematic;
+        this.cliCommand.setSchematic(schematic);
 
         let nameAsFirstArg: string | undefined;
 
@@ -237,13 +235,13 @@ export class UserJourney {
 
     private async askCollectionName(): Promise<string | undefined> {
 
-        if  (this.collections.getCollectionsNames().length === 0) {
+        if  (this.workspaceFolder.collections.getCollectionsNames().length === 0) {
             throw new Error(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
-        else if  (this.collections.getCollectionsNames().length === 1) {
+        else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
 
-            const collectionName = this.collections.getCollectionsNames()[0];
+            const collectionName = this.workspaceFolder.collections.getCollectionsNames()[0];
 
             Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
 
@@ -255,7 +253,7 @@ export class UserJourney {
 
             Output.logInfo(`Multiple collections detected: ask the user which one to use.`);
 
-            return vscode.window.showQuickPick(this.collections.getCollectionsNames(), {
+            return vscode.window.showQuickPick(this.workspaceFolder.collections.getCollectionsNames(), {
                 placeHolder: `What schematics collection do you want to use?`,
                 ignoreFocusOut: true,
             });
@@ -309,7 +307,7 @@ export class UserJourney {
     private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
         /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
-        const types = new Map(this.collections.shortcuts.componentTypesChoices.entries());
+        const types = new Map(this.workspaceFolder.collections.shortcuts.componentTypesChoices.entries());
 
         /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
         for (const [, config] of types) {
@@ -344,7 +342,7 @@ export class UserJourney {
     private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
 
         /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
-        const types = new Map(this.collections.shortcuts.moduleTypesChoices.entries());
+        const types = new Map(this.workspaceFolder.collections.shortcuts.moduleTypesChoices.entries());
 
         /* Lazy-loaded module schematic is support in Angular >= 8.1 only */
         if (!this.schematic.hasOption('route')) {

@@ -140,14 +140,10 @@ export class Schematic {
 
     private async setOptions(): Promise<void> {
 
-        const options = Object.entries(this.config.properties);
-
-        Output.logInfo(`${options.length} options detected for "${this.name}" schematic: ${options.map(([name]) => name).join(', ')}`);
-
         /* Set all options */
-        for (const [name, option] of options) {
-            this.options.set(name, option);
-        }
+        this.options = new Map(Object.entries(this.config.properties));
+
+        Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
 
         /* Set required options' names */
         this.requiredOptionsNames = (this.config.required ?? [])
