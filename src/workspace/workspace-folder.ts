@@ -1,9 +1,12 @@
 import * as vscode from 'vscode';
 
+import { defaultAngularCollection } from '../defaults';
 import { Output } from '../utils';
+import { formatCliCommandOptions } from '../generation';
 
 import { Collections } from './schematics';
 import { AngularConfig, AngularProject, AngularJsonSchematicsOptionsSchema, TslintConfig } from './angular';
+import { ModuleShortcut, ComponentShortcut, ShortcutsTypes } from './shortcuts';
 
 export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
@@ -11,9 +14,11 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     name: string;
     index: number;
 
+    collections!: Collections;
     private tslintConfig!: TslintConfig;
     private angularConfig!: AngularConfig;
-    collections!: Collections;
+    private componentShortcut!: ComponentShortcut;
+    private moduleShorcut!: ModuleShortcut;
 
     constructor(workspaceFolder: vscode.WorkspaceFolder) {
         this.uri = workspaceFolder.uri;
@@ -40,7 +45,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         Output.logInfo(`Loading Angular configuration.`);
 
         const angularConfig = new AngularConfig();
-        await angularConfig.init(this.uri.fsPath);
+        await angularConfig.init(workspaceFolder);
         this.angularConfig = angularConfig;
         
         Output.logInfo(`Loading global TSLint configuration.`);
@@ -54,6 +59,18 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const collections = new Collections();
         await collections.init(workspaceFolder, this.getDefaultCollections());
         this.collections = collections;
+
+        const componentShortcut = new ComponentShortcut();
+        await componentShortcut.init(workspaceFolder);
+        this.componentShortcut = componentShortcut;
+
+        /* Check if the `--route` option exists in Angular `module` schematic (Angular >= 8.1) */
+        const hasLazyModuleType = this.collections.getCollection(defaultAngularCollection)?.getSchematic('module')?.hasOption('route') ?? false;
+        Output.logInfo(`Lazy-loaded module type: ${hasLazyModuleType ? `enabled` : `disabled`}`);
+
+        const moduleShorcut = new ModuleShortcut();
+        moduleShorcut.init(hasLazyModuleType);
+        this.moduleShorcut = moduleShorcut;
 
     }
 
@@ -103,12 +120,41 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
-     * Tells if a project is the root Angular application
+     * Get component types
      */
-    isRootAngularProject(name: string): boolean {
+    getComponentTypes(projectName: string): ShortcutsTypes {
 
-        return (this.angularConfig.rootProjectName === name);
+        /* Types can be different from one Angular project to another */
+        const types = this.getAngularProject(projectName)?.componentShortcut.types ?? this.componentShortcut.types;
 
+        /* `--type` is only supported in Angular >= 9 */
+        const hasTypeOption = this.collections.getCollection(defaultAngularCollection)?.getSchematic('component')?.hasOption('type') ?? false;
+
+        for (const [, config] of types) {
+
+            if (config.options.has('type')) {
+
+                const suffix = config.options.get('type') as string;
+
+                /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
+                if (!hasTypeOption || !this.hasComponentSuffix(projectName, suffix)) {
+                    config.options.delete('type');
+                    config.choice.description = formatCliCommandOptions(config.options);
+                }
+
+            }
+
+        }
+
+        return types;
+
+    }
+
+    /**
+     * Get module types
+     */
+    getModuleTypes(): ShortcutsTypes {
+        return this.moduleShorcut.types;
     }
 
     /**
@@ -131,9 +177,18 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
+     * Tells if a project is the root Angular application
+     */
+    isRootAngularProject(name: string): boolean {
+
+        return (this.angularConfig.rootProjectName === name);
+
+    }
+
+    /**
      * Tells if a component suffix is authorized in tslint.json
      */
-    hasComponentSuffix(suffix: string, angularProjectName: string): boolean {
+    private hasComponentSuffix(angularProjectName: string, suffix: string): boolean {
 
         const angularProject = this.getAngularProject(angularProjectName);
 

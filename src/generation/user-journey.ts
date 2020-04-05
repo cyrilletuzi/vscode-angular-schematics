@@ -4,9 +4,11 @@ import * as path from 'path';
 import { defaultAngularCollection, extensionName } from '../defaults';
 import { Output, FileSystem } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
-import { Collection, Schematic, MODULE_TYPE, CONFIRMATION_LABEL, Shortcuts } from '../workspace/schematics';
+import { Collection, Schematic } from '../workspace/schematics';
+import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
 
-import { CliCommand, CliCommandOptions } from './cli-command';
+import { CliCommand } from './cli-command';
+import { CliCommandOptions, formatCliCommandOptions } from './cli-options';
 
 export class UserJourney {
 
@@ -121,12 +123,8 @@ export class UserJourney {
         }
 
         Output.logInfo(`Schematic used: "${collectionName}:${schematicName}"`);
-        
-        /* Show progress to the user */
-        const schematic = await vscode.window.withProgress({
-            location: vscode.ProgressLocation.Window,
-            title: `"${collectionName}:${schematicName}" schematic is loading, please wait...`,
-        }, () => this.collection.getSchematic(schematicName!));
+
+        const schematic = this.collection.getSchematic(schematicName);
 
         if (!schematic) {
             Output.showError(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
@@ -317,28 +315,9 @@ export class UserJourney {
 
     private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
-        const types = this.workspaceFolder.collections.shortcuts.componentTypesChoices;
+        const types = this.workspaceFolder.getComponentTypes(this.projectName);
 
-        /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
-        for (const [, config] of types) {
-
-            if (config.options.has('type')) {
-
-                const suffix = config.options.get('type') as string;
-
-                if (!this.schematic.hasOption('type') || !this.workspaceFolder.hasComponentSuffix(suffix, this.projectName)) {
-                    config.options.delete('type');
-                }
-
-            }
-
-        }
-
-        const typesChoices = Array.from(types.values()).map((type) => type.choice).map((choice) => ({
-            ...choice,
-            /* Add description based on options */
-            description: this.cliCommand.formatOptionsForCommand(types.get(choice.label)!.options).join(' '),
-        }));
+        const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         const typeChoice = await vscode.window.showQuickPick(typesChoices, {
             placeHolder: `What type of component do you want?`,
@@ -351,27 +330,22 @@ export class UserJourney {
 
     private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
 
-        const types = this.workspaceFolder.collections.shortcuts.moduleTypesChoices;
+        const types = this.workspaceFolder.getModuleTypes();
 
-        /* Lazy-loaded module schematic is support in Angular >= 8.1 only */
-        if (!this.schematic.hasOption('route')) {
-            types.delete(MODULE_TYPE.LAZY);
-        }
-        /* Lazy-loaded module type need the route name based on previously entered name */
-        else {
+        /* Set specific route name for lazy-loaded module type */
+        const lazyModuleType = types.get(MODULE_TYPE.LAZY);
+
+        if (lazyModuleType) {
+
             /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
             const routeName = path.posix.basename(nameAsFirstArg);
 
-            types.get(MODULE_TYPE.LAZY)?.options.set('route', routeName);
-        }
+            lazyModuleType.options.set('route', routeName);
+            lazyModuleType.choice.description = formatCliCommandOptions(lazyModuleType.options);
 
-        const typesChoices = Array.from(types.values()).map((type) => type.choice).map((choice) => ({
-            ...choice,
-            /* Add description based on options */
-            description: (types.get(choice.label)!.options.size > 0) ?
-                this.cliCommand.formatOptionsForCommand(types.get(choice.label)!.options).join(' ') :
-                `No pre-filled option`,
-        }));
+        }
+        
+        const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         const typeChoice = await vscode.window.showQuickPick(typesChoices, {
             placeHolder: `What type of module do you want?`,
@@ -384,14 +358,14 @@ export class UserJourney {
 
     private async askShortcutConfirmation(): Promise<boolean | undefined> {
 
-        const choice = await vscode.window.showQuickPick(Shortcuts.confirmationChoices, {
+        const choice = await vscode.window.showQuickPick(shortcutsConfirmationChoices, {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
 
-        if (choice?.label === CONFIRMATION_LABEL.YES) {
+        if (choice?.label === SHORTCUTS_CONFIRMATION_LABEL.YES) {
             return true;
-        } else if (choice?.label === CONFIRMATION_LABEL.MORE_OPTIONS) {
+        } else if (choice?.label === SHORTCUTS_CONFIRMATION_LABEL.MORE_OPTIONS) {
             return false;
         }
         return undefined;

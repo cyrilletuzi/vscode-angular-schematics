@@ -61,7 +61,7 @@ export class Collection {
     /**
      * Get a schematic from cache, or load it.
      */
-    async getSchematic(name: string): Promise<Schematic | undefined> {
+    getSchematic(name: string): Schematic | undefined {
         
         return this.schematics.get(name);
 
@@ -111,7 +111,7 @@ export class Collection {
     private async setSchematics(workspaceFolderFsPath: string): Promise<void> {
 
         /* Start from scratch as the function can be called again via watcher */
-        this.schematics = new Map();
+        this.schematics.clear();
         this.schematicsChoices = [];
 
         const allSchematics = Object.entries(this.config.schematics);

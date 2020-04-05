@@ -1,12 +1,15 @@
+import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Output } from '../../utils';
+import { ComponentShortcut } from '../shortcuts';
 
 import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
 import { TslintConfig } from './tslint';
 
 export class AngularProject {
 
+    componentShortcut!: ComponentShortcut;
     private name: string;
     /** Angular projects are `application` by default, but can be `library` too */
     private type: AngularProjectType;
@@ -63,15 +66,19 @@ export class AngularProject {
 
     }
 
-    async init(workspaceFolderfsPath: string): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         Output.logInfo(`Loading "${this.name}" Angular project's TSLint configuration.`);
 
-        const projectFsPath = path.join(workspaceFolderfsPath, this.rootPath);
+        const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
 
         const tslintConfig = new TslintConfig();
         await tslintConfig.init(projectFsPath);
         this.tslintConfig = tslintConfig;
+
+        const componentShortcut = new ComponentShortcut();
+        await componentShortcut.init(workspaceFolder);
+        this.componentShortcut = componentShortcut;
 
     }
 

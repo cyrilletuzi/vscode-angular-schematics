@@ -5,7 +5,6 @@ import { defaultCollectionsNames, defaultAngularCollection } from '../../default
 import { Output, Watchers, FileSystem } from '../../utils';
 
 import { Collection } from './collection';
-import { Shortcuts } from './shortcuts';
 
 export class Collections {
 
@@ -13,10 +12,6 @@ export class Collections {
      * List of collections existing in the workspace
      */
     list = new Map<string, Collection>();
-    /**
-     * List of shortchuts
-     */
-    shortcuts!: Shortcuts;
 
     /**
      * Initialize collections.
@@ -26,8 +21,6 @@ export class Collections {
     async init(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
 
         await this.setList(workspaceFolder, userDefaultCollections);
-
-        await this.setShortcuts(workspaceFolder);
 
         Watchers.watchCodePreferences('userCollections', () => {
             this.init(workspaceFolder, userDefaultCollections);
@@ -86,7 +79,7 @@ export class Collections {
         Output.logInfo(`Loading the list of schematics collections.`);
 
         /* Start from scratch as the function can be called again via watcher */
-        this.list = new Map();
+        this.list.clear();
 
         /* Configuration key is configured in `package.json` */
         const userPreference = vscode.workspace.getConfiguration('ngschematics', workspaceFolder.uri).get<string[]>(`schematics`, []);
@@ -136,19 +129,6 @@ export class Collections {
             }
 
         }
-
-    }
-
-    /**
-     * Set shortcuts for component and module types
-     */
-    private async setShortcuts(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
-
-        const shortcuts = new Shortcuts();
-
-        await shortcuts.init(workspaceFolder);
-
-        this.shortcuts = shortcuts;
 
     }
 

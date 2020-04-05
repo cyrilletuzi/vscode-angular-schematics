@@ -6,6 +6,8 @@ import { FileSystem, Output, Terminal } from '../utils';
 import { WorkspaceFolderConfig } from '../workspace';
 import { Schematic } from '../workspace/schematics';
 
+import { CliCommandOptions, formatCliCommandOptions } from './cli-options';
+
 interface ContextPath {
     /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
     full: string;
@@ -14,9 +16,6 @@ interface ContextPath {
     /** Eg. `some-module` */
     relativeToProjectFolder: string;
 }
-
-/** List of options */
-export type CliCommandOptions = Map<string, string | string[]>;
 
 export class CliCommand {
 
@@ -52,34 +51,8 @@ export class CliCommand {
             this.baseCommand,
             this.formatSchematicNameForCommand(),
             this.nameAsFirstArg,
-            ...this.formatOptionsForCommand(this.options),
+            formatCliCommandOptions(this.options),
         ].join(' ');
-
-    }
-
-    /**
-     * Format options for the generation command.
-     */
-    formatOptionsForCommand(options: CliCommandOptions): string[] {
-
-        /* Format the values. The goal is to be shortest as possible,
-         * so the user can see the full command, as VS Code input box has a fixed size */
-        return Array.from(options).map(([key, value]) => {
-
-            /* Boolean options are always true by default,
-                * ie. `--export` is equivalent to just `--export` */
-            if (value === 'true') {
-                return `--${key}`;
-            }
-            /* Some options can have multiple values (eg. `ng g guard --implements CanActivate CanLoad`) */
-            else if (Array.isArray(value)) {
-                return value.map((valueItem) => `--${key} ${valueItem}`).join(' ');
-            }
-            /* Otherwise we print the full option (eg. `--changeDetection OnPush`) */
-            else {
-                return `--${key} ${value}`;
-            }
-        });
 
     }
 

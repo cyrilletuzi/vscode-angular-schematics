@@ -18,16 +18,16 @@ export class TslintConfig {
      * **Must** be called after each `new TslintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolderFsPath: string, { silent = false } = {}): Promise<void> {
+    async init(contextFsPath: string, { silent = false } = {}): Promise<void> {
 
-        const fsPath = path.join(workspaceFolderFsPath, TslintConfig.fileName);
+        const fsPath = path.join(contextFsPath, TslintConfig.fileName);
 
         this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, { silent });
 
         this.setComponentSuffixes();
 
         Watchers.watchFile(fsPath, () => {
-            this.init(workspaceFolderFsPath);
+            this.init(contextFsPath);
         });
 
     }

@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultAngularCollection } from '../../defaults';
@@ -34,14 +35,14 @@ export class AngularConfig {
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolderFsPath: string): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         let fsPath = '';
 
         /* Try the different possible file names */
         for (const fileName of this.fileNames) {
 
-            fsPath = path.join(workspaceFolderFsPath, fileName);
+            fsPath = path.join(workspaceFolder.uri.fsPath, fileName);
 
             if (await FileSystem.isReadable(fsPath, { silent: true })) {
 
@@ -66,10 +67,10 @@ export class AngularConfig {
 
         this.setDefaultCollections();
 
-        await this.setProjects(workspaceFolderFsPath);
+        await this.setProjects(workspaceFolder);
 
         Watchers.watchFile(fsPath, () => {
-            this.init(workspaceFolderFsPath);
+            this.init(workspaceFolder);
         });
         
     }
@@ -100,11 +101,11 @@ export class AngularConfig {
     /**
      * Set all projects defined in `angular.json`
      */
-    private async setProjects(workspaceFolderFsPath: string): Promise<void> {
+    private async setProjects(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         /* Start from scratch (can be recalled via watcher) */
         this.rootProjectName = '';
-        this.projects = new Map();
+        this.projects.clear();
 
         /* Get `projects` in `angular.json`*/
         const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
@@ -119,7 +120,7 @@ export class AngularConfig {
         for (const [name, config] of projectsFromConfig) {
 
             const project = new AngularProject(name, config);
-            await project.init(workspaceFolderFsPath);
+            await project.init(workspaceFolder);
 
             this.projects.set(name, project);
 
