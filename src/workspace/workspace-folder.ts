@@ -19,6 +19,8 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     private angularConfig!: AngularConfig;
     private componentShortcut!: ComponentShortcut;
     private moduleShorcut!: ModuleShortcut;
+    private fileWatchers: vscode.FileSystemWatcher[] = [];
+    private preferencesWatcher: vscode.Disposable | undefined;
 
     constructor(workspaceFolder: vscode.WorkspaceFolder) {
         this.uri = workspaceFolder.uri;
@@ -33,6 +35,9 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
      */
     async init(): Promise<void> {
 
+        /* Cancel previous file watchers */
+        this.disposeWatchers();
+
         const workspaceFolder: vscode.WorkspaceFolder = {
             uri: this.uri,
             name: this.name,
@@ -45,13 +50,13 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         Output.logInfo(`Loading Angular configuration.`);
 
         const angularConfig = new AngularConfig();
-        await angularConfig.init(workspaceFolder);
+        const angularWatchers = await angularConfig.init(workspaceFolder);
         this.angularConfig = angularConfig;
         
         Output.logInfo(`Loading global TSLint configuration.`);
 
         const tslintConfig = new TslintConfig();
-        await tslintConfig.init(this.uri.fsPath);
+        const tslintWatcher = await tslintConfig.init(this.uri.fsPath);
         this.tslintConfig = tslintConfig;
 
         Output.logInfo(`Loading schematics configuration.`);
@@ -71,6 +76,24 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const moduleShorcut = new ModuleShortcut();
         moduleShorcut.init(hasLazyModuleType);
         this.moduleShorcut = moduleShorcut;
+
+        /* Watch config files */
+        this.fileWatchers.push(
+            ...angularWatchers,
+            tslintWatcher,
+        );
+        for (const watcher of this.fileWatchers) {
+            watcher.onDidChange(() => {
+                Output.logInfo(`Reloading "${workspaceFolder.name}" workspace folder configuration.`);
+                this.init();
+            });
+        }
+
+        /* Watch Code preferences */
+        this.preferencesWatcher = vscode.workspace.onDidChangeConfiguration(() => {
+            Output.logInfo(`Reloading "${workspaceFolder.name}" workspace folder configuration.`);
+            this.init();
+        });
 
     }
 
@@ -182,6 +205,20 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     isRootAngularProject(name: string): boolean {
 
         return (this.angularConfig.rootProjectName === name);
+
+    }
+
+    /**
+     * Cancel all file watchers
+     */
+    disposeWatchers(): void {
+
+        for (const watcher of this.fileWatchers) {
+            watcher.dispose();
+        }
+        this.fileWatchers = [];
+
+        this.preferencesWatcher?.dispose();
 
     }
 

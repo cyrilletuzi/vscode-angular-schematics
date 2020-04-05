@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultCollectionsNames, defaultAngularCollection } from '../../defaults';
-import { Output, Watchers, FileSystem } from '../../utils';
+import { Output, FileSystem } from '../../utils';
 
 import { Collection } from './collection';
 
@@ -21,10 +21,6 @@ export class Collections {
     async init(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
 
         await this.setList(workspaceFolder, userDefaultCollections);
-
-        Watchers.watchCodePreferences('userCollections', () => {
-            this.init(workspaceFolder, userDefaultCollections);
-        });
 
     }
 

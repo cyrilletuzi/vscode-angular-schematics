@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { defaultAngularCollection, extensionName } from './defaults';
-import { Watchers, Output, Terminal } from './utils';
+import { Output, Terminal } from './utils';
 import { Workspace } from './workspace';
 import { UserJourney } from './generation';
 import { SchematicsTreeDataProvider } from './view';
@@ -90,9 +90,9 @@ export function activate(context: vscode.ExtensionContext): void {
  */
 export function deactivate(): void {
 
-    Workspace.watcher.dispose();
-
-    Watchers.disposeAll();
+    for (const [, workspaceFolder] of Workspace.folders) {
+        workspaceFolder.disposeWatchers();
+    }
 
     Terminal.disposeAll();
 

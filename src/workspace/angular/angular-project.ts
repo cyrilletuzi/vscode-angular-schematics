@@ -66,19 +66,21 @@ export class AngularProject {
 
     }
 
-    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher> {
 
         Output.logInfo(`Loading "${this.name}" Angular project's TSLint configuration.`);
 
         const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
 
         const tslintConfig = new TslintConfig();
-        await tslintConfig.init(projectFsPath);
+        const watcher = await tslintConfig.init(projectFsPath);
         this.tslintConfig = tslintConfig;
 
         const componentShortcut = new ComponentShortcut();
         await componentShortcut.init(workspaceFolder);
         this.componentShortcut = componentShortcut;
+
+        return watcher;
 
     }
 

@@ -1,6 +1,7 @@
+import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Watchers, Output } from '../../utils';
+import { FileSystem, Output } from '../../utils';
 
 import { TslintJsonSchema } from './json-schema';
 
@@ -18,7 +19,7 @@ export class TslintConfig {
      * **Must** be called after each `new TslintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(contextFsPath: string, { silent = false } = {}): Promise<void> {
+    async init(contextFsPath: string, { silent = false } = {}): Promise<vscode.FileSystemWatcher> {
 
         const fsPath = path.join(contextFsPath, TslintConfig.fileName);
 
@@ -26,9 +27,7 @@ export class TslintConfig {
 
         this.setComponentSuffixes();
 
-        Watchers.watchFile(fsPath, () => {
-            this.init(contextFsPath);
-        });
+        return vscode.workspace.createFileSystemWatcher(fsPath);
 
     }
 

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Watchers, Output } from '../../utils';
+import { FileSystem, Output } from '../../utils';
 
 import { Schematic, SchematicConfig } from './schematic';
 import { PackageJsonSchema, CollectionJsonSchema } from './json-schemas';
@@ -23,7 +23,7 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolderFsPath: string): Promise<void> {
+    async init(workspaceFolderFsPath: string): Promise<vscode.FileSystemWatcher> {
 
         /* Can throw */
         this.fsPath = await this.getFsPath(workspaceFolderFsPath, this.name);
@@ -38,9 +38,7 @@ export class Collection {
 
         await this.setSchematics(workspaceFolderFsPath);
 
-        Watchers.watchFile(this.fsPath, () => {
-            this.init(workspaceFolderFsPath);
-        });
+        return vscode.workspace.createFileSystemWatcher(this.fsPath);
 
     }
 

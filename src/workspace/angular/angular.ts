@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultAngularCollection } from '../../defaults';
-import { FileSystem, Watchers, Output } from '../../utils';
+import { FileSystem, Output } from '../../utils';
 
 import { AngularProject } from './angular-project';
 import { AngularJsonSchema, AngularJsonProjectSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
@@ -35,7 +35,7 @@ export class AngularConfig {
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
 
         let fsPath = '';
 
@@ -67,11 +67,12 @@ export class AngularConfig {
 
         this.setDefaultCollections();
 
-        await this.setProjects(workspaceFolder);
+        const projectsWatchers = await this.setProjects(workspaceFolder);
 
-        Watchers.watchFile(fsPath, () => {
-            this.init(workspaceFolder);
-        });
+        return [
+            vscode.workspace.createFileSystemWatcher(fsPath),
+            ...projectsWatchers,
+        ];
         
     }
 
@@ -101,11 +102,12 @@ export class AngularConfig {
     /**
      * Set all projects defined in `angular.json`
      */
-    private async setProjects(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
+    private async setProjects(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
 
         /* Start from scratch (can be recalled via watcher) */
         this.rootProjectName = '';
         this.projects.clear();
+        const watchers: vscode.FileSystemWatcher[] = [];
 
         /* Get `projects` in `angular.json`*/
         const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
@@ -120,7 +122,7 @@ export class AngularConfig {
         for (const [name, config] of projectsFromConfig) {
 
             const project = new AngularProject(name, config);
-            await project.init(workspaceFolder);
+            watchers.push(await project.init(workspaceFolder));
 
             this.projects.set(name, project);
 
@@ -133,6 +135,8 @@ export class AngularConfig {
             }
 
         }
+
+        return watchers;
 
     }
 

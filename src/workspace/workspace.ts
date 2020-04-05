@@ -56,6 +56,7 @@ export class Workspace {
 
             for (const folder of event.removed) {
                 Output.logInfo(`Unloading configuration of removed "${folder.name}" workspace folder.`);
+                this.folders.get(folder.name)?.disposeWatchers();
                 this.folders.delete(folder.name);
             }
 
