@@ -302,7 +302,7 @@ export class CliCommand {
         for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
 
             /* If the relative path starts with the project path */
-            if (this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getSourcePath())) {
+            if (this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getAppOrLibPath())) {
 
                 this.projectName = projectName;
 
@@ -316,7 +316,25 @@ export class CliCommand {
 
         }
 
-        /* Second try by matching projects *root* path */
+        /* Second try by matching projects *source* path */
+        if (!this.projectName) {
+
+            for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
+
+                /* If the relative path starts with the project path */
+                if (this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getSourcePath())) {
+
+                    this.projectName = projectName;
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+        /* Third try by matching projects *root* path */
         if (!this.projectName) {
 
             for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
