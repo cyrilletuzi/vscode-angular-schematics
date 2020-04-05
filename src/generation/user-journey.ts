@@ -215,9 +215,6 @@ export class UserJourney {
 
         this.cliCommand.launchCommand();
 
-        /* Refresh Explorer, otherwise you may not see the generated files */
-        await vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
-
         this.jumpToFile(this.cliCommand.guessGereratedFileFsPath());
 
     }
@@ -495,15 +492,21 @@ export class UserJourney {
 
     private async askConfirmation(): Promise<boolean> {
 
-        const confirmationText = `$(check) Confirm`;
-        const cancelText = `$(close) Cancel`;
+        const confirmationLabel = `$(check) Confirm`;
 
-        const choice = await vscode.window.showQuickPick([confirmationText, cancelText], {
+        const confirmationChoices: vscode.QuickPickItem[] = [{
+            label: confirmationLabel,
+            description: `Pro-tip: take a minute to check the command above is really what you want`,
+        }, {
+            label: `$(close) Cancel`,
+        }];
+
+        const choice = await vscode.window.showQuickPick(confirmationChoices, {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
 
-        return (choice === confirmationText) ? true : false;
+        return (choice?.label === confirmationLabel) ? true : false;
 
     }
 
@@ -516,7 +519,7 @@ export class UserJourney {
          * as we can't react on Terminal output */
         if (possibleFsPath === '') {
 
-            Output.logInfo(`Command launched, check terminal to know its status.`);
+            this.showUnknownStatus();
 
         }
         /* If the file exists, open it */
@@ -526,7 +529,7 @@ export class UserJourney {
 
             await vscode.window.showTextDocument(document);
 
-            Output.logInfo(`Command has succeeded! Check terminal for more details.`);
+            Output.logInfo(`Command has succeeded! Check the Terminal for more details.`);
 
             return;
 
@@ -544,8 +547,30 @@ export class UserJourney {
         /* After 6 failures */
         else {
 
-            Output.logInfo(`Command launched, check terminal to know its status.`);
+            /* Refresh Explorer, otherwise you may not see the generated files */
+            this.showUnknownStatus();
 
+        }
+
+    }
+
+    /**
+     * Show an information message when we cannot detect the generated file
+     */
+    private async showUnknownStatus(): Promise<void> {
+
+        const refreshLabel = `Refresh Explorer`;
+
+        Output.logInfo(`Command launched.`);
+
+        const action = await vscode.window.showInformationMessage(
+            `Command launched, check the Terminal to know its status. You may need to refresh the Explorer to see the generated file(s).`,
+            `Refresh Explorer`,
+        );
+        
+        if (action === refreshLabel) {
+            /* Refresh Explorer, otherwise you may not see the generated files */
+            vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
         }
 
     }
