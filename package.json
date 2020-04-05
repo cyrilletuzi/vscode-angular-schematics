@@ -108,7 +108,7 @@
                             "properties": {
                                 "label": {
                                     "type": "string",
-                                    "description": "Required component type's name, must be unique. \"Page\", \"Pure component\", \"Exported component\" are already used and will be overrided if you use the same label."
+                                    "description": "Required component type's name, must be unique."
                                 },
                                 "options": {
                                     "type": "array",

@@ -64,7 +64,7 @@ export class CliCommand {
 
         /* Format the values. The goal is to be shortest as possible,
          * so the user can see the full command, as VS Code input box has a fixed size */
-        return Array.from(options.entries()).map(([key, value]) => {
+        return Array.from(options).map(([key, value]) => {
 
             /* Boolean options are always true by default,
                 * ie. `--export` is equivalent to just `--export` */

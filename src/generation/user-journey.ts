@@ -317,8 +317,7 @@ export class UserJourney {
 
     private async askComponentOptions(): Promise<CliCommandOptions | undefined> {
 
-        /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
-        const types = new Map(this.workspaceFolder.collections.shortcuts.componentTypesChoices.entries());
+        const types = this.workspaceFolder.collections.shortcuts.componentTypesChoices;
 
         /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
         for (const [, config] of types) {
@@ -352,8 +351,7 @@ export class UserJourney {
 
     private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
 
-        /* New `Map` to have a copy and not a reference, as some chances are specific to the current command */
-        const types = new Map(this.workspaceFolder.collections.shortcuts.moduleTypesChoices.entries());
+        const types = this.workspaceFolder.collections.shortcuts.moduleTypesChoices;
 
         /* Lazy-loaded module schematic is support in Angular >= 8.1 only */
         if (!this.schematic.hasOption('route')) {

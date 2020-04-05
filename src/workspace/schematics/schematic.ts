@@ -107,7 +107,7 @@ export class Schematic {
      */
     hasNameAsFirstArg(): boolean {
 
-        for (const [name, option] of this.options.entries()) {
+        for (const [name, option] of this.options) {
 
             /* `argv[0]` means it is the first argument in command line after `ng g <some-schema>` */
             if ((name === 'name') && (option.$default?.$source === 'argv') && (option.$default?.index === 0)) {
@@ -163,7 +163,7 @@ export class Schematic {
 
         const choices: vscode.QuickPickItem[] = [];
 
-        const filteredOptionsNames = Array.from(this.options.entries())
+        const filteredOptionsNames = Array.from(this.options)
             /* Do not keep options marked as not visible (internal options for the CLI) */
             .filter(([_, option]) => (option.visible !== false))
             /* Do not keep deprecated options */
