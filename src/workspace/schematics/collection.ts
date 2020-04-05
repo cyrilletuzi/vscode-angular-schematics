@@ -12,7 +12,6 @@ export class Collection {
     private name: string;
     private fsPath!: string;
     private config!: CollectionJsonSchema;
-    private schematicsConfigs = new Map<string, SchematicConfig>();
     private schematics = new Map<string, Schematic | undefined>();
 
     constructor(name: string) {
@@ -37,7 +36,7 @@ export class Collection {
 
         this.config = config;
 
-        await this.setSchematicsConfigs(workspaceFolderFsPath);
+        await this.setSchematics(workspaceFolderFsPath);
 
         Watchers.watchFile(this.fsPath, () => {
             this.init(workspaceFolderFsPath);
@@ -56,40 +55,15 @@ export class Collection {
      * Get all collection's schematics' names
      */
     getSchematicsNames(): string[] {
-        return Array.from(this.schematicsConfigs.values()).map((config) => config.name).sort();
+        return Array.from(this.schematics.keys()).sort();
     }
 
     /**
      * Get a schematic from cache, or load it.
      */
     async getSchematic(name: string): Promise<Schematic | undefined> {
-
-        const fullName = this.getFullSchematicName(name);
-
-        if (!this.schematicsConfigs.has(fullName)) {
-            Output.logError(`"${fullName}" schematic configuration not found.`);
-            return undefined;
-        }
-
-        const schematicConfig = this.schematicsConfigs.get(fullName)!;
-
-        /* Schematics are not preloaded */
-        if (!this.schematics.has(fullName)) {
-
-            Output.logInfo(`Loading "${fullName}" schematic`);
-
-            const schematicInstance = new Schematic(schematicConfig);
-
-            try {
-                await schematicInstance.init();
-                this.schematics.set(fullName, schematicInstance);
-            } catch {
-                Output.logError(`"${fullName}" schematic loading failed.`);
-            }
-
-        }
         
-        return this.schematics.get(fullName);
+        return this.schematics.get(name);
 
     }
 
@@ -134,10 +108,11 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematicsConfigs(workspaceFolderFsPath: string): Promise<void> {
+    private async setSchematics(workspaceFolderFsPath: string): Promise<void> {
 
         /* Start from scratch as the function can be called again via watcher */
-        this.schematicsConfigs = new Map();
+        this.schematics = new Map();
+        this.schematicsChoices = [];
 
         const allSchematics = Object.entries(this.config.schematics);
 
@@ -153,6 +128,12 @@ export class Collection {
 
         for (const [name, config] of schematics) {
 
+            const schematicFullName = this.getFullSchematicName(name);
+
+            Output.logInfo(`Loading "${schematicFullName}" schematic`);
+
+            let schematicConfig: SchematicConfig | undefined = undefined;
+
             /* Some collection extends another one */
             if (config.extends) {
 
@@ -163,12 +144,12 @@ export class Collection {
                     /* Can fail */
                     const collectionFsPath = await this.getFsPath(workspaceFolderFsPath, collectionName);
 
-                    this.schematicsConfigs.set(`${this.name}:${name}`, {
+                    schematicConfig = {
                         name,
                         collectionName: this.name,
                         description: `Schematic herited from "${collectionName}"`,
                         collectionFsPath,
-                    });
+                    };
 
                 } catch {
                     Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
@@ -178,30 +159,42 @@ export class Collection {
 
                 const fsPath = path.join(path.dirname(this.fsPath), config.schema);
 
-                this.schematicsConfigs.set(this.getFullSchematicName(name), {
+                schematicConfig = {
                     name,
                     collectionName: this.name,
                     description: config.description,
                     fsPath,
-                });
+                };
+
+            }
+
+            if (schematicConfig) {
+
+                const schematicInstance = new Schematic(schematicConfig);
+
+                try {
+                    await schematicInstance.init();
+                    this.schematics.set(name, schematicInstance);
+                    this.setSchematicChoice(schematicConfig);
+                } catch {
+                    Output.logError(`"${schematicFullName}" schematic loading failed.`);
+                }
 
             }
 
         }
 
-        this.setSchematicsChoices();
-
     }
 
     /**
-     * Set schematics choice (for caching)
+     * Add schematic's choice (for caching)
      */
-    private setSchematicsChoices(): void {
+    private setSchematicChoice(schematicConfig: SchematicConfig): void {
 
-        this.schematicsChoices = Array.from(this.schematicsConfigs).map(([_, config]) => ({
-            label: config.name,
-            description: config.description,
-        }));
+        this.schematicsChoices.push({
+            label: schematicConfig.name,
+            description: schematicConfig.description,
+        });
 
     }
 
