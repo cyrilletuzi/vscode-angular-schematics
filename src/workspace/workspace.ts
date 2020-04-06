@@ -88,37 +88,62 @@ export class Workspace {
      * Try to resolve the current workspace folder, or ask the user for it.
      * @param contextUri URI of any file in the current workspace folder
      */
-    static async getCurrentFolder(contextUri?: vscode.Uri): Promise<vscode.WorkspaceFolder | undefined> {
+    static async askFolder(contextUri?: vscode.Uri): Promise<WorkspaceFolderConfig | undefined> {
 
-        let folder: vscode.WorkspaceFolder | undefined;
+        let folderName: string | undefined;
 
         if (contextUri) {
 
             Output.logInfo(`Context path detected: resolving current workspace folder from it.`);
 
-            /* If there is a context URI, current workspace folder can be resolved from it */
-            folder = vscode.workspace.getWorkspaceFolder(contextUri);
+            /* 1. If there is a context URI, current workspace folder can be resolved from it */
+            folderName = vscode.workspace.getWorkspaceFolder(contextUri)?.name;
 
         }
 
-        if (!folder) {
+        if (!folderName) {
         
             if (vscode.workspace.workspaceFolders?.length === 1) {
 
                 Output.logInfo(`There is only one workspace folder opened, default to it.`);
 
-                /* If there is just one workspace folder, take it directly */
-                folder = vscode.workspace.workspaceFolders[0];
+                /* 2. If there is just one workspace folder, take it directly */
+                folderName = vscode.workspace.workspaceFolders[0].name;
 
             } else {
 
                 Output.logInfo(`There are multiple Code workspaces opened, ask the user which one we should use.`);
 
-                /* Otherwise the user must be asked */
-                folder = await vscode.window.showWorkspaceFolderPick();
+                const angularWorkspaceFolders = Array.from(this.folders.keys());
+
+                if (angularWorkspaceFolders.length > 0) {
+
+                    /* 3. Ask user but with Angular-detected workspace folders only */
+                    folderName = await vscode.window.showQuickPick(angularWorkspaceFolders, {
+                        placeHolder: `In which of your Angular workspace folders do you want to generate?`,
+                        ignoreFocusOut: true,
+                    });
+
+                } else {
+
+                    /* 4. Otherwise ask any workspace */
+                    folderName = (await vscode.window.showWorkspaceFolderPick())?.name;
+
+                } 
 
             }
 
+        }
+
+        /* User canceled */
+        if (!folderName) {
+            return undefined;
+        }
+
+        const folder = this.folders.get(folderName);
+
+        if (!folder) {
+            throw new Error(`Cannot find the configuration of the chosen workspace folder. It can happen if there is no "angular.json" at the root of your workspace folder.`);
         }
 
         return folder;

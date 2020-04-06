@@ -21,15 +21,6 @@ export class UserJourney {
 
     async start(contextUri?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
 
-        /* Resolve the current workspace folder */
-        const workspaceFolder = await Workspace.getCurrentFolder(contextUri);
-        if (!workspaceFolder) {
-            Output.logInfo(`You have canceled the workspace folder choice.`);
-            return;
-        }
-
-        Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
-
         /* As the configurations are loaded in an async way, they may not be ready */
         try {
 
@@ -44,16 +35,26 @@ export class UserJourney {
             return;
         }
 
+        let workspaceFolder: WorkspaceFolderConfig | undefined;
         /* Get workspace folder configuration */
-        const workspaceFolderConfig = Workspace.getFolderConfig(workspaceFolder);
-        /* Not supposed to happen */
-        if (!workspaceFolderConfig) {
-            Output.showError(`Command canceled: cannot find the configuration of the chosen workspace folder. It can happen if there is no "angular.json" at the root of your workspace folder.`);
+        try {
+            workspaceFolder = await Workspace.askFolder(contextUri);
+        } catch (error) {
+            /* Not supposed to happen */
+            Output.showError((error as Error).message);
             return;
         }
-        this.workspaceFolder = workspaceFolderConfig;
 
-        this.cliCommand = new CliCommand(workspaceFolderConfig, contextUri);
+        if (!workspaceFolder) {
+            Output.logInfo(`You have canceled the workspace folder choice.`);
+            return;
+        }
+
+        this.workspaceFolder = workspaceFolder;
+
+        Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
+
+        this.cliCommand = new CliCommand(workspaceFolder, contextUri);
 
         /* If the project has not been already resolved via context path (in `CliCommand` constructor)
          * and if the Angular projects have been correctly resolved from config */
@@ -85,7 +86,7 @@ export class UserJourney {
                 collectionName = await this.askCollectionName();
             } catch (error) {
                 /* Happens if `@schematics/angular` is not installed */
-                Output.showError(error.message);
+                Output.showError((error as Error).message);
                 return;
             }
 

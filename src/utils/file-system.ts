@@ -71,7 +71,7 @@ export class FileSystem {
         
                 json = JSON.parse(data) as T;
         
-            } catch (error) {
+            } catch {
 
                 if (!silent) {
 
