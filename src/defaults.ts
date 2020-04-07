@@ -91,4 +91,11 @@ export const defaultComponentTypes: ComponentType[] = [
 
 export const defaultAngularCollection = '@schematics/angular';
 
+export const defaultAngularConfigFileNames: string[] = [
+    'angular.json',
+    '.angular.json',
+    'angular-cli.json',
+    '.angular-cli.json',
+];
+
 export const extensionName = 'Angular Schematics';

@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
-import { defaultAngularCollection } from '../defaults';
+import { defaultAngularCollection, defaultAngularConfigFileNames } from '../defaults';
 import { Output } from '../utils';
 import { formatCliCommandOptions } from '../generation';
 
@@ -35,23 +36,43 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
      */
     async init(): Promise<void> {
 
+        // TODO: [feature] configs could be in parent
+        // TODO: [feature] handle custom node_modules folder
+
         /* Cancel previous file watchers */
         this.disposeWatchers();
 
-        const workspaceFolder: vscode.WorkspaceFolder = {
+        Output.logInfo(`Loading Angular configuration.`);
+
+        const angularConfigFsPath = await this.findAngularConfigFsPath({
             uri: this.uri,
             name: this.name,
             index: this.index,
-        };
+        });
 
-        // TODO: [feature] configs could be in parent or subdirectories
-        // TODO: [feature] handle custom node_modules folder
+        const angularWatchers: vscode.FileSystemWatcher[] = [];
 
-        Output.logInfo(`Loading Angular configuration.`);
+        if (angularConfigFsPath) {
 
-        const angularConfig = new AngularConfig();
-        const angularWatchers = await angularConfig.init(workspaceFolder);
-        this.angularConfig = angularConfig;
+            /* Keep only the directory part */
+            const workspaceFolderFsPath = path.dirname(angularConfigFsPath);
+
+            if (workspaceFolderFsPath !== this.uri.fsPath) {
+                Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderFsPath}`);
+            }
+
+            /* Update the workspace folder URI */
+            this.uri = vscode.Uri.file(workspaceFolderFsPath);
+
+            const angularConfig = new AngularConfig();
+            angularWatchers.push(...(await angularConfig.init(angularConfigFsPath, {
+                uri: this.uri,
+                name: this.name,
+                index: this.index,
+            })));
+            this.angularConfig = angularConfig;
+
+        }
         
         Output.logInfo(`Loading global TSLint configuration.`);
 
@@ -62,11 +83,19 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         Output.logInfo(`Loading schematics configuration.`);
 
         const collections = new Collections();
-        await collections.init(workspaceFolder, this.getDefaultCollections());
+        await collections.init({
+            uri: this.uri,
+            name: this.name,
+            index: this.index,
+        }, this.getDefaultCollections());
         this.collections = collections;
 
         const componentShortcut = new ComponentShortcut();
-        await componentShortcut.init(workspaceFolder);
+        await componentShortcut.init({
+            uri: this.uri,
+            name: this.name,
+            index: this.index,
+        });
         this.componentShortcut = componentShortcut;
 
         /* Check if the `--route` option exists in Angular `module` schematic (Angular >= 8.1) */
@@ -84,14 +113,14 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         );
         for (const watcher of this.fileWatchers) {
             watcher.onDidChange(() => {
-                Output.logInfo(`Reloading "${workspaceFolder.name}" workspace folder configuration.`);
+                Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
                 this.init();
             });
         }
 
         /* Watch Code preferences */
         this.preferencesWatcher = vscode.workspace.onDidChangeConfiguration(() => {
-            Output.logInfo(`Reloading "${workspaceFolder.name}" workspace folder configuration.`);
+            Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
             this.init();
         });
 
@@ -235,6 +264,31 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         return ((angularProject?.getComponentSuffixes().length ?? 0) > 0) ?
                 angularProject!.hasComponentSuffix(suffix) :
                 this.tslintConfig.hasComponentSuffix(suffix);
+
+    }
+
+    /**
+     * Try to find the Angular config file's fs path, or `undefined`
+     */
+    private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string | undefined> {
+
+        /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
+        const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${defaultAngularConfigFileNames.join(',')}}`);
+
+        /* Third param is the maximum number of results */
+        const searchMatches = await vscode.workspace.findFiles(pattern, undefined, 1);
+
+        if (searchMatches.length > 0) {
+
+            Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0].fsPath}`);
+
+            return searchMatches[0].fsPath;
+
+        }
+
+        Output.logWarning(`No Angular config file found for "${this.name}" workspace folder. The extension will work but with limited features.`);
+
+        return undefined;
 
     }
 

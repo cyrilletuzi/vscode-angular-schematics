@@ -37,6 +37,17 @@ This is especially good news for **issues resolution**, as you can now
 detect and correct configurations issues based on logs, and
 copy/past the logs when creating a new GitHub issue is relevant.
 
+### Open from a parent directory
+
+Until now, a requirement was to open your Angular project from its root directory (ie. where `angular.json` is).
+The Angular CLI itself only works if this condition is met.
+
+While it is not the best practice in today's front-end development,
+now you can open your Angular project from a parent directory!
+
+This is especially good news for **Java users** who often like to keep their front-end project
+inside their back-end project.
+
 ### Full compatibility with Code workspaces with multiple folders
 
 VS Code allows to use several projects (folders) in the same Code workspace.
@@ -45,7 +56,7 @@ While the extension was already partially supporting that,
 it is something really difficult to manage well,
 and there was a lot of issues here and there.
 
-Now every detail of the extension will be **aware of the workspace folder** you are working in.
+Now every detail of the extension should be **aware of the workspace folder** you are working in.
 
 ### Full compatibility with Angular CLI monorepo
 
@@ -58,7 +69,7 @@ and/or multiple applications (`ng g application`) in the same folder.
 And Angular projects can have different configurations
 (for example TSLint, which is useful to manage components types in Angular >= 9).
 
-Now every detail of the extension will be **aware of the Angular project** you are working in.
+Now every detail of the extension should be **aware of the Angular project** you are working in.
 This is especially good news for users doing an **Angular monorepo**.
 
 ### Component types

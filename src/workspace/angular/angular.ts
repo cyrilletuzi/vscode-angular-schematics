@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { defaultAngularCollection } from '../../defaults';
 import { FileSystem, Output } from '../../utils';
@@ -17,16 +16,6 @@ export class AngularConfig {
     defaultCollections: string[] = [];
     /** Root project name */
     rootProjectName = '';
-    /** 
-     * Possible basenames of official Angular config file
-     * From https://github.com/angular/angular-cli/blob/master/packages/angular/cli/utilities/project.ts
-     */
-    private fileNames = [
-        'angular.json',
-        '.angular.json',
-        'angular-cli.json',
-        '.angular-cli.json',
-    ];
     /** Values from the Angular config file */
     private config: AngularJsonSchema | undefined;
     
@@ -35,42 +24,16 @@ export class AngularConfig {
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
+    async init(angularConfigFsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
 
-        let fsPath = '';
-
-        /* Try the different possible file names */
-        for (const fileName of this.fileNames) {
-
-            fsPath = path.join(workspaceFolder.uri.fsPath, fileName);
-
-            if (await FileSystem.isReadable(fsPath, { silent: true })) {
-
-                /* Keep only the right file name */
-                this.fileNames = [fileName];
-
-                Output.logInfo(`Angular config file name detected: "${fileName}"`);
-
-                /* Stop the iteration, we have a config */
-                break;
-
-            }
-
-        }
-
-        /* Workspace folder should have an Angular config file */
-        if (this.fileNames.length !== 1) {
-            throw new Error();
-        }
-
-        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(fsPath);
+        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(angularConfigFsPath);
 
         this.setDefaultCollections();
 
         const projectsWatchers = await this.setProjects(workspaceFolder);
 
         return [
-            vscode.workspace.createFileSystemWatcher(fsPath),
+            vscode.workspace.createFileSystemWatcher(angularConfigFsPath),
             ...projectsWatchers,
         ];
         
@@ -92,7 +55,7 @@ export class AngularConfig {
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
         this.defaultUserCollection = this.config?.cli?.defaultCollection ?? defaultAngularCollection;
 
-        Output.logInfo(`Default schematics collection detected in "${this.fileNames[0]}": ${this.defaultUserCollection}`);
+        Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
 
         /* `Set` removes duplicates */
         this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
@@ -115,7 +78,7 @@ export class AngularConfig {
         if (projectsFromConfig.length > 0) {
             Output.logInfo(`${projectsFromConfig.length} Angular project(s) detected.`);
         } else {
-            Output.logWarning(`No Angular project detected. Check your "${this.fileNames[0]}" configuration.`);
+            Output.logWarning(`No Angular project detected. Check your Angular configuration file.`);
         }
 
         /* Transform Angular config with more convenient information for this extension */
