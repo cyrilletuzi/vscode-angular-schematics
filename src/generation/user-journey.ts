@@ -216,7 +216,20 @@ export class UserJourney {
 
         this.cliCommand.launchCommand();
 
-        this.jumpToFile(this.cliCommand.guessGereratedFileFsPath());
+        try {
+
+            /* Show progress to the user */
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Angular Schematics: launching the generation, please wait...`,
+            }, () => this.jumpToFile(this.cliCommand.guessGereratedFileFsPath()));
+
+        } catch {
+
+            /* Auto-opening the file was not possible, warn the user the command is launched
+             * and propose to refresh Explorer to see the generated files */
+            this.showUnknownStatus();
+        }
 
     }
 
@@ -520,7 +533,7 @@ export class UserJourney {
          * as we can't react on Terminal output */
         if (possibleFsPath === '') {
 
-            this.showUnknownStatus();
+            throw new Error();
 
         }
         /* If the file exists, open it */
@@ -535,21 +548,26 @@ export class UserJourney {
             return;
 
         }
-        /* Otherwise retry every half second, 6 times (so 3 seconds maximum) */
-        else if (counter < 6) {
+        /* Otherwise retry every half second, 10 times (so 5 seconds maximum) */
+        else if (counter < 10) {
 
             counter += 1;
 
-            setTimeout(() => {
-                this.jumpToFile(possibleFsPath, counter);
-            }, 500);
+            await new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    this.jumpToFile(possibleFsPath, counter).then(() => {
+                        resolve();
+                    }).catch(() => {
+                        reject();
+                    });
+                }, 500);
+            });
 
         }
-        /* After 6 failures */
+        /* After 10 failures */
         else {
 
-            /* Refresh Explorer, otherwise you may not see the generated files */
-            this.showUnknownStatus();
+            throw new Error();
 
         }
 
