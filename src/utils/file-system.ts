@@ -4,8 +4,22 @@ import * as path from 'path';
 
 import { Output } from './output';
 
+interface PackageJsonSchema {
+    /** The `package.json` of a Yarn workspace will have this property */
+    workspaces?: string[];
+}
+
+interface NodeModuleConfig {
+    fsPath: string;
+    /** Tells if there are Yarn workspaces */
+    workspaces?: string[];
+}
+
 export class FileSystem {
 
+    // TODO: [feature] handle custom node_modules folder
+    private static readonly defaultNodeModulesPath = 'node_modules';
+    private static userNodeModulesFsPaths = new Map<string, NodeModuleConfig | null>();
     /** Cache for already checked files */
     private static readableFiles = new Set<string>();
 
@@ -14,13 +28,33 @@ export class FileSystem {
      */
     static async findPackageFsPath(workspaceFolder: vscode.WorkspaceFolder, name: string, { silent = false } = {}): Promise<string | undefined> {
 
-        // TODO: [feature] handle custom node_modules folder
-        // TODO: [feature] handle yarn workspaces
+        const nodeModulesConfig = await this.getNodeModulesFsPath(workspaceFolder);
 
-        let fsPath = path.join(workspaceFolder.uri.fsPath, 'node_modules', name, 'package.json');
+        if (nodeModulesConfig) {
 
-        if (await this.isReadable(fsPath, { silent })) {
-            return fsPath;
+            let fsPath = path.join(nodeModulesConfig.fsPath, name, 'package.json');
+
+            if (await this.isReadable(fsPath, { silent })) {
+                return fsPath;
+            }
+            /* Yarn workspaces */
+            else if (nodeModulesConfig.workspaces) {
+
+                /* In Yarn workspaces, dependencies can be in a subdirecty whose name is the same as the workspace folder's name */
+                const yarnWorkspaceFolder = nodeModulesConfig.workspaces.filter((folder) => workspaceFolder.uri.fsPath.endsWith(folder));
+
+                if (yarnWorkspaceFolder.length > 0) {
+
+                    fsPath = path.join(nodeModulesConfig.fsPath, yarnWorkspaceFolder[0], name, 'package.json');
+
+                    if (await this.isReadable(fsPath, { silent })) {
+                        return fsPath;
+                    }
+
+                }
+
+            }
+
         }
 
         return undefined;
@@ -135,6 +169,73 @@ export class FileSystem {
         const message = `"${fsPath}" can not be ${failedAction}.`;
 
         Output.logError(message);
+
+    }
+
+    /**
+     * Try to get the `node_modules` fs path and cache it, or returns `undefined`
+     */
+    private static async getNodeModulesFsPath(workspaceFolder: vscode.WorkspaceFolder, nestingCounter = 0): Promise<NodeModuleConfig | undefined | null> {
+
+        /* Maximum nesting to 3 */
+        if (nestingCounter >= 3) {
+
+            this.userNodeModulesFsPaths.set(workspaceFolder.name, null);
+
+            Output.logError(`No "node_modules" folder found.`);
+
+        }
+        /* If path does not exist yet */
+        else if (!this.userNodeModulesFsPaths.has(workspaceFolder.name)) {
+
+            /* Get up in folders hierarchy based on counter */
+            const nestingFsPath = Array.from(Array(nestingCounter)).map(() => '..');
+
+            /* In a classic scenario, `node_modules` is directly in the workspace folder */
+            const fsPath = path.join(workspaceFolder.uri.fsPath, ...nestingFsPath, this.defaultNodeModulesPath);
+
+            if (await this.isReadable(fsPath, { silent: true })) {
+
+                /* If we are in a parent folder, we may be in Yarn workspaces */
+                const workspaces = (nestingCounter !== 0) ? await this.getPackageWorkspaces(fsPath) : undefined;
+
+                this.userNodeModulesFsPaths.set(workspaceFolder.name, {
+                    fsPath,
+                    workspaces,
+                });
+
+                Output.logInfo(`"node_modules" path detected: ${fsPath}`);
+
+                if (workspaces && (workspaces.length > 0)) {
+                    Output.logInfo(`Yarn workspaces detected: ${workspaces.join(', ')}`);
+                }
+
+            }
+            /* Try again on parent directory */
+            else {
+
+                nestingCounter += 1;
+
+                return await this.getNodeModulesFsPath(workspaceFolder, nestingCounter);
+
+            }
+
+        }
+
+        return this.userNodeModulesFsPaths.get(workspaceFolder.name);
+
+    }
+
+    /**
+     * Try to get Yarn workspaces
+     */
+    private static async getPackageWorkspaces(nodeModulesFsPath: string): Promise<string[]> {
+
+        const packageJsonFsPath = path.join(nodeModulesFsPath, '..', 'package.json');
+
+        const packageJson = await this.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, { silent: true });
+
+        return packageJson?.workspaces ?? [];
 
     }
 
