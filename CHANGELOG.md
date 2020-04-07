@@ -162,6 +162,10 @@ This is especially good news for **contributors**, which can now help more easil
 (for example to add the support of Yarn workspaces asked in
 [#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49)).
 
+### UX
+
+User experience has been improved everywhere it was possible.
+
 ## [3.3.1] - 2020-03-19
 
 ### UX
