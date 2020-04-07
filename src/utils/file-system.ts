@@ -5,14 +5,15 @@ import * as path from 'path';
 import { Output } from './output';
 
 interface PackageJsonSchema {
-    /** The `package.json` of a Yarn workspace will have this property */
-    workspaces?: string[];
+    workspaces?: string[] | {
+        [key: string]: string[];
+    };
 }
 
 interface NodeModuleConfig {
     fsPath: string;
-    /** Tells if there are Yarn workspaces */
-    workspaces?: string[];
+    /** Tells if there is package.json workspaces */
+    packageJsonWorkspaces?: string[];
 }
 
 export class FileSystem {
@@ -37,19 +38,38 @@ export class FileSystem {
             if (await this.isReadable(fsPath, { silent })) {
                 return fsPath;
             }
-            /* Yarn workspaces */
-            else if (nodeModulesConfig.workspaces) {
+            /* If there is package.json workspaces */
+            else if (nodeModulesConfig.packageJsonWorkspaces) {
 
-                /* In Yarn workspaces, dependencies can be in a subdirecty whose name is the same as the workspace folder's name */
-                const yarnWorkspaceFolder = nodeModulesConfig.workspaces.filter((folder) => workspaceFolder.uri.fsPath.endsWith(folder));
+                /* In package.json workspaces, dependencies can be in a subdirecty whose name is the same as the workspace folder's name */
+                const packageWorkspaceFolder = nodeModulesConfig.packageJsonWorkspaces.filter((packageJsonWorkspace) => {
 
-                if (yarnWorkspaceFolder.length > 0) {
+                    /* Try to reconstruct the workspace folder and see if it matches */
+                    const testFsPath = path.join(nodeModulesConfig.fsPath, '..', packageJsonWorkspace);
 
-                    fsPath = path.join(nodeModulesConfig.fsPath, yarnWorkspaceFolder[0], name, 'package.json');
+                    /* Manage glob patterns */
+                    if (packageJsonWorkspace.endsWith('/*')) {
+                        return workspaceFolder.uri.fsPath.startsWith(testFsPath);
+                    }
+                    else {
+                        return (workspaceFolder.uri.fsPath === testFsPath);
+                    }
+
+                });
+
+                if (packageWorkspaceFolder.length === 1) {
+
+                    Output.logInfo(`"package.json" workspace detected: ${packageWorkspaceFolder[0]}`);
+
+                    fsPath = path.join(nodeModulesConfig.fsPath, packageWorkspaceFolder[0], name, 'package.json');
 
                     if (await this.isReadable(fsPath, { silent })) {
                         return fsPath;
                     }
+
+                } else if (packageWorkspaceFolder.length > 1) {
+
+                    Output.logError(`There is a configuration issue in your "package.json" workspaces`);
 
                 }
 
@@ -196,18 +216,18 @@ export class FileSystem {
 
             if (await this.isReadable(fsPath, { silent: true })) {
 
-                /* If we are in a parent folder, we may be in Yarn workspaces */
-                const workspaces = (nestingCounter !== 0) ? await this.getPackageWorkspaces(fsPath) : undefined;
+                /* If we are in a parent folder, we may be in "package.json" workspaces */
+                const packageJsonWorkspaces = (nestingCounter !== 0) ? await this.getPackageJsonWorkspaces(fsPath) : undefined;
 
                 this.userNodeModulesFsPaths.set(workspaceFolder.name, {
                     fsPath,
-                    workspaces,
+                    packageJsonWorkspaces,
                 });
 
                 Output.logInfo(`"node_modules" path detected: ${fsPath}`);
 
-                if (workspaces && (workspaces.length > 0)) {
-                    Output.logInfo(`Yarn workspaces detected: ${workspaces.join(', ')}`);
+                if (packageJsonWorkspaces && (packageJsonWorkspaces.length > 0)) {
+                    Output.logInfo(`"package.json" workspaces detected: ${packageJsonWorkspaces.join(', ')}`);
                 }
 
             }
@@ -227,15 +247,33 @@ export class FileSystem {
     }
 
     /**
-     * Try to get Yarn workspaces
+     * Try to get package.json workspaces
      */
-    private static async getPackageWorkspaces(nodeModulesFsPath: string): Promise<string[]> {
+    private static async getPackageJsonWorkspaces(nodeModulesFsPath: string): Promise<string[]> {
 
         const packageJsonFsPath = path.join(nodeModulesFsPath, '..', 'package.json');
 
         const packageJson = await this.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, { silent: true });
 
-        return packageJson?.workspaces ?? [];
+        const packageJsonWorkspaces = packageJson?.workspaces ?? [];
+
+        const workspaces: string[] = [];
+
+        /* `workspaces` property of `package.json` can be an array or an object */
+        if (Array.isArray(packageJsonWorkspaces)) {
+            workspaces.push(...packageJsonWorkspaces);
+        }
+        else if ((typeof packageJsonWorkspaces === 'object') && (packageJsonWorkspaces !== null)) {
+
+            Object.values(packageJsonWorkspaces)
+                .filter((list) => Array.isArray(list))
+                .forEach((list) => {
+                    workspaces.push(...list);
+                });
+
+        }
+
+        return workspaces;
 
     }
 
