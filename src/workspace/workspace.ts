@@ -200,13 +200,8 @@ export class Workspace {
         Output.logInfo(`Loading configuration of "${workspaceFolder.name}" workspace folder.`);
 
         const folderConfig = new WorkspaceFolderConfig(workspaceFolder);
-
-        try {
-            await folderConfig.init();
-            this.folders.set(workspaceFolder.name, folderConfig);
-        } catch {
-            Output.logWarning(`"${workspaceFolder.name}" workspace folder configuration has not been loaded as it does not seem to be an Angular project. A "angular.json" file should be present at the root of the workspace folder.`);
-        }
+        await folderConfig.init();
+        this.folders.set(workspaceFolder.name, folderConfig);
 
     }
 

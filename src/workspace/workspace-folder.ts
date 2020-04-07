@@ -64,15 +64,15 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             /* Update the workspace folder URI */
             this.uri = vscode.Uri.file(workspaceFolderFsPath);
 
-            const angularConfig = new AngularConfig();
-            angularWatchers.push(...(await angularConfig.init(angularConfigFsPath, {
-                uri: this.uri,
-                name: this.name,
-                index: this.index,
-            })));
-            this.angularConfig = angularConfig;
-
         }
+
+        const angularConfig = new AngularConfig();
+        angularWatchers.push(...(await angularConfig.init({
+            uri: this.uri,
+            name: this.name,
+            index: this.index,
+        }, angularConfigFsPath)));
+        this.angularConfig = angularConfig;
         
         Output.logInfo(`Loading global TSLint configuration.`);
 
@@ -140,7 +140,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
      */
     getDefaultCollections(): string[] {
 
-        return this.angularConfig.defaultCollections;
+        return this.angularConfig?.defaultCollections ?? [];
 
     }
 
@@ -276,7 +276,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${defaultAngularConfigFileNames.join(',')}}`);
 
         /* Third param is the maximum number of results */
-        const searchMatches = await vscode.workspace.findFiles(pattern, undefined, 1);
+        const searchMatches = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
 
         if (searchMatches.length > 0) {
 

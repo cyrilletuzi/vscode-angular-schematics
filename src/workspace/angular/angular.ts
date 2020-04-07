@@ -24,18 +24,23 @@ export class AngularConfig {
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(angularConfigFsPath: string, workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, angularConfigFsPath?: string): Promise<vscode.FileSystemWatcher[]> {
 
-        this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(angularConfigFsPath);
+        if (angularConfigFsPath) {
+
+            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(angularConfigFsPath);
+
+        }
 
         this.setDefaultCollections();
 
-        const projectsWatchers = await this.setProjects(workspaceFolder);
+        const watchers = await this.setProjects(workspaceFolder);
 
-        return [
-            vscode.workspace.createFileSystemWatcher(angularConfigFsPath),
-            ...projectsWatchers,
-        ];
+        if (angularConfigFsPath) {
+            watchers.push(vscode.workspace.createFileSystemWatcher(angularConfigFsPath));
+        }
+
+        return watchers;
         
     }
 
