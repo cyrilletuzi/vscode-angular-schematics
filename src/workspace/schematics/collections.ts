@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { defaultCollectionsNames, defaultAngularCollection } from '../../defaults';
-import { Output, FileSystem } from '../../utils';
+import { Output } from '../../utils';
 
 import { Collection } from './collection';
+import { findCollectionFsPath } from './find-collection';
 
 export class Collections {
 
@@ -18,9 +18,9 @@ export class Collections {
      * **Must** be called after each `new Collections()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<vscode.FileSystemWatcher[]> {
 
-        await this.setList(workspaceFolder, userDefaultCollections);
+        return await this.setList(workspaceFolder, userDefaultCollections);
 
     }
 
@@ -70,12 +70,13 @@ export class Collections {
     /**
      * Set collections names and preload official collections.
      */
-    private async setList(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<void> {
+    private async setList(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<vscode.FileSystemWatcher[]> {
 
         Output.logInfo(`Loading the list of schematics collections.`);
 
         /* Start from scratch as the function can be called again via watcher */
         this.list.clear();
+        const watchers = [];
 
         /* Configuration key is configured in `package.json` */
         const userPreference = vscode.workspace.getConfiguration('ngschematics', workspaceFolder.uri).get<string[]>(`schematics`, []);
@@ -89,7 +90,7 @@ export class Collections {
          * Default collections are set first as they are the most used */
         const collectionsNames = Array.from(new Set([...userDefaultCollections, ...defaultCollectionsNames, ...userCollectionsNames]));
 
-        const existingCollectionsNames = [];
+        const existingCollections: { name: string; fsPath: string; }[] = [];
 
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
@@ -98,58 +99,43 @@ export class Collections {
             /* Be silent on extension defaults, be not on user defined collections */
             const silent = (userDefaultCollections.includes(name) || userCollectionsNames.includes(name)) ? false : true;
 
-            if (await this.isCollectionExisting(workspaceFolder.uri.fsPath, name, { silent })) {
-                existingCollectionsNames.push(name);
+            const fsPath = await findCollectionFsPath(workspaceFolder, name, { silent });
+
+            if (fsPath) {
+                existingCollections.push({ name, fsPath });
             }
     
         }
 
-        if (existingCollectionsNames.length > 0) {
-            Output.logInfo(`${existingCollectionsNames.length} installed collection(s) detected: ${existingCollectionsNames.join(', ')}`);
+        if (existingCollections.length > 0) {
+            Output.logInfo(`${existingCollections.length} installed collection(s) detected: ${existingCollections.map((collection) => collection.name).join(', ')}`);
         } else {
             Output.logError(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
         }
         
         /* `.filter()` is not possible here as there is an async operation */
-        for (const name of existingCollectionsNames) {
+        for (const existingCollection of existingCollections) {
 
-            Output.logInfo(`Loading "${name}" collection.`);
+            Output.logInfo(`Loading "${existingCollection.name}" collection.`);
 
-            const collection = new Collection(name);
+            const collection = new Collection(existingCollection.name);
                     
             try {
-                await collection.init(workspaceFolder.uri.fsPath);
-                this.list.set(name, collection);
+
+                const watcher = await collection.init(workspaceFolder, existingCollection.fsPath);
+                this.list.set(existingCollection.name, collection);
+
+                if (watcher) {
+                    watchers.push(watcher);
+                }
+
             } catch {
-                Output.logError(`Loading of "${name}" collection failed.`);
+                Output.logError(`Loading of "${existingCollection.name}" collection failed.`);
             }
 
         }
 
-    }
-
-    /**
-     * Check if a collection exists
-     */
-    private async isCollectionExisting(workspaceFolderFsPath: string, name: string, { silent = false }): Promise<boolean> {
-
-        let fsPath = '';
-
-        /* Local schematics */
-        if (name.startsWith('.') && name.endsWith('.json')) {
-
-            fsPath = path.join(workspaceFolderFsPath, name);
-
-        }
-        /* Package schematics */
-        else {
-            
-            fsPath = path.join(workspaceFolderFsPath, 'node_modules', name);
-
-        }
-
-        /* It's normal that not all collections exist, so we want to be silent here */
-        return await FileSystem.isReadable(fsPath, { silent });
+        return watchers;
 
     }
 

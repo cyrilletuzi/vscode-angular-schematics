@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -7,6 +8,24 @@ export class FileSystem {
 
     /** Cache for already checked files */
     private static readableFiles = new Set<string>();
+
+    /**
+     * Try to find a package's fs path, or `undefined`
+     */
+    static async findPackageFsPath(workspaceFolder: vscode.WorkspaceFolder, name: string, { silent = false } = {}): Promise<string | undefined> {
+
+        // TODO: [feature] handle custom node_modules folder
+        // TODO: [feature] handle yarn workspaces
+
+        let fsPath = path.join(workspaceFolder.uri.fsPath, 'node_modules', name, 'package.json');
+
+        if (await this.isReadable(fsPath, { silent })) {
+            return fsPath;
+        }
+
+        return undefined;
+
+    }
 
     /**
      * Check if a file exists and is readable.
@@ -27,7 +46,7 @@ export class FileSystem {
         } catch (error) {
 
             if (!silent) {
-                this.showError(fsPath, (error?.code === 'ENOENT') ? `found` : `read`);
+                this.logError(fsPath, (error?.code === 'ENOENT') ? `found` : `read`);
             }
             
             return false;
@@ -75,7 +94,7 @@ export class FileSystem {
 
                 if (!silent) {
 
-                    this.showError(fsPath, `parsed`);
+                    this.logError(fsPath, `parsed`);
 
                 }
 
@@ -111,7 +130,7 @@ export class FileSystem {
      * Display an error message to the user.
      * @param actionFailed Past form of a verb about what fails (eg. `found`)
      */
-    private static showError(fsPath: string, failedAction: string): void {
+    private static logError(fsPath: string, failedAction: string): void {
 
         const message = `"${fsPath}" can not be ${failedAction}.`;
 

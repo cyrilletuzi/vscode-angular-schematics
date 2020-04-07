@@ -36,9 +36,6 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
      */
     async init(): Promise<void> {
 
-        // TODO: [feature] configs could be in parent
-        // TODO: [feature] handle custom node_modules folder
-
         /* Cancel previous file watchers */
         this.disposeWatchers();
 
@@ -83,7 +80,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         Output.logInfo(`Loading schematics configuration.`);
 
         const collections = new Collections();
-        await collections.init({
+        const collectionsWatchers = await collections.init({
             uri: this.uri,
             name: this.name,
             index: this.index,
@@ -110,6 +107,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         this.fileWatchers.push(
             ...angularWatchers,
             tslintWatcher,
+            ...collectionsWatchers,
         );
         for (const watcher of this.fileWatchers) {
             watcher.onDidChange(() => {

@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { ComponentType, defaultComponentTypes } from '../../defaults';
 import { Output, FileSystem } from '../../utils';
@@ -123,10 +122,8 @@ export class ComponentShortcut {
         /* Default custom types */
         for (const defaultType of defaultComponentTypes) {
 
-            const packageFsPath = path.join(workspaceFolder.uri.fsPath, 'node_modules', defaultType.package);
-            
             /* Enable defaults only if the package exists */
-            if (await FileSystem.isReadable(packageFsPath, { silent: true })) {
+            if (await FileSystem.findPackageFsPath(workspaceFolder, defaultType.package, { silent: true })) {
 
                 customTypes.set(defaultType.label, defaultType);
 

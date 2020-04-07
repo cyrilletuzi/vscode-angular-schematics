@@ -4,7 +4,8 @@ import * as path from 'path';
 import { FileSystem, Output } from '../../utils';
 
 import { Schematic, SchematicConfig } from './schematic';
-import { PackageJsonSchema, CollectionJsonSchema } from './json-schemas';
+import { CollectionJsonSchema } from './json-schemas';
+import { findCollectionFsPath } from './find-collection';
 
 export class Collection {
 
@@ -23,22 +24,22 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolderFsPath: string): Promise<vscode.FileSystemWatcher> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, collectionFsPath: string): Promise<vscode.FileSystemWatcher | undefined> {
 
-        /* Can throw */
-        this.fsPath = await this.getFsPath(workspaceFolderFsPath, this.name);
+        this.fsPath = collectionFsPath;
 
-        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(this.fsPath);
+        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
 
         if (!config) {
-            throw new Error(`"${this.name}" collection can not be loaded.`);
+            throw new Error();
         }
 
         this.config = config;
 
-        await this.setSchematics(workspaceFolderFsPath);
+        await this.setSchematics(workspaceFolder);
 
-        return vscode.workspace.createFileSystemWatcher(this.fsPath);
+        /* Only watch local schematics */
+        return !collectionFsPath.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(collectionFsPath) : undefined;
 
     }
 
@@ -66,37 +67,6 @@ export class Collection {
     }
 
     /**
-     * Get the collection filesystem path.
-     */
-    private async getFsPath(workspaceFolderFsPath: string, name: string): Promise<string> {
-
-        /* Local schematics */
-        if (name.startsWith('.') && name.endsWith('.json')) {
-
-            return path.join(workspaceFolderFsPath, name);
-    
-        }
-
-        /* Package schematics */
-        else {
-
-            /* `collection.json` path is defined in `package.json` */
-            const packageJsonFsPath = path.join(workspaceFolderFsPath, 'node_modules', name, 'package.json');
-
-            const packageJsonConfig = await FileSystem.parseJsonFile<PackageJsonSchema>(packageJsonFsPath);
-
-            /* `package.json` should have a `schematics` property with relative path to `collection.json` */
-            if (!packageJsonConfig?.schematics) {
-                throw new Error(`"${this.name}" collection can not be found or read.`);
-            }
-
-            return path.join(path.dirname(packageJsonFsPath), packageJsonConfig.schematics);
-
-        }
-
-    }
-
-    /**
      * Get full schematic name (eg. `@schematics/angular:component`)
      */
     private getFullSchematicName(name: string): string {
@@ -106,7 +76,7 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematics(workspaceFolderFsPath: string): Promise<void> {
+    private async setSchematics(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
         /* Start from scratch as the function can be called again via watcher */
         this.schematics.clear();
@@ -137,10 +107,11 @@ export class Collection {
 
                 const [collectionName] = config.extends.split(':');
 
-                try {
+                const collectionFsPath = await findCollectionFsPath(workspaceFolder, collectionName);
 
-                    /* Can fail */
-                    const collectionFsPath = await this.getFsPath(workspaceFolderFsPath, collectionName);
+                if (!collectionFsPath) {
+                    Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
+                } else {
 
                     schematicConfig = {
                         name,
@@ -149,8 +120,6 @@ export class Collection {
                         collectionFsPath,
                     };
 
-                } catch {
-                    Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
                 }
 
             } else {
