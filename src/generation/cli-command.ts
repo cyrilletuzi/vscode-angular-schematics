@@ -88,6 +88,17 @@ export class CliCommand {
         return this.projectName;
     }
 
+    /** 
+     * Get project's source path, or defaut to `src/app`
+     */
+    getProjectSourcePath(): string {
+        
+        return this.projectName ?
+            path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
+            path.join(this.workspaceFolder.uri.fsPath, 'src/app');
+
+    }
+
     /**
      * Set the project
      */
@@ -128,7 +139,7 @@ export class CliCommand {
     /**
      * Add options
      */
-    addOptions(options: CliCommandOptions): void {
+    addOptions(options: CliCommandOptions | [string, string | string[]][]): void {
 
         for (const [name, option] of options) {
 
@@ -168,9 +179,7 @@ export class CliCommand {
         if (this.nameAsFirstArg) {
 
             /* Get the project path, or defaut to `src/app` */
-            const projectSourcePath = this.projectName ?
-                path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
-                path.join(this.workspaceFolder.uri.fsPath, 'src/app');
+            const projectSourcePath = this.getProjectSourcePath();
 
             /* Default file's suffix is the schematic name (eg. `service`) */
             let suffix = `.${this.schematicName}`;

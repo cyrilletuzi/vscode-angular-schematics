@@ -179,6 +179,17 @@ export class UserJourney {
                     return;
                 }
 
+                /* A module should be imported somewhere, so ask the user */
+                if (!shortcutOptions.has('module')) {
+
+                    const whereToImportModule = await this.askWhereToImportModule();
+
+                    if (whereToImportModule) {
+                        this.cliCommand.addOptions([['module', whereToImportModule]]);
+                    }
+
+                }
+
             }
 
             if (shortcutOptions) {
@@ -364,6 +375,35 @@ export class UserJourney {
         });
 
         return typeChoice ? types.get(typeChoice.label)?.options : undefined;
+
+    }
+
+    private async askWhereToImportModule(): Promise<string | undefined> {
+
+        /* Should look only in the current project */
+        const pattern = new vscode.RelativePattern(this.cliCommand.getProjectSourcePath(), '**/*.module.ts');
+
+        /* Show progress to the user */
+        const existingModulesUris = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Angular Schematics: looking for existing modules, please wait...`,
+        }, () => vscode.workspace.findFiles(pattern, undefined, 50));
+
+        const modulesChoices = existingModulesUris
+            /* Routing module should not be proposed */
+            .filter((uri) => !uri.fsPath.includes('-routing'))
+            .map((uri) => path.basename(uri.fsPath));
+
+        if (modulesChoices.length === 0) {
+            return undefined;
+        }
+
+        const whereToImportChoice = await vscode.window.showQuickPick(modulesChoices, {
+            placeHolder: `Where do you want to import the module?`,
+            ignoreFocusOut: true,
+        });
+
+        return whereToImportChoice?.replace('.module.ts', '');
 
     }
 

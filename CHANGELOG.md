@@ -164,7 +164,12 @@ This is especially good news for **contributors**, which can now help more easil
 
 ### UX
 
-User experience has been improved everywhere it was possible.
+User experience has been improved everywhere it was possible. Non-exhaustive list:
+- show progress on actions taking time
+- icons for default component and module types choices
+- ask where to import the module when doing "Generate a module"
+- if the generated file cannot be opened automatically, propose to refresh the Explorer
+- as the Terminal is now used, output is colored
 
 ## [3.3.1] - 2020-03-19
 
