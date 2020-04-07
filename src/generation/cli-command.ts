@@ -172,15 +172,27 @@ export class CliCommand {
                 path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
                 path.join(this.workspaceFolder.uri.fsPath, 'src/app');
 
-            /* Default file's suffix is the schematic name (eg. `service`),
-            * except for Angular component schematic which can have a specific suffix with the `--type` option */
-            const suffix = ((this.collectionName === defaultAngularCollection) && (this.schematicName === 'component') && this.options.has('type')) ?
-                this.options.get('type')! : this.schematicName;
+            /* Default file's suffix is the schematic name (eg. `service`) */
+            let suffix = `.${this.schematicName}`;
+
+            /* Official Angular schematics have some special cases */
+            if (this.collectionName === defaultAngularCollection) {
+
+                /* Component can have a custom suffix via `--type` option */
+                if ((this.schematicName === 'component') && this.options.has('type')) {
+                    suffix = `.${this.options.get('type')!}`;
+                }
+                /* Classes and interfaces do not have suffix */
+                else if (['class', 'interface'].includes(this.schematicName)) {
+                    suffix = '';
+                }
+
+            }
 
             /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
             const fileName = path.posix.basename(this.nameAsFirstArg);
-            const fileWithSuffixName = `${fileName}.${suffix}.ts`;
+            const fileWithSuffixName = `${fileName}${suffix}.ts`;
 
             /* Schematics are created with or without an intermediate folder */
             let isFlat = true;
