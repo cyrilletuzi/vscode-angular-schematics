@@ -255,10 +255,27 @@ export class UserJourney {
         /* Otherwise ask the user */
         else {
 
-            return vscode.window.showQuickPick(this.workspaceFolder.getAngularProjectsNames(), {
+            const projectsChoices: vscode.QuickPickItem[] = Array.from(this.workspaceFolder.getAngularProjects())
+                .map(([label, project]) => {
+
+                    /* Tell if it is an application or a library, and the path */
+                    const rawDescription = `${this.workspaceFolder.isRootAngularProject(label) ? `root ` : ''}${project.getType()} in ${project.getAppOrLibPath()}`;
+                    /* Uppercase first letter */
+                    const description = `${rawDescription[0].toUpperCase()}${rawDescription.substr(1)}`;
+
+                    return {
+                        label,
+                        description,
+                    };
+
+                });
+
+            const projectChoice = await vscode.window.showQuickPick(projectsChoices, {
                 placeHolder: `In which your Angular projects do you want to generate?`,
                 ignoreFocusOut: true,
             });
+
+            return projectChoice?.label;
 
         } 
 

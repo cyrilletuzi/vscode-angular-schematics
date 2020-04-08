@@ -118,6 +118,13 @@ export class AngularProject {
     }
 
     /**
+     * Get project's type ('application' or 'library')
+     */
+    getType(): AngularProjectType {
+        return this.type;
+    }
+
+    /**
      * Tells if a suffix is authorized in Angular project's tslint.json
      */
     hasComponentSuffix(suffix: string): boolean {

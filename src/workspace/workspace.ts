@@ -114,15 +114,21 @@ export class Workspace {
 
                 Output.logInfo(`There are multiple Code workspaces opened, ask the user which one we should use.`);
 
-                const angularWorkspaceFolders = Array.from(this.folders.keys());
+                const angularWorkspaceFolders: vscode.QuickPickItem[] = Array.from(this.folders)
+                    .map(([label, folder]) => ({
+                        label,
+                        description: folder.uri.fsPath,
+                    }));
 
                 if (angularWorkspaceFolders.length > 0) {
 
                     /* 3. Ask user but with Angular-detected workspace folders only */
-                    folderName = await vscode.window.showQuickPick(angularWorkspaceFolders, {
+                    const folderChoice = await vscode.window.showQuickPick(angularWorkspaceFolders, {
                         placeHolder: `In which of your Angular workspace folders do you want to generate?`,
                         ignoreFocusOut: true,
                     });
+
+                    folderName = folderChoice?.label;
 
                 } else {
 
