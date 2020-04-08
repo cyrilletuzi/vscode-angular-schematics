@@ -31,7 +31,7 @@ export class Collection {
         const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
 
         if (!config) {
-            throw new Error();
+            throw new Error(`Loading of "${this.name}" collection failed.`);
         }
 
         this.config = config;
@@ -84,6 +84,10 @@ export class Collection {
 
         const allSchematics = Object.entries(this.config.schematics);
 
+        if (allSchematics.length === 0) {
+            throw new Error(`No schematic found for "${this.name}" collection, so it is dropped.`);
+        }
+
         Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
 
         const schematics = allSchematics
@@ -91,6 +95,10 @@ export class Collection {
             .filter(([_, config]) => !config.hidden)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
+
+        if (schematics.length === 0) {
+            throw new Error(`No public generation schematic found for "${this.name}" collection, so it is dropped.`);
+        }
 
         Output.logInfo(`${schematics.length} filtered schematic(s) keeped for "${this.name}" collection: ${schematics.map(([name]) => name).join(', ')}`);
 

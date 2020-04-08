@@ -129,8 +129,8 @@ export class Collections {
                     watchers.push(watcher);
                 }
 
-            } catch {
-                Output.logError(`Loading of "${existingCollection.name}" collection failed.`);
+            } catch (error) {
+                Output.logError((error as Error).message);
             }
 
         }

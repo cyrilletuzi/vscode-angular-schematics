@@ -1,6 +1,6 @@
 # Change Log
 
-## [4.0.0-beta.1] - 2020-04-07
+## [4.0.0-beta.2] - 2020-04-07
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
