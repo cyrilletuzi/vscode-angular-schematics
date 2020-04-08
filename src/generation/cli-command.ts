@@ -87,10 +87,12 @@ export class CliCommand {
      * Get project's source path, or defaut to `src/app`
      */
     getProjectSourcePath(): string {
-        
-        return this.projectName ?
-            path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
-            path.join(this.workspaceFolder.uri.fsPath, 'src/app');
+
+        const projectSourcePath = this.projectName ?
+            this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath() :
+            (this.options.get('path') as string | undefined) ?? 'src/app';
+
+        return path.join(this.workspaceFolder.uri.fsPath, projectSourcePath);
 
     }
 
