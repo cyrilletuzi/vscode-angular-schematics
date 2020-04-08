@@ -672,6 +672,8 @@ export class UserJourney {
 
             Terminal.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
 
+            vscode.window.showInformationMessage(`Once the npm install is finished, close and reopen your project.`);
+
         }
 
     }
