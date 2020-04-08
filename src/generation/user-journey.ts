@@ -664,15 +664,23 @@ export class UserJourney {
 
         const fixLabel = `Try to install the missing schematics`;
 
-        const action = await vscode.window.showErrorMessage(message, fixLabel);
+        const fixAction = await vscode.window.showErrorMessage(message, fixLabel);
 
-        if (action === fixLabel) {
+        if (fixAction === fixLabel) {
 
             Output.logInfo(`Trying to npm install ${collectionName}`);
 
             Terminal.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
 
-            vscode.window.showInformationMessage(`Once the npm install is finished, close and reopen your project.`);
+            const reloadLabel = `Reload window`;
+
+            const reloadAction = await vscode.window.showInformationMessage(`Once the npm install is finished, the project must be reloaded.`, reloadLabel);
+
+            if (reloadAction === reloadLabel) {
+
+                vscode.commands.executeCommand('workbench.action.reloadWindow');
+
+            }
 
         }
 
