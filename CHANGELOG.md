@@ -1,6 +1,6 @@
 # Change Log
 
-## [4.0.0-beta.3] - 2020-04-08
+## [4.0.0-beta.4] - 2020-04-08
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
@@ -180,6 +180,10 @@ User experience has been improved everywhere it was possible. Non-exhaustive lis
 - if the generated file cannot be opened automatically, propose to refresh the Explorer
 - as the Terminal is now used, output is colored
 - actionnable fix if a schematics package is missing
+
+### Yarn workspaces
+
+Partially fixes [#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49).
 
 ## [3.3.1] - 2020-03-19
 

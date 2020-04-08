@@ -684,7 +684,7 @@ export class UserJourney {
 
         Output.logError(message);
 
-        const fixLabel = `Try to install the missing schematics`;
+        const fixLabel = `Try to npm install the missing schematics`;
 
         const fixAction = await vscode.window.showErrorMessage(message, fixLabel);
 
