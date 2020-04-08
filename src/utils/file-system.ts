@@ -59,8 +59,6 @@ export class FileSystem {
 
                 if (packageWorkspaceFolder.length === 1) {
 
-                    Output.logInfo(`"package.json" workspace detected: ${packageWorkspaceFolder[0]}`);
-
                     fsPath = path.join(nodeModulesConfig.fsPath, packageWorkspaceFolder[0], name, 'package.json');
 
                     if (await this.isReadable(fsPath, { silent })) {
@@ -195,29 +193,18 @@ export class FileSystem {
     /**
      * Try to get the `node_modules` fs path and cache it, or returns `undefined`
      */
-    private static async getNodeModulesFsPath(workspaceFolder: vscode.WorkspaceFolder, nestingCounter = 0): Promise<NodeModuleConfig | undefined | null> {
+    private static async getNodeModulesFsPath(workspaceFolder: vscode.WorkspaceFolder, contextFsPath?: string): Promise<NodeModuleConfig | undefined | null> {
 
-        /* Maximum nesting to 3 */
-        if (nestingCounter >= 3) {
-
-            this.userNodeModulesFsPaths.set(workspaceFolder.name, null);
-
-            Output.logError(`No "node_modules" folder found.`);
-
-        }
         /* If path does not exist yet */
-        else if (!this.userNodeModulesFsPaths.has(workspaceFolder.name)) {
-
-            /* Get up in folders hierarchy based on counter */
-            const nestingFsPath = Array.from(Array(nestingCounter)).map(() => '..');
+        if (!this.userNodeModulesFsPaths.has(workspaceFolder.name)) {
 
             /* In a classic scenario, `node_modules` is directly in the workspace folder */
-            const fsPath = path.join(workspaceFolder.uri.fsPath, ...nestingFsPath, this.defaultNodeModulesPath);
+            const fsPath = path.join(contextFsPath ?? workspaceFolder.uri.fsPath, this.defaultNodeModulesPath);
 
             if (await this.isReadable(fsPath, { silent: true })) {
 
                 /* If we are in a parent folder, we may be in "package.json" workspaces */
-                const packageJsonWorkspaces = (nestingCounter !== 0) ? await this.getPackageJsonWorkspaces(fsPath) : undefined;
+                const packageJsonWorkspaces = contextFsPath ? await this.getPackageJsonWorkspaces(fsPath) : undefined;
 
                 this.userNodeModulesFsPaths.set(workspaceFolder.name, {
                     fsPath,
@@ -232,11 +219,19 @@ export class FileSystem {
 
             }
             /* Try again on parent directory */
+            else if (contextFsPath !== path.sep) {
+
+                const parentFsPath = path.join(contextFsPath ?? workspaceFolder.uri.fsPath, '..');
+
+                return await this.getNodeModulesFsPath(workspaceFolder, parentFsPath);
+
+            }
+            /* We arrived at root, so stop */
             else {
 
-                nestingCounter += 1;
-
-                return await this.getNodeModulesFsPath(workspaceFolder, nestingCounter);
+                this.userNodeModulesFsPaths.set(workspaceFolder.name, null);
+        
+                Output.logError(`No "node_modules" folder found.`);
 
             }
 
