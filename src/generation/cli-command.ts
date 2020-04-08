@@ -126,7 +126,8 @@ export class CliCommand {
 
                 const pathRelativeToWorkspace = appModulePossibleFsPaths[0].fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
 
-                const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace));
+                /* Path must be in Linux format */
+                const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace).replace(/\\/g, '/'));
 
                 this.options.set('path', commandPath);
 
