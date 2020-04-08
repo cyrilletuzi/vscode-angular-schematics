@@ -18,7 +18,6 @@ interface NodeModuleConfig {
 
 export class FileSystem {
 
-    // TODO: [feature] handle custom node_modules folder
     private static readonly defaultNodeModulesPath = 'node_modules';
     private static userNodeModulesFsPaths = new Map<string, NodeModuleConfig | null>();
     /** Cache for already checked files */
