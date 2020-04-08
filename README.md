@@ -1,7 +1,7 @@
 # Angular schematics extension for Visual Studio Code
 
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
-allowing you to **launch Angular schematics (CLI commands) with a Graphical User Interface, directly inside VS Code!**
+allowing you to **generate Angular schematics with a Graphical User Interface**.
 
 ## Why this extension?
 
@@ -9,16 +9,16 @@ allowing you to **launch Angular schematics (CLI commands) with a Graphical User
 
 This extension will save you time:
 
-- **Simple interface for Angular CLI**: no command line required
-- **Many options are inferred** (like the path and the project)
-- **Generated files will auto open**
-- No more typo errors = no more cleaning mess
-- No more documentation search, all options available are proposed and described
+- Simple interface for Angular CLI: **no command line required**
+- **Many options are pre-filled**
+- **The generated file will auto open**
+- No more typo errors
+- No more search in documentation: all options available are described
 
 ### Good practices
 
 This extension promote **Angular good practices**,
-by improving component generation with the choice of different component types
+by improving component generation with the suggestion of different component types
 (explained below). To separate component types is good for:
 - the **architecture** of your project, ie. **maintainability** and **scalability**,
 - **performances**: pure components are optimized.
@@ -27,7 +27,7 @@ by improving component generation with the choice of different component types
 
 I started this project to help my students learning Angular.
 Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-**this extension helps more than 250 000 developers** like you to be more productive.
+**this extension helps more than 270 000 developers** like you to be more productive.
 
 It's a lot of *free* work.
 So if your company earns money with projects using this extension,
@@ -44,50 +44,44 @@ So if your company earns money with projects using this extension,
 ## Getting started
 
 Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code extensions panel.
+or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code Extensions view.
 
 Then, **you can launch Angular CLI commands from 4 places:**
-- the files Explorer context menu: **right-click on any directory, then choose an "Angular: Generate..." command**
+- the Explorer: **right-click on a directory, then choose "Angular: Generate..."**
 - the dedicated Angular Schematics view (icon in the Activity bar on the left)
 - the Command Palette
-- from a shortcut (see configuration below)
+- with a [keyboard shortcut](./docs/KEYBOARD.md)
+
+**The quickest way to launch a generation is the first: a right-click on a directory in the Explorer.**
+Why? Because in this scenario, the extension will automatically infer
+the path where you want to generate the schematic.
 
 ![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo-20191025.gif)
 
-**The quickest way to launch your Angular CLI commands is the first, with a right-click inside the files Explorer context menu.**
-Why? Because the destination path and `project` will be automatically inferred to the directory you just right-clicked.
-
 ## Requirements
-
-### VS Code
 
 This extension requires Visual Studio Code version >= 1.41.
 
-### Angular CLI
+Basically, in your project, if `ng g component hello` works
+in the VS Code Terminal, the extension should work.
 
-This extension is only enabled inside an Angular CLI project
-(ie. with an `angular.json` file in workspace).
+If the Angular CLI is not working in the VS Code Terminal,
+please correct that first *before* opening a GitHub issue. For examples:
 
-We follow [Angular LTS support](https://angular.io/guide/releases),
-ie. your project should use Angular >= 7.
+- if you use a *custom shell* and your Angular CLI installation is tied to it,
+the Terminal must be configured accordingly in your VS Code settings
+(`terminal.integrated.shell.osx`/ `.linux` / `.windows`).
 
-### Project root
+- non-Angular CLI projects must meet [special requirements](./docs/NO-CLI.md).
 
-**The project opened must be the *root* directory of the Angular project. It won't work from a parent directory, as the CLI itself requires to be in the Angular directory.**
-
-If your Angular project is inside your backend project, and you want both opened in VS Code:
-- open the *root* directory of the Angular project,
-- then in VS Code menu: "File" > "Add Folder to Workspace" > open the directory of your backend project.
-
-### Custom shell
-
-On macOS or Linux, if you use a custom shell (like `zsh`) and your Angular CLI installation is tied it,
-it must be configured accordingly in your VS Code settings
-(`terminal.integrated.shell.osx` or `terminal.integrated.shell.linux`).
+If you have issues with the extension itself, everything is logged in the
+"Angular Schematics" Output channel (second tab left to the Terminal).
+If there are warnings or errors, try to correct your configuration accordingly
+*before* opening a GitHub issue.
 
 ## Recommendations
 
-### VS Code compact folders
+### Compact folders setting
 
 Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
 a new default behavior combines single folders together.
@@ -100,20 +94,8 @@ So you should consider disabling this setting in your VS Code *workspace* prefer
 
 ### Ionic
 
-If you use Ionic, it configures custom default schematics in `angular.json`:
-```json
-{ "cli": { "defaultCollection": "@ionic/angular-toolkit" } }
-```
-
-Unfortunately, these schematics are completely outdated
-(some important options like `--change-detection` or `--skip-selector` are missing),
-and some are even buggy (lazy-loaded module schematics is failing).
-
-While Ionic custom schematics were useful in Ionic 3,
-because Ionic added special things on top of Angular,
-they are now useless in Ionic >= 4, which is just standard Angular.
-So you should remove this line of config in your `angular.json`,
-to take advantage of the official and up to date Angular CLI schematics instead.
+The extension supports **Ionic** projects too,
+but it is recommended to [adjust some Ionic settings](./docs/IONIC.md).
 
 ## Component good practices
 
@@ -129,9 +111,6 @@ Option pre-filled: `--skip-selector`
 A component associated to a route relies on specific features
 (like the `ActivatedRoute` service to get URL params).
 Thus, it should not be called via a HTML tag and so should not have a selector.
-
-Since Angular 9, a modal/dialog must be generated as a page too
-(previously it was a special type: `--entry-component`).
 
 ### Pure component
 
@@ -152,28 +131,59 @@ So if you want to use a component in another module (for example if you are doin
 
 [Learn more about Angular modules and their scopes](https://medium.com/@cyrilletuzi/understanding-angular-modules-ngmodule-and-their-scopes-81e4ed6f7407?source=friends_link&sk=4d246eec7026910c950f19e0a16ee9bd).
 
-## Customize component suffixes (Angular >= 9)
+### Component suffixes
 
-Angular CLI >= 9 introduces a new `type` option for component generation, to change the component's suffix.
+Angular CLI >= 9 introduces a new `--type` option for component generation, to change the component's suffix.
 
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
-To customize component suffixes, **your *root* `tslint.json` config must be changed** like this:
+The extension will add `--type page` automatically for Pages if
+you **change the authorized suffixes in your tslint.json**:
 
-`"component-class-suffix": [true, "Component", "Page", "Dialog"]`.
+```json
+{
+  "rules": {
+    "component-class-suffix": [true, "Component", "Page"]
+  }
+}
+```
 
-Now the extension will ask which component type you want based on this suffixes list,
-and set the `--type` option automatically.
+### Library specific component types
 
-Common suffixes will automatically pre-select the recommended type:
-- Page: `Page`, `Container`, `Smart`, `Routed`, `Route`, `Dialog`, `SnackBar`, `BottomSheet`, `Modal`, `Popover`, `Entry`
-- Pure: `Pure`, `UI`, `Presentation`, `Presentational`, `Dumb`
-- Exported: `Exported`, `Lib`
+The extension suggests these additional component types if the related libraries are installed:
+- Angular Material dialog
+- Angular Material snackbar
+- Angular Material bottomsheet
+- Ionic modal
+- Ionic popover
+- PrimeNG dynamic dialog
 
-The list above includes common suffixes in Angular, Material, Ionic and PrimeNG.
-If you think some other common suffixes are missing, please open a Pull Request with new
-[defaults](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
+As for Pages, a custom `--type`/suffix will be automatically added
+if your `tslint.json` is configured accordingly.
+
+Library authors are encouraged to create a Pull Request to
+easily add defaults components types in
+[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
+
+### Custom component types
+
+You can add custom component types in your VS Code preferences
+(preferably your *workspace* preferences, so all your team can benefit).
+
+For example, non-[Ivy](https://angular.io/guide/ivy) projects
+(ie. Angular <= 8 or Angular >= 9 with Ivy manually disabled)
+can add this deprecated component type for modals/dialogs:
+
+```json
+{
+  "ngschematics.componentTypes": [{
+    "label": "Entry component",
+    "options": [["entryComponent", "true"], ["skipSelector", "true"]],
+    "detail": "Component instanciated at runtime, like a dialog or modal",
+  }]
+}
+```
 
 ## Default options
 
@@ -216,7 +226,7 @@ It can be interesting for the following options:
 
 ## Libraries schematics
 
-By default, this extension supports (if they are installed):
+By default, this extension detects the following schematics:
 - `@schematics/angular` (official Angular CLI commands)
 - `@angular/material`
 - `@ionic/angular-toolkit`
@@ -232,38 +242,29 @@ By default, this extension supports (if they are installed):
 - `./schematics/collection.json`
 
 Scanning all packages to find all potential schematics would be too slow.
-If you are a library author, feel free to open a Pull Request to add your schematics in the
-[default list](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
+If you are a library author, you can open a Pull Request to easily add your schematics package in the
+[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
 
 ## Custom schematics
 
 If you created [your own Angular schematics](https://blog.angular.io/schematics-an-introduction-dc1dfbc2a2b2),
 this extension can load them too. By default, the extension will look into `./schematics/collection.json`.
 
-If your schematics collection path is different,
-you can add:
+If your schematics collection path is different, you can add:
 - a *relative* path in VS Code preferences:
 `"ngschematics.schematics": ["./path/to/collection.json"]`
 - if it's a package in `node_modules`:
 `"ngschematics.schematics": ["my-private-lib"]`
 
-## Other features
+## Multiple projects
 
-### Keyboard shortcuts
+If you work with multiple projects at the same time, the extension supports:
+- VS Code workspace folders
+- Angular CLI monorepo (several `ng g application`s and/or `ng g library`s in the same project)
 
-You can add keyboard shortcuts to the following actions:
-- `ngschematics.generateComponent`
-- `ngschematics.generateService`
-- `ngschematics.generateModule`
-- `ngschematics.generate`
-
-But again, it's not the easiest way to use this extension:
-**a right-click in the files Explorer menu is better as the extension will infer the destination path and `project`**.
-
-### Icons
-
-The icons in the Angular Schematics view will be nicer if you use
-the [Material Icon Theme extension](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme).
+Using a right-click on a directory in the Explorer to launch a schematic generation
+is essential in both these cases, as the Code workspace folder and/or the Angular project
+will be automatically inferred by the extension. Otherwise you will have to choose them manually.
 
 ## Release Notes
 

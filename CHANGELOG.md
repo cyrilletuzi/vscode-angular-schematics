@@ -161,7 +161,6 @@ now the extension may still work, with limited features, if you met these minima
 - Angular CLI installed globally: `npm install @angular/cli -g`
 - Angular Schematics installed locally: `npm install @schematics/angular --save-dev`
 - Add an `angular.json` in your project with at least `{ "version": 1 }`
-- Your project must have a `app.module.ts` file
 
 ### Easier contribution
 
