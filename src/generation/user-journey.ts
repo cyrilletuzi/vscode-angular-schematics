@@ -136,7 +136,19 @@ export class UserJourney {
         this.cliCommand.setSchematic(schematic);
 
         /* Project can only be validated once the schematic is here */
-        await this.cliCommand.validateProject();
+        if (!await this.cliCommand.validateProject()) {
+
+            /* If no project or path has been detected, user is asked about the source path */
+            const sourcePath = await this.askSourcePath();
+
+            if (!sourcePath) {
+                Output.logInfo(`You have canceled the source path choice.`);
+                return;
+            }
+
+            this.cliCommand.addOptions([['path', sourcePath]]);
+
+        }
 
         let nameAsFirstArg: string | undefined;
 
@@ -321,6 +333,16 @@ export class UserJourney {
         });
 
         return choice ? choice.label : undefined;
+
+    }
+
+    private async askSourcePath(): Promise<string | undefined> {
+
+        return vscode.window.showInputBox({
+            prompt: `What is the source path? (Pro-tip: the extension can detect it with a correct "angular.json" or if there is an "app.module.ts" file)`,
+            placeHolder: 'src/app',
+            ignoreFocusOut: true,
+        });
 
     }
 

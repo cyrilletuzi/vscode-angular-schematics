@@ -106,7 +106,7 @@ export class CliCommand {
     /**
      * Add the project in command if available and relevant, or try to find "app.module.ts" path
      */
-    async validateProject(): Promise<void> {
+    async validateProject(): Promise<boolean> {
 
         /* If a project was detected or chosen by the user */
         if (this.projectName) {
@@ -137,11 +137,15 @@ export class CliCommand {
 
             } else {
 
-                Output.logError(`No Angular project or "app.module.ts" detected, the command will probably fail.`);
+                Output.logWarning(`No Angular project or "app.module.ts" detected.`);
+
+                return false;
 
             }
 
         }
+
+        return true;
 
     }
 
