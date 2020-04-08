@@ -1,6 +1,6 @@
 # Change Log
 
-## [4.0.0-beta.2] - 2020-04-07
+## [4.0.0-beta.3] - 2020-04-08
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
@@ -152,6 +152,16 @@ the CLI still support other legacy file names. The extension now supports all of
 - `.angular.json`
 - `angular-cli.json`
 - `.angular-cli.json`
+
+### Support for non-Angular CLI projects
+
+If you do not use the official Angular CLI project structure and configuration,
+now the extension may still work, with limited features, if you met these minimal requirements:
+
+- Angular CLI installed globally: `npm install @angular/cli -g`
+- Angular Schematics installed locally: `npm install @schematics/angular --save-dev`
+- Add an `angular.json` in your project with at least `{ "version": 1 }`
+- Your project must have a `app.module.ts` file
 
 ### Easier contribution
 

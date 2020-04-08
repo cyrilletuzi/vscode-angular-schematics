@@ -284,7 +284,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
         }
 
-        Output.logWarning(`No Angular config file found for "${this.name}" workspace folder. The extension will work but with limited features.`);
+        Output.logError(`No Angular config file found for "${this.name}" workspace folder and the Angular CLI needs it. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
 
         return undefined;
 

@@ -75,8 +75,6 @@ export class UserJourney {
 
         if (this.projectName) {
             Output.logInfo(`Angular project used: "${this.cliCommand.getProjectName()}"`);
-        } else {
-            Output.logWarning(`No Angular project detected, the command will be generated in the root application.`);
         }
 
         /* Collection may be already defined (from shortcut command or from view) */
@@ -134,6 +132,9 @@ export class UserJourney {
 
         this.schematic = schematic;
         this.cliCommand.setSchematic(schematic);
+
+        /* Project can only be validated once the schematic is here */
+        await this.cliCommand.validateProject();
 
         let nameAsFirstArg: string | undefined;
 

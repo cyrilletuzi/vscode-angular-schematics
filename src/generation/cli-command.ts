@@ -68,16 +68,11 @@ export class CliCommand {
     /**
      * Set schematic, and project if relevant.
      */
-    setSchematic(schematic: Schematic): void {
+    async setSchematic(schematic: Schematic): Promise<void> {
 
         this.schematicName = schematic.getName();
 
         this.schematic = schematic;
-
-        /* If a project was detected, the schematic supports it and it's not the root project, add the project */
-        if (this.projectName && schematic.hasOption('project') && !this.workspaceFolder.isRootAngularProject(this.projectName)) {
-            this.options.set('project', this.projectName);
-        }
 
     }
 
@@ -100,10 +95,51 @@ export class CliCommand {
     }
 
     /**
-     * Set the project
+     * Set the project's name
      */
     setProjectName(name: string): void {
         this.projectName = name;
+    }
+
+    /**
+     * Add the project in command if available and relevant, or try to find "app.module.ts" path
+     */
+    async validateProject(): Promise<void> {
+
+        /* If a project was detected or chosen by the user */
+        if (this.projectName) {
+
+            /* We only need to add it to options if the schematic supports it and it's not the root project */
+            if (this.schematic.hasOption('project') && !this.workspaceFolder.isRootAngularProject(this.projectName)) {
+                this.options.set('project', this.projectName);
+            }
+
+        }
+        /* Otherwise try to find the path of "app.module.ts" */
+        else {
+
+            const pattern = new vscode.RelativePattern(this.workspaceFolder, '**/app.module.ts');
+
+            const appModulePossibleFsPaths = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
+
+            if (appModulePossibleFsPaths.length > 0) {
+
+                const pathRelativeToWorkspace = appModulePossibleFsPaths[0].fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
+
+                const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace));
+
+                this.options.set('path', commandPath);
+
+                Output.logInfo(`"app.module.ts" detected in: ${commandPath}`);
+
+            } else {
+
+                Output.logError(`No Angular project or "app.module.ts" detected, the command will probably fail.`);
+
+            }
+
+        }
+
     }
 
     /**

@@ -110,7 +110,7 @@ export class Collections {
         if (existingCollections.length > 0) {
             Output.logInfo(`${existingCollections.length} installed collection(s) detected: ${existingCollections.map((collection) => collection.name).join(', ')}`);
         } else {
-            Output.logError(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
+            Output.logError(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, try to run in the Terminal: "npm install ${defaultAngularCollection} --save-dev"`);
         }
         
         /* `.filter()` is not possible here as there is an async operation */
