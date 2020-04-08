@@ -4,23 +4,11 @@ import * as path from 'path';
 
 import { Output } from './output';
 
-interface PackageJsonSchema {
-    workspaces?: string[] | {
-        [key: string]: string[];
-    };
-}
-
-interface NodeModuleConfig {
-    fsPath: string;
-    /** Tells if there is package.json workspaces */
-    packageJsonWorkspaces?: string[];
-}
-
 export class FileSystem {
 
     // TODO: [feature] handle custom node_modules folder
     private static readonly defaultNodeModulesPath = 'node_modules';
-    private static userNodeModulesFsPaths = new Map<string, NodeModuleConfig | null>();
+    private static userNodeModulesFsPaths = new Map<string, string | null>();
     /** Cache for already checked files */
     private static readableFiles = new Set<string>();
 
@@ -29,48 +17,14 @@ export class FileSystem {
      */
     static async findPackageFsPath(workspaceFolder: vscode.WorkspaceFolder, name: string, { silent = false } = {}): Promise<string | undefined> {
 
-        const nodeModulesConfig = await this.getNodeModulesFsPath(workspaceFolder);
+        const nodeModulesfsPath = await this.getNodeModulesFsPath(workspaceFolder);
 
-        if (nodeModulesConfig) {
+        if (nodeModulesfsPath) {
 
-            let fsPath = path.join(nodeModulesConfig.fsPath, name, 'package.json');
+            let fsPath = path.join(nodeModulesfsPath, name, 'package.json');
 
             if (await this.isReadable(fsPath, { silent })) {
                 return fsPath;
-            }
-            /* If there is package.json workspaces */
-            else if (nodeModulesConfig.packageJsonWorkspaces) {
-
-                /* In package.json workspaces, dependencies can be in a subdirecty whose name is the same as the workspace folder's name */
-                const packageWorkspaceFolder = nodeModulesConfig.packageJsonWorkspaces.filter((packageJsonWorkspace) => {
-
-                    /* Try to reconstruct the workspace folder and see if it matches */
-                    const testFsPath = path.join(nodeModulesConfig.fsPath, '..', packageJsonWorkspace);
-
-                    /* Manage glob patterns */
-                    if (packageJsonWorkspace.endsWith('/*')) {
-                        return workspaceFolder.uri.fsPath.startsWith(testFsPath);
-                    }
-                    else {
-                        return (workspaceFolder.uri.fsPath === testFsPath);
-                    }
-
-                });
-
-                if (packageWorkspaceFolder.length === 1) {
-
-                    fsPath = path.join(nodeModulesConfig.fsPath, packageWorkspaceFolder[0], name, 'package.json');
-
-                    if (await this.isReadable(fsPath, { silent })) {
-                        return fsPath;
-                    }
-
-                } else if (packageWorkspaceFolder.length > 1) {
-
-                    Output.logError(`There is a configuration issue in your "package.json" workspaces`);
-
-                }
-
             }
 
         }
@@ -193,7 +147,7 @@ export class FileSystem {
     /**
      * Try to get the `node_modules` fs path and cache it, or returns `undefined`
      */
-    private static async getNodeModulesFsPath(workspaceFolder: vscode.WorkspaceFolder, contextFsPath?: string): Promise<NodeModuleConfig | undefined | null> {
+    private static async getNodeModulesFsPath(workspaceFolder: vscode.WorkspaceFolder, contextFsPath?: string): Promise<string | undefined | null> {
 
         /* If path does not exist yet */
         if (!this.userNodeModulesFsPaths.has(workspaceFolder.name)) {
@@ -203,19 +157,9 @@ export class FileSystem {
 
             if (await this.isReadable(fsPath, { silent: true })) {
 
-                /* If we are in a parent folder, we may be in "package.json" workspaces */
-                const packageJsonWorkspaces = contextFsPath ? await this.getPackageJsonWorkspaces(fsPath) : undefined;
-
-                this.userNodeModulesFsPaths.set(workspaceFolder.name, {
-                    fsPath,
-                    packageJsonWorkspaces,
-                });
+                this.userNodeModulesFsPaths.set(workspaceFolder.name, fsPath);
 
                 Output.logInfo(`"node_modules" path detected: ${fsPath}`);
-
-                if (packageJsonWorkspaces && (packageJsonWorkspaces.length > 0)) {
-                    Output.logInfo(`"package.json" workspaces detected: ${packageJsonWorkspaces.join(', ')}`);
-                }
 
             }
             /* Try again on parent directory */
@@ -238,37 +182,6 @@ export class FileSystem {
         }
 
         return this.userNodeModulesFsPaths.get(workspaceFolder.name);
-
-    }
-
-    /**
-     * Try to get package.json workspaces
-     */
-    private static async getPackageJsonWorkspaces(nodeModulesFsPath: string): Promise<string[]> {
-
-        const packageJsonFsPath = path.join(nodeModulesFsPath, '..', 'package.json');
-
-        const packageJson = await this.parseJsonFile<PackageJsonSchema>(packageJsonFsPath, { silent: true });
-
-        const packageJsonWorkspaces = packageJson?.workspaces ?? [];
-
-        const workspaces: string[] = [];
-
-        /* `workspaces` property of `package.json` can be an array or an object */
-        if (Array.isArray(packageJsonWorkspaces)) {
-            workspaces.push(...packageJsonWorkspaces);
-        }
-        else if ((typeof packageJsonWorkspaces === 'object') && (packageJsonWorkspaces !== null)) {
-
-            Object.values(packageJsonWorkspaces)
-                .filter((list) => Array.isArray(list))
-                .forEach((list) => {
-                    workspaces.push(...list);
-                });
-
-        }
-
-        return workspaces;
 
     }
 
