@@ -1,6 +1,6 @@
 # Change Log
 
-## [4.0.0-beta.1] - 2020-04-07
+## [4.0.0-beta.3] - 2020-04-08
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
@@ -153,6 +153,15 @@ the CLI still support other legacy file names. The extension now supports all of
 - `angular-cli.json`
 - `.angular-cli.json`
 
+### Support for non-Angular CLI projects
+
+If you do not use the official Angular CLI project structure and configuration,
+now the extension may still work, with limited features, if you met these minimal requirements:
+
+- Angular CLI installed globally: `npm install @angular/cli -g`
+- Angular Schematics installed locally: `npm install @schematics/angular --save-dev`
+- Add an `angular.json` in your project with at least `{ "version": 1 }`
+
 ### Easier contribution
 
 With time, the extension's code became quite messy.
@@ -164,7 +173,13 @@ This is especially good news for **contributors**, which can now help more easil
 
 ### UX
 
-User experience has been improved everywhere it was possible.
+User experience has been improved everywhere it was possible. Non-exhaustive list:
+- show progress on actions taking time
+- icons for default component and module types choices
+- ask where to import the module when doing "Generate a module"
+- if the generated file cannot be opened automatically, propose to refresh the Explorer
+- as the Terminal is now used, output is colored
+- actionnable fix if a schematics package is missing
 
 ## [3.3.1] - 2020-03-19
 

@@ -114,15 +114,21 @@ export class Workspace {
 
                 Output.logInfo(`There are multiple Code workspaces opened, ask the user which one we should use.`);
 
-                const angularWorkspaceFolders = Array.from(this.folders.keys());
+                const angularWorkspaceFolders: vscode.QuickPickItem[] = Array.from(this.folders)
+                    .map(([label, folder]) => ({
+                        label,
+                        description: folder.uri.fsPath,
+                    }));
 
                 if (angularWorkspaceFolders.length > 0) {
 
                     /* 3. Ask user but with Angular-detected workspace folders only */
-                    folderName = await vscode.window.showQuickPick(angularWorkspaceFolders, {
+                    const folderChoice = await vscode.window.showQuickPick(angularWorkspaceFolders, {
                         placeHolder: `In which of your Angular workspace folders do you want to generate?`,
                         ignoreFocusOut: true,
                     });
+
+                    folderName = folderChoice?.label;
 
                 } else {
 
@@ -143,7 +149,7 @@ export class Workspace {
         const folder = this.folders.get(folderName);
 
         if (!folder) {
-            throw new Error(`Cannot find the configuration of the chosen workspace folder. It can happen if there is no "angular.json" at the root of your workspace folder.`);
+            throw new Error();
         }
 
         return folder;
@@ -199,9 +205,13 @@ export class Workspace {
 
         Output.logInfo(`Loading configuration of "${workspaceFolder.name}" workspace folder.`);
 
-        const folderConfig = new WorkspaceFolderConfig(workspaceFolder);
-        await folderConfig.init();
-        this.folders.set(workspaceFolder.name, folderConfig);
+        try {
+            const folderConfig = new WorkspaceFolderConfig(workspaceFolder);
+            await folderConfig.init();
+            this.folders.set(workspaceFolder.name, folderConfig);
+        } catch {
+            Output.logError(`"${workspaceFolder.name}" was dropped as it does not contain any Angular config file. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
+        }
 
     }
 

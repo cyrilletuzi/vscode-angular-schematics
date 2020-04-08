@@ -68,16 +68,11 @@ export class CliCommand {
     /**
      * Set schematic, and project if relevant.
      */
-    setSchematic(schematic: Schematic): void {
+    async setSchematic(schematic: Schematic): Promise<void> {
 
         this.schematicName = schematic.getName();
 
         this.schematic = schematic;
-
-        /* If a project was detected, the schematic supports it and it's not the root project, add the project */
-        if (this.projectName && schematic.hasOption('project') && !this.workspaceFolder.isRootAngularProject(this.projectName)) {
-            this.options.set('project', this.projectName);
-        }
 
     }
 
@@ -88,11 +83,70 @@ export class CliCommand {
         return this.projectName;
     }
 
+    /** 
+     * Get project's source path, or defaut to `src/app`
+     */
+    getProjectSourcePath(): string {
+
+        const projectSourcePath = this.projectName ?
+            this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath() :
+            (this.options.get('path') as string | undefined) ?? 'src/app';
+
+        return path.join(this.workspaceFolder.uri.fsPath, projectSourcePath);
+
+    }
+
     /**
-     * Set the project
+     * Set the project's name
      */
     setProjectName(name: string): void {
         this.projectName = name;
+    }
+
+    /**
+     * Add the project in command if available and relevant, or try to find "app.module.ts" path
+     */
+    async validateProject(): Promise<boolean> {
+
+        /* If a project was detected or chosen by the user */
+        if (this.projectName) {
+
+            /* We only need to add it to options if the schematic supports it and it's not the root project */
+            if (this.schematic.hasOption('project') && !this.workspaceFolder.isRootAngularProject(this.projectName)) {
+                this.options.set('project', this.projectName);
+            }
+
+        }
+        /* Otherwise try to find the path of "app.module.ts" */
+        else {
+
+            const pattern = new vscode.RelativePattern(this.workspaceFolder, '**/app.module.ts');
+
+            const appModulePossibleFsPaths = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
+
+            if (appModulePossibleFsPaths.length > 0) {
+
+                const pathRelativeToWorkspace = appModulePossibleFsPaths[0].fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
+
+                /* Path must be in Linux format */
+                const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace).replace(/\\/g, '/'));
+
+                this.options.set('path', commandPath);
+
+                Output.logInfo(`"app.module.ts" detected in: ${commandPath}`);
+
+            } else {
+
+                Output.logWarning(`No Angular project or "app.module.ts" detected.`);
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
     }
 
     /**
@@ -128,7 +182,7 @@ export class CliCommand {
     /**
      * Add options
      */
-    addOptions(options: CliCommandOptions): void {
+    addOptions(options: CliCommandOptions | [string, string | string[]][]): void {
 
         for (const [name, option] of options) {
 
@@ -168,9 +222,7 @@ export class CliCommand {
         if (this.nameAsFirstArg) {
 
             /* Get the project path, or defaut to `src/app` */
-            const projectSourcePath = this.projectName ?
-                path.join(this.workspaceFolder.uri.fsPath, this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath()) :
-                path.join(this.workspaceFolder.uri.fsPath, 'src/app');
+            const projectSourcePath = this.getProjectSourcePath();
 
             /* Default file's suffix is the schematic name (eg. `service`) */
             let suffix = `.${this.schematicName}`;

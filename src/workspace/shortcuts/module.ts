@@ -21,7 +21,7 @@ export class ModuleShortcut {
         this.types.set(MODULE_TYPE.DEFAULT, {
             choice: {
                 label: MODULE_TYPE.DEFAULT,
-                detail: `Module of UI / presentation components, don't forget to import it somewhere`,
+                detail: `Module of UI / presentation components`,
             },
             options: new Map(),
         });

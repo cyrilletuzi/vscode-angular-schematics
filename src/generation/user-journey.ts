@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultAngularCollection, extensionName } from '../defaults';
-import { Output, FileSystem } from '../utils';
+import { Output, FileSystem, Terminal } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collection, Schematic } from '../workspace/schematics';
 import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
@@ -31,7 +31,7 @@ export class UserJourney {
             }, () => Workspace.whenStable());
 
         } catch {
-            Output.showError(`Command canceled: loading configurations needed for ${extensionName} extension was too long.`);
+            Output.showError(`Loading configurations needed for ${extensionName} extension was too long. Check Output channel for error logs.`);
             return;
         }
 
@@ -39,9 +39,8 @@ export class UserJourney {
         /* Get workspace folder configuration */
         try {
             workspaceFolder = await Workspace.askFolder(contextUri);
-        } catch (error) {
-            /* Not supposed to happen */
-            Output.showError((error as Error).message);
+        } catch {
+            Output.showError(`No Angular config file found for the chosen workspace. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
             return;
         }
 
@@ -75,8 +74,6 @@ export class UserJourney {
 
         if (this.projectName) {
             Output.logInfo(`Angular project used: "${this.cliCommand.getProjectName()}"`);
-        } else {
-            Output.logWarning(`No Angular project detected, the command will be generated in the root application.`);
         }
 
         /* Collection may be already defined (from shortcut command or from view) */
@@ -84,9 +81,9 @@ export class UserJourney {
 
             try {
                 collectionName = await this.askCollectionName();
-            } catch (error) {
+            } catch {
                 /* Happens if `@schematics/angular` is not installed */
-                Output.showError((error as Error).message);
+                this.showCollectionMissingErrorWithFix(defaultAngularCollection);
                 return;
             }
 
@@ -105,8 +102,11 @@ export class UserJourney {
         const collection = this.workspaceFolder.collections.getCollection(collectionName);
 
         if (!collection) {
-            Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
+
+            this.showCollectionMissingErrorWithFix(collectionName);
+
             return;
+
         }
 
         this.collection = collection;
@@ -128,12 +128,27 @@ export class UserJourney {
         const schematic = this.collection.getSchematic(schematicName);
 
         if (!schematic) {
-            Output.showError(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
+            Output.showError(`Cannot load "${collectionName}:${schematicName}" schematic. See Output channel for error logs.`);
             return;
         }
 
         this.schematic = schematic;
         this.cliCommand.setSchematic(schematic);
+
+        /* Project can only be validated once the schematic is here */
+        if (!await this.cliCommand.validateProject()) {
+
+            /* If no project or path has been detected, user is asked about the source path */
+            const sourcePath = await this.askSourcePath();
+
+            if (!sourcePath) {
+                Output.logInfo(`You have canceled the source path choice.`);
+                return;
+            }
+
+            this.cliCommand.addOptions([['path', sourcePath]]);
+
+        }
 
         let nameAsFirstArg: string | undefined;
 
@@ -179,6 +194,17 @@ export class UserJourney {
                     return;
                 }
 
+                /* A module should be imported somewhere, so ask the user */
+                if (!shortcutOptions.has('module')) {
+
+                    const whereToImportModule = await this.askWhereToImportModule();
+
+                    if (whereToImportModule) {
+                        this.cliCommand.addOptions([['module', whereToImportModule]]);
+                    }
+
+                }
+
             }
 
             if (shortcutOptions) {
@@ -221,7 +247,7 @@ export class UserJourney {
             /* Show progress to the user */
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `Angular Schematics: launching the generation, please wait...`,
+                title: `${extensionName}: launching the generation, please wait...`,
             }, () => this.jumpToFile(this.cliCommand.guessGereratedFileFsPath()));
 
         } catch {
@@ -244,10 +270,27 @@ export class UserJourney {
         /* Otherwise ask the user */
         else {
 
-            return vscode.window.showQuickPick(this.workspaceFolder.getAngularProjectsNames(), {
+            const projectsChoices: vscode.QuickPickItem[] = Array.from(this.workspaceFolder.getAngularProjects())
+                .map(([label, project]) => {
+
+                    /* Tell if it is an application or a library, and the path */
+                    const rawDescription = `${this.workspaceFolder.isRootAngularProject(label) ? `root ` : ''}${project.getType()} in ${project.getAppOrLibPath()}`;
+                    /* Uppercase first letter */
+                    const description = `${rawDescription[0].toUpperCase()}${rawDescription.substr(1)}`;
+
+                    return {
+                        label,
+                        description,
+                    };
+
+                });
+
+            const projectChoice = await vscode.window.showQuickPick(projectsChoices, {
                 placeHolder: `In which your Angular projects do you want to generate?`,
                 ignoreFocusOut: true,
             });
+
+            return projectChoice?.label;
 
         } 
 
@@ -256,7 +299,7 @@ export class UserJourney {
     private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.workspaceFolder.collections.getCollectionsNames().length === 0) {
-            throw new Error(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
+            throw new Error();
         }
         
         else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
@@ -290,6 +333,16 @@ export class UserJourney {
         });
 
         return choice ? choice.label : undefined;
+
+    }
+
+    private async askSourcePath(): Promise<string | undefined> {
+
+        return vscode.window.showInputBox({
+            prompt: `What is the source path? (Pro-tip: the extension can detect it with a correct "angular.json" or if there is an "app.module.ts" file)`,
+            placeHolder: 'src/app',
+            ignoreFocusOut: true,
+        });
 
     }
 
@@ -364,6 +417,35 @@ export class UserJourney {
         });
 
         return typeChoice ? types.get(typeChoice.label)?.options : undefined;
+
+    }
+
+    private async askWhereToImportModule(): Promise<string | undefined> {
+
+        /* Should look only in the current project */
+        const pattern = new vscode.RelativePattern(this.cliCommand.getProjectSourcePath(), '**/*.module.ts');
+
+        /* Show progress to the user */
+        const existingModulesUris = await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `${extensionName}: looking for existing modules, please wait...`,
+        }, () => vscode.workspace.findFiles(pattern, undefined, 50));
+
+        const modulesChoices = existingModulesUris
+            /* Routing module should not be proposed */
+            .filter((uri) => !uri.fsPath.includes('-routing'))
+            .map((uri) => path.basename(uri.fsPath));
+
+        if (modulesChoices.length === 0) {
+            return undefined;
+        }
+
+        const whereToImportChoice = await vscode.window.showQuickPick(modulesChoices, {
+            placeHolder: `Where do you want to import the module?`,
+            ignoreFocusOut: true,
+        });
+
+        return whereToImportChoice?.replace('.module.ts', '');
 
     }
 
@@ -590,6 +672,38 @@ export class UserJourney {
         if (action === refreshLabel) {
             /* Refresh Explorer, otherwise you may not see the generated files */
             vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+        }
+
+    }
+
+    private async showCollectionMissingErrorWithFix(collectionName: string): Promise<void> {
+
+        const message = (collectionName === defaultAngularCollection) ?
+            `"${collectionName}" should be present in a correctly installed Angular project.` :
+            `Cannot load "${collectionName}" collection. It may not exist in "${this.workspaceFolder.name}" workspace folder.`;
+
+        Output.logError(message);
+
+        const fixLabel = `Try to install the missing schematics`;
+
+        const fixAction = await vscode.window.showErrorMessage(message, fixLabel);
+
+        if (fixAction === fixLabel) {
+
+            Output.logInfo(`Trying to npm install ${collectionName}`);
+
+            Terminal.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
+
+            const reloadLabel = `Reload window`;
+
+            const reloadAction = await vscode.window.showInformationMessage(`Once the npm install is finished, the project must be reloaded.`, reloadLabel);
+
+            if (reloadAction === reloadLabel) {
+
+                vscode.commands.executeCommand('workbench.action.reloadWindow');
+
+            }
+
         }
 
     }
