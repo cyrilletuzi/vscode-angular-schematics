@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { defaultAngularCollection, extensionName } from '../defaults';
-import { Output, FileSystem } from '../utils';
+import { Output, FileSystem, Terminal } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collection, Schematic } from '../workspace/schematics';
 import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
@@ -31,7 +31,7 @@ export class UserJourney {
             }, () => Workspace.whenStable());
 
         } catch {
-            Output.showError(`Command canceled: loading configurations needed for ${extensionName} extension was too long.`);
+            Output.showError(`Loading configurations needed for ${extensionName} extension was too long. Check Output channel for error logs.`);
             return;
         }
 
@@ -39,9 +39,8 @@ export class UserJourney {
         /* Get workspace folder configuration */
         try {
             workspaceFolder = await Workspace.askFolder(contextUri);
-        } catch (error) {
-            /* Not supposed to happen */
-            Output.showError((error as Error).message);
+        } catch {
+            Output.showError(`No Angular config file found for the chosen workspace. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
             return;
         }
 
@@ -82,9 +81,9 @@ export class UserJourney {
 
             try {
                 collectionName = await this.askCollectionName();
-            } catch (error) {
+            } catch {
                 /* Happens if `@schematics/angular` is not installed */
-                Output.showError((error as Error).message);
+                this.showCollectionMissingErrorWithFix(defaultAngularCollection);
                 return;
             }
 
@@ -103,12 +102,11 @@ export class UserJourney {
         const collection = this.workspaceFolder.collections.getCollection(collectionName);
 
         if (!collection) {
-            if (collectionName === defaultAngularCollection) {
-                Output.showError(`"${defaultAngularCollection}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, run in the Terminal: "npm install ${defaultAngularCollection} --save-dev"`);
-            } else {
-                Output.showError(`Cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
-            }
+
+            this.showCollectionMissingErrorWithFix(collectionName);
+
             return;
+
         }
 
         this.collection = collection;
@@ -130,7 +128,7 @@ export class UserJourney {
         const schematic = this.collection.getSchematic(schematicName);
 
         if (!schematic) {
-            Output.showError(`Command canceled: cannot load "${collectionName}:${schematicName}" schematic.`);
+            Output.showError(`Cannot load "${collectionName}:${schematicName}" schematic. See Output channel for error logs.`);
             return;
         }
 
@@ -237,7 +235,7 @@ export class UserJourney {
             /* Show progress to the user */
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `Angular Schematics: launching the generation, please wait...`,
+                title: `${extensionName}: launching the generation, please wait...`,
             }, () => this.jumpToFile(this.cliCommand.guessGereratedFileFsPath()));
 
         } catch {
@@ -289,7 +287,7 @@ export class UserJourney {
     private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.workspaceFolder.collections.getCollectionsNames().length === 0) {
-            throw new Error(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project.`);
+            throw new Error();
         }
         
         else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
@@ -408,7 +406,7 @@ export class UserJourney {
         /* Show progress to the user */
         const existingModulesUris = await vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Angular Schematics: looking for existing modules, please wait...`,
+            title: `${extensionName}: looking for existing modules, please wait...`,
         }, () => vscode.workspace.findFiles(pattern, undefined, 50));
 
         const modulesChoices = existingModulesUris
@@ -652,6 +650,28 @@ export class UserJourney {
         if (action === refreshLabel) {
             /* Refresh Explorer, otherwise you may not see the generated files */
             vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+        }
+
+    }
+
+    private async showCollectionMissingErrorWithFix(collectionName: string): Promise<void> {
+
+        const message = (collectionName === defaultAngularCollection) ?
+            `"${collectionName}" should be present in a correctly installed Angular project.` :
+            `Cannot load "${collectionName}" collection. It may not exist in "${this.workspaceFolder.name}" workspace folder.`;
+
+        Output.logError(message);
+
+        const fixLabel = `Try to install the missing schematics`;
+
+        const action = await vscode.window.showErrorMessage(message, fixLabel);
+
+        if (action === fixLabel) {
+
+            Output.logInfo(`Trying to npm install ${collectionName}`);
+
+            Terminal.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
+
         }
 
     }

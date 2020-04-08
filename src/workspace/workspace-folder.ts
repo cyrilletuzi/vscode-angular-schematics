@@ -49,19 +49,15 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
         const angularWatchers: vscode.FileSystemWatcher[] = [];
 
-        if (angularConfigFsPath) {
+        /* Keep only the directory part */
+        const workspaceFolderFsPath = path.dirname(angularConfigFsPath);
 
-            /* Keep only the directory part */
-            const workspaceFolderFsPath = path.dirname(angularConfigFsPath);
-
-            if (workspaceFolderFsPath !== this.uri.fsPath) {
-                Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderFsPath}`);
-            }
-
-            /* Update the workspace folder URI */
-            this.uri = vscode.Uri.file(workspaceFolderFsPath);
-
+        if (workspaceFolderFsPath !== this.uri.fsPath) {
+            Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderFsPath}`);
         }
+
+        /* Update the workspace folder URI */
+        this.uri = vscode.Uri.file(workspaceFolderFsPath);
 
         const angularConfig = new AngularConfig();
         angularWatchers.push(...(await angularConfig.init({
@@ -268,7 +264,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     /**
      * Try to find the Angular config file's fs path, or `undefined`
      */
-    private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string | undefined> {
+    private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string> {
 
         /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
         const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${defaultAngularConfigFileNames.join(',')}}`);
@@ -284,9 +280,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
         }
 
-        Output.logError(`No Angular config file found for "${this.name}" workspace folder and the Angular CLI needs it. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
-
-        return undefined;
+        throw new Error();
 
     }
 

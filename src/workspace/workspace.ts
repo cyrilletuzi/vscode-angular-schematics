@@ -149,7 +149,7 @@ export class Workspace {
         const folder = this.folders.get(folderName);
 
         if (!folder) {
-            throw new Error(`Cannot find the configuration of the chosen workspace folder. It can happen if there is no "angular.json" at the root of your workspace folder.`);
+            throw new Error();
         }
 
         return folder;
@@ -205,9 +205,13 @@ export class Workspace {
 
         Output.logInfo(`Loading configuration of "${workspaceFolder.name}" workspace folder.`);
 
-        const folderConfig = new WorkspaceFolderConfig(workspaceFolder);
-        await folderConfig.init();
-        this.folders.set(workspaceFolder.name, folderConfig);
+        try {
+            const folderConfig = new WorkspaceFolderConfig(workspaceFolder);
+            await folderConfig.init();
+            this.folders.set(workspaceFolder.name, folderConfig);
+        } catch {
+            Output.logError(`"${workspaceFolder.name}" was dropped as it does not contain any Angular config file. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
+        }
 
     }
 
