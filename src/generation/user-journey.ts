@@ -103,7 +103,11 @@ export class UserJourney {
         const collection = this.workspaceFolder.collections.getCollection(collectionName);
 
         if (!collection) {
-            Output.showError(`Command canceled: cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
+            if (collectionName === defaultAngularCollection) {
+                Output.showError(`"${defaultAngularCollection}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, run in the Terminal: "npm install ${defaultAngularCollection} --save-dev"`);
+            } else {
+                Output.showError(`Cannot load "${collectionName}" collection. It may not exist in "${workspaceFolder.name}" workspace folder.`);
+            }
             return;
         }
 
