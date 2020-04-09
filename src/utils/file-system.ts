@@ -163,7 +163,8 @@ export class FileSystem {
 
             }
             /* Try again on parent directory */
-            else if (contextFsPath !== path.sep) {
+            else if (((path.sep === '/') && (contextFsPath !== path.sep)) ||
+            (contextFsPath && (path.sep === '\\') && (contextFsPath.split(path.sep).length <= 2))) {
 
                 const parentFsPath = path.join(contextFsPath ?? workspaceFolder.uri.fsPath, '..');
 
