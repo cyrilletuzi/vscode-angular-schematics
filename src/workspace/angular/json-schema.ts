@@ -11,10 +11,10 @@ export interface AngularJsonSchematicsSchema {
 }
 
 export interface AngularJsonProjectSchema {
-    /** Angular projects are `application` by default, but can be `library` too */
-    projectType: AngularProjectType;
-    /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
-    root: string;
+    /** Required project type, Angular projects are `application` by default, but can be `library` too. */
+    projectType?: AngularProjectType;
+    /** Required. Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
+    root?: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     sourceRoot?: string;
     /** Default values for schematics options */

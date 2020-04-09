@@ -59,9 +59,8 @@ export class TslintConfig {
         /* Check we are in the 3rd case */
         if (Array.isArray(tslintRule) && tslintRule.length > 1) {
 
-            /* Removes the first value (`true`)
-             * Type cast is required as TypeScript cannot do it itself in this case */
-            const tslintSuffixes = tslintRule.slice(1) as string[];
+            /* Removes the first value (`true`) */
+            const tslintSuffixes = tslintRule.slice(1).filter((suffix) => (typeof suffix === 'string')) as string[];
 
             suffixes.push(...tslintSuffixes);
 
