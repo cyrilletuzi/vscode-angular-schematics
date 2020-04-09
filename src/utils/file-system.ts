@@ -163,20 +163,23 @@ export class FileSystem {
 
             }
             /* Try again on parent directory */
-            else if (((path.sep === '/') && (contextFsPath !== path.sep)) ||
-            (contextFsPath && (path.sep === '\\') && (contextFsPath.split(path.sep).length <= 2))) {
+            else {
 
                 const parentFsPath = path.join(contextFsPath ?? workspaceFolder.uri.fsPath, '..');
 
-                return await this.getNodeModulesFsPath(workspaceFolder, parentFsPath);
+                if (contextFsPath !== parentFsPath) {
+    
+                    return await this.getNodeModulesFsPath(workspaceFolder, parentFsPath);
 
-            }
-            /* We arrived at root, so stop */
-            else {
+                }
+                /* We arrived at root, so stop */
+                else {
 
-                this.userNodeModulesFsPaths.set(workspaceFolder.name, null);
-        
-                Output.logError(`No "node_modules" folder found.`);
+                    this.userNodeModulesFsPaths.set(workspaceFolder.name, null);
+            
+                    Output.logError(`No "node_modules" folder found.`);
+
+                }
 
             }
 
