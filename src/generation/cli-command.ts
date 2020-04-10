@@ -243,6 +243,10 @@ export class CliCommand {
                 else if (['class', 'interface'].includes(this.schematicName)) {
                     suffix = '';
                 }
+                /* Web workers have not the same suffix as the schematic's name */
+                else if (this.schematicName === 'webWorker') {
+                    suffix = '.worker';
+                }
 
             }
 
