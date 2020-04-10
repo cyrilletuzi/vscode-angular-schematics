@@ -33,31 +33,18 @@ export class AngularProject {
 
         this.schematicsDefaults = config.schematics;
 
-        const possibleProjectTypes: AngularProjectType[] = ['application', 'library'];
-
-        /* `projectType` is supposed to be required, but default to `application` for safety */
-        if (config.projectType && possibleProjectTypes.includes(config.projectType)) {
-            this.type = config.projectType;
-        } else {
-            this.type = 'application';
-            Output.logWarning(`Your Angular configuration file should contain a "projectType" property with "application" or "library" for your "${this.name}" project. Default to "application".`);
-        }
+        this.type = config.projectType;
 
         /* Project's path relative to workspace folder (ie. where `angular.json` is).
          * For the main application, it's empty as it's directly in the workspace folder.
          * For sub-applications/libraries, it's `<projects-root>/hello-world`. */
-        if (typeof config.root === 'string') {
-            this.rootPath = config.root;
-        } else {
-            this.rootPath = '';
-            Output.logWarning(`Your Angular configuration file should contain a "root" string property for your "${this.name}" project. Default to "".`);
-        }
+        this.rootPath = config.root;
 
         /* Project's source path relative to workspace folder (ie. where `angular.json` is).
          * For the main application, it's `src` by default but can be customized.
          * For sub-applications/libraries, it's `<projects-root>/hello-world/<src-or-something-else>`.
          * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
-        if (typeof config.sourceRoot === 'string') {
+        if (config.sourceRoot !== undefined) {
             this.sourcePath = config.sourceRoot;
         } else {
             this.sourcePath = path.posix.join(this.rootPath, 'src');

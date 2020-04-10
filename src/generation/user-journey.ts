@@ -40,7 +40,7 @@ export class UserJourney {
         try {
             workspaceFolder = await Workspace.askFolder(contextUri);
         } catch {
-            Output.showError(`No Angular config file found for the chosen workspace. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
+            Output.showError(`No valid Angular config file found for the chosen workspace. Add a "angular.json" file in your project with \`{ "version": 1 }\``);
             return;
         }
 
