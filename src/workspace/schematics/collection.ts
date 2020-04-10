@@ -186,6 +186,8 @@ export class Collection {
 
         }
 
+        this.schematicsChoices = this.schematicsChoices.sort((a, b) => a.label.localeCompare(b.label));
+
     }
 
     /**
