@@ -353,10 +353,10 @@ export class UserJourney {
 
         Output.logInfo(`Context path detected for default argument: "${contextPath}"`);
 
-        let prompt = `Name or path/to/name ${projectName ? `in project '${projectName}'` : 'in default project'}?`;
+        let prompt = `Choose the name${this.schematic.hasOption('path') ? ` or path/to/name` : ''}.`;
 
         /* Pro-tip to educate users that it is easier to launch the command from a right-click in Explorer */
-        if (this.workspaceFolder.isRootAngularProject(projectName) && !contextPath) {
+        if (this.schematic.hasOption('path') && this.workspaceFolder.isRootAngularProject(projectName) && !contextPath) {
             prompt = `${prompt} Pro-tip: the path can be inferred if you right-click on the directory where you want to generate.`;
         }
 
