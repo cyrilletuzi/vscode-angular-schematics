@@ -1,28 +1,21 @@
-export interface PackageJsonSchema {
-    /**
-     * `package.json` should have a `schematics` property with the relative path to `collection.json`
-     */
-    schematics?: string;
+export interface CollectionSchematicJsonSchema {
+    /** Relative path to `schema.json` */
+    schema?: string;
+    description?: string;
+    /** Some schematics are internal for Angular CLI */
+    hidden?: boolean;
+    /** Some schematics extend another one */
+    extends?: string;
 }
 
 export interface CollectionJsonSchema {
-    schematics: {
-        /** Key is the schematic's name */
-        [key: string]: {
-            /** Relative path to `schema.json` */
-            schema: string;
-            description: string;
-            /** Some schematics are internal for Angular CLI */
-            hidden?: boolean;
-            /** Some schematics extend another one */
-            extends?: string;
-        };
-    };
+    /** Key is the schematic's name */
+    schematics: Map<string, CollectionSchematicJsonSchema>;
 }
 
 export interface SchematicOptionJsonSchema {
     type: 'string' | 'boolean' | 'array';
-    description: string;
+    description?: string;
     enum?: string[];
     /** Some option are internal to Angular CLI */
     visible?: boolean;
@@ -52,10 +45,8 @@ export interface SchematicOptionJsonSchema {
 }
 
 export interface SchematicJsonSchema {
-    properties: {
-        /** Key is the option's name */
-        [key: string]: SchematicOptionJsonSchema;
-    };
+    /** Key is the option's name */
+    properties: Map<string, SchematicOptionJsonSchema>;
     /** Some options may be required */
     required?: string[];
 }

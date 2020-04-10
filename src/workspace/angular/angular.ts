@@ -26,7 +26,7 @@ export class AngularConfig {
      */
     async init(workspaceFolder: vscode.WorkspaceFolder, angularConfigFsPath: string): Promise<vscode.FileSystemWatcher[]> {
 
-        this.config = this.validateConfig(await FileSystem.parseJsonFile<unknown>(angularConfigFsPath));
+        this.config = this.validateConfig(await FileSystem.parseJsonFile(angularConfigFsPath));
 
         this.setDefaultCollections();
 
@@ -45,7 +45,7 @@ export class AngularConfig {
      * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
      */
     getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
-        return this.config?.schematics?.[schematicsFullName]?.[optionName];
+        return this.config?.schematics?.get(schematicsFullName)?.[optionName];
     }
 
     /**
@@ -64,7 +64,7 @@ export class AngularConfig {
 
         const possibleProjectTypes: AngularProjectType[] = ['application', 'library'];
 
-        const projectsEntries = Object.entries(JsonValidator.object(config.projects) ?? {})
+        const projects = new Map(Object.entries(JsonValidator.object(config.projects) ?? {})
             .map(([name, rawOptions]) => {
                 
                 const options = JsonValidator.object(rawOptions) ?? {};
@@ -91,10 +91,9 @@ export class AngularConfig {
                     sourceRoot: JsonValidator.string(options.sourceRoot),
                     schematics: this.validateConfigSchematics(options.schematics),
                 }];
-            });
-        const projects = Object.fromEntries(projectsEntries);
+            }));
 
-        if (projectsEntries.length === 0) {
+        if (projects.size === 0) {
             Output.logWarning(`No "projects" detected in your Angular config file. You should correct that.`);
         }
 
@@ -114,10 +113,10 @@ export class AngularConfig {
      */
     private validateConfigSchematics(config: unknown): AngularJsonSchematicsSchema {
 
-        return Object.fromEntries(Object.entries(JsonValidator.object(config) ?? {})
-        .map(([name, options]) => [name, {
-            flat: JsonValidator.boolean(JsonValidator.object(options)?.flat),
-        }]));
+        return new Map(Object.entries(JsonValidator.object(config) ?? {})
+            .map(([name, options]) => [name, {
+                flat: JsonValidator.boolean(JsonValidator.object(options)?.flat),
+            }]));
 
     }
 
@@ -146,13 +145,10 @@ export class AngularConfig {
         this.projects.clear();
         const watchers: vscode.FileSystemWatcher[] = [];
 
-        /* Get `projects` in `angular.json`*/
-        const projectsFromConfig = Object.entries(this.config.projects);
-
-        Output.logInfo(`${projectsFromConfig.length} Angular project(s) detected.`);
+        Output.logInfo(`${this.config.projects.size} Angular project(s) detected.`);
 
         /* Transform Angular config with more convenient information for this extension */
-        for (const [name, config] of projectsFromConfig) {
+        for (const [name, config] of this.config.projects) {
 
             const project = new AngularProject(name, config);
             watchers.push(await project.init(workspaceFolder));

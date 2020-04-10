@@ -5,10 +5,8 @@ export interface AngularJsonSchematicsOptionsSchema {
     flat?: boolean;
 }
 
-export interface AngularJsonSchematicsSchema {
-    /** Key will be the full schematics name (eg.: "@schematics/angular") */
-    [key: string]: AngularJsonSchematicsOptionsSchema;
-}
+/** Key will be the full schematics name (eg.: "@schematics/angular") */
+export type AngularJsonSchematicsSchema = Map<string, AngularJsonSchematicsOptionsSchema>;
 
 export interface AngularJsonProjectSchema {
     /** Required project type, Angular projects are `application` by default, but can be `library` too. */
@@ -38,10 +36,7 @@ export interface AngularJsonSchema {
      * List of Angular projects.
      * While it's optional in CLI JSON schema, a workspace folder should have at least one project.
      */
-    projects: {
-        /** Name of the project */
-        [key: string]: AngularJsonProjectSchema;
-    };
+    projects: Map<string, AngularJsonProjectSchema>;
 }
 
 export interface TslintJsonSchema {

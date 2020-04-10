@@ -511,7 +511,7 @@ export class UserJourney {
             const promptSchema = option?.['x-prompt'];
 
             /* Some schematics have a prompt message already defined, otherwise we use the description */
-            const prompt = promptSchema?.message ?? option.description;
+            const prompt = promptSchema?.message ?? option.description ?? `What value do you want for this option?`;
 
             // TODO: [feature] Take user defaults in angular.json into account in ordering
     

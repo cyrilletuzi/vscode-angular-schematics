@@ -140,7 +140,7 @@ export class AngularProject {
      * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
      */
     getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
-        return this.schematicsDefaults?.[schematicsFullName]?.[optionName];
+        return this.schematicsDefaults?.get(schematicsFullName)?.[optionName];
     }
 
 }

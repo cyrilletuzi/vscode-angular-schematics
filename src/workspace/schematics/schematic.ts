@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Output } from '../../utils';
-import { SchematicJsonSchema, SchematicOptionJsonSchema, CollectionJsonSchema } from './json-schemas';
+import { FileSystem, Output, JsonValidator } from '../../utils';
+import { SchematicJsonSchema, SchematicOptionJsonSchema } from './json-schemas';
 
 /** Configuration needed to load a schematic */
 export interface SchematicConfig {
     name: string;
     collectionName: string;
-    description: string;
+    description?: string;
     fsPath?: string;
     collectionFsPath?: string;
 }
@@ -46,13 +46,13 @@ export class Schematic {
             this.fsPath = await this.getFsPath(this.collectionFsPath);
         }
         
-        const config = await FileSystem.parseJsonFile<SchematicJsonSchema>(this.fsPath);
+        const config = await FileSystem.parseJsonFile(this.fsPath);
 
         if (!config) {
             throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be loaded.`);
         }
 
-        this.config = config;
+        this.config = this.validateConfig(config);
 
         await this.setOptions();
 
@@ -125,9 +125,9 @@ export class Schematic {
      */
     private async getFsPath(collectionFsPath: string): Promise<string> {
 
-        const collectionJsonConfig = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
+        const collectionJsonConfig = await FileSystem.parseJsonFile(collectionFsPath);
 
-        const schemaPath = collectionJsonConfig?.schematics?.[this.name]?.schema;
+        const schemaPath = JsonValidator.string(JsonValidator.object(JsonValidator.object(JsonValidator.object(collectionJsonConfig)?.schematics)?.[this.name])?.schema);
 
         /* `package.json` should have a `schematics` property with relative path to `collection.json` */
         if (!schemaPath) {
@@ -138,10 +138,61 @@ export class Schematic {
 
     }
 
+    /**
+     * Validate schema.json
+     */
+    private validateConfig(rawConfig: unknown): SchematicJsonSchema {
+
+        const config = JsonValidator.object(rawConfig);
+
+        const properties = new Map(Object.entries(JsonValidator.object(config?.properties) ?? {})
+            .map(([name, rawConfig]) => {
+
+                const config = JsonValidator.object(rawConfig);
+
+                const $default = JsonValidator.object(config?.$default);
+                if ($default) {
+                    $default.$source = JsonValidator.string($default.$source);
+                    $default.index = JsonValidator.number($default.index);
+                }
+
+                const items = JsonValidator.object(config?.items);
+                if (items) {
+                    items.enum = JsonValidator.array(items.enum);
+                }
+
+                const xPrompt = JsonValidator.object(config?.['x-prompt']);
+                if (xPrompt) {
+                    xPrompt.message = JsonValidator.string(xPrompt.message);
+                    xPrompt.multiselect = JsonValidator.boolean(xPrompt.multiselect);
+                    xPrompt.items = JsonValidator.array(xPrompt.items);
+                }
+
+                return [name, {
+                    type: JsonValidator.string(config?.type),
+                    description: JsonValidator.string(config?.description),
+                    visible: JsonValidator.boolean(config?.visible),
+                    default: config?.default,
+                    $default,
+                    enum: JsonValidator.array(config?.enum),
+                    items,
+                    ['x-deprecated']: JsonValidator.string(config?.['x-deprecated']),
+                    ['x-prompt']: xPrompt,
+                }] as [string, SchematicOptionJsonSchema];
+
+            }));
+
+        return {
+            properties,
+            required: JsonValidator.array(config?.required, 'string'), 
+        };
+
+    }
+
     private async setOptions(): Promise<void> {
 
         /* Set all options */
-        this.options = new Map(Object.entries(this.config.properties));
+        this.options = this.config.properties;
 
         Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
 

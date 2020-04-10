@@ -36,11 +36,10 @@ export class JsonValidator {
 
         if (Array.isArray(value)) {
 
-            if (type && (value.length === value.filter((item) => typeof item === type).length)) {
+            if (!type || (value.length === value.filter((item) => typeof item === type).length)) {
                 return value;
             }
 
-            return value;
         }
 
         return undefined;

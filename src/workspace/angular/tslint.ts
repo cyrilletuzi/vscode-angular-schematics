@@ -23,7 +23,7 @@ export class TslintConfig {
 
         const fsPath = path.join(contextFsPath, TslintConfig.fileName);
 
-        this.config = this.validateConfig(await FileSystem.parseJsonFile<unknown>(fsPath, { silent }));
+        this.config = this.validateConfig(await FileSystem.parseJsonFile(fsPath, { silent }));
 
         /* `Set` removes duplicates */
         this.componentSuffixes = Array.from(new Set(this.config?.rules?.['component-class-suffix'] ?? []));
