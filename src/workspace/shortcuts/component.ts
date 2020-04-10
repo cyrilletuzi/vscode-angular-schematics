@@ -91,7 +91,7 @@ export class ComponentShortcut {
 
         const type = JsonValidator.object(userPreference);
         const label = JsonValidator.string(type?.label);
-        const optionsList = JsonValidator.array(type?.optionsList);
+        const optionsList = JsonValidator.array(type?.options);
 
         if (!label || !optionsList) {
             return undefined;

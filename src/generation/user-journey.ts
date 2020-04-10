@@ -508,10 +508,8 @@ export class UserJourney {
 
             let choice: string | string[] | undefined = '';
 
-            const promptSchema = option?.['x-prompt'];
-
             /* Some schematics have a prompt message already defined, otherwise we use the description */
-            const prompt = promptSchema?.message ?? option.description ?? `What value do you want for this option?`;
+            const prompt = option?.['x-prompt'] ?? option.description ?? `What value do you want for this option?`;
 
             // TODO: [feature] Take user defaults in angular.json into account in ordering
     
@@ -534,10 +532,6 @@ export class UserJourney {
                 /* Angular >= 8.3 */
                 if (option.items?.enum) {
                     choice = await this.askOptionMultiselect(optionName, option.items.enum, prompt);
-                }
-                /* Angular < 8.3 (guard schematics) */
-                else if (promptSchema?.multiselect && promptSchema?.items) {
-                    choice = await this.askOptionMultiselect(optionName, promptSchema.items, prompt);
                 } else {
                     choice = await this.askOptionText(optionName, prompt);
                 }

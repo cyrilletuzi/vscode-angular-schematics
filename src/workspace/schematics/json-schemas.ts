@@ -36,12 +36,7 @@ export interface SchematicOptionJsonSchema {
     };
     'x-deprecated'?: string;
     /** Some options can have a prompt for Angular CLI interactive mode */
-    'x-prompt'?: {
-        message?: string;
-        multiselect?: boolean;
-        /** Deprecated, Angular >= 8.3 uses `items.enum` instead */
-        items?: string[];
-    };
+    'x-prompt'?: string;
 }
 
 export interface SchematicJsonSchema {
