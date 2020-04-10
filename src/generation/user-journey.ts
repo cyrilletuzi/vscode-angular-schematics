@@ -346,6 +346,7 @@ export class UserJourney {
 
     }
 
+    // TODO: `@schematics/angular:interface` has a second argv
     private async askNameAsFirstArg(): Promise<string | undefined> {
 
         const projectName = this.cliCommand.getProjectName();

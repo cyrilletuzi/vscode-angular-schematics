@@ -108,6 +108,8 @@ export class CliCommand {
      */
     async validateProject(): Promise<boolean> {
 
+        // TODO: `@ngxs/schematics` has an issue, it's guessing just `src` path instead of `src/app`
+
         /* If a project was detected or chosen by the user */
         if (this.projectName) {
 
