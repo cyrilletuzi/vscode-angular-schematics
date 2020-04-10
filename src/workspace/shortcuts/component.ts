@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { ComponentType, defaultComponentTypes } from '../../defaults';
-import { Output, FileSystem } from '../../utils';
+import { Output, FileSystem, JsonValidator } from '../../utils';
 import { formatCliCommandOptions } from '../../generation';
 
 import { ShortcutsTypes } from './shortcuts';
@@ -87,27 +87,43 @@ export class ComponentShortcut {
     /**
      * Validate "ngschematics.componentTypes" user preference
      */
-    private validateUserComponentType(userPreference: unknown): boolean {
+    private validateUserComponentType(userPreference: unknown): ComponentType | undefined {
 
-        if ((typeof userPreference === 'object')
-        && (userPreference !== null)
-        && ('label' in userPreference)
-        && (!('detail' in userPreference) || typeof (userPreference as { detail: unknown }).detail === 'string')
-        && ('options' in userPreference)
-        && Array.isArray((userPreference as { options: unknown }).options)
-        ) {
-            for (const option of (userPreference as { options: unknown[] }).options) {
-                if (!Array.isArray(option)
-                || (option.length !== 2)
-                || (typeof option[0] !== 'string')
-                && (typeof option[1] !== 'string')) {
-                    return false;
-                }
+        const type = JsonValidator.object(userPreference);
+        const label = JsonValidator.string(type?.label);
+        const optionsList = JsonValidator.array(type?.optionsList);
+
+        if (!label || !optionsList) {
+            return undefined;
+        } 
+
+        const options: [string, string][] = [];
+
+        for (const optionItem of optionsList) {
+
+            const option = JsonValidator.array(optionItem);
+
+            if (!option || (option.length !== 2)) {
+                return undefined;
             }
-            return true;
+
+            const name = JsonValidator.string(option[0]);
+            const value = JsonValidator.string(option[1]);
+
+            if (!name || (value === undefined)) {
+                return undefined;
+            }
+
+            options.push([name, value]);
+
         }
 
-        return false;
+        return {
+            label,
+            detail: JsonValidator.string(type?.detail),
+            options,
+            package: '',
+        };
 
     }
 
@@ -151,9 +167,9 @@ export class ComponentShortcut {
 
             for (const userType of userTypes) {
 
-                if (this.validateUserComponentType(userType)) {
+                const type = this.validateUserComponentType(userType);
 
-                    const type = userType as ComponentType;
+                if (type) {
 
                     if (customTypes.has(type.label)) {
                         Output.logWarning(`"${type.label}" component type already exists.`);
@@ -162,10 +178,6 @@ export class ComponentShortcut {
                     customTypes.set(type.label, type);
 
                     Output.logInfo(`Adding "${type.label}" custom component type.`);
-
-                } else {
-
-                    Output.logWarning(`Your "ngschematics.componentTypes" preference is invalid.`);
 
                 }
 
