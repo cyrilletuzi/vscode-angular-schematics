@@ -23,7 +23,7 @@ export async function findCollectionFsPath(workspaceFolder: vscode.WorkspaceFold
     /* Package schematics */
     else {
 
-        const packageJsonFsPath = await FileSystem.findPackageFsPath(workspaceFolder, name, { silent });
+        const packageJsonFsPath = await FileSystem.findPackageFsPath(workspaceFolder, workspaceFolder.uri.fsPath, name, { silent });
 
         if (!packageJsonFsPath) {
             return undefined;
