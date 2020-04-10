@@ -568,7 +568,7 @@ provided that your VS Code settings are configured accordingly
 ## [1.1.0] - 2018-06-22
 
 ### Feature
-- Support `@nrwl/schematics` and `@nstudio/schematics` by default.
+- Support `@nrwl/schematics` by default.
 
 ## [1.0.1] - 2018-06-22
 

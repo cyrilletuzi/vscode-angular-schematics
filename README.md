@@ -221,7 +221,6 @@ By default, this extension detects the following schematics:
 - `@ionic/angular-toolkit`
 - `@ngrx/schematics`
 - `@nrwl/schematics`
-- `@nstudio/schematics`
 - `@ngxs/schematics`
 - `@nativescript/schematics`
 - `@ngx-formly/schematics`
