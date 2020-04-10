@@ -519,7 +519,7 @@ export class UserJourney {
             } else if (option.type === 'boolean') {
     
                 /* Put the default value first */
-                const choices = (option.default === true) ? ['true', 'false'] : ['false', 'true'];
+                const choices = (option.default === false) ? ['false', 'true'] : ['true', 'false'];
     
                 choice = await this.askOptionEnum(optionName, choices, prompt);
     
