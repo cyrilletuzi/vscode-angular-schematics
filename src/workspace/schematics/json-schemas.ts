@@ -4,6 +4,8 @@ export interface CollectionSchematicJsonSchema {
     description?: string;
     /** Some schematics are internal for Angular CLI */
     hidden?: boolean;
+    /** Material use a different property for internals schematics */
+    private?: boolean;
     /** Some schematics extend another one */
     extends?: string;
 }

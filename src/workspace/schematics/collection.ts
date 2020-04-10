@@ -81,6 +81,7 @@ export class Collection {
                     schema: JsonValidator.string(config?.schema),
                     description: JsonValidator.string(config?.description),
                     hidden: JsonValidator.boolean(config?.hidden),
+                    private: JsonValidator.boolean(config?.private),
                     extends: JsonValidator.string(config?.extends),
                 }] as [string, CollectionSchematicJsonSchema];
 
@@ -118,7 +119,7 @@ export class Collection {
 
         const schematics = allSchematics
             /* Remove internal schematics */
-            .filter(([_, config]) => !config.hidden)
+            .filter(([_, config]) => !config.hidden && !config.private)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
 
