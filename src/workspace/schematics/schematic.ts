@@ -236,6 +236,8 @@ export class Schematic {
         const choices: vscode.QuickPickItem[] = [];
 
         const filteredOptionsNames = Array.from(this.options)
+            /* Project is already managed by the extension */
+            .filter(([name]) => (name !== 'project'))
             /* Do not keep options marked as not visible (internal options for the CLI) */
             .filter(([_, option]) => (option.visible !== false))
             /* Do not keep deprecated options */
