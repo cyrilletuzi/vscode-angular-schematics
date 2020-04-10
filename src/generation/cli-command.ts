@@ -155,8 +155,13 @@ export class CliCommand {
      */
     getContextForNameAsFirstArg(): string {
 
+        /* Application and library schematics just need a name, not a path */
+        if ((this.collectionName === defaultAngularCollection)
+        && ['application', 'library'].includes(this.schematicName)) {
+            return '';
+        }
         /* `ngx-spec` schematics works on a file, and thus need the file part */
-        if (this.collectionName === 'ngx-spec') {
+        else if (this.collectionName === 'ngx-spec') {
             return this.contextPath.relativeToProjectFolder;
         }
 
