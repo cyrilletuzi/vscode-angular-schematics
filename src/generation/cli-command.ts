@@ -299,8 +299,12 @@ export class CliCommand {
                     if (isSchematicDefaultFlat !== undefined) {
                         isFlat = isSchematicDefaultFlat;
                     }
-                    /* Priority 4: use hard defaults known for Angular official schematics */
+                    /* Priority 4: use hard defaults known for some schematics */
                     else if ((this.collectionName === defaultAngularCollection) && ['component', 'module'].includes(this.schematicName)) {
+
+                        isFlat = false;
+
+                    } else if (this.collectionName === '@ngxs/schematics') {
 
                         isFlat = false;
 
