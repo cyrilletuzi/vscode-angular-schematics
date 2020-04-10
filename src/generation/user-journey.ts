@@ -510,8 +510,6 @@ export class UserJourney {
 
             /* Some schematics have a prompt message already defined, otherwise we use the description */
             const prompt = option?.['x-prompt'] ?? option.description ?? `What value do you want for this option?`;
-
-            // TODO: [feature] Take user defaults in angular.json into account in ordering
     
             if (option.enum !== undefined) {
     
@@ -519,8 +517,8 @@ export class UserJourney {
     
             } else if (option.type === 'boolean') {
     
-                /* Put the non-default value first */
-                const choices = (option.default === true) ? ['false', 'true'] : ['true', 'false'];
+                /* Put the default value first */
+                const choices = (option.default === true) ? ['true', 'false'] : ['false', 'true'];
     
                 choice = await this.askOptionEnum(optionName, choices, prompt);
     
