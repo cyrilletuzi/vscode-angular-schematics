@@ -249,6 +249,10 @@ export class CliCommand {
                 }
 
             }
+            /* All Material schematics have a component suffix */
+            else if (this.collectionName === '@angular/material') {
+                suffix = '.component';
+            }
 
             /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
