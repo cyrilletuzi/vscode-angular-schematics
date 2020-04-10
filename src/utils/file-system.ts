@@ -105,9 +105,9 @@ export class FileSystem {
             try {
                 
                 let data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
-
+                
                 /* Angular Material schematics have comments, we remove them as it's not JSON compliant */
-                if (fsPath.includes('@angular/material')) {
+                if (fsPath.includes('@angular/material') || fsPath.includes('@ngx-formly/schematics')) {
 
                     /* Split the file by line, and if a line is a comment, remove it.
                      * RegExp explanation:
