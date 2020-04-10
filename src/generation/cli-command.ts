@@ -231,7 +231,7 @@ export class CliCommand {
             if (this.collectionName === defaultAngularCollection) {
 
                 /* Component can have a custom suffix via `--type` option */
-                if ((this.schematicName === 'component') && this.options.has('type')) {
+                if (['component', 'class', 'interface'].includes(this.schematicName) && this.options.has('type')) {
                     suffix = `.${this.options.get('type')!}`;
                 }
                 /* Classes and interfaces do not have suffix */
