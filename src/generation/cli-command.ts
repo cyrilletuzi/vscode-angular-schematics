@@ -256,6 +256,19 @@ export class CliCommand {
             else if (this.collectionName === '@angular/material') {
                 suffix = '.component';
             }
+            else if (this.collectionName === '@ngrx/schematics') {
+                if (['action', 'effect', 'selector'].includes(this.schematicName)) {
+                    suffix = `.${this.schematicName}s`;
+                } else if (this.schematicName === 'entity') {
+                    suffix = '.model';
+                } else if (this.schematicName === 'entity') {
+                    suffix = '.actions';
+                } else if (this.schematicName === 'container') {
+                    suffix = '.component';
+                } else if (this.schematicName === 'data') {
+                    suffix = '.service';
+                }
+            }
 
             /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
