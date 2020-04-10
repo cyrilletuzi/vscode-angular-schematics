@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Output } from '../../utils';
+import { FileSystem, Output, JsonValidator } from '../../utils';
 
 import { Schematic, SchematicConfig } from './schematic';
-import { CollectionJsonSchema } from './json-schemas';
+import { CollectionJsonSchema, CollectionSchematicJsonSchema } from './json-schemas';
 import { findCollectionFsPath } from './find-collection';
 
 export class Collection {
@@ -28,13 +28,7 @@ export class Collection {
 
         this.fsPath = collectionFsPath;
 
-        const config = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
-
-        if (!config) {
-            throw new Error(`Loading of "${this.name}" collection failed.`);
-        }
-
-        this.config = config;
+        this.config = this.validateConfig(await FileSystem.parseJsonFile(collectionFsPath));
 
         await this.setSchematics(workspaceFolder);
 
@@ -74,6 +68,42 @@ export class Collection {
     }
 
     /**
+     * Validate collection.json
+     */
+    private validateConfig(config: unknown): CollectionJsonSchema {
+
+        const schematics = new Map(Object.entries(JsonValidator.object(JsonValidator.object(config)?.schematics) ?? {})
+            .map(([name, rawConfig]) => {
+
+                const config = JsonValidator.object(rawConfig);
+
+                return [name, {
+                    schema: JsonValidator.string(config?.schema),
+                    description: JsonValidator.string(config?.description),
+                    hidden: JsonValidator.boolean(config?.hidden),
+                    extends: JsonValidator.string(config?.extends),
+                }] as [string, CollectionSchematicJsonSchema];
+
+            })
+            .filter(([name, config]) => {
+                if (!config.schema && !config?.extends) {
+                    Output.logWarning(`"${this.name}:${name}" schematic does not have a "schema" string property, so it is dropped.`);
+                    return false;
+                }
+                return true;
+            }));
+
+        if (schematics.size === 0) {
+            throw new Error(`No schematic found for "${this.name}" collection, so it is dropped.`);
+        }
+
+        return {
+            schematics,
+        };
+
+    }
+
+    /**
      * Set all schematics' configuration of the collection.
      */
     private async setSchematics(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
@@ -82,11 +112,7 @@ export class Collection {
         this.schematics.clear();
         this.schematicsChoices = [];
 
-        const allSchematics = Object.entries(this.config.schematics);
-
-        if (allSchematics.length === 0) {
-            throw new Error(`No schematic found for "${this.name}" collection, so it is dropped.`);
-        }
+        const allSchematics = Array.from(this.config.schematics);
 
         Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
 
@@ -130,7 +156,7 @@ export class Collection {
 
                 }
 
-            } else {
+            } else if (config.schema) {
 
                 const fsPath = path.join(path.dirname(this.fsPath), config.schema);
 

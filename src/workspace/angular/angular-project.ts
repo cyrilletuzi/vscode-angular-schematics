@@ -33,19 +33,23 @@ export class AngularProject {
 
         this.schematicsDefaults = config.schematics;
 
-        /* `projectType` is supposed to be required, but default to `application` for safety */
-        this.type = config.projectType ? config.projectType : 'application';
+        this.type = config.projectType;
 
         /* Project's path relative to workspace folder (ie. where `angular.json` is).
          * For the main application, it's empty as it's directly in the workspace folder.
          * For sub-applications/libraries, it's `<projects-root>/hello-world`. */
-        this.rootPath = config.root ?? '';
+        this.rootPath = config.root;
 
         /* Project's source path relative to workspace folder (ie. where `angular.json` is).
          * For the main application, it's `src` by default but can be customized.
          * For sub-applications/libraries, it's `<projects-root>/hello-world/<src-or-something-else>`.
          * Usage of `posix` is important here, as we want slashes on all platforms, including Windows. */
-        this.sourcePath = config.sourceRoot ?? path.posix.join(this.rootPath, 'src');
+        if (config.sourceRoot !== undefined) {
+            this.sourcePath = config.sourceRoot;
+        } else {
+            this.sourcePath = path.posix.join(this.rootPath, 'src');
+            Output.logWarning(`Your Angular configuration file should contain a "sourceRoot" string property for your "${this.name}" project. Default to "${this.sourcePath}".`);
+        }
 
         /* These folders are imposed by Angular CLI.
          * See https://github.com/angular/angular-cli/blob/9190f622365b8eb85b7d8828f170959ded643518/packages/schematics/angular/utility/project.ts#L17 */
@@ -136,7 +140,7 @@ export class AngularProject {
      * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
      */
     getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
-        return this.schematicsDefaults?.[schematicsFullName]?.[optionName];
+        return this.schematicsDefaults?.get(schematicsFullName)?.[optionName];
     }
 
 }

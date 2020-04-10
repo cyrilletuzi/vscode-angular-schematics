@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
 import { defaultAngularCollection } from '../../defaults';
-import { FileSystem, Output } from '../../utils';
+import { FileSystem, Output, JsonValidator } from '../../utils';
 
 import { AngularProject } from './angular-project';
-import { AngularJsonSchema, AngularJsonProjectSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
+import { AngularJsonSchema, AngularJsonSchematicsOptionsSchema, AngularJsonSchematicsSchema, AngularProjectType } from './json-schema';
 
 export class AngularConfig {
 
@@ -17,20 +17,16 @@ export class AngularConfig {
     /** Root project name */
     rootProjectName = '';
     /** Values from the Angular config file */
-    private config: AngularJsonSchema | undefined;
+    private config!: AngularJsonSchema;
     
     /**
      * Initializes `angular.json` configuration.
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder, angularConfigFsPath?: string): Promise<vscode.FileSystemWatcher[]> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, angularConfigFsPath: string): Promise<vscode.FileSystemWatcher[]> {
 
-        if (angularConfigFsPath) {
-
-            this.config = await FileSystem.parseJsonFile<AngularJsonSchema>(angularConfigFsPath);
-
-        }
+        this.config = this.validateConfig(await FileSystem.parseJsonFile(angularConfigFsPath));
 
         this.setDefaultCollections();
 
@@ -49,7 +45,79 @@ export class AngularConfig {
      * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
      */
     getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
-        return this.config?.schematics?.[schematicsFullName]?.[optionName];
+        return this.config?.schematics?.get(schematicsFullName)?.[optionName];
+    }
+
+    /**
+     * Validate angular.json
+     */
+    private validateConfig(rawConfig: unknown): AngularJsonSchema {
+
+        const config = JsonValidator.object(rawConfig) ?? {};
+
+        const version = JsonValidator.number(config.version);
+
+        if (!version) {
+            Output.logError(`Your Angular config file must contain \`"version" : 1\`, please correct it.`);
+            throw new Error();
+        }
+
+        const possibleProjectTypes: AngularProjectType[] = ['application', 'library'];
+
+        const projects = new Map(Object.entries(JsonValidator.object(config.projects) ?? {})
+            .map(([name, rawOptions]) => {
+                
+                const options = JsonValidator.object(rawOptions) ?? {};
+
+                const projectTypeRaw = JsonValidator.string(options.projectType) ?? '';
+                let projectType: AngularProjectType = 'application';
+
+                /* `projectType` is supposed to be required, but default to `application` for safety */
+                if ((possibleProjectTypes as string[]).includes(projectTypeRaw)) {
+                    projectType = projectTypeRaw  as AngularProjectType;
+                } else {
+                    Output.logWarning(`Your Angular configuration file should contain a "projectType" property with "application" or "library" for your "${name}" project. Default to "application".`);
+                }
+
+                let root = JsonValidator.string(options.root);
+                if (root === undefined) {
+                    root = '';
+                    Output.logWarning(`Your Angular configuration file should contain a "root" string property for your "${name}" project. Default to "".`);
+                }
+
+                return [name, {
+                    projectType,
+                    root,
+                    sourceRoot: JsonValidator.string(options.sourceRoot),
+                    schematics: this.validateConfigSchematics(options.schematics),
+                }];
+            }));
+
+        if (projects.size === 0) {
+            Output.logWarning(`No "projects" detected in your Angular config file. You should correct that.`);
+        }
+
+        return {
+            version,
+            cli: {
+                defaultCollection: JsonValidator.string(JsonValidator.object(config.cli)?.defaultCollection),
+            },
+            schematics: this.validateConfigSchematics(config.schematics),
+            projects,
+        };
+
+    }
+
+    /**
+     * Validate angular.json "schematics" property
+     */
+    private validateConfigSchematics(config: unknown): AngularJsonSchematicsSchema {
+
+        return new Map(Object.entries(JsonValidator.object(config) ?? {})
+            .map(([name, options]) => [name, {
+                flat: JsonValidator.boolean(JsonValidator.object(options)?.flat),
+            }]));
+
     }
 
     /**
@@ -58,7 +126,7 @@ export class AngularConfig {
     private setDefaultCollections(): void {
 
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
-        this.defaultUserCollection = this.config?.cli?.defaultCollection ?? defaultAngularCollection;
+        this.defaultUserCollection = this.config.cli?.defaultCollection ?? defaultAngularCollection;
 
         Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
 
@@ -77,17 +145,10 @@ export class AngularConfig {
         this.projects.clear();
         const watchers: vscode.FileSystemWatcher[] = [];
 
-        /* Get `projects` in `angular.json`*/
-        const projectsFromConfig: [string, AngularJsonProjectSchema][] = this.config?.projects ? Object.entries(this.config?.projects) : [];
-
-        if (projectsFromConfig.length > 0) {
-            Output.logInfo(`${projectsFromConfig.length} Angular project(s) detected.`);
-        } else {
-            Output.logWarning(`No Angular project detected. Check your Angular configuration file.`);
-        }
+        Output.logInfo(`${this.config.projects.size} Angular project(s) detected.`);
 
         /* Transform Angular config with more convenient information for this extension */
-        for (const [name, config] of projectsFromConfig) {
+        for (const [name, config] of this.config.projects) {
 
             const project = new AngularProject(name, config);
             watchers.push(await project.init(workspaceFolder));

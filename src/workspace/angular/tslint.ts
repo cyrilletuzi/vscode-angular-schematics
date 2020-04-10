@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Output } from '../../utils';
+import { FileSystem, Output, JsonValidator } from '../../utils';
 
 import { TslintJsonSchema } from './json-schema';
 
@@ -23,9 +23,12 @@ export class TslintConfig {
 
         const fsPath = path.join(contextFsPath, TslintConfig.fileName);
 
-        this.config = await FileSystem.parseJsonFile<TslintJsonSchema>(fsPath, { silent });
+        this.config = this.validateConfig(await FileSystem.parseJsonFile(fsPath, { silent }));
 
-        this.setComponentSuffixes();
+        /* `Set` removes duplicates */
+        this.componentSuffixes = Array.from(new Set(this.config?.rules?.['component-class-suffix'] ?? []));
+
+        Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in TSLint config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
         return vscode.workspace.createFileSystemWatcher(fsPath);
 
@@ -42,11 +45,11 @@ export class TslintConfig {
     }
 
     /**
-     * Set component suffixes defined in `tslint.json`, or at least `Component` by default.
+     * Validate tslint.json
      */
-    private setComponentSuffixes(): void {
+    private validateConfig(config: unknown): TslintJsonSchema {
 
-        const suffixes = [];
+        const rules = JsonValidator.object(JsonValidator.object(config)?.rules) ?? {};
 
         /* 
          * Can be:
@@ -54,23 +57,13 @@ export class TslintConfig {
          * 2. `true` (default Angular CLI config)
          * 3. `[true, "Component", "Dialog"]` (user defined)
          */
-        const tslintRule = this.config?.rules?.['component-class-suffix'];
+        const suffixesArray = JsonValidator.array(rules?.['component-class-suffix']);
 
-        /* Check we are in the 3rd case */
-        if (Array.isArray(tslintRule) && tslintRule.length > 1) {
-
-            /* Removes the first value (`true`)
-             * Type cast is required as TypeScript cannot do it itself in this case */
-            const tslintSuffixes = tslintRule.slice(1) as string[];
-
-            suffixes.push(...tslintSuffixes);
-
-        }
-
-        /* `Set` removes duplicates */
-        this.componentSuffixes = Array.from(new Set(suffixes));
-
-        Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in TSLint config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
+        return {
+            rules: {
+                'component-class-suffix': JsonValidator.array(suffixesArray?.slice(1), 'string'),
+            },
+        };
 
     }
 

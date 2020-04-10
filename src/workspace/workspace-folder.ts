@@ -274,7 +274,11 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
         if (searchMatches.length > 0) {
 
-            Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0].fsPath}`);
+            if (searchMatches.length === 1) {
+                Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0].fsPath}`);
+            } else {
+                Output.logInfo(`More than one Angular config file found for "${this.name}" workspace folder, keeping the first one: ${searchMatches[0].fsPath}`);
+            }
 
             return searchMatches[0].fsPath;
 

@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { FileSystem, Output } from '../../utils';
-import { SchematicJsonSchema, SchematicOptionJsonSchema, CollectionJsonSchema } from './json-schemas';
+import { FileSystem, Output, JsonValidator } from '../../utils';
+import { SchematicJsonSchema, SchematicOptionJsonSchema } from './json-schemas';
 
 /** Configuration needed to load a schematic */
 export interface SchematicConfig {
     name: string;
     collectionName: string;
-    description: string;
+    description?: string;
     fsPath?: string;
     collectionFsPath?: string;
 }
@@ -46,13 +46,13 @@ export class Schematic {
             this.fsPath = await this.getFsPath(this.collectionFsPath);
         }
         
-        const config = await FileSystem.parseJsonFile<SchematicJsonSchema>(this.fsPath);
+        const config = await FileSystem.parseJsonFile(this.fsPath);
 
         if (!config) {
             throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be loaded.`);
         }
 
-        this.config = config;
+        this.config = this.validateConfig(config);
 
         await this.setOptions();
 
@@ -125,9 +125,9 @@ export class Schematic {
      */
     private async getFsPath(collectionFsPath: string): Promise<string> {
 
-        const collectionJsonConfig = await FileSystem.parseJsonFile<CollectionJsonSchema>(collectionFsPath);
+        const collectionJsonConfig = await FileSystem.parseJsonFile(collectionFsPath);
 
-        const schemaPath = collectionJsonConfig?.schematics?.[this.name]?.schema;
+        const schemaPath = JsonValidator.string(JsonValidator.object(JsonValidator.object(JsonValidator.object(collectionJsonConfig)?.schematics)?.[this.name])?.schema);
 
         /* `package.json` should have a `schematics` property with relative path to `collection.json` */
         if (!schemaPath) {
@@ -138,17 +138,89 @@ export class Schematic {
 
     }
 
+    /**
+     * Validate schema.json
+     */
+    private validateConfig(rawConfig: unknown): SchematicJsonSchema {
+
+        const config = JsonValidator.object(rawConfig);
+
+        const properties = new Map(Object.entries(JsonValidator.object(config?.properties) ?? {})
+            .map(([name, rawConfig]) => {
+
+                const config = JsonValidator.object(rawConfig);
+
+                const $default = JsonValidator.object(config?.$default);
+                if ($default) {
+                    $default.$source = JsonValidator.string($default.$source);
+                    $default.index = JsonValidator.number($default.index);
+                }
+
+                let items = JsonValidator.object(config?.items);
+
+                const xPromptString = JsonValidator.string(config?.['x-prompt']);
+                const xPromptObject = JsonValidator.object(config?.['x-prompt']);
+
+                if (items) {
+                    items.enum = this.validateConfigArrayChoices(JsonValidator.array(items.enum));
+                }
+                /** Deprecated, Angular >= 8.3 uses `items.enum` instead */
+                else if (xPromptObject) {
+                    const multiselect = JsonValidator.boolean(xPromptObject.multiselect);
+                    if (multiselect === true) {
+                        items = {};
+                        items.enum = this.validateConfigArrayChoices(JsonValidator.array(xPromptObject.items));
+                    }
+                }
+
+                return [name, {
+                    type: JsonValidator.string(config?.type),
+                    description: JsonValidator.string(config?.description),
+                    visible: JsonValidator.boolean(config?.visible),
+                    default: config?.default,
+                    $default,
+                    enum: this.validateConfigArrayChoices(JsonValidator.array(config?.enum)),
+                    items,
+                    ['x-deprecated']: JsonValidator.string(config?.['x-deprecated']),
+                    ['x-prompt']: xPromptString ?? JsonValidator.string(xPromptObject?.message),
+                }] as [string, SchematicOptionJsonSchema];
+
+            }));
+
+        return {
+            properties,
+            required: JsonValidator.array(config?.required, 'string'), 
+        };
+
+    }
+
+    /**
+     * Convert array of choices into strings for user input
+     */
+    validateConfigArrayChoices(list: unknown[] | undefined): string[] | undefined {
+
+        if (list === undefined) {
+            return undefined;
+        }
+
+        return list
+            .map((item) => JsonValidator.string(item) ?? JsonValidator.number(item) ?? JsonValidator.boolean(item))
+            .map((item) => (item ?? '').toString())
+            .filter((item) => item);
+
+    }
+
     private async setOptions(): Promise<void> {
 
         /* Set all options */
-        this.options = new Map(Object.entries(this.config.properties));
+        this.options = this.config.properties;
 
         Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
 
         /* Set required options' names */
         this.requiredOptionsNames = (this.config.required ?? [])
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
-            .filter((name) => !(('$default') in this.options.get(name)!));
+            .filter((name) => (this.options.get(name)!.$default === undefined));
 
         Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
         
@@ -167,7 +239,7 @@ export class Schematic {
             /* Do not keep options marked as not visible (internal options for the CLI) */
             .filter(([_, option]) => (option.visible !== false))
             /* Do not keep deprecated options */
-            .filter(([_, option]) => !('x-deprecated' in option))
+            .filter(([_, option]) => (option['x-deprecated'] === undefined))
             /* Do not keep option already managed by first command line arg (name) */
             .filter(([_, option]) => !(option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)));
 
@@ -179,7 +251,7 @@ export class Schematic {
             let requiredOrSuggestedInfo = '';
 
             /* Do not pre-select options with defaults values, as the CLI will take care of them */
-            if (!('$default' in option)) {
+            if (option.$default === undefined) {
 
                 /* Required options */
                 if (this.requiredOptionsNames.includes(label)) {
@@ -187,7 +259,7 @@ export class Schematic {
                     requiredOrSuggestedInfo = `(required) `;
                 }
                 /* Suggested options (because they have a prompt) */
-                else if ('x-prompt' in option) {
+                else if (option['x-prompt'] !== undefined) {
                     picked = true;
                     requiredOrSuggestedInfo = `(suggested) `;
                 }

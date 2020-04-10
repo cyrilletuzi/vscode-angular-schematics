@@ -5,15 +5,13 @@ export interface AngularJsonSchematicsOptionsSchema {
     flat?: boolean;
 }
 
-export interface AngularJsonSchematicsSchema {
-    /** Key will be the full schematics name (eg.: "@schematics/angular") */
-    [key: string]: AngularJsonSchematicsOptionsSchema;
-}
+/** Key will be the full schematics name (eg.: "@schematics/angular") */
+export type AngularJsonSchematicsSchema = Map<string, AngularJsonSchematicsOptionsSchema>;
 
 export interface AngularJsonProjectSchema {
-    /** Angular projects are `application` by default, but can be `library` too */
+    /** Required project type, Angular projects are `application` by default, but can be `library` too. */
     projectType: AngularProjectType;
-    /** Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
+    /** Required. Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
     root: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     sourceRoot?: string;
@@ -23,6 +21,8 @@ export interface AngularJsonProjectSchema {
 
 /** Description of `angular.json` */
 export interface AngularJsonSchema {
+    /** Currently can only be `1` */
+    version: number;
     cli?: {
         /**
          * If set, Angular CLI will use this collection by default instead of the official one.
@@ -36,14 +36,11 @@ export interface AngularJsonSchema {
      * List of Angular projects.
      * While it's optional in CLI JSON schema, a workspace folder should have at least one project.
      */
-    projects?: {
-        /** Name of the project */
-        [key: string]: AngularJsonProjectSchema;
-    };
+    projects: Map<string, AngularJsonProjectSchema>;
 }
 
 export interface TslintJsonSchema {
-    rules?: {
-        'component-class-suffix'?: boolean | [true, ...string[]];
+    rules: {
+        'component-class-suffix'?: string[];
     };
 }

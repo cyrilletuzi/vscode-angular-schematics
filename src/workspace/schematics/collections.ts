@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { defaultCollectionsNames, defaultAngularCollection } from '../../defaults';
-import { Output } from '../../utils';
+import { Output, JsonValidator } from '../../utils';
 
 import { Collection } from './collection';
 import { findCollectionFsPath } from './find-collection';
@@ -42,32 +42,6 @@ export class Collections {
     }
 
     /**
-     * Validate "ngschematics.schematics" user preference
-     */
-    private validateSchematicsPreference(values: unknown): string[] {
-
-        const errorMessage = `Your "ngschematics.schematics" preference is invalid.`;
-
-        if (values === '') {
-            return [];
-        }
-
-        if (!Array.isArray(values)) {
-            Output.logWarning(errorMessage);
-            return [];
-        }
-        for (const value of values) {
-            if (typeof value !== 'string') {
-                Output.logWarning(errorMessage);
-                return [];
-            }
-        }
-
-        return values;
-
-    }
-
-    /**
      * Set collections names and preload official collections.
      */
     private async setList(workspaceFolder: vscode.WorkspaceFolder, userDefaultCollections: string[]): Promise<vscode.FileSystemWatcher[]> {
@@ -82,7 +56,7 @@ export class Collections {
         const userPreference = vscode.workspace.getConfiguration('ngschematics', workspaceFolder.uri).get<string[]>(`schematics`, []);
 
         /* Validate user input */
-        const userCollectionsNames = this.validateSchematicsPreference(userPreference);
+        const userCollectionsNames = JsonValidator.array(userPreference, 'string') ?? [];
 
         Output.logInfo(`${userCollectionsNames.length} user schematics collection(s) detected in Code preferences${userCollectionsNames.length > 0 ? `: ${userCollectionsNames.join(', ')}` : ''}`);
 

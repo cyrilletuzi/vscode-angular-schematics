@@ -63,21 +63,10 @@ the path where you want to generate the schematic.
 This extension requires Visual Studio Code version >= 1.41.
 
 Basically, in your project, if `ng g component hello` works
-in the VS Code Terminal, the extension should work.
+in the *VS Code* Terminal, the extension should work.
 
-If the Angular CLI is not working in the VS Code Terminal,
-please correct that first *before* opening a GitHub issue. For examples:
-
-- if you use a *custom shell* and your Angular CLI installation is tied to it,
-the Terminal must be configured accordingly in your VS Code settings
-(`terminal.integrated.shell.osx`/ `.linux` / `.windows`).
-
-- non-Angular CLI projects must meet [special requirements](./docs/NO-CLI.md).
-
-If you have issues with the extension itself, everything is logged in the
-"Angular Schematics" Output channel (second tab left to the Terminal).
-If there are warnings or errors, try to correct your configuration accordingly
-*before* opening a GitHub issue.
+**If the Angular CLI is not working in the *VS Code* Terminal, please correct that first *before* opening a GitHub issue.**
+See the [troubleshooting guide](./docs/TROUBLESHOOTING.md) for help.
 
 ## Recommendations
 
