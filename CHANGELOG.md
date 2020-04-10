@@ -1,6 +1,6 @@
 # Change Log
 
-## [4.0.0-beta.5] - 2020-04-08
+## [4.0.0-beta.7] - 2020-04-10
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
@@ -127,6 +127,12 @@ Fortunately, with customizable component types explained above, you can still ad
 }
 ```
 
+### node_modules location
+
+The extension now supports hoisted `node_modules`, ie. `node_modules` being in a parent folder.
+
+This is especially good news for **Yarn workspaces** users ([#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49)).
+
 ### Performance
 
 Caching is quite hard to manage in this extension, as many details can change depending on your project's configuration.
@@ -180,10 +186,6 @@ User experience has been improved everywhere it was possible. Non-exhaustive lis
 - if the generated file cannot be opened automatically, propose to refresh the Explorer
 - as the Terminal is now used, output is colored
 - actionnable fix if a schematics package is missing
-
-### Yarn workspaces
-
-Partially fixes [#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49).
 
 ## [3.3.1] - 2020-03-19
 
