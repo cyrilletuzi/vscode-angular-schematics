@@ -183,6 +183,7 @@ User experience has been improved everywhere it was possible. Non-exhaustive lis
 - show progress on actions taking time
 - icons for default component and module types choices
 - ask where to import the module when doing "Generate a module"
+- auto-opening the generated file works with even more schematics
 - if the generated file cannot be opened automatically, propose to refresh the Explorer
 - as the Terminal is now used, output is colored
 - actionnable fix if a schematics package is missing
