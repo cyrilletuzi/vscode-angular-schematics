@@ -220,7 +220,6 @@ By default, this extension detects the following schematics:
 - `@angular/material`
 - `@ionic/angular-toolkit`
 - `@ngrx/schematics`
-- `@nrwl/schematics`
 - `@ngxs/schematics`
 - `@nativescript/schematics`
 - `@ngx-formly/schematics`

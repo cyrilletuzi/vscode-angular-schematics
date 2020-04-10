@@ -565,11 +565,6 @@ provided that your VS Code settings are configured accordingly
 ### Feature
 - Support for Angular 5 / CLI 1.7 projects.
 
-## [1.1.0] - 2018-06-22
-
-### Feature
-- Support `@nrwl/schematics` by default.
-
 ## [1.0.1] - 2018-06-22
 
 ### Bug fix

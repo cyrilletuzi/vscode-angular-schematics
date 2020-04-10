@@ -7,7 +7,6 @@ export const defaultCollectionsNames: string[] = [
     '@ngrx/schematics',
     '@ngxs/schematics',
     '@nativescript/schematics',
-    '@nrwl/schematics',
     '@ngx-formly/schematics',
     'primeng-schematics',
     '@ngx-kit/collection',
