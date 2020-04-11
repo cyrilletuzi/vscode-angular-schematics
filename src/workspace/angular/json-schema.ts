@@ -31,7 +31,7 @@ export interface AngularJsonSchema {
         defaultCollection?: string;
     };
     /** Default values for schematics options */
-    schematics?: AngularJsonSchematicsSchema;
+    schematics: AngularJsonSchematicsSchema;
     /**
      * List of Angular projects.
      * While it's optional in CLI JSON schema, a workspace folder should have at least one project.

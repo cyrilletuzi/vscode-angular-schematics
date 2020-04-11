@@ -77,7 +77,7 @@ export class AngularProject {
         const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
 
         const tslintConfig = new TslintConfig();
-        const watcher = await tslintConfig.init(projectFsPath);
+        const watcher = await tslintConfig.init(projectFsPath, { silent: true });
         this.tslintConfig = tslintConfig;
 
         const componentShortcut = new ComponentShortcut();

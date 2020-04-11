@@ -8,6 +8,7 @@ import { AngularJsonSchema, AngularJsonSchematicsOptionsSchema, AngularJsonSchem
 
 export class AngularConfig {
 
+    schematicsDefaults: AngularJsonSchematicsSchema = new Map();
     /** List of projects registered in Angular config file */
     projects = new Map<string, AngularProject>();
     /** User default collection, otherwise official Angular CLI default collection */
@@ -16,24 +17,32 @@ export class AngularConfig {
     defaultCollections: string[] = [];
     /** Root project name */
     rootProjectName = '';
-    /** Values from the Angular config file */
-    private config!: AngularJsonSchema;
     
     /**
      * Initializes `angular.json` configuration.
      * **Must** be called after each `new Angular()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder, angularConfigFsPath: string): Promise<vscode.FileSystemWatcher[]> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, fsPath: string): Promise<vscode.FileSystemWatcher[]> {
 
-        this.config = this.validateConfig(await FileSystem.parseJsonFile(angularConfigFsPath));
+        const unsafeConfig = await FileSystem.parseJsonFile(fsPath);
 
-        this.setDefaultCollections();
+        const config = this.validateConfig(unsafeConfig);
 
-        const watchers = await this.setProjects(workspaceFolder);
+        this.defaultUserCollection = this.initDefaultUserCollection(config);
 
-        if (angularConfigFsPath) {
-            watchers.push(vscode.workspace.createFileSystemWatcher(angularConfigFsPath));
+        Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
+
+        this.defaultCollections = this.initDefaultCollections(this.defaultUserCollection);
+
+        this.schematicsDefaults = config.schematics;
+
+        Output.logInfo(`${config.projects.size} Angular project(s) detected.`);
+
+        const watchers = await this.setProjects(workspaceFolder, config);
+
+        if (fsPath) {
+            watchers.push(vscode.workspace.createFileSystemWatcher(fsPath));
         }
 
         return watchers;
@@ -45,7 +54,7 @@ export class AngularConfig {
      * @param schematicsFullName Must be the full schematics name (eg. "@schematics/angular")
      */
     getSchematicsOptionDefaultValue<T extends keyof AngularJsonSchematicsOptionsSchema>(schematicsFullName: string, optionName: T): AngularJsonSchematicsOptionsSchema[T] | undefined {
-        return this.config?.schematics?.get(schematicsFullName)?.[optionName];
+        return this?.schematicsDefaults?.get(schematicsFullName)?.[optionName];
     }
 
     /**
@@ -121,41 +130,44 @@ export class AngularConfig {
     }
 
     /**
-     * Set default collections (user one + official one)
+     * Initialize default user collection
      */
-    private setDefaultCollections(): void {
+    private initDefaultUserCollection(config: Pick<AngularJsonSchema, 'cli'>): string {
 
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
-        this.defaultUserCollection = this.config.cli?.defaultCollection ?? defaultAngularCollection;
+        return config.cli?.defaultCollection ?? defaultAngularCollection;
 
-        Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
+    }
+
+    /**
+     * Initialize default collections (user one + official one)
+     */
+    private initDefaultCollections(defaultUserCollection: string): string[] {
 
         /* `Set` removes duplicates */
-        this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
+        return Array.from(new Set([defaultUserCollection, defaultAngularCollection]));
 
     }
 
     /**
      * Set all projects defined in `angular.json`
      */
-    private async setProjects(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher[]> {
+    private async setProjects(workspaceFolder: vscode.WorkspaceFolder, angularConfig: Pick<AngularJsonSchema, 'projects'>): Promise<vscode.FileSystemWatcher[]> {
 
         /* Start from scratch (can be recalled via watcher) */
         this.rootProjectName = '';
         this.projects.clear();
         const watchers: vscode.FileSystemWatcher[] = [];
 
-        Output.logInfo(`${this.config.projects.size} Angular project(s) detected.`);
-
         /* Transform Angular config with more convenient information for this extension */
-        for (const [name, config] of this.config.projects) {
+        for (const [name, projectConfig] of angularConfig.projects) {
 
-            const project = new AngularProject(name, config);
+            const project = new AngularProject(name, projectConfig);
             watchers.push(await project.init(workspaceFolder));
 
             this.projects.set(name, project);
 
-            if (!this.rootProjectName && (config.root === '')) {
+            if (!this.rootProjectName && (projectConfig.root === '')) {
 
                 this.rootProjectName = name;
 

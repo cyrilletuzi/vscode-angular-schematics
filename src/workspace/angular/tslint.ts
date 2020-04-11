@@ -7,12 +7,8 @@ import { TslintJsonSchema } from './json-schema';
 
 export class TslintConfig {
 
-    /** List of components suffixes defined in `tslint.json` */
+    /** List of components suffixes defined in `tslint.json`, lowercased */
     componentSuffixes: string[] = [];
-    /** Basename of TSLint config file */
-    private static readonly fileName = 'tslint.json';
-    /** Values from TSLint config file */
-    private config: TslintJsonSchema | undefined;
 
     /**
      * Initializes `tslint.json` configuration.
@@ -21,12 +17,13 @@ export class TslintConfig {
      */
     async init(contextFsPath: string, { silent = false } = {}): Promise<vscode.FileSystemWatcher> {
 
-        const fsPath = path.join(contextFsPath, TslintConfig.fileName);
+        const fsPath = path.join(contextFsPath, 'tslint.json');
 
-        this.config = this.validateConfig(await FileSystem.parseJsonFile(fsPath, { silent }));
+        const unsafeConfig = await FileSystem.parseJsonFile(fsPath, { silent });
 
-        /* `Set` removes duplicates */
-        this.componentSuffixes = Array.from(new Set(this.config?.rules?.['component-class-suffix'] ?? []));
+        const config = this.validateConfig(unsafeConfig);
+
+        this.componentSuffixes = this.initComponentSuffixes(config);
 
         Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in TSLint config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
@@ -40,7 +37,7 @@ export class TslintConfig {
     hasComponentSuffix(suffix: string): boolean {
 
         /* Lowercase both values to be sure to match all styles */
-        return this.componentSuffixes.map((suffix) => suffix.toLowerCase()).includes(suffix.toLowerCase());
+        return this.componentSuffixes.includes(suffix.toLowerCase());
 
     }
 
@@ -64,6 +61,17 @@ export class TslintConfig {
                 'component-class-suffix': JsonValidator.array(suffixesArray?.slice(1), 'string'),
             },
         };
+
+    }
+
+    /**
+     * Initialize user components suffixes
+     */
+    private initComponentSuffixes(config: Pick<TslintJsonSchema, 'rules'>): string[] {
+
+        /* `Set` removes duplicates */
+        return Array.from(new Set(config?.rules?.['component-class-suffix'] ?? []))
+            .map((suffix) => suffix.toLowerCase());
 
     }
 

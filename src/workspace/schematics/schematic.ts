@@ -4,31 +4,17 @@ import * as path from 'path';
 import { FileSystem, Output, JsonValidator } from '../../utils';
 import { SchematicJsonSchema, SchematicOptionJsonSchema } from './json-schemas';
 
-/** Configuration needed to load a schematic */
-export interface SchematicConfig {
-    name: string;
-    collectionName: string;
-    description?: string;
-    fsPath?: string;
-    collectionFsPath?: string;
-}
-
 export class Schematic {
 
     optionsChoices: vscode.QuickPickItem[] = [];
     private name: string;
     private collectionName: string;
-    private fsPath: string | undefined;
-    private collectionFsPath: string | undefined;
-    private config!: SchematicJsonSchema;
     private options = new Map<string, SchematicOptionJsonSchema>();
     private requiredOptionsNames: string[] = [];
 
-    constructor(config: SchematicConfig) {
-        this.name = config.name;
-        this.collectionName = config.collectionName;
-        this.fsPath = config.fsPath;
-        this.collectionFsPath = config.collectionFsPath;
+    constructor(name: string, collectionName: string) {
+        this.name = name;
+        this.collectionName = collectionName;
     }
 
     /**
@@ -36,25 +22,38 @@ export class Schematic {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(): Promise<void> {
+    async init({ fsPath, collectionFsPath }: { fsPath?: string; collectionFsPath?: string; }): Promise<void> {
 
         /* Schematics extended from another collection needs to get back the schema path */
-        if (!this.fsPath) {
-            if (!this.collectionFsPath) {
+        if (!fsPath) {
+            if (!collectionFsPath) {
                 throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be extended.`);
             }
-            this.fsPath = await this.getFsPath(this.collectionFsPath);
+            try {
+                fsPath = await this.getFsPathFromCollection(collectionFsPath);
+            } catch {
+                throw new Error(`"${this.collectionName}:${this.name}" can not be extended.`);
+            }
         }
         
-        const config = await FileSystem.parseJsonFile(this.fsPath);
+        const unsafeConfig = await FileSystem.parseJsonFile(fsPath);
 
-        if (!config) {
+        if (!unsafeConfig) {
             throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be loaded.`);
         }
 
-        this.config = this.validateConfig(config);
+        const config = this.validateConfig(unsafeConfig);
 
-        await this.setOptions();
+        /* Set all options */
+        this.options = config.properties;
+
+        Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
+
+        this.requiredOptionsNames = this.initRequiredOptions(config);
+
+        Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
+        
+        this.optionsChoices = this.initOptionsChoices(config, this.requiredOptionsNames);
 
     }
 
@@ -123,7 +122,7 @@ export class Schematic {
     /**
      * Get the schema filesystem path.
      */
-    private async getFsPath(collectionFsPath: string): Promise<string> {
+    private async getFsPathFromCollection(collectionFsPath: string): Promise<string> {
 
         const collectionJsonConfig = await FileSystem.parseJsonFile(collectionFsPath);
 
@@ -131,7 +130,7 @@ export class Schematic {
 
         /* `package.json` should have a `schematics` property with relative path to `collection.json` */
         if (!schemaPath) {
-            throw new Error(`"${this.collectionName}:${this.name}" can not be extended.`);
+            throw new Error();
         }
 
         return path.join(path.dirname(collectionFsPath), schemaPath);
@@ -197,7 +196,7 @@ export class Schematic {
     /**
      * Convert array of choices into strings for user input
      */
-    validateConfigArrayChoices(list: unknown[] | undefined): string[] | undefined {
+    private validateConfigArrayChoices(list: unknown[] | undefined): string[] | undefined {
 
         if (list === undefined) {
             return undefined;
@@ -210,32 +209,26 @@ export class Schematic {
 
     }
 
-    private async setOptions(): Promise<void> {
-
-        /* Set all options */
-        this.options = this.config.properties;
-
-        Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
+    /** 
+     * Initialize required options' names
+     */
+    private initRequiredOptions(config: Pick<SchematicJsonSchema, 'required' | 'properties'>): string[] {
 
         /* Set required options' names */
-        this.requiredOptionsNames = (this.config.required ?? [])
+        return (config.required ?? [])
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
-            .filter((name) => (this.options.get(name)!.$default === undefined));
-
-        Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
-        
-        this.setOptionsChoices();
+            .filter((name) => (config.properties.get(name)!.$default === undefined));
 
     }
 
     /**
      * Cache options choices
      */
-    private setOptionsChoices(): void {
+    private initOptionsChoices(config: Pick<SchematicJsonSchema, 'properties'>, requiredOptionsNames: string[]): vscode.QuickPickItem[] {
 
         const choices: vscode.QuickPickItem[] = [];
 
-        const filteredOptionsNames = Array.from(this.options)
+        const filteredOptionsNames = Array.from(config.properties)
             /* Project is already managed by the extension */
             .filter(([name]) => (name !== 'project'))
             /* Do not keep options marked as not visible (internal options for the CLI) */
@@ -256,7 +249,7 @@ export class Schematic {
             if (option.$default === undefined) {
 
                 /* Required options */
-                if (this.requiredOptionsNames.includes(label)) {
+                if (requiredOptionsNames.includes(label)) {
                     picked = true;
                     requiredOrSuggestedInfo = `(required) `;
                 }
@@ -286,7 +279,7 @@ export class Schematic {
             .sort((a, b) => a.label.localeCompare(b.label));
 
         /* Required and suggested options first */
-        this.optionsChoices = [...sortedPickedChoices, ...sortedOptionalChoices];
+        return [...sortedPickedChoices, ...sortedOptionalChoices];
 
     } 
 

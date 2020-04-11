@@ -3,16 +3,23 @@ import * as path from 'path';
 
 import { FileSystem, Output, JsonValidator } from '../../utils';
 
-import { Schematic, SchematicConfig } from './schematic';
+import { Schematic } from './schematic';
 import { CollectionJsonSchema, CollectionSchematicJsonSchema } from './json-schemas';
 import { findCollectionFsPath } from './find-collection';
+
+/** Configuration needed to load a schematic */
+interface SchematicConfig {
+    name: string;
+    collectionName: string;
+    description?: string;
+    fsPath?: string;
+    collectionFsPath?: string;
+}
 
 export class Collection {
 
     schematicsChoices: vscode.QuickPickItem[] = [];
     private name: string;
-    private fsPath!: string;
-    private config!: CollectionJsonSchema;
     private schematics = new Map<string, Schematic | undefined>();
 
     constructor(name: string) {
@@ -24,16 +31,14 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder, collectionFsPath: string): Promise<vscode.FileSystemWatcher | undefined> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, fsPath: string): Promise<vscode.FileSystemWatcher | undefined> {
 
-        this.fsPath = collectionFsPath;
+        const config = this.validateConfig(await FileSystem.parseJsonFile(fsPath));
 
-        this.config = this.validateConfig(await FileSystem.parseJsonFile(collectionFsPath));
-
-        await this.setSchematics(workspaceFolder);
+        await this.setSchematics(workspaceFolder, config, fsPath);
 
         /* Only watch local schematics */
-        return !collectionFsPath.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(collectionFsPath) : undefined;
+        return !fsPath.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(fsPath) : undefined;
 
     }
 
@@ -107,13 +112,13 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematics(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
+    private async setSchematics(workspaceFolder: vscode.WorkspaceFolder, config: CollectionJsonSchema, fsPath: string): Promise<void> {
 
         /* Start from scratch as the function can be called again via watcher */
         this.schematics.clear();
         this.schematicsChoices = [];
 
-        const allSchematics = Array.from(this.config.schematics);
+        const allSchematics = Array.from(config.schematics);
 
         Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
 
@@ -159,23 +164,26 @@ export class Collection {
 
             } else if (config.schema) {
 
-                const fsPath = path.join(path.dirname(this.fsPath), config.schema);
+                const schematicFsPath = path.join(path.dirname(fsPath), config.schema);
 
                 schematicConfig = {
                     name,
                     collectionName: this.name,
                     description: config.description,
-                    fsPath,
+                    fsPath: schematicFsPath,
                 };
 
             }
 
             if (schematicConfig) {
 
-                const schematicInstance = new Schematic(schematicConfig);
+                const schematicInstance = new Schematic(schematicConfig.name, schematicConfig.collectionName);
 
                 try {
-                    await schematicInstance.init();
+                    await schematicInstance.init({
+                        fsPath: schematicConfig.fsPath,
+                        collectionFsPath: schematicConfig.collectionFsPath,
+                    });
                     this.schematics.set(name, schematicInstance);
                     this.setSchematicChoice(schematicConfig);
                 } catch {

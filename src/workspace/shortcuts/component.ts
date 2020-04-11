@@ -85,49 +85,6 @@ export class ComponentShortcut {
     }
 
     /**
-     * Validate "ngschematics.componentTypes" user preference
-     */
-    private validateUserComponentType(userPreference: unknown): ComponentType | undefined {
-
-        const type = JsonValidator.object(userPreference);
-        const label = JsonValidator.string(type?.label);
-        const optionsList = JsonValidator.array(type?.options);
-
-        if (!label || !optionsList) {
-            return undefined;
-        } 
-
-        const options: [string, string][] = [];
-
-        for (const optionItem of optionsList) {
-
-            const option = JsonValidator.array(optionItem);
-
-            if (!option || (option.length !== 2)) {
-                return undefined;
-            }
-
-            const name = JsonValidator.string(option[0]);
-            const value = JsonValidator.string(option[1]);
-
-            if (!name || (value === undefined)) {
-                return undefined;
-            }
-
-            options.push([name, value]);
-
-        }
-
-        return {
-            label,
-            detail: JsonValidator.string(type?.detail),
-            options,
-            package: '',
-        };
-
-    }
-
-    /**
      * Get custom types (active defaults + user ones)
      */
     private async getCustomComponentTypes(workspaceFolder: vscode.WorkspaceFolder): Promise<ComponentType[]> {
@@ -186,6 +143,49 @@ export class ComponentShortcut {
         }
 
         return Array.from(customTypes.values());
+
+    }
+
+        /**
+     * Validate "ngschematics.componentTypes" user preference
+     */
+    private validateUserComponentType(userPreference: unknown): ComponentType | undefined {
+
+        const type = JsonValidator.object(userPreference);
+        const label = JsonValidator.string(type?.label);
+        const optionsList = JsonValidator.array(type?.options);
+
+        if (!label || !optionsList) {
+            return undefined;
+        } 
+
+        const options: [string, string][] = [];
+
+        for (const optionItem of optionsList) {
+
+            const option = JsonValidator.array(optionItem);
+
+            if (!option || (option.length !== 2)) {
+                return undefined;
+            }
+
+            const name = JsonValidator.string(option[0]);
+            const value = JsonValidator.string(option[1]);
+
+            if (!name || (value === undefined)) {
+                return undefined;
+            }
+
+            options.push([name, value]);
+
+        }
+
+        return {
+            label,
+            detail: JsonValidator.string(type?.detail),
+            options,
+            package: '',
+        };
 
     }
 
