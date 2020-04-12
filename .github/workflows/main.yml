@@ -49,4 +49,4 @@ jobs:
     - name: Test check
       run: npm test
       env:
-        DISPLAY: :0
+        DISPLAY: 0
