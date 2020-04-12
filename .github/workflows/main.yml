@@ -34,7 +34,7 @@ jobs:
     - name: Build check
       run: npm run compile
 
-  build:
+  test:
     name: Test check
     runs-on: ubuntu-latest
     timeout-minutes: 3
