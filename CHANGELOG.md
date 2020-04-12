@@ -1,12 +1,12 @@
 # Change Log
 
-## [4.0.0-beta.7] - 2020-04-10
+## [4.0.0] - 2020-04-13
 
 This is a huge update. I started this extension to help my students during my Angular courses,
 and it is now used by more than 270 000 developers. As many open source projects,
 it started small and messy, and then growed a lot. So it was time for a *full* rewrite.
 
-It took a *full-time* non-paid week (thanks to the current situation) to do so.
+It took more than a *full-time* non-paid week (thanks to the current situation) to do so.
 Yet I still do not have any **[sponsor](https://github.com/sponsors/cyrilletuzi)**.
 So please consider to help, or to ask your enterprise, which makes money with this extension, to help. 
 

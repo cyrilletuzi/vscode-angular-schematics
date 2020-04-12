@@ -3,7 +3,7 @@ import { describe, beforeEach, it } from 'mocha';
 
 import { TslintConfig } from '../../workspace/angular';
 
-import { getTestWorkspaceFolderFsPath } from './test-utils';
+import { getDefaultsWorkspaceFolderFsPath, getCustomizedWorkspaceFolderFsPath } from './test-utils';
 
 describe('TSLint config', () => {
 
@@ -96,9 +96,17 @@ describe('TSLint config', () => {
 
         });
 
-        it('with real workspace', async () => {
+        it('with defaults workspace', async () => {
 
-            await tslintConfig.init(getTestWorkspaceFolderFsPath(), { silent: true });
+            await tslintConfig.init(getDefaultsWorkspaceFolderFsPath(), { silent: true });
+            
+            assert.strictEqual(false, tslintConfig['hasComponentSuffix']('Page'));
+
+        });
+
+        it('with customized workspace defaults', async () => {
+
+            await tslintConfig.init(getCustomizedWorkspaceFolderFsPath(), { silent: true });
             
             assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Page'));
             assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Component'));

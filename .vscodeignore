@@ -18,4 +18,4 @@ webpack.config.js
 # Custom
 angular-schematics-demo-20191025.gif
 docs/**
-test-workspace/**
+test-workspaces/**
