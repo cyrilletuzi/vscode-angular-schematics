@@ -3,7 +3,9 @@ import { describe, beforeEach, it } from 'mocha';
 
 import { TslintConfig } from '../../workspace/angular';
 
-describe('TSLint', () => {
+import { getTestWorkspaceFolderFsPath } from './test-utils';
+
+describe('TSLint config', () => {
 
     describe('Component suffixes', () => {
 
@@ -13,55 +15,7 @@ describe('TSLint', () => {
             tslintConfig = new TslintConfig();
         });
 
-        it('initializes empty suffixes with no config', () => {
-
-            const config = tslintConfig['validateConfig'](undefined);
-            tslintConfig['initComponentSuffixes'](config);
-
-            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
-
-        });
-
-        it('initializes empty suffixes with no component suffixes rule', () => {
-
-            const config = tslintConfig['validateConfig']({
-                rules: {
-                    'no-console': true,
-                }
-            });
-            tslintConfig['initComponentSuffixes'](config);
-
-            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
-
-        });
-
-        it('initializes empty suffixes from boolean', () => {
-
-            const config = tslintConfig['validateConfig']({
-                rules: {
-                    'component-class-suffix': true,
-                }
-            });
-            tslintConfig['initComponentSuffixes'](config);
-
-            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
-
-        });
-
-        it('initializes empty suffixes from array with only boolean', () => {
-
-            const config = tslintConfig['validateConfig']({
-                rules: {
-                    'component-class-suffix': [true],
-                }
-            });
-            tslintConfig['initComponentSuffixes'](config);
-
-            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
-
-        });
-
-        it('initializes empty suffixes from array with 1 suffix', () => {
+        it('with 1 suffix', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
@@ -76,7 +30,7 @@ describe('TSLint', () => {
 
         });
 
-        it('initializes empty suffixes from array with 2 suffixes', () => {
+        it('with 2 suffixes', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
@@ -89,6 +43,66 @@ describe('TSLint', () => {
             assert.strictEqual(true, tslintConfig.hasComponentSuffix('Page'));
             assert.strictEqual(true, tslintConfig.hasComponentSuffix('component'));
             assert.strictEqual(true, tslintConfig.hasComponentSuffix('Component'));
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('Elmo'));
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('elmo'));
+
+        });
+
+        it('with no config', () => {
+
+            const config = tslintConfig['validateConfig'](undefined);
+            tslintConfig['initComponentSuffixes'](config);
+
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
+
+        });
+
+        it('with no suffix rule', () => {
+
+            const config = tslintConfig['validateConfig']({
+                rules: {
+                    'no-console': true,
+                }
+            });
+            tslintConfig['initComponentSuffixes'](config);
+
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
+
+        });
+
+        it('with boolean rule', () => {
+
+            const config = tslintConfig['validateConfig']({
+                rules: {
+                    'component-class-suffix': true,
+                }
+            });
+            tslintConfig['initComponentSuffixes'](config);
+
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
+
+        });
+
+        it('with array rule but no suffix', () => {
+
+            const config = tslintConfig['validateConfig']({
+                rules: {
+                    'component-class-suffix': [true],
+                }
+            });
+            tslintConfig['initComponentSuffixes'](config);
+
+            assert.strictEqual(false, tslintConfig.hasComponentSuffix('page'));
+
+        });
+
+        it('with real workspace', async () => {
+
+            await tslintConfig.init(getTestWorkspaceFolderFsPath(), { silent: true });
+            
+            assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Page'));
+            assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Component'));
+            assert.strictEqual(false, tslintConfig['hasComponentSuffix']('Elmo'));
 
         });
 

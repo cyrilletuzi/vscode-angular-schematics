@@ -65,15 +65,6 @@ export class Workspace {
     }
 
     /**
-     * Get a workspace folder's configuration, or `undefined`.
-     */
-    static getFolderConfig(workspaceFolder: vscode.WorkspaceFolder): WorkspaceFolderConfig | undefined {
-
-        return this.folders.get(workspaceFolder.name);
-
-    }
-
-    /**
      * Get a workspace folder based on a file system path, or `undefined`.
      */
     static getFolderFromPath(contextFsPath: string): vscode.WorkspaceFolder | undefined {
