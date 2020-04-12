@@ -46,7 +46,7 @@ jobs:
         node-version: 12
     - name: Install dependencies
       run: npm ci
+    - name: Required for Code display
+      run: sudo apt-get install xvfb
     - name: Test check
-      run: npm test
-      env:
-        DISPLAY: :99
+      run: xvfb-run --auto-servernum npm test
