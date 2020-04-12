@@ -33,7 +33,7 @@ export class AngularConfig {
 
         Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
 
-        this.schematicsDefaults = config.schematics;
+        this.initSchematicsDefaults(config);
 
         Output.logInfo(`${config.projects.size} Angular project(s) detected.`);
 
@@ -136,6 +136,13 @@ export class AngularConfig {
         /* `Set` removes duplicates */
         this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
 
+    }
+
+    /**
+     * Initialize schematics collections
+     */
+    private initSchematicsDefaults(config: Pick<AngularJsonSchema, 'schematics'>): void {
+        this.schematicsDefaults = config.schematics;
     }
 
     /**

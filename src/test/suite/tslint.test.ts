@@ -7,13 +7,13 @@ import { getDefaultsWorkspaceFolder, getCustomizedWorkspaceFolder } from './test
 
 describe('TSLint config', () => {
 
+    let tslintConfig: TslintConfig;
+
+    beforeEach(() => {
+        tslintConfig = new TslintConfig();
+    });
+
     describe('Component suffixes', () => {
-
-        let tslintConfig: TslintConfig;
-
-        beforeEach(() => {
-            tslintConfig = new TslintConfig();
-        });
 
         it('with 1 suffix', () => {
 
@@ -96,7 +96,11 @@ describe('TSLint config', () => {
 
         });
 
-        it('with defaults workspace', async () => {
+    });
+
+    describe('with actual workspaces', () => {
+
+        it('defaults', async () => {
 
             const workspaceFolder = getDefaultsWorkspaceFolder();
 
@@ -106,7 +110,7 @@ describe('TSLint config', () => {
 
         });
 
-        it('with customized workspace', async () => {
+        it('customized', async () => {
 
             const workspaceFolder = getCustomizedWorkspaceFolder();
 
