@@ -3,7 +3,7 @@ import { describe, beforeEach, it } from 'mocha';
 
 import { TslintConfig } from '../../workspace/angular';
 
-import { getDefaultsWorkspaceFolderFsPath, getCustomizedWorkspaceFolderFsPath } from './test-utils';
+import { getDefaultsWorkspaceFolder, getCustomizedWorkspaceFolder } from './test-utils';
 
 describe('TSLint config', () => {
 
@@ -19,7 +19,7 @@ describe('TSLint config', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
-                    'component-class-suffix': [true, 'Page'],
+                    'component-class-suffix': [true, 'Page']
                 }
             });
             tslintConfig['initComponentSuffixes'](config);
@@ -34,7 +34,7 @@ describe('TSLint config', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
-                    'component-class-suffix': [true, 'Component', 'Page'],
+                    'component-class-suffix': [true, 'Component', 'Page']
                 }
             });
             tslintConfig['initComponentSuffixes'](config);
@@ -61,7 +61,7 @@ describe('TSLint config', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
-                    'no-console': true,
+                    'no-console': true
                 }
             });
             tslintConfig['initComponentSuffixes'](config);
@@ -74,7 +74,7 @@ describe('TSLint config', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
-                    'component-class-suffix': true,
+                    'component-class-suffix': true
                 }
             });
             tslintConfig['initComponentSuffixes'](config);
@@ -87,7 +87,7 @@ describe('TSLint config', () => {
 
             const config = tslintConfig['validateConfig']({
                 rules: {
-                    'component-class-suffix': [true],
+                    'component-class-suffix': [true]
                 }
             });
             tslintConfig['initComponentSuffixes'](config);
@@ -98,15 +98,19 @@ describe('TSLint config', () => {
 
         it('with defaults workspace', async () => {
 
-            await tslintConfig.init(getDefaultsWorkspaceFolderFsPath(), { silent: true });
+            const workspaceFolder = getDefaultsWorkspaceFolder();
+
+            await tslintConfig.init(workspaceFolder.uri.fsPath, { silent: true });
             
             assert.strictEqual(false, tslintConfig['hasComponentSuffix']('Page'));
 
         });
 
-        it('with customized workspace defaults', async () => {
+        it('with customized workspace', async () => {
 
-            await tslintConfig.init(getCustomizedWorkspaceFolderFsPath(), { silent: true });
+            const workspaceFolder = getCustomizedWorkspaceFolder();
+
+            await tslintConfig.init(workspaceFolder.uri.fsPath, { silent: true });
             
             assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Page'));
             assert.strictEqual(true, tslintConfig['hasComponentSuffix']('Component'));

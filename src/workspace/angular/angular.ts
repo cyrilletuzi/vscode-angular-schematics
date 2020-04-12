@@ -29,11 +29,9 @@ export class AngularConfig {
 
         const config = this.validateConfig(unsafeConfig);
 
-        this.defaultUserCollection = this.initDefaultUserCollection(config);
+        this.initDefaultCollections(config);
 
         Output.logInfo(`Default schematics collection detected in your Angular config: ${this.defaultUserCollection}`);
-
-        this.defaultCollections = this.initDefaultCollections(this.defaultUserCollection);
 
         this.schematicsDefaults = config.schematics;
 
@@ -41,9 +39,7 @@ export class AngularConfig {
 
         const watchers = await this.setProjects(workspaceFolder, config);
 
-        if (fsPath) {
-            watchers.push(vscode.workspace.createFileSystemWatcher(fsPath));
-        }
+        watchers.push(vscode.workspace.createFileSystemWatcher(fsPath));
 
         return watchers;
         
@@ -130,22 +126,15 @@ export class AngularConfig {
     }
 
     /**
-     * Initialize default user collection
+     * Initialize default collections
      */
-    private initDefaultUserCollection(config: Pick<AngularJsonSchema, 'cli'>): string {
+    private initDefaultCollections(config: Pick<AngularJsonSchema, 'cli'>): void {
 
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
-        return config.cli?.defaultCollection ?? defaultAngularCollection;
-
-    }
-
-    /**
-     * Initialize default collections (user one + official one)
-     */
-    private initDefaultCollections(defaultUserCollection: string): string[] {
+        this.defaultUserCollection = config.cli?.defaultCollection ?? defaultAngularCollection;
 
         /* `Set` removes duplicates */
-        return Array.from(new Set([defaultUserCollection, defaultAngularCollection]));
+        this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
 
     }
 

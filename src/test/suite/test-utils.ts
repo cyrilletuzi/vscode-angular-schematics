@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 
-export function getDefaultsWorkspaceFolderFsPath(): string {
+export function getDefaultsWorkspaceFolder(): vscode.WorkspaceFolder {
 
-    return vscode.workspace.workspaceFolders![0].uri.fsPath;
+    return vscode.workspace.workspaceFolders![0];
 
 }
 
-export function getCustomizedWorkspaceFolderFsPath(): string {
+export function getCustomizedWorkspaceFolder(): vscode.WorkspaceFolder {
 
-    return vscode.workspace.workspaceFolders![1].uri.fsPath;
+    return vscode.workspace.workspaceFolders![1];
 
 }
