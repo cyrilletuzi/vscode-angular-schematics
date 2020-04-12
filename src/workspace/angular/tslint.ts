@@ -23,7 +23,7 @@ export class TslintConfig {
 
         const config = this.validateConfig(unsafeConfig);
 
-        this.componentSuffixes = this.initComponentSuffixes(config);
+        this.initComponentSuffixes(config);
 
         Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in TSLint config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
@@ -67,10 +67,10 @@ export class TslintConfig {
     /**
      * Initialize user components suffixes
      */
-    private initComponentSuffixes(config: Pick<TslintJsonSchema, 'rules'>): string[] {
+    private initComponentSuffixes(config: Pick<TslintJsonSchema, 'rules'>): void {
 
         /* `Set` removes duplicates */
-        return Array.from(new Set(config?.rules?.['component-class-suffix'] ?? []))
+        this.componentSuffixes = Array.from(new Set(config?.rules?.['component-class-suffix'] ?? []))
             .map((suffix) => suffix.toLowerCase());
 
     }
