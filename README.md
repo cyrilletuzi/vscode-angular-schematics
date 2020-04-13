@@ -250,6 +250,7 @@ If your schematics collection path is different, you can add:
 If you work with multiple projects at the same time, the extension supports:
 - VS Code workspace folders
 - Angular CLI monorepo (several `ng g application`s and/or `ng g library`s in the same project)
+- Hoisted `node_modules` (eg. Yarn workspaces)
 
 Using a right-click on a directory in the Explorer to launch a schematic generation
 is essential in both these cases, as the Code workspace folder and/or the Angular project
