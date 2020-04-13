@@ -77,6 +77,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${materialCollectionName}:table hello`, cliCommand.getCommand());
+        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
