@@ -188,7 +188,7 @@ export class UserJourney {
             } else if (schematicName === 'module') {
 
                 /* We know that Angular module schematics has a name as first argument */
-                shortcutOptions = await this.askModuleOptions(nameAsFirstArg!);
+                shortcutOptions = await this.askModuleOptions();
                 if (!shortcutOptions) {
                     Output.logInfo(`You have canceled the module type choice.`);
                     return;
@@ -393,7 +393,7 @@ export class UserJourney {
 
     }
 
-    private async askModuleOptions(nameAsFirstArg: string): Promise<CliCommandOptions | undefined> {
+    private async askModuleOptions(): Promise<CliCommandOptions | undefined> {
 
         const types = this.workspaceFolder.getModuleTypes();
 
@@ -403,7 +403,7 @@ export class UserJourney {
         if (lazyModuleType) {
 
             /* Usage of `posix` is important here as we are working with path with Linux separators `/` */
-            const routeName = path.posix.basename(nameAsFirstArg);
+            const routeName = this.cliCommand.getRouteFromFirstArg();
 
             lazyModuleType.options.set('route', routeName);
             lazyModuleType.choice.description = formatCliCommandOptions(lazyModuleType.options);

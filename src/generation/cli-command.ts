@@ -181,6 +181,13 @@ export class CliCommand {
     }
 
     /**
+     * Get route name from module's path
+     */
+    getRouteFromFirstArg(): string {
+        return path.posix.basename(this.nameAsFirstArg);
+    }
+
+    /**
      * Set name as first argument of the command line, eg. `path/to/some-component`
      */
     setNameAsFirstArg(pathToName: string): void {
