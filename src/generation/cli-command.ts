@@ -52,7 +52,7 @@ export class CliCommand {
             this.formatSchematicNameForCommand(),
             this.nameAsFirstArg,
             formatCliCommandOptions(this.options),
-        ].join(' ');
+        ].join(' ').trim();
 
     }
 

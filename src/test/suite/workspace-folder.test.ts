@@ -2,13 +2,13 @@ import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { describe, before, it } from 'mocha';
 
-import { WorkspaceFolderConfig } from '../../workspace';
 import { angularCollectionName } from '../../defaults';
+import { WorkspaceFolderConfig } from '../../workspace';
 import { COMPONENT_TYPE } from '../../workspace/shortcuts';
 
-describe('Real workspace folders', () => {
+import { rootProjectName, ionicCollectionName, libProjectName, subAppProjectName, materialCollectionName } from './test-config';
 
-    const rootProjectName = 'my-app';
+describe('Workspace folder config', () => {
 
     describe('Defaults', () => {
 
@@ -97,10 +97,6 @@ describe('Real workspace folders', () => {
     describe('Customized', () => {
 
         let workspaceFolder: WorkspaceFolderConfig;
-        const libProjectName = 'my-lib';
-        const subAppProjectName = 'other-app';
-        const ionicCollectionName = '@ionic/angular-toolkit';
-        const materialCollectionName = '@angular/material';
 
         before(async () => {
 
