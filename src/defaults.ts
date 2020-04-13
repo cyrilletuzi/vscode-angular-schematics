@@ -64,7 +64,7 @@ export const defaultComponentTypes: ComponentType[] = [
             ['type', 'modal'],
             ['skipSelector', 'true'],
         ],
-        package: '@angular/material',
+        package: '@ionic/angular',
         detail: `Ionic modal`,
     },
     {
@@ -73,7 +73,7 @@ export const defaultComponentTypes: ComponentType[] = [
             ['type', 'popover'],
             ['skipSelector', 'true'],
         ],
-        package: '@angular/material',
+        package: '@ionic/angular',
         detail: `Ionic popover`,
     },
     {

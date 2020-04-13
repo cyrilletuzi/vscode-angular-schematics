@@ -1,0 +1,9 @@
+{
+  "name": "customized",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "dependencies": {
+    "@angular/material": "9.2.0"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "ngschematics.componentTypes": [{
+    "label": "Custom component type",
+    "options": [["skipSelector", "true"], ["entryComponent", "true"]]
+  }]
+}

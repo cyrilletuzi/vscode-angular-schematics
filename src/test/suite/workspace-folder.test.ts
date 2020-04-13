@@ -4,6 +4,7 @@ import { describe, before, it } from 'mocha';
 
 import { WorkspaceFolderConfig } from '../../workspace';
 import { defaultAngularCollection } from '../../defaults';
+import { COMPONENT_TYPE } from '../../workspace/shortcuts';
 
 describe('Real workspace folders', () => {
 
@@ -57,6 +58,15 @@ describe('Real workspace folders', () => {
         it('Modules types', () => {
 
             assert.strictEqual(3, workspaceFolder.getModuleTypes().size);
+
+        });
+
+        it('Component types', () => {
+
+            assert.strictEqual(4, workspaceFolder.getComponentTypes(rootProjectName).size);
+
+            const pageComponentType = workspaceFolder.getComponentTypes(rootProjectName).get(COMPONENT_TYPE.PAGE);
+            assert.strictEqual(false, pageComponentType?.options.has('type'));
 
         });
 
@@ -143,6 +153,21 @@ describe('Real workspace folders', () => {
         it('Modules types', () => {
 
             assert.strictEqual(3, workspaceFolder.getModuleTypes().size);
+
+        });
+
+        it('Component types', () => {
+
+            assert.strictEqual(8, workspaceFolder.getComponentTypes(rootProjectName).size);
+
+            const rootPageComponentType = workspaceFolder.getComponentTypes(rootProjectName).get(COMPONENT_TYPE.PAGE);
+            assert.strictEqual('page', rootPageComponentType?.options.get('type'));
+
+            const libPageComponentType = workspaceFolder.getComponentTypes(libProjectName).get(COMPONENT_TYPE.PAGE);
+            assert.strictEqual('page', libPageComponentType?.options.get('type'));
+
+            const subAppPageComponentType = workspaceFolder.getComponentTypes(subAppProjectName).get(COMPONENT_TYPE.PAGE);
+            assert.strictEqual(false, subAppPageComponentType?.options.has('type'));
 
         });
 

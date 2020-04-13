@@ -25,7 +25,6 @@ describe('TSLint config', () => {
             assert.strictEqual(true, tslintConfig.hasComponentSuffix('page'));
             assert.strictEqual(true, tslintConfig.hasComponentSuffix('Page'));
 
-
         });
 
         it('with 2 suffixes', () => {

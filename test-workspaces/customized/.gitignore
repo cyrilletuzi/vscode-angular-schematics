@@ -1,0 +1,16 @@
+!node_modules/
+node_modules/*
+
+!node_modules/@angular/
+node_modules/@angular/*
+!node_modules/@angular/material/
+node_modules/@angular/material/*
+!node_modules/@angular/material/schematics/
+node_modules/@angular/material/schematics/*
+!node_modules/@angular/material/schematics/collection.json
+!node_modules/@angular/material/schematics/ng-add/
+node_modules/@angular/material/schematics/ng-add/*
+!node_modules/@angular/material/schematics/ng-add/schema.json
+!node_modules/@angular/material/schematics/ng-generate/
+node_modules/@angular/material/schematics/ng-generate/*
+!node_modules/@angular/material/schematics/ng-generate/schema.json
