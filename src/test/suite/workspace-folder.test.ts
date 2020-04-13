@@ -7,10 +7,11 @@ import { defaultAngularCollection } from '../../defaults';
 
 describe('Real workspace folders', () => {
 
+    const rootProjectName = 'my-app';
+
     describe('Defaults', () => {
 
         let workspaceFolder: WorkspaceFolderConfig;
-        const rootProjectName = 'defaults';
 
         before(async () => {
 
@@ -44,8 +45,9 @@ describe('Real workspace folders', () => {
     describe('Customized', () => {
 
         let workspaceFolder: WorkspaceFolderConfig;
+        const libProjectName = 'my-lib';
+        const subAppProjectName = 'other-app';
         const ionicCollection = '@ionic/angular-toolkit';
-        const rootProjectName = 'customized';
 
         before(async () => {
 
@@ -57,9 +59,17 @@ describe('Real workspace folders', () => {
 
         it('TSLint component suffixes', async () => {
 
-            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](rootProjectName, 'Page'));
             assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](rootProjectName, 'Component'));
-            assert.strictEqual(false, workspaceFolder['hasComponentSuffix'](rootProjectName, 'Elmo'));
+            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](rootProjectName, 'Page'));
+            assert.strictEqual(false, workspaceFolder['hasComponentSuffix'](rootProjectName, 'Dialog'));
+
+            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](libProjectName, 'Component'));
+            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](libProjectName, 'Page'));
+            assert.strictEqual(false, workspaceFolder['hasComponentSuffix'](libProjectName, 'Dialog'));
+
+            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](subAppProjectName, 'Component'));
+            assert.strictEqual(false, workspaceFolder['hasComponentSuffix'](subAppProjectName, 'Page'));
+            assert.strictEqual(true, workspaceFolder['hasComponentSuffix'](subAppProjectName, 'Dialog'));
 
         });
 
@@ -73,6 +83,10 @@ describe('Real workspace folders', () => {
         it('Angular schematics defaults', () => {
 
             assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(rootProjectName, `${defaultAngularCollection}:component`, 'flat'));
+
+            assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(libProjectName, `${defaultAngularCollection}:component`, 'flat'));
+
+            assert.strictEqual(false, workspaceFolder.getSchematicsOptionDefaultValue(subAppProjectName, `${defaultAngularCollection}:component`, 'flat'));
 
         });
 
