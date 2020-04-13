@@ -25,7 +25,7 @@ export class AngularProject {
     private appOrLibPath: string;
     /** Default values for schematics options */
     private schematicsDefaults: AngularJsonSchematicsSchema | undefined;
-    private tslintConfig!: TslintConfig;
+    tslintConfig!: TslintConfig;
 
     constructor(name: string, config: AngularJsonProjectSchema) {
 

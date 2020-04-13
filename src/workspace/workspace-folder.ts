@@ -157,15 +157,6 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
-     * Get all Angular projects' names
-     */
-    getAngularProjectsNames(): string[] {
-
-        return Array.from(this.angularConfig.projects.keys());
-
-    }
-
-    /**
      * Get component types
      */
     getComponentTypes(projectName: string): ShortcutsTypes {
@@ -232,6 +223,22 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
+     * Tells if a component suffix is authorized in tslint.json
+     */
+    hasComponentSuffix(angularProjectName: string, suffix: string): boolean {
+
+        const angularProject = this.getAngularProject(angularProjectName);
+
+        /* Suffixes can be defined at, in order of priority:
+         * 1. project level
+         * 2. workspace folder level */
+        return ((angularProject?.getComponentSuffixes().length ?? 0) > 0) ?
+                angularProject!.hasComponentSuffix(suffix) :
+                this.tslintConfig.hasComponentSuffix(suffix);
+
+    }
+
+    /**
      * Cancel all file watchers
      */
     disposeWatchers(): void {
@@ -242,22 +249,6 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         this.fileWatchers = [];
 
         this.preferencesWatcher?.dispose();
-
-    }
-
-    /**
-     * Tells if a component suffix is authorized in tslint.json
-     */
-    private hasComponentSuffix(angularProjectName: string, suffix: string): boolean {
-
-        const angularProject = this.getAngularProject(angularProjectName);
-
-        /* Suffixes can be defined at, in order of priority:
-         * 1. project level
-         * 2. workspace folder level */
-        return ((angularProject?.getComponentSuffixes().length ?? 0) > 0) ?
-                angularProject!.hasComponentSuffix(suffix) :
-                this.tslintConfig.hasComponentSuffix(suffix);
 
     }
 
