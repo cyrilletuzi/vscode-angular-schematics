@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultAngularCollection, defaultAngularConfigFileNames } from '../defaults';
+import { angularCollectionName, angularConfigFileNames } from '../defaults';
 import { Output } from '../utils';
 import { formatCliCommandOptions } from '../generation';
 
@@ -92,7 +92,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         this.componentShortcut = componentShortcut;
 
         /* Check if the `--route` option exists in Angular `module` schematic (Angular >= 8.1) */
-        const hasLazyModuleType = this.collections.getCollection(defaultAngularCollection)?.getSchematic('module')?.hasOption('route') ?? false;
+        const hasLazyModuleType = this.collections.getCollection(angularCollectionName)?.getSchematic('module')?.hasOption('route') ?? false;
         Output.logInfo(`Lazy-loaded module type: ${hasLazyModuleType ? `enabled` : `disabled`}`);
 
         const moduleShorcut = new ModuleShortcut();
@@ -165,7 +165,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const types = this.getAngularProject(projectName)?.componentShortcut.types ?? this.componentShortcut.types;
 
         /* `--type` is only supported in Angular >= 9 */
-        const hasTypeOption = this.collections.getCollection(defaultAngularCollection)?.getSchematic('component')?.hasOption('type') ?? false;
+        const hasTypeOption = this.collections.getCollection(angularCollectionName)?.getSchematic('component')?.hasOption('type') ?? false;
 
         for (const [, config] of types) {
 
@@ -258,7 +258,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string> {
 
         /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
-        const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${defaultAngularConfigFileNames.join(',')}}`);
+        const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${angularConfigFileNames.join(',')}}`);
 
         /* Third param is the maximum number of results */
         const searchMatches = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);

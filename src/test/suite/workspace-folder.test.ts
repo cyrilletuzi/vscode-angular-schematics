@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import { describe, before, it } from 'mocha';
 
 import { WorkspaceFolderConfig } from '../../workspace';
-import { defaultAngularCollection } from '../../defaults';
+import { angularCollectionName } from '../../defaults';
 import { COMPONENT_TYPE } from '../../workspace/shortcuts';
 
 describe('Real workspace folders', () => {
@@ -24,8 +24,8 @@ describe('Real workspace folders', () => {
 
         it('Angular default collections', () => {
 
-            assert.strictEqual(defaultAngularCollection, workspaceFolder.getDefaultUserCollection());
-            assert.deepEqual([defaultAngularCollection], workspaceFolder.getDefaultCollections());
+            assert.strictEqual(angularCollectionName, workspaceFolder.getDefaultUserCollection());
+            assert.deepEqual([angularCollectionName], workspaceFolder.getDefaultCollections());
 
         });
 
@@ -45,7 +45,7 @@ describe('Real workspace folders', () => {
 
         it('Angular schematics defaults', () => {
 
-            assert.strictEqual(undefined, workspaceFolder.getSchematicsOptionDefaultValue(rootProjectName, `${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(undefined, workspaceFolder.getSchematicsOptionDefaultValue(rootProjectName, `${angularCollectionName}:component`, 'flat'));
 
         });
 
@@ -70,6 +70,16 @@ describe('Real workspace folders', () => {
 
         });
 
+        it('Collections', () => {
+
+            assert.deepEqual([angularCollectionName], workspaceFolder.collections.getCollectionsNames());
+
+            const angularCollection = workspaceFolder.collections.getCollection(angularCollectionName);
+            assert.strictEqual(angularCollectionName, angularCollection?.getName());
+            assert.strictEqual(true, angularCollection?.getSchematicsNames().includes('component'));
+
+        });
+
     });
 
     describe('Customized', () => {
@@ -77,7 +87,8 @@ describe('Real workspace folders', () => {
         let workspaceFolder: WorkspaceFolderConfig;
         const libProjectName = 'my-lib';
         const subAppProjectName = 'other-app';
-        const ionicCollection = '@ionic/angular-toolkit';
+        const ionicCollectionName = '@ionic/angular-toolkit';
+        const materialCollectionName = '@angular/material';
 
         before(async () => {
 
@@ -89,8 +100,8 @@ describe('Real workspace folders', () => {
 
         it('Angular default collections', () => {
 
-            assert.strictEqual(ionicCollection, workspaceFolder.getDefaultUserCollection());
-            assert.deepEqual([ionicCollection, defaultAngularCollection], workspaceFolder.getDefaultCollections());
+            assert.strictEqual(ionicCollectionName, workspaceFolder.getDefaultUserCollection());
+            assert.deepEqual([ionicCollectionName, angularCollectionName], workspaceFolder.getDefaultCollections());
 
         });
 
@@ -126,11 +137,11 @@ describe('Real workspace folders', () => {
 
         it('Angular schematics defaults', () => {
 
-            assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(rootProjectName, `${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(rootProjectName, `${angularCollectionName}:component`, 'flat'));
 
-            assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(libProjectName, `${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(true, workspaceFolder.getSchematicsOptionDefaultValue(libProjectName, `${angularCollectionName}:component`, 'flat'));
 
-            assert.strictEqual(false, workspaceFolder.getSchematicsOptionDefaultValue(subAppProjectName, `${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(false, workspaceFolder.getSchematicsOptionDefaultValue(subAppProjectName, `${angularCollectionName}:component`, 'flat'));
 
         });
 
@@ -168,6 +179,25 @@ describe('Real workspace folders', () => {
 
             const subAppPageComponentType = workspaceFolder.getComponentTypes(subAppProjectName).get(COMPONENT_TYPE.PAGE);
             assert.strictEqual(false, subAppPageComponentType?.options.has('type'));
+
+        });
+
+        it('Collections', () => {
+
+            assert.deepEqual([ionicCollectionName, angularCollectionName, materialCollectionName], workspaceFolder.collections.getCollectionsNames());
+
+            const angularCollection = workspaceFolder.collections.getCollection(angularCollectionName);
+            assert.strictEqual(angularCollectionName, angularCollection?.getName());
+            assert.strictEqual(true, angularCollection?.getSchematicsNames().includes('component'));
+
+            const materialCollection = workspaceFolder.collections.getCollection(materialCollectionName);
+            assert.strictEqual(materialCollectionName, materialCollection?.getName());
+            assert.strictEqual(true, materialCollection?.getSchematicsNames().includes('table'));
+
+            const ionicCollection = workspaceFolder.collections.getCollection(ionicCollectionName);
+            assert.strictEqual(ionicCollectionName, ionicCollection?.getName());
+            assert.strictEqual(true, ionicCollection?.getSchematicsNames().includes('component'));
+            assert.strictEqual(true, ionicCollection?.getSchematicsNames().includes('page'));
 
         });
 

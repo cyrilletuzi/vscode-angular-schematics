@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { defaultCollectionsNames, defaultAngularCollection } from '../../defaults';
+import { defaultCollectionsNames, angularCollectionName } from '../../defaults';
 import { Output, JsonValidator } from '../../utils';
 
 import { Collection } from './collection';
@@ -84,7 +84,7 @@ export class Collections {
         if (existingCollections.length > 0) {
             Output.logInfo(`${existingCollections.length} installed collection(s) detected: ${existingCollections.map((collection) => collection.name).join(', ')}`);
         } else {
-            Output.logError(`No collection found. "${defaultAngularCollection}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, try to run in the Terminal: "npm install ${defaultAngularCollection} --save-dev"`);
+            Output.logError(`No collection found. "${angularCollectionName}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, try to run in the Terminal: "npm install ${angularCollectionName} --save-dev"`);
         }
         
         /* `.filter()` is not possible here as there is an async operation */

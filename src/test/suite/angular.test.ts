@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { describe, beforeEach, it } from 'mocha';
 
-import { defaultAngularCollection } from '../../defaults';
+import { angularCollectionName } from '../../defaults';
 import { AngularConfig } from '../../workspace/angular';
 
 describe('Angular config', () => {
@@ -22,8 +22,8 @@ describe('Angular config', () => {
             });
             angularConfig['initDefaultCollections'](config);
 
-            assert.strictEqual(defaultAngularCollection, angularConfig.defaultUserCollection);
-            assert.deepEqual([defaultAngularCollection], angularConfig.defaultCollections);
+            assert.strictEqual(angularCollectionName, angularConfig.defaultUserCollection);
+            assert.deepEqual([angularCollectionName], angularConfig.defaultCollections);
 
         });
 
@@ -38,7 +38,7 @@ describe('Angular config', () => {
             angularConfig['initDefaultCollections'](config);
 
             assert.strictEqual(ionicCollection, angularConfig.defaultUserCollection);
-            assert.deepEqual([ionicCollection, defaultAngularCollection], angularConfig.defaultCollections);
+            assert.deepEqual([ionicCollection, angularCollectionName], angularConfig.defaultCollections);
 
         });
 
@@ -53,7 +53,7 @@ describe('Angular config', () => {
             });
             angularConfig['initSchematicsDefaults'](config);
 
-            assert.strictEqual(undefined, angularConfig.getSchematicsOptionDefaultValue(`${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(undefined, angularConfig.getSchematicsOptionDefaultValue(`${angularCollectionName}:component`, 'flat'));
 
         });
 
@@ -62,14 +62,14 @@ describe('Angular config', () => {
             const config = angularConfig['validateConfig']({
                 version: 1,
                 schematics: {
-                    [`${defaultAngularCollection}:component`]: {
+                    [`${angularCollectionName}:component`]: {
                         flat: true
                     }
                 }
             });
             angularConfig['initSchematicsDefaults'](config);
 
-            assert.strictEqual(true, angularConfig.getSchematicsOptionDefaultValue(`${defaultAngularCollection}:component`, 'flat'));
+            assert.strictEqual(true, angularConfig.getSchematicsOptionDefaultValue(`${angularCollectionName}:component`, 'flat'));
 
         });
 

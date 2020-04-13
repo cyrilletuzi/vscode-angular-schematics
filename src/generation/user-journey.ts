@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultAngularCollection, extensionName } from '../defaults';
+import { angularCollectionName, extensionName } from '../defaults';
 import { Output, FileSystem, Terminal } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collection, Schematic } from '../workspace/schematics';
@@ -83,7 +83,7 @@ export class UserJourney {
                 collectionName = await this.askCollectionName();
             } catch {
                 /* Happens if `@schematics/angular` is not installed */
-                this.showCollectionMissingErrorWithFix(defaultAngularCollection);
+                this.showCollectionMissingErrorWithFix(angularCollectionName);
                 return;
             }
 
@@ -170,7 +170,7 @@ export class UserJourney {
         let shortcutConfirm: boolean | undefined = false;
 
         /* Quicker scenario for basic schematics (component, service, module of official schematics) */
-        if ((collectionName === defaultAngularCollection)
+        if ((collectionName === angularCollectionName)
         && UserJourney.shortcutSchematics.includes(schematicName)) {
 
             let shortcutOptions: CliCommandOptions | undefined;
@@ -671,7 +671,7 @@ export class UserJourney {
 
     private async showCollectionMissingErrorWithFix(collectionName: string): Promise<void> {
 
-        const message = (collectionName === defaultAngularCollection) ?
+        const message = (collectionName === angularCollectionName) ?
             `"${collectionName}" should be present in a correctly installed Angular project.` :
             `Cannot load "${collectionName}" collection. It may not exist in "${this.workspaceFolder.name}" workspace folder.`;
 

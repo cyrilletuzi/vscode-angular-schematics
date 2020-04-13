@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { defaultAngularCollection } from '../defaults';
+import { angularCollectionName } from '../defaults';
 import { FileSystem, Output, Terminal } from '../utils';
 import { WorkspaceFolderConfig } from '../workspace';
 import { Schematic } from '../workspace/schematics';
@@ -27,7 +27,7 @@ export class CliCommand {
     };
     private baseCommand = 'ng g';
     private projectName = '';
-    private collectionName = defaultAngularCollection;
+    private collectionName = angularCollectionName;
     private schematicName = '';
     private schematic!: Schematic;
     private nameAsFirstArg = '';
@@ -158,7 +158,7 @@ export class CliCommand {
     getContextForNameAsFirstArg(): string {
 
         /* Some schematics do not need a path */
-        if ((this.collectionName === defaultAngularCollection)
+        if ((this.collectionName === angularCollectionName)
         && ['application', 'library'].includes(this.schematicName)) {
             return '';
         }
@@ -238,7 +238,7 @@ export class CliCommand {
             let suffix = `.${this.schematicName}`;
 
             /* Official Angular schematics have some special cases */
-            if (this.collectionName === defaultAngularCollection) {
+            if (this.collectionName === angularCollectionName) {
 
                 /* Component can have a custom suffix via `--type` option */
                 if (['component', 'class', 'interface'].includes(this.schematicName) && this.options.has('type')) {
@@ -302,7 +302,7 @@ export class CliCommand {
                         isFlat = isSchematicDefaultFlat;
                     }
                     /* Priority 4: use hard defaults known for some schematics */
-                    else if ((this.collectionName === defaultAngularCollection) && ['component', 'module'].includes(this.schematicName)) {
+                    else if ((this.collectionName === angularCollectionName) && ['component', 'module'].includes(this.schematicName)) {
 
                         isFlat = false;
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { defaultAngularCollection } from '../../defaults';
+import { angularCollectionName } from '../../defaults';
 import { FileSystem, Output, JsonValidator } from '../../utils';
 
 import { AngularProject } from './angular-project';
@@ -12,7 +12,7 @@ export class AngularConfig {
     /** List of projects registered in Angular config file */
     projects = new Map<string, AngularProject>();
     /** User default collection, otherwise official Angular CLI default collection */
-    defaultUserCollection = defaultAngularCollection;
+    defaultUserCollection = angularCollectionName;
     /** User + official default collections */
     defaultCollections: string[] = [];
     /** Root project name */
@@ -131,10 +131,10 @@ export class AngularConfig {
     private initDefaultCollections(config: Pick<AngularJsonSchema, 'cli'>): void {
 
         /* Take `defaultCollection` defined in `angular.json`, or defaults to official collection */
-        this.defaultUserCollection = config.cli?.defaultCollection ?? defaultAngularCollection;
+        this.defaultUserCollection = config.cli?.defaultCollection ?? angularCollectionName;
 
         /* `Set` removes duplicates */
-        this.defaultCollections = Array.from(new Set([this.defaultUserCollection, defaultAngularCollection]));
+        this.defaultCollections = Array.from(new Set([this.defaultUserCollection, angularCollectionName]));
 
     }
 

@@ -5,5 +5,8 @@
   "license": "MIT",
   "dependencies": {
     "@angular/material": "9.2.0"
+  },
+  "devDependencies": {
+    "@ionic/angular-toolkit": "2.2.0"
   }
 }
