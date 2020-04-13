@@ -173,9 +173,9 @@ now the extension may still work, with limited features, if you met these minima
 With time, the extension's code became quite messy.
 The code has been fully rewritten, reorganized and above all fully *documented*.
 
-This is especially good news for **contributors**, which can now help more easily
-(for example to add the support of Yarn workspaces asked in
-[#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49)).
+Also, there are now tests, automatically launched by Github Actions.
+
+This is especially good news for **contributors**, which can now help more easily.
 
 ### UX
 
