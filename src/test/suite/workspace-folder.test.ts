@@ -80,6 +80,18 @@ describe('Real workspace folders', () => {
 
         });
 
+        it('Schematics', () => {
+
+            const angularComponentSchematic = workspaceFolder.collections.getCollection(angularCollectionName)?.getSchematic('component');
+            assert.strictEqual('component', angularComponentSchematic?.getName());
+            assert.strictEqual(0, angularComponentSchematic?.getRequiredOptions().size);
+            assert.strictEqual(true, angularComponentSchematic?.hasNameAsFirstArg());
+            assert.strictEqual(true, angularComponentSchematic?.hasOption('changeDetection'));
+            assert.strictEqual(false, angularComponentSchematic?.getOptionDefaultValue('flat'));
+            assert.strictEqual(1, angularComponentSchematic?.getSomeOptions(['export', 'elmo']).size);
+
+        });
+
     });
 
     describe('Customized', () => {
@@ -198,6 +210,23 @@ describe('Real workspace folders', () => {
             assert.strictEqual(ionicCollectionName, ionicCollection?.getName());
             assert.strictEqual(true, ionicCollection?.getSchematicsNames().includes('component'));
             assert.strictEqual(true, ionicCollection?.getSchematicsNames().includes('page'));
+
+        });
+
+        it('Schematics', () => {
+
+            const angularComponentSchematic = workspaceFolder.collections.getCollection(angularCollectionName)?.getSchematic('component');
+            assert.strictEqual('component', angularComponentSchematic?.getName());
+            assert.strictEqual(0, angularComponentSchematic?.getRequiredOptions().size);
+            assert.strictEqual(true, angularComponentSchematic?.hasNameAsFirstArg());
+            assert.strictEqual(true, angularComponentSchematic?.hasOption('changeDetection'));
+            assert.strictEqual(false, angularComponentSchematic?.getOptionDefaultValue('flat'));
+            assert.strictEqual(1, angularComponentSchematic?.getSomeOptions(['export', 'elmo']).size);
+
+            const materialSchematic = workspaceFolder.collections.getCollection(materialCollectionName)?.getSchematic('table');
+            assert.strictEqual('table', materialSchematic?.getName());
+            assert.strictEqual(true, materialSchematic?.hasNameAsFirstArg());
+            assert.strictEqual(true, materialSchematic?.hasOption('inlineTemplate'));
 
         });
 
