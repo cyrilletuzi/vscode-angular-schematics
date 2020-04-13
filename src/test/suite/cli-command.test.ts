@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import * as assert from 'assert';
 import { describe, before, it } from 'mocha';
 
@@ -6,7 +7,7 @@ import { angularCollectionName, defaultComponentTypes } from '../../defaults';
 import { WorkspaceFolderConfig } from '../../workspace';
 import { CliCommand } from '../../generation/cli-command';
 
-import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName } from './test-config';
+import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath } from './test-config';
 import { COMPONENT_TYPE, ShortcutsTypes, MODULE_TYPE } from '../../workspace/shortcuts';
 
 describe('Cli command', () => {
@@ -24,7 +25,7 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic', () => {
+    it('Basic component', () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
@@ -34,19 +35,35 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+
+    });
+
+    it('Basic service', () => {
+
+        const cliCommand = new CliCommand(workspaceFolderDefaults);
+        cliCommand.setProjectName(rootProjectName);
+        cliCommand.setCollectionName(angularCollectionName);
+        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('service')!);
+        cliCommand.validateProject();
+        cliCommand.setNameAsFirstArg('hello');
+
+        assert.strictEqual(`ng g service hello`, cliCommand.getCommand());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.service.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
     it('With project', () => {
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
+        const cliCommand = new CliCommand(workspaceFolderCustomized);
         cliCommand.setProjectName(libProjectName);
         cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+        cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
         cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
-        assert.strictEqual(`ng g component hello --project ${libProjectName}`, cliCommand.getCommand());
+        assert.strictEqual(`ng g ${angularCollectionName}:component hello --project ${libProjectName}`, cliCommand.getCommand());
+        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -129,6 +146,20 @@ describe('Cli command', () => {
         cliCommand.addOptions([['export', 'true'], ['changeDetection', 'OnPush']]);
 
         assert.strictEqual(`ng g component hello --export --changeDetection OnPush`, cliCommand.getCommand());
+
+    });
+
+    it('invalid', () => {
+
+        const cliCommand = new CliCommand(workspaceFolderDefaults);
+        cliCommand.setProjectName(rootProjectName);
+        cliCommand.setCollectionName(angularCollectionName);
+        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+        cliCommand.validateProject();
+        cliCommand.setNameAsFirstArg('hello');
+        cliCommand.addOptions([['elmo', 'true']]);
+
+        assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
 
     });
 
