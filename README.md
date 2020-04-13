@@ -3,6 +3,8 @@
 [Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics)
 allowing you to **generate Angular schematics with a Graphical User Interface**.
 
+Works with Ionic Angular projects too!
+
 ## Why this extension?
 
 ### Productivity!
