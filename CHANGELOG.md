@@ -1,5 +1,193 @@
 # Change Log
 
+## [4.0.0] - 2020-04-13
+
+This is a huge update. I started this extension to help my students during my Angular courses,
+and it is now used by more than 270 000 developers. As many open source projects,
+it started small and messy, and then growed a lot. So it was time for a *full* rewrite.
+
+It took more than a *full-time* non-paid week (thanks to the current situation) to do so.
+Yet I still do not have any **[sponsor](https://github.com/sponsors/cyrilletuzi)**.
+So please consider to help, or to ask your enterprise, which makes money with this extension, to help. 
+
+### Compatibility with all shells
+
+Previously, the extension was launching the Angular CLI commands directly via Node.
+Although there was advantages (knowing the command result to know which file was generated and auto-open it),
+it caused a lot of issues for people having special configurations
+(nvm [#51](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/51),
+custom shells on Windows [#27](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/27)...).
+
+Now the extension is using a Terminal, ie. your environment directly.
+So **if the Angular CLI is working in your VS Code terminal, the extension should work too.**
+
+It means **the extension now supports any shell**:
+- macOS / Linux: default shell or any custom shell (zsh...)
+- Windows: default shell or any custom shell (PowerShell, Git bash...),
+- Windows WSL too!
+
+And while the extension cannot know the Terminal result,
+in most cases, the generated file will still be automatically opened!
+
+### Troubleshooting
+
+Everything is now logged in `Angular Schematics` output channel (second tab left to your Terminal).
+
+This is especially good news for **issues resolution**, as you can now
+detect and correct configurations issues based on logs, and
+copy/past the logs when creating a new GitHub issue is relevant.
+
+### Open from a parent directory
+
+Until now, a requirement was to open your Angular project from its root directory (ie. where `angular.json` is).
+The Angular CLI itself only works if this condition is met.
+
+While it is not the best practice in today's front-end development,
+now you can open your Angular project from a parent directory!
+
+This is especially good news for **Java users** who often like to keep their front-end project
+inside their back-end project.
+
+### Full compatibility with Code workspaces with multiple folders
+
+VS Code allows to use several projects (folders) in the same Code workspace.
+
+While the extension was already partially supporting that,
+it is something really difficult to manage well,
+and there was a lot of issues here and there.
+
+Now every detail of the extension should be **aware of the workspace folder** you are working in.
+
+### Full compatibility with Angular CLI monorepo
+
+It gets worse: configuration can be specific to the workspace folder,
+but it can also be specific to the Angular project you are working in.
+
+Indeed, Angular CLI allows you to generate libraries (`ng g library`)
+and/or multiple applications (`ng g application`) in the same folder.
+
+And Angular projects can have different configurations
+(for example TSLint, which is useful to manage components types in Angular >= 9).
+
+Now every detail of the extension should be **aware of the Angular project** you are working in.
+This is especially good news for users doing an **Angular monorepo**.
+
+### Component types
+
+#### Fully customizable component types
+
+Default component types proposed when doing "Generate a component" are now fully customizable.
+
+For example, in your VS Code preferences
+(preferably your *workspace* preferences, so all your team can benefit):
+
+```json
+{
+  "ngschematics.componentTypes": [{
+    "label": "Angular Element",
+    "options": [["viewEncapsulation", "ShadowDom"], ["export", "true"]],
+    "detail": "Optional human description",
+  }]
+}
+```
+
+**Breaking change**: it means the previous `ngschematics.componentTypes`
+setting's format is not supported anymore.
+
+#### Library specific component types
+
+It was already partially done before, but the extension will now detect
+and propose these additional component types if the related libraries are installed:
+- Angular Material dialog
+- Angular Material snackbar
+- Angular Material bottomsheet
+- Ionic modal
+- Ionic popover
+- PrimeNG dynamic dialog
+
+Library authors are encouraged to create a Pull Request and
+easily add defaults components types in `src/defaults.ts`.
+
+#### Removed entry component type
+
+Previously, default suggested component types had an "Entry component" type.
+It has been removed as it is now officially deprecated in Angular CLI >= 9,
+and because detecting if your project has an old configuration was (really) too complicated and messy.
+
+Fortunately, with customizable component types explained above, you can still add it back
+(only needed if you have an Angular < 9 project or an Angular >= 9 project with Ivy manually disabled):
+
+```json
+{
+  "ngschematics.componentTypes": [{
+    "label": "Entry component",
+    "options": [["entryComponent", "true"], ["skipSelector", "true"]],
+    "detail": "Component instanciated at runtime, like a dialog or modal",
+  }]
+}
+```
+
+### node_modules location
+
+The extension now supports hoisted `node_modules`, ie. `node_modules` being in a parent folder.
+
+This is especially good news for **Yarn workspaces** users ([#49](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/49)).
+
+### Performance
+
+Caching is quite hard to manage in this extension, as many details can change depending on your project's configuration.
+Now the extension caches and preloads everything possible.
+
+This is a good news for **performance**.
+
+### Better cross-OS compatibility
+
+The extension does a lot of path composition. It is quite hard to manage,
+as some paths need to always use classic `/`, while others need to use the OS-specific separator.
+
+Previously it was done via custom methods. Now the extension uses reliable APIs,
+and has adopted naming conventions to distinguish path types.
+
+This is especially good news for **Windows users**.
+
+### Support for all Angular configuration files
+
+While a today's Angular CLI project should have a `angular.json` file,
+the CLI still support other legacy file names. The extension now supports all of them, ie.:
+- `angular.json`
+- `.angular.json`
+- `angular-cli.json`
+- `.angular-cli.json`
+
+### Support for non-Angular CLI projects
+
+If you do not use the official Angular CLI project structure and configuration,
+now the extension may still work, with limited features, if you met these minimal requirements:
+
+- Angular CLI installed globally: `npm install @angular/cli -g`
+- Angular Schematics installed locally: `npm install @schematics/angular --save-dev`
+- Add an `angular.json` in your project with at least `{ "version": 1 }`
+
+### Easier contribution
+
+With time, the extension's code became quite messy.
+The code has been fully rewritten, reorganized and above all fully *documented*.
+
+Also, there are now tests, automatically launched by Github Actions.
+
+This is especially good news for **contributors**, which can now help more easily.
+
+### UX
+
+User experience has been improved everywhere it was possible. Non-exhaustive list:
+- show progress on actions taking time
+- icons for default component and module types choices
+- ask where to import the module when doing "Generate a module"
+- auto-opening the generated file works with even more schematics
+- if the generated file cannot be opened automatically, propose to refresh the Explorer
+- as the Terminal is now used, output is colored
+- actionnable fix if a schematics package is missing
+
 ## [3.3.1] - 2020-03-19
 
 ### UX
@@ -164,7 +352,7 @@ See the detailed [instructions in README](./README.md).
 
 ### Easier contributions
 
-All default values are now in a [simple and single file](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/schematics/defaults.ts),
+All default values are now in a [simple and single file](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts),
 so you can easily do a Pull Request to add new defaults (for example to add a commonly used schematics).
 
 ### Other feature
@@ -377,11 +565,6 @@ provided that your VS Code settings are configured accordingly
 
 ### Feature
 - Support for Angular 5 / CLI 1.7 projects.
-
-## [1.1.0] - 2018-06-22
-
-### Feature
-- Support `@nrwl/schematics` and `@nstudio/schematics` by default.
 
 ## [1.0.1] - 2018-06-22
 

@@ -5,9 +5,9 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "compile",
-			"problemMatcher": "$ts-webpack",
-			"isBackground": false,
+			"script": "watch",
+			"problemMatcher": "$ts-webpack-watch",
+			"isBackground": true,
 			"presentation": {
 				"reveal": "never"
 			},

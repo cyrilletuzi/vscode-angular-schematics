@@ -1,70 +1,103 @@
-'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-import { AngularSchematicsProvider } from './schematics/view';
-import { Commands } from './schematics/commands';
-import { GenerateConfig } from './schematics/commands';
-import { Output } from './schematics/output';
-import { AngularConfig } from './schematics/angular-config';
-import { Preferences } from './schematics/preferences';
-import { ExplorerMenuContext } from './schematics/workspace';
+import { angularCollectionName, extensionName } from './defaults';
+import { Output, Terminal } from './utils';
+import { Workspace } from './workspace';
+import { UserJourney } from './generation';
+import { SchematicsTreeDataProvider } from './view';
 
+let treeDataProvider: vscode.TreeView<vscode.TreeItem> | undefined;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+/**
+ * Function called when the extension is activated, to register new commands.
+ * Activation triggers are configured in `package.json`.
+ */
+export function activate(context: vscode.ExtensionContext): void {
 
+    Output.logInfo(`${extensionName} extension has been activated.`);
+
+    /* Enable context menus */
     vscode.commands.executeCommand('setContext', 'inAngularProject', true);
 
-    vscode.window.registerTreeDataProvider('angular-schematics', new AngularSchematicsProvider());
+    /* Initialize all configurations */
+    Workspace.init();
 
-    Preferences.init();
+    /* Add a new View with the list of all Angular schematics.
+     * Collections must be loaded to be able to load the view */
+    Workspace.whenStable().then(() => {
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    const generateComponentCommand = vscode.commands.registerCommand('ngschematics.generateComponent', async (context: ExplorerMenuContext) => {
-
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'component'
+        treeDataProvider = vscode.window.createTreeView('angular-schematics', {
+            treeDataProvider: new SchematicsTreeDataProvider(),
         });
+        treeDataProvider.message = `Hello! While this list is useful to see all the schematics available,
+        it is easier to launch a generation with a right-click on a folder in the Explorer,
+        as then the extension will infer the workspace folder, the path and the project.`;
 
-    });
+    }).catch();
+    
+    /* 
+     * Register new commands. Important things:
+     * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
+     * - the callback parameters' values depends on how the command is trigerred:
+     *   - with a right click in Explorer: will a `Uri` object of the file or folder clicked
+     *   - with the Command Palette or the dedicated extension panel: `undefined`
+     *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name 
+     */
+    context.subscriptions.push(
+        vscode.commands.registerCommand('ngschematics.generateComponent', (contextUri?: vscode.Uri) => {
 
-    const generateServiceCommand = vscode.commands.registerCommand('ngschematics.generateService', async (context: ExplorerMenuContext) => {
+            Output.logInfo(`Starting journey to generate a component.`);
 
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'service'
-        });
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            (new UserJourney()).start(contextUri, angularCollectionName, 'component');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generateService', (contextUri?: vscode.Uri) => {
 
-    });
+            Output.logInfo(`Starting journey to generate a service.`);
 
-    const generateModuleCommand = vscode.commands.registerCommand('ngschematics.generateModule', async (context: ExplorerMenuContext) => {
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            (new UserJourney()).start(contextUri, angularCollectionName, 'service');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generateModule', (contextUri?: vscode.Uri) => {
 
-        await Commands.generate(context, {
-            collectionName: AngularConfig.cliCollection,
-            schemaName: 'module'
-        });
+            Output.logInfo(`Starting journey to generate a module.`);
 
-    });
+            /* For shortcuts, always use default official collection
+             * (default user collection can be set to something else,
+             * and this can be an issue when they are buggy like the Ionic ones) */
+            (new UserJourney()).start(contextUri, angularCollectionName, 'module');
+    
+        }),
+        vscode.commands.registerCommand('ngschematics.generate', (contextUri?: vscode.Uri, options?: { collectionName?: string, schematicName?: string }) => {
 
-    const generateCommand = vscode.commands.registerCommand('ngschematics.generate', async (context: ExplorerMenuContext, options: GenerateConfig = {}) => {
+            Output.logInfo(`Starting journey to generate a schematics.`);
 
-        await Commands.generate(context, options);
-
-    });
-
-    context.subscriptions.push(generateComponentCommand, generateServiceCommand, generateModuleCommand, generateCommand);
+            (new UserJourney()).start(contextUri, options?.collectionName, options?.schematicName);
+    
+        }),
+    );
 
 }
 
-// this method is called when your extension is deactivated
+/** 
+ * Function called when the extension is deactivated, to do cleaning.
+ */
 export function deactivate(): void {
 
+    for (const [, workspaceFolder] of Workspace.folders) {
+        workspaceFolder.disposeWatchers();
+    }
+
+    Terminal.disposeAll();
+
     Output.dispose();
+
+    treeDataProvider?.dispose();
 
 }

@@ -12,8 +12,14 @@ async function main(): Promise<void> {
 		// Passed to --extensionTestsPath
 		const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
+		const testWorkspace = path.resolve(extensionDevelopmentPath, 'test-workspaces/test.code-workspace');
+
 		// Download VS Code, unzip it and run the integration test
-		await runTests({ extensionDevelopmentPath, extensionTestsPath });
+		await runTests({
+			extensionDevelopmentPath,
+			extensionTestsPath,
+			launchArgs: [testWorkspace, '--disable-extensions'],
+		});
 	} catch (err) {
 		console.error('Failed to run tests');
 		process.exit(1);

@@ -7,6 +7,7 @@ jobs:
   lint:
     name: Lint check
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
@@ -21,6 +22,7 @@ jobs:
   build:
     name: Build check
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
@@ -31,3 +33,20 @@ jobs:
       run: npm ci
     - name: Build check
       run: npm run compile
+
+  test:
+    name: Test check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install dependencies
+      run: npm ci && cd test-workspaces && npm ci && cd customized && npm ci
+    - name: Required for Code display
+      run: sudo apt-get install xvfb
+    - name: Test check
+      run: xvfb-run --auto-servernum npm test
