@@ -35,10 +35,10 @@ export class CliCommand {
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
-        contextUri?: vscode.Uri,
+        contextPath?: string,
     ) {
 
-        this.setContextPathAndProject(contextUri);
+        this.setContextPathAndProject(contextPath);
 
     }
 
@@ -360,14 +360,14 @@ export class CliCommand {
     /**
      * Set context path and prject.
      */
-    private setContextPathAndProject(context?: vscode.Uri): void {
+    private setContextPathAndProject(contextPath?: string): void {
 
-        if (!context?.path) {
+        if (!contextPath) {
             Output.logInfo(`No context path detected.`);
             return;
         }
 
-        this.contextPath.full = context.path;
+        this.contextPath.full = contextPath;
 
         Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
 

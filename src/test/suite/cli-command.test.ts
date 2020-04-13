@@ -53,6 +53,34 @@ describe('Cli command', () => {
 
     });
 
+    it('Basic module', () => {
+
+        const cliCommand = new CliCommand(workspaceFolderDefaults);
+        cliCommand.setProjectName(rootProjectName);
+        cliCommand.setCollectionName(angularCollectionName);
+        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
+        cliCommand.validateProject();
+        cliCommand.setNameAsFirstArg('hello');
+
+        assert.strictEqual(`ng g module hello`, cliCommand.getCommand());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.module.ts'), cliCommand.guessGereratedFileFsPath());
+
+    });
+
+    it('Basic interface', () => {
+
+        const cliCommand = new CliCommand(workspaceFolderDefaults);
+        cliCommand.setProjectName(rootProjectName);
+        cliCommand.setCollectionName(angularCollectionName);
+        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('interface')!);
+        cliCommand.validateProject();
+        cliCommand.setNameAsFirstArg('hello');
+
+        assert.strictEqual(`ng g interface hello`, cliCommand.getCommand());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.ts'), cliCommand.guessGereratedFileFsPath());
+
+    });
+
     it('With project', () => {
 
         const cliCommand = new CliCommand(workspaceFolderCustomized);
@@ -91,76 +119,81 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello/world');
 
         assert.strictEqual(`ng g component hello/world`, cliCommand.getCommand());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world/world.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
-    it('With a string option', () => {
+    describe('with options', () => {
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
-        cliCommand.setProjectName(rootProjectName);
-        cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
-        cliCommand.setNameAsFirstArg('hello');
-        cliCommand.addOptions([['changeDetection', 'OnPush']]);
+        it('string', () => {
 
-        assert.strictEqual(`ng g component hello --changeDetection OnPush`, cliCommand.getCommand());
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+            cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+            cliCommand.addOptions([['changeDetection', 'OnPush']]);
 
-    });
+            assert.strictEqual(`ng g component hello --changeDetection OnPush`, cliCommand.getCommand());
 
-    it('With a boolean option', () => {
+        });
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
-        cliCommand.setProjectName(rootProjectName);
-        cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
-        cliCommand.setNameAsFirstArg('hello');
-        cliCommand.addOptions([['export', 'true']]);
+        it('boolean', () => {
 
-        assert.strictEqual(`ng g component hello --export`, cliCommand.getCommand());
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+            cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+            cliCommand.addOptions([['export', 'true']]);
 
-    });
+            assert.strictEqual(`ng g component hello --export`, cliCommand.getCommand());
 
-    it('With an array option', () => {
+        });
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
-        cliCommand.setProjectName(rootProjectName);
-        cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('guard')!);
-        cliCommand.validateProject();
-        cliCommand.setNameAsFirstArg('hello');
-        cliCommand.addOptions([['implements', ['CanActivate', 'CanDeactivate']]]);
+        it('array', () => {
 
-        assert.strictEqual(`ng g guard hello --implements CanActivate --implements CanDeactivate`, cliCommand.getCommand());
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('guard')!);
+            cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+            cliCommand.addOptions([['implements', ['CanActivate', 'CanDeactivate']]]);
 
-    });
+            assert.strictEqual(`ng g guard hello --implements CanActivate --implements CanDeactivate`, cliCommand.getCommand());
 
-    it('With 2 options', () => {
+        });
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
-        cliCommand.setProjectName(rootProjectName);
-        cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
-        cliCommand.setNameAsFirstArg('hello');
-        cliCommand.addOptions([['export', 'true'], ['changeDetection', 'OnPush']]);
+        it('multiple', () => {
 
-        assert.strictEqual(`ng g component hello --export --changeDetection OnPush`, cliCommand.getCommand());
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+            cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+            cliCommand.addOptions([['export', 'true'], ['changeDetection', 'OnPush']]);
 
-    });
+            assert.strictEqual(`ng g component hello --export --changeDetection OnPush`, cliCommand.getCommand());
 
-    it('invalid', () => {
+        });
 
-        const cliCommand = new CliCommand(workspaceFolderDefaults);
-        cliCommand.setProjectName(rootProjectName);
-        cliCommand.setCollectionName(angularCollectionName);
-        cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
-        cliCommand.setNameAsFirstArg('hello');
-        cliCommand.addOptions([['elmo', 'true']]);
+        it('invalid', () => {
 
-        assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+            cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+            cliCommand.addOptions([['elmo', 'true']]);
+
+            assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
+
+        });
 
     });
 
@@ -213,6 +246,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skipSelector`, cliCommand.getCommand());
+            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -275,6 +309,7 @@ describe('Cli command', () => {
 
             cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0].label)!.options);
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skipSelector`, cliCommand.getCommand());
+            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -344,6 +379,177 @@ describe('Cli command', () => {
             cliCommand.addOptions(types.get(MODULE_TYPE.ROUTING)!.options);
 
             assert.strictEqual(`ng g module hello --module app --routing`, cliCommand.getCommand());
+
+        });
+
+    });
+
+    describe('Context path', () => {
+
+        it('none', () => {
+
+            const cliCommand = new CliCommand(workspaceFolderDefaults);
+
+            assert.strictEqual('', cliCommand['contextPath'].full);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual('', cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('workspace folder', () => {
+
+            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderFsPath);
+
+            assert.strictEqual(defaultsWorkspaceFolderFsPath, cliCommand['contextPath'].full);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual('', cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('src folder', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('src/app folder', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('folder', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app/hello', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('hello/', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('subfolder', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('hello/world/', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('file', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world.ts');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app/hello/world.ts', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world.ts', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('hello/', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('lib', () => {
+
+            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello/world');
+            const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual(`projects/${libProjectName}/src/lib/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(libProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('hello/world/', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('subapp', () => {
+
+            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', subAppProjectName, 'src/app/hello/world');
+            const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
+
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual(`projects/${subAppProjectName}/src/app/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(subAppProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('hello/world/', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('@schematics/angular:library', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
+        
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
+
+        });
+
+        it('@schematics/angular:application', () => {
+
+            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
+        
+            assert.strictEqual(contextPath, cliCommand['contextPath'].full);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+
+            assert.strictEqual(rootProjectName, cliCommand.getProjectName());
+
+            assert.strictEqual('', cliCommand.getContextForNameAsFirstArg());
 
         });
 
