@@ -70,6 +70,8 @@ export class AngularConfig {
         const possibleProjectTypes: AngularProjectType[] = ['application', 'library'];
 
         const projects = new Map(Object.entries(JsonValidator.object(config.projects) ?? {})
+            /* Old Angular projects may have their e2e config set as a separate project */
+            .filter(([name]) => !name.endsWith('-e2e'))
             .map(([name, rawOptions]) => {
                 
                 const options = JsonValidator.object(rawOptions) ?? {};

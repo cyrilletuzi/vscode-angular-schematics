@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.0.1] - 2020-04-14
+
+### Fix
+
+Old projects with a deprecated Angular configuration may have their e2e configuration
+set as a separate `projects` entry in `angular.json`.
+So the extension now filters projects' names ending with `-e2e`.
+
 ## [4.0.0] - 2020-04-13
 
 This is a huge update. I started this extension to help my students during my Angular courses,
