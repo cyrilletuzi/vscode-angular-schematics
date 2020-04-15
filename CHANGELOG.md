@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.0.2] - 2020-04-15
+
+### Fix
+
+Angular Material has additional schematics in `@angular/cdk` package,
+so it has been added in the defaults detected schematics.
+
 ## [4.0.1] - 2020-04-14
 
 ### Fix
