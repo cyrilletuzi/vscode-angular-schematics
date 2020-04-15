@@ -262,7 +262,7 @@ export class CliCommand {
 
             }
             /* All Material schematics have a component suffix */
-            else if (this.collectionName === '@angular/material') {
+            else if (['@angular/material', '@angular/cdk'].includes(this.collectionName)) {
                 suffix = '.component';
             }
             else if (this.collectionName === '@ngrx/schematics') {
