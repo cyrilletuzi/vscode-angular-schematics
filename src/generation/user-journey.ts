@@ -423,6 +423,8 @@ export class UserJourney {
 
     private async askWhereToImportModule(): Promise<string | undefined> {
 
+        const nowhereLabel = `Nowhere`;
+
         /* Should look only in the current project */
         const pattern = new vscode.RelativePattern(this.cliCommand.getProjectSourcePath(), '**/*.module.ts');
 
@@ -441,10 +443,16 @@ export class UserJourney {
             return undefined;
         }
 
+        modulesChoices.unshift(nowhereLabel);
+
         const whereToImportChoice = await vscode.window.showQuickPick(modulesChoices, {
             placeHolder: `Where do you want to import the module?`,
             ignoreFocusOut: true,
         });
+
+        if (whereToImportChoice === nowhereLabel) {
+            return undefined;
+        }
 
         return whereToImportChoice?.replace('.module.ts', '');
 

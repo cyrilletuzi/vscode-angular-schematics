@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.0.3] - 2020-04-16
+
+### Fix
+
+Some modules may not be imported immediately,
+so add a "Nowhere" choice when asking where to import a module of components.
+
 ## [4.0.2] - 2020-04-15
 
 ### Fix
