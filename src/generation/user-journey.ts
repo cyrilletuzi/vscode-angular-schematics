@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { angularCollectionName, extensionName } from '../defaults';
 import { Output, FileSystem, Terminal } from '../utils';
