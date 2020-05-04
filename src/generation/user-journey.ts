@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { angularCollectionName, extensionName } from '../defaults';
 import { Output, FileSystem, Terminal } from '../utils';
@@ -437,7 +436,8 @@ export class UserJourney {
         const modulesChoices = existingModulesUris
             /* Routing module should not be proposed */
             .filter((uri) => !uri.fsPath.includes('-routing'))
-            .map((uri) => path.basename(uri.fsPath));
+            /* We keep only the relative module path, and stop at `-10` to remove `.module.ts` */
+            .map((uri) => uri.fsPath.substring(this.cliCommand.getProjectSourcePath().length + 1, uri.fsPath.length - 10));
 
         if (modulesChoices.length === 0) {
             return undefined;
@@ -450,11 +450,7 @@ export class UserJourney {
             ignoreFocusOut: true,
         });
 
-        if (whereToImportChoice === nowhereLabel) {
-            return undefined;
-        }
-
-        return whereToImportChoice?.replace('.module.ts', '');
+        return whereToImportChoice;
 
     }
 
