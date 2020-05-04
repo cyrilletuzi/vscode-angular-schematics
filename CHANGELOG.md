@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.0.4] - 2020-05-04
+
+### Fix
+
+When choosing where to import a module of components,
+module choice must contain its path (not just its name)
+when the target module is not in a parent folder of the new module.
+
 ## [4.0.3] - 2020-04-16
 
 ### Fix
