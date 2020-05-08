@@ -450,7 +450,7 @@ export class UserJourney {
             ignoreFocusOut: true,
         });
 
-        return whereToImportChoice;
+        return (whereToImportChoice !== nowhereLabel) ? whereToImportChoice : undefined;
 
     }
 

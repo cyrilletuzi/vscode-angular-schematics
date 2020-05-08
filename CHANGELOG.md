@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.0.5] - 2020-05-08
+
+### Fix
+
+Fixes an issue introduced in 4.0.4 where the "Nowhere" choice when generating a module
+of components was not working anymore.
+
 ## [4.0.4] - 2020-05-04
 
 ### Fix
