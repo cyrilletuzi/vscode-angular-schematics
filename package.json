@@ -172,7 +172,7 @@
     "devDependencies": {
         "@types/glob": "7.1.1",
         "@types/mocha": "7.0.2",
-        "@types/node": "12.12.39",
+        "@types/node": "12.12.42",
         "@types/vscode": "1.41.0",
         "@typescript-eslint/eslint-plugin": "3.0.0",
         "@typescript-eslint/parser": "3.0.0",
@@ -180,7 +180,7 @@
         "glob": "7.1.6",
         "mocha": "7.1.2",
         "ts-loader": "7.0.4",
-        "typescript": "3.9.2",
+        "typescript": "3.9.3",
         "vsce": "1.75.0",
         "vscode-test": "1.3.0",
         "webpack": "4.43.0",
