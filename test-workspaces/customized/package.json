@@ -4,7 +4,7 @@
   "description": "",
   "license": "MIT",
   "dependencies": {
-    "@angular/material": "9.2.3"
+    "@angular/material": "9.2.4"
   },
   "devDependencies": {
     "@ionic/angular-toolkit": "2.2.0"
