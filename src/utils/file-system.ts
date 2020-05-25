@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Output } from './output';
+import { parseJson, JsonParseMode } from './parser';
 
 export class FileSystem {
 
@@ -120,7 +121,7 @@ export class FileSystem {
 
                 }
         
-                json = JSON.parse(data);
+                json = parseJson(data, JsonParseMode.Json5);
         
             } catch {
 
