@@ -106,20 +106,6 @@ export class FileSystem {
             try {
                 
                 let data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
-                
-                /* Angular Material schematics have comments, we remove them as it's not JSON compliant */
-                if (fsPath.includes('@angular/material') || fsPath.includes('@ngx-formly/schematics')) {
-
-                    /* Split the file by line, and if a line is a comment, remove it.
-                     * RegExp explanation:
-                     * - `^`    starts with
-                     * - ` *`   none or multiple spaces
-                     * - `\/\/` start of a comment (//), backslashed as they are special RegExp characters
-                     * - `.*`   any number of any character
-                     */
-                    data = data.split('\n').map((line) => line.replace(/^ *\/\/.*/, '')).join('\n');
-
-                }
         
                 json = parseJson(data, JsonParseMode.Json5);
         
