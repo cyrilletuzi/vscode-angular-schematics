@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.1.0] - 2020-05-26
+
+### Feature
+
+Support for JSON5 (comments, etc.) configuration files.
+
 ## [4.0.5] - 2020-05-08
 
 ### Fix
