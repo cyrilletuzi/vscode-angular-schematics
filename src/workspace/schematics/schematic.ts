@@ -47,14 +47,9 @@ export class Schematic {
         /* Set all options */
         this.options = config.properties;
 
-        /* Add global `force` CLI option */
-        this.options.set('force', {
-            type: 'boolean',
-            default: false,
-            description: `Forces overwriting of existing files.`,
-        });
-
         Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
+
+        this.initGlobalOptions();
 
         this.requiredOptionsNames = this.initRequiredOptions(config);
 
@@ -213,6 +208,19 @@ export class Schematic {
             .map((item) => JsonValidator.string(item) ?? JsonValidator.number(item) ?? JsonValidator.boolean(item))
             .map((item) => (item ?? '').toString())
             .filter((item) => item);
+
+    }
+
+    /**
+     * Add global CLI options
+     */
+    private initGlobalOptions(): void {
+
+        this.options.set('force', {
+            type: 'boolean',
+            default: false,
+            description: `Forces overwriting of existing files.`,
+        });
 
     }
 
