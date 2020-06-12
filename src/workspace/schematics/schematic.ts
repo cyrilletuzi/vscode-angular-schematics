@@ -47,6 +47,13 @@ export class Schematic {
         /* Set all options */
         this.options = config.properties;
 
+        /* Add global `force` CLI option */
+        this.options.set('force', {
+            type: 'boolean',
+            default: false,
+            description: `Forces overwriting of existing files.`,
+        });
+
         Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
 
         this.requiredOptionsNames = this.initRequiredOptions(config);
