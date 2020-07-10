@@ -170,7 +170,7 @@
         "release:major": "vsce publish major && git push && git push --tags && vsce package"
     },
     "devDependencies": {
-        "@types/glob": "7.1.2",
+        "@types/glob": "7.1.3",
         "@types/mocha": "7.0.2",
         "@types/node": "12.12.47",
         "@types/vscode": "1.41.0",
