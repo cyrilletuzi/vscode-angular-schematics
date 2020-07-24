@@ -586,10 +586,14 @@ export class UserJourney {
     private async askConfirmation(): Promise<boolean> {
 
         const confirmationLabel = `$(check) Confirm`;
+        const testLabel = `$(debug-alt) Test`;
 
         const confirmationChoices: vscode.QuickPickItem[] = [{
             label: confirmationLabel,
             description: `Pro-tip: take a minute to check the command above is really what you want`,
+        }, {
+            label: testLabel,
+            description: `Simulate the command with --dryRun`,
         }, {
             label: `$(close) Cancel`,
         }];
@@ -598,6 +602,14 @@ export class UserJourney {
             placeHolder: this.cliCommand.getCommand(),
             ignoreFocusOut: true,
         });
+
+        if (choice?.label === testLabel) {
+
+            this.cliCommand.launchCommand({ dryRun: true });
+
+            return this.askConfirmation();
+
+        }
 
         return (choice?.label === confirmationLabel) ? true : false;
 

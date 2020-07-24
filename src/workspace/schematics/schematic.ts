@@ -49,6 +49,8 @@ export class Schematic {
 
         Output.logInfo(`${this.options.size} options detected for "${this.name}" schematic: ${Array.from(this.options.keys()).join(', ')}`);
 
+        this.initGlobalOptions();
+
         this.requiredOptionsNames = this.initRequiredOptions(config);
 
         Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
@@ -206,6 +208,19 @@ export class Schematic {
             .map((item) => JsonValidator.string(item) ?? JsonValidator.number(item) ?? JsonValidator.boolean(item))
             .map((item) => (item ?? '').toString())
             .filter((item) => item);
+
+    }
+
+    /**
+     * Add global CLI options
+     */
+    private initGlobalOptions(): void {
+
+        this.options.set('force', {
+            type: 'boolean',
+            default: false,
+            description: `Forces overwriting of existing files.`,
+        });
 
     }
 

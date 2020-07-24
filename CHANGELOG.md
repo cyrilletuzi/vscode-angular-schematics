@@ -1,5 +1,17 @@
 # Change Log
 
+## [4.3.0] - 2020-06-12
+
+### Feature
+
+When adding options, add a new choice on final confirmation to test the command with `--dryRun`.
+
+## [4.2.0] - 2020-06-12
+
+### Feature
+
+Add global `--force` CLI option to all schematics.
+
 ## [4.1.0] - 2020-05-26
 
 ### Feature

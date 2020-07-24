@@ -219,11 +219,13 @@ export class CliCommand {
     /**
      * Launch command in a terminal
      */
-    launchCommand(): void {
+    launchCommand({ dryRun = false } = {}): void {
 
         Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
-        Terminal.send(this.workspaceFolder, this.getCommand());
+        const command = `${this.getCommand()}${dryRun ? ` --dryRun` : ''}`;
+
+        Terminal.send(this.workspaceFolder, command);
     
     }
 
