@@ -1,5 +1,3 @@
-<!-- Due to summer holidays, expect a longer answer delay. -->
-
 # Checks before posting an issue
 
 - [ ] I have read all the extension's documentation (README and docs/TROUBLESHOOTING)
