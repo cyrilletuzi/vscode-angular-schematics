@@ -1,4 +1,4 @@
-/* eslint-disable eqeqeq */
+/* eslint-disable eqeqeq, @typescript-eslint/naming-convention */
 /**
  * Copied from https://github.com/angular/angular-cli/tree/master/packages/angular_devkit/core/src/json
  * 
