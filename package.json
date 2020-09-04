@@ -181,7 +181,7 @@
         "mocha": "8.1.3",
         "ts-loader": "8.0.3",
         "typescript": "4.0.2",
-        "vsce": "1.79.3",
+        "vsce": "1.79.5",
         "vscode-test": "1.4.0",
         "webpack": "4.44.1",
         "webpack-cli": "3.3.12"
