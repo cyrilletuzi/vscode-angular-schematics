@@ -165,9 +165,10 @@
         "pretest": "tsc -p ./",
         "test": "node ./out/test/runTest.js",
         "lint": "eslint src --ext ts",
-        "release:patch": "vsce publish patch && git push && git push --tags && vsce package",
-        "release:minor": "vsce publish minor && git push && git push --tags && vsce package",
-        "release:major": "vsce publish major && git push && git push --tags && vsce package"
+        "release:patch": "vsce publish patch && git push && git push --tags && vsce package && npm run githubrelease",
+        "release:minor": "vsce publish minor && git push && git push --tags && vsce package && npm run githubrelease",
+        "release:major": "vsce publish major && git push && git push --tags && vsce package && npm run githubrelease",
+        "githubrelease": "gh release create v$npm_package_version 'angular-schematics-$npm_package_version.vsix' --title v$npm_package_version --notes-file CHANGELOG.md"
     },
     "devDependencies": {
         "@types/glob": "7.1.3",
