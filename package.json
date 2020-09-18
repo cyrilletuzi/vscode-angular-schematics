@@ -184,7 +184,7 @@
         "typescript": "4.0.2",
         "vsce": "1.79.5",
         "vscode-test": "1.4.0",
-        "webpack": "4.44.1",
+        "webpack": "4.44.2",
         "webpack-cli": "3.3.12"
     },
     "dependencies": {}
