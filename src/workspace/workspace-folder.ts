@@ -257,18 +257,39 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
      */
     private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string> {
 
+        /* Search in root folder only first for performance */
+
         /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
-        const pattern = new vscode.RelativePattern(workspaceFolder, `**/{${angularConfigFileNames.join(',')}}`);
+        const rootPattern = new vscode.RelativePattern(workspaceFolder, `{${angularConfigFileNames.join(',')}}`);
 
         /* Third param is the maximum number of results */
-        const searchMatches = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
+        let searchMatches = await vscode.workspace.findFiles(rootPattern, '**/node_modules/**', 1);
+
+        /* Otherwise, search in all subfolders */
+        if (searchMatches.length === 0) {
+
+            /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
+            const everywherePattern = new vscode.RelativePattern(workspaceFolder, `**/{${angularConfigFileNames.join(',')}}`);
+
+            /* Third param is the maximum number of results */
+            searchMatches = await vscode.workspace.findFiles(everywherePattern, '**/node_modules/**');
+
+        }
 
         if (searchMatches.length > 0) {
 
             if (searchMatches.length === 1) {
+
                 Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0].fsPath}`);
+
             } else {
-                Output.logInfo(`More than one Angular config file found for "${this.name}" workspace folder, keeping the first one: ${searchMatches[0].fsPath}`);
+
+                /* Unfortunately the results' order from VS Code search is inconsistent from one time to another,
+                 * so we sort based on paths' nesting length to keep the directory closest to the root folder */
+                searchMatches.sort((a, b) => (a.path.split('/').length < b.path.split('/').length) ? -1 : 1);
+
+                Output.logInfo(`More than one Angular config file found for "${this.name}" workspace folder, keeping the closest one: ${searchMatches[0].fsPath}. If you work with multiple Angular repositories at once, you need to open them as different workspaces in Visual Studio Code.`);
+
             }
 
             return searchMatches[0].fsPath;
