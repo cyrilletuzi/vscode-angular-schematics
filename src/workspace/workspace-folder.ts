@@ -271,7 +271,6 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             /* Required to look only in the current workspace folder (otherwise it searches in all folders) */
             const everywherePattern = new vscode.RelativePattern(workspaceFolder, `**/{${angularConfigFileNames.join(',')}}`);
 
-            /* Third param is the maximum number of results */
             searchMatches = await vscode.workspace.findFiles(everywherePattern, '**/node_modules/**');
 
         }
