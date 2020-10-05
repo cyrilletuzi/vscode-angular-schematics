@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.4.0] - 2020-10-05
+
+### Feature
+
+Better support for projects having nested Angular projects (for example because of git submodules).
+
 ## [4.3.0] - 2020-06-12
 
 ### Feature
