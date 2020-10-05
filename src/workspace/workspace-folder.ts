@@ -283,11 +283,25 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
             } else {
 
+                const errorMessage = `More than one Angular config file found for "${this.name}" workspace folder. If you work with multiple Angular repositories at once, you need to open them as different workspaces in Visual Studio Code.`;
+
+                const docLabel = `Open VS Code workspaces documentation`;
+
+                Output.logError(errorMessage);
+
+                vscode.window.showErrorMessage(errorMessage, 'OK', docLabel).then((action) => {
+
+                    if (action === docLabel) {
+
+                        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/docs/editor/multi-root-workspaces'));
+
+                    }
+
+                });
+
                 /* Unfortunately the results' order from VS Code search is inconsistent from one time to another,
                  * so we sort based on paths' nesting length to keep the directory closest to the root folder */
                 searchMatches.sort((a, b) => (a.path.split('/').length < b.path.split('/').length) ? -1 : 1);
-
-                Output.logInfo(`More than one Angular config file found for "${this.name}" workspace folder, keeping the closest one: ${searchMatches[0].fsPath}. If you work with multiple Angular repositories at once, you need to open them as different workspaces in Visual Studio Code.`);
 
             }
 
