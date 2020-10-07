@@ -168,7 +168,7 @@
         "release:patch": "vsce publish patch && git push && git push --tags && vsce package && npm run githubrelease",
         "release:minor": "vsce publish minor && git push && git push --tags && vsce package && npm run githubrelease",
         "release:major": "vsce publish major && git push && git push --tags && vsce package && npm run githubrelease",
-        "githubrelease": "gh release create v$npm_package_version angular-schematics-$npm_package_version.vsix --title v$npm_package_version --notes-file CHANGELOG.md"
+        "githubrelease": "CHANGELOG=$(sed -n \"/^## \\[$npm_package_version\\]/,/^## /p\" CHANGELOG.md | sed '1d;$d') && gh release create v$npm_package_version angular-schematics-$npm_package_version.vsix --title v$npm_package_version --notes \"$CHANGELOG\""
     },
     "devDependencies": {
         "@types/glob": "7.1.3",
