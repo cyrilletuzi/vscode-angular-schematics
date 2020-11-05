@@ -160,8 +160,8 @@
     },
     "scripts": {
         "vscode:prepublish": "webpack --mode production",
-        "compile": "webpack --mode development",
-        "watch": "webpack --mode development --watch",
+        "compile": "webpack --mode development --no-performance",
+        "watch": "webpack --mode development --no-performance --watch",
         "pretest": "tsc -p ./",
         "test": "node ./out/test/runTest.js",
         "lint": "eslint src --ext ts",

@@ -34,6 +34,21 @@ jobs:
     - name: Build check
       run: npm run compile
 
+  size:
+    name: Size check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install dependencies
+      run: npm ci
+    - name: Size check
+      run: npm run vscode:prepublish
+
   test:
     name: Test check
     runs-on: ubuntu-latest
