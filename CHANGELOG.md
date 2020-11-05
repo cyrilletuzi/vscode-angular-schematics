@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.6.0] - 2020-11-05
+
+No change for users.
+
+### Internal
+
+JSON parser from Angular CLI has been deprecated in v11 and is replaced by the `jsonc-parser` lib.
+
 ## [4.5.0] - 2020-10-05
 
 ### Feature
