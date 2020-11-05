@@ -36,6 +36,11 @@ const config = {
         ]
       }
     ]
+  },
+  performance: {
+    hints: "error",
+    maxAssetSize: 100000,
+    maxEntrypointSize: 100000,
   }
 };
 module.exports = config;
