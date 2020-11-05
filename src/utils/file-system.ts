@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { parse } from 'jsonc-parser';
 
 import { Output } from './output';
-import { parseJson, JsonParseMode } from './parser';
 
 export class FileSystem {
 
@@ -107,7 +107,7 @@ export class FileSystem {
                 
                 let data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
         
-                json = parseJson(data, JsonParseMode.Json5);
+                json = parse(data);
         
             } catch {
 
