@@ -58,7 +58,7 @@ Then, **you can launch Angular CLI commands from 4 places:**
 Why? Because in this scenario, the extension will automatically infer
 the path where you want to generate the schematic.
 
-![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/master/angular-schematics-demo-20191025.gif)
+![](https://github.com/cyrilletuzi/vscode-angular-schematics/raw/main/angular-schematics-demo-20191025.gif)
 
 ## Requirements
 
@@ -155,7 +155,7 @@ if your `tslint.json` is configured accordingly.
 
 Library authors are encouraged to create a Pull Request to
 easily add defaults components types in
-[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
+[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/src/defaults.ts).
 
 ### Custom component types
 
@@ -232,7 +232,7 @@ By default, this extension detects the following schematics:
 
 Scanning all packages to find all potential schematics would be too slow.
 If you are a library author, you can open a Pull Request to easily add your schematics package in the
-[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/src/defaults.ts).
+[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/src/defaults.ts).
 
 ## Custom schematics
 
@@ -258,7 +258,7 @@ will be automatically inferred by the extension. Otherwise you will have to choo
 
 ## Release Notes
 
-[Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/master/CHANGELOG.md).
+[Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/CHANGELOG.md).
 
 ## License
 
