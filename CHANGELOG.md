@@ -1,5 +1,9 @@
 # Change Log
 
+## [4.6.1] - 2020-11-13
+
+No change, just a released to update links in marketplace documentation.
+
 ## [4.6.0] - 2020-11-05
 
 No change for users.
