@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as assert from 'assert';
@@ -25,13 +26,13 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic component', () => {
+    it('Basic component', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
@@ -39,13 +40,13 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic service', () => {
+    it('Basic service', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('service')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g service hello`, cliCommand.getCommand());
@@ -53,13 +54,13 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic module', () => {
+    it('Basic module', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g module hello`, cliCommand.getCommand());
@@ -67,13 +68,13 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic interface', () => {
+    it('Basic interface', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('interface')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g interface hello`, cliCommand.getCommand());
@@ -81,13 +82,13 @@ describe('Cli command', () => {
 
     });
 
-    it('With project', () => {
+    it('With project', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderCustomized);
         cliCommand.setProjectName(libProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${angularCollectionName}:component hello --project ${libProjectName}`, cliCommand.getCommand());
@@ -95,13 +96,13 @@ describe('Cli command', () => {
 
     });
 
-    it('With collection', () => {
+    it('With collection', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderCustomized);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(materialCollectionName);
         cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(materialCollectionName)!.getSchematic('table')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${materialCollectionName}:table hello`, cliCommand.getCommand());
@@ -109,13 +110,13 @@ describe('Cli command', () => {
 
     });
 
-    it('With path', () => {
+    it('With path', async () => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
         cliCommand.setCollectionName(angularCollectionName);
         cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-        cliCommand.validateProject();
+        await cliCommand.validateProject();
         cliCommand.setNameAsFirstArg('hello/world');
 
         assert.strictEqual(`ng g component hello/world`, cliCommand.getCommand());
@@ -125,13 +126,13 @@ describe('Cli command', () => {
 
     describe('with options', () => {
 
-        it('string', () => {
+        it('string', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['changeDetection', 'OnPush']]);
 
@@ -139,13 +140,13 @@ describe('Cli command', () => {
 
         });
 
-        it('boolean', () => {
+        it('boolean', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['export', 'true']]);
 
@@ -153,13 +154,13 @@ describe('Cli command', () => {
 
         });
 
-        it('array', () => {
+        it('array', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('guard')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['implements', ['CanActivate', 'CanDeactivate']]]);
 
@@ -167,13 +168,13 @@ describe('Cli command', () => {
 
         });
 
-        it('multiple', () => {
+        it('multiple', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['export', 'true'], ['changeDetection', 'OnPush']]);
 
@@ -181,13 +182,13 @@ describe('Cli command', () => {
 
         });
 
-        it('invalid', () => {
+        it('invalid', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['elmo', 'true']]);
 
@@ -205,13 +206,13 @@ describe('Cli command', () => {
             types = workspaceFolderDefaults.getComponentTypes(rootProjectName);
         });
 
-        it('Default', () => {
+        it('Default', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.DEFAULT)!.options);
 
@@ -219,13 +220,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Page without type', () => {
+        it('Page without type', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.PAGE)!.options);
 
@@ -233,13 +234,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Page with type', () => {
+        it('Page with type', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderCustomized);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
 
             const typesCustomized = workspaceFolderCustomized.getComponentTypes(rootProjectName);
@@ -250,13 +251,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Pure', () => {
+        it('Pure', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.PURE)!.options);
             
@@ -264,13 +265,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Exported', () => {
+        it('Exported', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.EXPORTED)!.options);
             
@@ -278,13 +279,13 @@ describe('Cli command', () => {
 
         });
 
-        it('From user preferences', () => {
+        it('From user preferences', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderCustomized);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
 
             const typesCustomized = workspaceFolderCustomized.getComponentTypes(rootProjectName);
@@ -295,13 +296,13 @@ describe('Cli command', () => {
 
         });
 
-        it('From lib', () => {
+        it('From lib', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderCustomized);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderCustomized.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
 
             const typesCustomized = workspaceFolderCustomized.getComponentTypes(subAppProjectName);
@@ -323,13 +324,13 @@ describe('Cli command', () => {
             types = workspaceFolderDefaults.getModuleTypes();
         });
 
-        it('Default', () => {
+        it('Default', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(MODULE_TYPE.DEFAULT)!.options);
             cliCommand.addOptions([['module', 'app']]);
@@ -338,13 +339,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Lazy', () => {
+        it('Lazy', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(MODULE_TYPE.LAZY)!.options);
             cliCommand.addOptions([['route', cliCommand.getRouteFromFirstArg()]]);
@@ -353,13 +354,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Lazy with path', () => {
+        it('Lazy with path', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello/world');
             cliCommand.addOptions(types.get(MODULE_TYPE.LAZY)!.options);
             cliCommand.addOptions([['route', cliCommand.getRouteFromFirstArg()]]);
@@ -368,13 +369,13 @@ describe('Cli command', () => {
 
         });
 
-        it('Routing', () => {
+        it('Routing', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
             cliCommand.setProjectName(rootProjectName);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('module')!);
-            cliCommand.validateProject();
+            await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(MODULE_TYPE.ROUTING)!.options);
 

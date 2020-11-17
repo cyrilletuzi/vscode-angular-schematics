@@ -16,6 +16,7 @@ describe('Workspace folder config', () => {
 
         before(async () => {
 
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
 
             await workspaceFolder.init();
@@ -100,6 +101,7 @@ describe('Workspace folder config', () => {
 
         before(async () => {
 
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]!);
 
             await workspaceFolder.init();
@@ -153,7 +155,7 @@ describe('Workspace folder config', () => {
 
         });
 
-        it('TSLint component suffixes', async () => {
+        it('TSLint component suffixes', () => {
 
             assert.strictEqual(true, workspaceFolder.hasComponentSuffix(rootProjectName, 'Component'));
             assert.strictEqual(true, workspaceFolder.hasComponentSuffix(rootProjectName, 'Page'));

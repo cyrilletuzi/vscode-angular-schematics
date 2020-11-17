@@ -31,7 +31,7 @@ export class CliCommand {
     private schematicName = '';
     private schematic!: Schematic;
     private nameAsFirstArg = '';
-    private options: CliCommandOptions = new Map();
+    private options: CliCommandOptions = new Map<string, string | string[]>();
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
@@ -68,7 +68,7 @@ export class CliCommand {
     /**
      * Set schematic, and project if relevant.
      */
-    async setSchematic(schematic: Schematic): Promise<void> {
+    setSchematic(schematic: Schematic): void {
 
         this.schematicName = schematic.getName();
 
@@ -88,8 +88,10 @@ export class CliCommand {
      */
     getProjectSourcePath(): string {
 
-        const projectSourcePath = this.projectName ?
-            this.workspaceFolder.getAngularProject(this.projectName)!.getAppOrLibPath() :
+        const project = this.workspaceFolder.getAngularProject(this.projectName);
+
+        const projectSourcePath = (this.projectName && project) ?
+            project.getAppOrLibPath() :
             (this.options.get('path') as string | undefined) ?? 'src/app';
 
         return path.join(this.workspaceFolder.uri.fsPath, projectSourcePath);
@@ -200,7 +202,7 @@ export class CliCommand {
     /**
      * Add options
      */
-    addOptions(options: CliCommandOptions | [string, string | string[]][]): void {
+    addOptions(options: CliCommandOptions | [string, string | string[]][]): void {
 
         for (const [name, option] of options) {
 
@@ -252,7 +254,8 @@ export class CliCommand {
 
                 /* Component can have a custom suffix via `--type` option */
                 if (['component', 'class', 'interface'].includes(this.schematicName) && this.options.has('type')) {
-                    suffix = `.${this.options.get('type')!}`;
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    suffix = `.${this.options.get('type')! as string}`;
                 }
                 /* Classes and interfaces do not have suffix */
                 else if (['class', 'interface'].includes(this.schematicName)) {
@@ -273,8 +276,6 @@ export class CliCommand {
                     suffix = `.${this.schematicName}s`;
                 } else if (this.schematicName === 'entity') {
                     suffix = '.model';
-                } else if (this.schematicName === 'entity') {
-                    suffix = '.actions';
                 } else if (this.schematicName === 'container') {
                     suffix = '.component';
                 } else if (this.schematicName === 'data') {
@@ -303,7 +304,7 @@ export class CliCommand {
 
                 if (isUserDefaultFlat !== undefined) {
                     isFlat = isUserDefaultFlat;
-                } else {
+                } else {
 
                     /* Priority 3: the schematic schema has a default */
                     const isSchematicDefaultFlat = this.schematic.getOptionDefaultValue('flat') as boolean | undefined;
@@ -437,7 +438,7 @@ export class CliCommand {
         if (this.projectName) {
             Output.logInfo(`Source-relative context path detected: ${this.contextPath.relativeToProjectFolder}`);
             Output.logInfo(`Angular project detected from context path: "${this.projectName}"`);
-        } else {
+        } else {
             Output.logInfo(`No Angular project detected from context path.`);
         }
 

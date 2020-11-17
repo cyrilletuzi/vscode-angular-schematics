@@ -8,7 +8,7 @@ import { AngularJsonSchema, AngularJsonSchematicsOptionsSchema, AngularJsonSchem
 
 export class AngularConfig {
 
-    schematicsDefaults: AngularJsonSchematicsSchema = new Map();
+    schematicsDefaults: AngularJsonSchematicsSchema = new Map<string, AngularJsonSchematicsOptionsSchema>();
     /** List of projects registered in Angular config file */
     projects = new Map<string, AngularProject>();
     /** User default collection, otherwise official Angular CLI default collection */

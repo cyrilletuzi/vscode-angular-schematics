@@ -21,7 +21,7 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
         return element;
     }
 
-    async getChildren(element?: vscode.TreeItem | undefined): Promise<vscode.TreeItem[]> {
+    getChildren(element?: vscode.TreeItem | undefined): vscode.TreeItem[] {
 
         /* Primary level: collection's name */
         if (!element) {
@@ -45,9 +45,9 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
         /* Secondary level: schematics's names for each collection */
         else {
 
-            const collection = this.collections.get(element.label as string)!;
+            const collection = this.collections.get(element.label as string);
 
-            return collection.getSchematicsNames()
+            return collection?.getSchematicsNames()
                 .map((schematicName) => {
 
                     const item = new vscode.TreeItem(schematicName, vscode.TreeItemCollapsibleState.None);
@@ -61,7 +61,7 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
 
                     return item;
 
-                });
+                }) ?? [];
 
         }
 

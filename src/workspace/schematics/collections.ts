@@ -76,7 +76,7 @@ export class Collections {
             const fsPath = await findCollectionFsPath(workspaceFolder, name, { silent });
 
             if (fsPath) {
-                existingCollections.push({ name, fsPath });
+                existingCollections.push({ name, fsPath });
             }
     
         }
