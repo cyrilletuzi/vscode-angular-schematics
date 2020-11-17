@@ -73,6 +73,7 @@ export class Schematic {
 
         return new Map(names
             .filter((name) => this.options.has(name))
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map((name) => [name, this.options.get(name)!])
         );
 
@@ -84,6 +85,7 @@ export class Schematic {
     getRequiredOptions(): Map<string, SchematicOptionJsonSchema> {
 
         return new Map(this.requiredOptionsNames
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             .map((name) => [name, this.options.get(name)!])
         );
 
@@ -198,7 +200,7 @@ export class Schematic {
     /**
      * Convert array of choices into strings for user input
      */
-    private validateConfigArrayChoices(list: unknown[] | undefined): string[] | undefined {
+    private validateConfigArrayChoices(list: unknown[] | undefined): string[] | undefined {
 
         if (list === undefined) {
             return undefined;
@@ -230,9 +232,9 @@ export class Schematic {
     private initRequiredOptions(config: Pick<SchematicJsonSchema, 'required' | 'properties'>): string[] {
 
         /* Set required options' names */
-        return (config.required ?? [])
+        return (config.required ?? [])
             /* Options which have a `$default` will be taken care by the CLI, so they are not required */
-            .filter((name) => (config.properties.get(name)!.$default === undefined));
+            .filter((name) => (config.properties.get(name)?.$default === undefined));
 
     }
 
@@ -247,13 +249,13 @@ export class Schematic {
             /* Project is already managed by the extension */
             .filter(([name]) => (name !== 'project'))
             /* Do not keep options marked as not visible (internal options for the CLI) */
-            .filter(([_, option]) => (option.visible !== false))
+            .filter(([, option]) => (option.visible !== false))
             /* Do not keep deprecated options */
-            .filter(([_, option]) => (option['x-deprecated'] === undefined))
+            .filter(([, option]) => (option['x-deprecated'] === undefined))
             /* Do not keep option already managed by first command line arg (name) */
-            .filter(([_, option]) => !(option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)));
+            .filter(([, option]) => !(option.$default && (option.$default.$source === 'argv') && (option.$default.index === 0)));
 
-        for (const [label, option] of filteredOptionsNames) {
+        for (const [label, option] of filteredOptionsNames) {
 
             let picked = false;
 
@@ -278,7 +280,7 @@ export class Schematic {
 
             choices.push({
                 label,
-                description: `${requiredOrSuggestedInfo}${option.description}`,
+                description: `${requiredOrSuggestedInfo}${option.description ?? ''}`,
                 picked
             });
 

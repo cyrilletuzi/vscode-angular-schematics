@@ -108,14 +108,14 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         for (const watcher of this.fileWatchers) {
             watcher.onDidChange(() => {
                 Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-                this.init();
+                this.init().catch(() => {});
             });
         }
 
         /* Watch Code preferences */
         this.preferencesWatcher = vscode.workspace.onDidChangeConfiguration(() => {
             Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-            this.init();
+            this.init().catch(() => {});
         });
 
     }
@@ -141,7 +141,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     /**
      * Get an Angular projects based on its name, or `undefined`.
      */
-    getAngularProject(name: string): AngularProject | undefined {
+    getAngularProject(name: string): AngularProject | undefined {
 
         return this.angularConfig.projects.get(name);
 
@@ -232,8 +232,8 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         /* Suffixes can be defined at, in order of priority:
          * 1. project level
          * 2. workspace folder level */
-        return ((angularProject?.getComponentSuffixes().length ?? 0) > 0) ?
-                angularProject!.hasComponentSuffix(suffix) :
+        return (angularProject && (angularProject.getComponentSuffixes().length ?? 0) > 0) ?
+                angularProject.hasComponentSuffix(suffix) :
                 this.tslintConfig.hasComponentSuffix(suffix);
 
     }
@@ -293,11 +293,11 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
                     if (action === docLabel) {
 
-                        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/docs/editor/multi-root-workspaces'));
+                        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/docs/editor/multi-root-workspaces')).then(() => {}, () => {});
 
                     }
 
-                });
+                }).then(() => {}, () => {});
 
                 /* Unfortunately the results' order from VS Code search is inconsistent from one time to another,
                  * so we sort based on paths' nesting length to keep the directory closest to the root folder */

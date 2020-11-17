@@ -4,7 +4,7 @@ import { ComponentType, defaultComponentTypes } from '../../defaults';
 import { Output, FileSystem, JsonValidator } from '../../utils';
 import { formatCliCommandOptions } from '../../generation';
 
-import { ShortcutsTypes } from './shortcuts';
+import { ShortcutsTypes, ShortcutType } from './shortcuts';
 
 export enum COMPONENT_TYPE {
     DEFAULT  = `$(thumbsdown) Default component`,
@@ -16,7 +16,7 @@ export enum COMPONENT_TYPE {
 export class ComponentShortcut {
 
     /* Cache for component types choices */
-    types: ShortcutsTypes = new Map();
+    types: ShortcutsTypes = new Map<string, ShortcutType>();
 
     async init(workspaceFolder: vscode.WorkspaceFolder): Promise<void> {
 
@@ -28,7 +28,7 @@ export class ComponentShortcut {
                 label: COMPONENT_TYPE.DEFAULT,
                 detail: `Component with no special behavior (pro-tip: learn about component types in our documentation)`,
             },
-            options: new Map(),
+            options: new Map<string, string | string[]>(),
         });
 
         this.types.set(COMPONENT_TYPE.PAGE, {

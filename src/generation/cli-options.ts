@@ -1,10 +1,10 @@
 /** List of options */
-export type CliCommandOptions = Map<string, string | string[]>;
+export type CliCommandOptions = Map<string, string | string[]>;
 
 /**
  * Format options for the generation command.
  */
-export function formatCliCommandOptions(options: CliCommandOptions | [string, string | string[]][]): string {
+export function formatCliCommandOptions(options: CliCommandOptions | [string, string | string[]][]): string {
 
     /* Format the values. The goal is to be shortest as possible,
      * so the user can see the full command, as VS Code input box has a fixed size */

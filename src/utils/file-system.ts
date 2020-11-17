@@ -32,7 +32,7 @@ export class FileSystem {
                 this.packagesCache.set(`${workspaceFolder.name}:${name}`, fsPath);
             }
             /* Try on parent folder */
-            else {
+            else {
 
                 const parentFsPath = path.join(contextFsPath, '..');
 
@@ -74,12 +74,12 @@ export class FileSystem {
         try {
 
             /* Check if the file exists (`F_OK`) and is readable (`R_OK`) */
-            await fs.promises.access(fsPath, fs.constants.F_OK | fs.constants.R_OK);
+            await fs.promises.access(fsPath, fs.constants.F_OK | fs.constants.R_OK);
 
-        } catch (error) {
+        } catch (error: unknown) {
 
             if (!silent) {
-                this.logError(fsPath, (error?.code === 'ENOENT') ? `found` : `read`);
+                this.logError(fsPath, ((typeof error === 'object') && ((error as { [key: string]: unknown })?.code === 'ENOENT')) ? `found` : `read`);
             }
             
             return false;
@@ -105,9 +105,9 @@ export class FileSystem {
     
             try {
                 
-                let data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
+                const data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
         
-                json = parse(data);
+                json = parse(data) as unknown;
         
             } catch {
 

@@ -54,7 +54,7 @@ export class Output {
 
         this.logError(message);
 
-        vscode.window.showErrorMessage(message);
+        vscode.window.showErrorMessage(message).then(() => {}, () => {});
 
     }
 
