@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export interface ShortcutType {
-    options: Map<string, string | string[]>;
+    options: Map<string, string | string[]>;
     choice: vscode.QuickPickItem;
 }
 

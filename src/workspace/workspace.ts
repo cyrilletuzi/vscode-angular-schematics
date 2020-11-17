@@ -26,11 +26,11 @@ export class Workspace {
 
         /* Default array is just for type-safety, it cannot happen
          * as the extension can only be activated inside a workspace folder */
-        const folders = vscode.workspace.workspaceFolders ?? [];
+        const folders = vscode.workspace.workspaceFolders ?? [];
 
         if (folders.length > 0) {
             Output.logInfo(`${folders.length} workspace folder(s) detected.`);
-        } else {
+        } else {
             Output.logError(`No workspace folder detected.`);
         }
 
@@ -51,7 +51,7 @@ export class Workspace {
 
             for (const folder of event.added) {
                 Output.logInfo(`Loading configuration of new "${folder.name}" workspace folder.`);
-                this.add(folder);
+                this.add(folder).catch(() => {});
             }
 
             for (const folder of event.removed) {
@@ -167,7 +167,7 @@ export class Workspace {
 
             return Promise.race([isStable, timeout]);
 
-        } else {
+        } else {
             return;
         }
 

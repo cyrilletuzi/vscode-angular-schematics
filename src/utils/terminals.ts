@@ -45,6 +45,7 @@ export class Terminals {
             }));
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this.terminals.get(workspaceFolder.name)!;
 
     }

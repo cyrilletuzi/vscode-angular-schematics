@@ -82,7 +82,7 @@ export class UserJourney {
                 collectionName = await this.askCollectionName();
             } catch {
                 /* Happens if `@schematics/angular` is not installed */
-                this.showCollectionMissingErrorWithFix(angularCollectionName);
+                this.showCollectionMissingErrorWithFix(angularCollectionName).catch(() => {});
                 return;
             }
 
@@ -102,7 +102,7 @@ export class UserJourney {
 
         if (!collection) {
 
-            this.showCollectionMissingErrorWithFix(collectionName);
+            this.showCollectionMissingErrorWithFix(collectionName).catch(() => {});
 
             return;
 
@@ -149,7 +149,7 @@ export class UserJourney {
 
         }
 
-        let nameAsFirstArg: string | undefined;
+        let nameAsFirstArg: string | undefined;
 
         if (this.schematic.hasNameAsFirstArg()) {
 
@@ -253,7 +253,7 @@ export class UserJourney {
 
             /* Auto-opening the file was not possible, warn the user the command is launched
              * and propose to refresh Explorer to see the generated files */
-            this.showUnknownStatus();
+            this.showUnknownStatus().catch(() => {});
         }
 
     }
@@ -295,7 +295,7 @@ export class UserJourney {
 
     }
 
-    private async askCollectionName(): Promise<string | undefined> {
+    private async askCollectionName(): Promise<string | undefined> {
 
         if  (this.workspaceFolder.collections.getCollectionsNames().length === 0) {
             throw new Error();
@@ -496,7 +496,7 @@ export class UserJourney {
             canPickMany: true,
             placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
             ignoreFocusOut: true,
-        }) || [];
+        }) ?? [];
 
         return selectedOptions.map((selectedOption) => selectedOption.label);
 
@@ -507,9 +507,9 @@ export class UserJourney {
         /* Force required options, otherwise the schematic will fail */
         const options = [...this.schematic.getRequiredOptions(), ...this.schematic.getSomeOptions(optionsNames)];
 
-        const filledOptions: CliCommandOptions = new Map();
+        const filledOptions: CliCommandOptions = new Map<string, string | string[]>();
     
-        for (let [optionName, option] of options) {
+        for (const [optionName, option] of options) {
 
             let choice: string | string[] | undefined = '';
 
@@ -555,7 +555,7 @@ export class UserJourney {
     
     }
 
-    private async askOptionText(optionName: string, prompt: string): Promise<string | undefined> {
+    private async askOptionText(optionName: string, prompt: string): Promise<string | undefined> {
 
         return vscode.window.showInputBox({
             prompt: `--${optionName}: ${prompt}`,
@@ -564,7 +564,7 @@ export class UserJourney {
 
     }
 
-    private async askOptionEnum(optionName: string, choices: string[], placeholder: string): Promise<string | undefined> {
+    private async askOptionEnum(optionName: string, choices: string[], placeholder: string): Promise<string | undefined> {
 
         return vscode.window.showQuickPick(choices, {
             placeHolder: `--${optionName}: ${placeholder}`,
@@ -644,7 +644,7 @@ export class UserJourney {
 
             counter += 1;
 
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 setTimeout(() => {
                     this.jumpToFile(possibleFsPath, counter).then(() => {
                         resolve();
@@ -656,7 +656,7 @@ export class UserJourney {
 
         }
         /* After 10 failures */
-        else {
+        else {
 
             throw new Error();
 
@@ -680,7 +680,7 @@ export class UserJourney {
         
         if (action === refreshLabel) {
             /* Refresh Explorer, otherwise you may not see the generated files */
-            vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer');
+            vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer').then(() => {}, () => {});
         }
 
     }
@@ -709,7 +709,7 @@ export class UserJourney {
 
             if (reloadAction === reloadLabel) {
 
-                vscode.commands.executeCommand('workbench.action.reloadWindow');
+                vscode.commands.executeCommand('workbench.action.reloadWindow').then(() => {}, () => {});
 
             }
 

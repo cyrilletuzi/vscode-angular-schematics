@@ -1,6 +1,6 @@
 import { formatCliCommandOptions } from '../../generation';
 
-import { ShortcutsTypes } from './shortcuts';
+import { ShortcutsTypes, ShortcutType } from './shortcuts';
 
 export enum MODULE_TYPE {
     DEFAULT = `$(extensions) Module of components`,
@@ -11,7 +11,7 @@ export enum MODULE_TYPE {
 export class ModuleShortcut {
 
     /* Cache for module types choices */
-    types: ShortcutsTypes = new Map();
+    types: ShortcutsTypes = new Map<string, ShortcutType>();
 
     init(hasLazyType: boolean): void {
 
@@ -23,7 +23,7 @@ export class ModuleShortcut {
                 label: MODULE_TYPE.DEFAULT,
                 detail: `Module of UI / presentation components`,
             },
-            options: new Map(),
+            options: new Map<string, string | string[]>(),
         });
 
         if (hasLazyType) {

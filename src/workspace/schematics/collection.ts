@@ -124,7 +124,7 @@ export class Collection {
 
         const schematics = allSchematics
             /* Remove internal schematics */
-            .filter(([_, config]) => !config.hidden && !config.private)
+            .filter(([, config]) => !config.hidden && !config.private)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
             .filter(([name]) => (name !== 'ng-add'));
 

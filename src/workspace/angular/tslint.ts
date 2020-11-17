@@ -70,7 +70,7 @@ export class TslintConfig {
     private initComponentSuffixes(config: Pick<TslintJsonSchema, 'rules'>): void {
 
         /* `Set` removes duplicates */
-        this.componentSuffixes = Array.from(new Set(config?.rules?.['component-class-suffix'] ?? []))
+        this.componentSuffixes = Array.from(new Set(config?.rules?.['component-class-suffix'] ?? []))
             .map((suffix) => suffix.toLowerCase());
 
     }
