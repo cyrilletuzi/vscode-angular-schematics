@@ -17,10 +17,10 @@ describe('Cli command', () => {
 
     before(async () => {
 
-        workspaceFolderDefaults = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]);
+        workspaceFolderDefaults = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
         await workspaceFolderDefaults.init();
 
-        workspaceFolderCustomized = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]);
+        workspaceFolderCustomized = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]!);
         await workspaceFolderCustomized.init();
 
     });
@@ -305,9 +305,9 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
 
             const typesCustomized = workspaceFolderCustomized.getComponentTypes(subAppProjectName);
-            assert.strictEqual(true, typesCustomized.has(defaultComponentTypes[0].label));
+            assert.strictEqual(true, typesCustomized.has(defaultComponentTypes[0]!.label));
 
-            cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0].label)!.options);
+            cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0]!.label)!.options);
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skipSelector`, cliCommand.getCommand());
             assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
 

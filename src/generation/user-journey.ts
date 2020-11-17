@@ -275,7 +275,7 @@ export class UserJourney {
                     /* Tell if it is an application or a library, and the path */
                     const rawDescription = `${this.workspaceFolder.isRootAngularProject(label) ? `root ` : ''}${project.getType()} in ${project.getAppOrLibPath()}`;
                     /* Uppercase first letter */
-                    const description = `${rawDescription[0].toUpperCase()}${rawDescription.substr(1)}`;
+                    const description = `${rawDescription.charAt(0).toUpperCase()}${rawDescription.substr(1)}`;
 
                     return {
                         label,
@@ -644,7 +644,7 @@ export class UserJourney {
 
             counter += 1;
 
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 setTimeout(() => {
                     this.jumpToFile(possibleFsPath, counter).then(() => {
                         resolve();

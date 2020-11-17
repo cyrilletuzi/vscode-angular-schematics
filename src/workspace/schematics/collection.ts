@@ -147,18 +147,24 @@ export class Collection {
 
                 const [collectionName] = config.extends.split(':');
 
-                const collectionFsPath = await findCollectionFsPath(workspaceFolder, collectionName);
-
-                if (!collectionFsPath) {
-                    Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
+                if (!collectionName) {
+                    Output.logWarning(`"${this.name}" collection's name is invalid.`);
                 } else {
 
-                    schematicConfig = {
-                        name,
-                        collectionName: this.name,
-                        description: `Schematic herited from "${collectionName}"`,
-                        collectionFsPath,
-                    };
+                    const collectionFsPath = await findCollectionFsPath(workspaceFolder, collectionName);
+
+                    if (!collectionFsPath) {
+                        Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
+                    } else {
+
+                        schematicConfig = {
+                            name,
+                            collectionName: this.name,
+                            description: `Schematic herited from "${collectionName}"`,
+                            collectionFsPath,
+                        };
+
+                    }
 
                 }
 
