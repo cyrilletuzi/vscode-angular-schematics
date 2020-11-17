@@ -279,6 +279,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
             if (searchMatches.length === 1) {
 
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0]!.fsPath}`);
 
             } else {
@@ -305,7 +306,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
             }
 
-            // `!` is OK here because we checked `length`
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return searchMatches[0]!.fsPath;
 
         }

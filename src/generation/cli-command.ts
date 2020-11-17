@@ -130,7 +130,7 @@ export class CliCommand {
 
             if (appModulePossibleFsPaths.length > 0) {
 
-                // `!` is OK because we checked `length`
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 const pathRelativeToWorkspace = appModulePossibleFsPaths[0]!.fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
 
                 /* Path must be in Linux format */

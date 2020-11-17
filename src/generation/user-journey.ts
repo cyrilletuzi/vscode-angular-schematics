@@ -303,7 +303,8 @@ export class UserJourney {
         
         else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
 
-            const collectionName = this.workspaceFolder.collections.getCollectionsNames()[0];
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const collectionName = this.workspaceFolder.collections.getCollectionsNames()[0]!;
 
             Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
 
