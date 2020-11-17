@@ -6,7 +6,7 @@
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": "./tsconfig.json",
-        "ecmaVersion": 10
+        "ecmaVersion": 6
     },
     "plugins": [
         "@typescript-eslint"
