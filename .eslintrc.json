@@ -17,6 +17,13 @@
         "plugin:@typescript-eslint/recommended-requiring-type-checking"
     ],
     "rules": {
+        "quotes": [
+            "warn",
+            "single",
+            {
+                "allowTemplateLiterals": true
+            }
+        ],
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/explicit-function-return-type": "error"
     }
