@@ -275,7 +275,7 @@ export class UserJourney {
                     /* Tell if it is an application or a library, and the path */
                     const rawDescription = `${this.workspaceFolder.isRootAngularProject(label) ? `root ` : ''}${project.getType()} in ${project.getAppOrLibPath()}`;
                     /* Uppercase first letter */
-                    const description = `${rawDescription[0].toUpperCase()}${rawDescription.substr(1)}`;
+                    const description = `${rawDescription.charAt(0).toUpperCase()}${rawDescription.substr(1)}`;
 
                     return {
                         label,
@@ -303,7 +303,8 @@ export class UserJourney {
         
         else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
 
-            const collectionName = this.workspaceFolder.collections.getCollectionsNames()[0];
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const collectionName = this.workspaceFolder.collections.getCollectionsNames()[0]!;
 
             Output.logInfo(`Only collection detected: "${collectionName}". Default to it.`);
 

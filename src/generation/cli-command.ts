@@ -130,7 +130,8 @@ export class CliCommand {
 
             if (appModulePossibleFsPaths.length > 0) {
 
-                const pathRelativeToWorkspace = appModulePossibleFsPaths[0].fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const pathRelativeToWorkspace = appModulePossibleFsPaths[0]!.fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
 
                 /* Path must be in Linux format */
                 const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace).replace(/\\/g, '/'));

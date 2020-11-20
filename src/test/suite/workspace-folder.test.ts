@@ -17,7 +17,7 @@ describe('Workspace folder config', () => {
         before(async () => {
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]);
+            workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
 
             await workspaceFolder.init();
 
@@ -102,7 +102,7 @@ describe('Workspace folder config', () => {
         before(async () => {
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]);
+            workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]!);
 
             await workspaceFolder.init();
 

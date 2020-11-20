@@ -99,7 +99,8 @@ export class Workspace {
                 Output.logInfo(`There is only one workspace folder opened, default to it.`);
 
                 /* 2. If there is just one workspace folder, take it directly */
-                folderName = vscode.workspace.workspaceFolders[0].name;
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                folderName = vscode.workspace.workspaceFolders[0]!.name;
 
             } else {
 
