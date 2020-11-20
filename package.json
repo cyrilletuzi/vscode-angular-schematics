@@ -181,7 +181,7 @@
         "glob": "7.1.6",
         "mocha": "8.2.1",
         "ts-loader": "8.0.11",
-        "typescript": "4.0.5",
+        "typescript": "4.1.2",
         "vsce": "1.81.1",
         "vscode-test": "1.4.1",
         "webpack": "5.6.0",
