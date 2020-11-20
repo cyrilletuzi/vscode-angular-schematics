@@ -7,6 +7,6 @@
     "@angular/material": "11.0.0"
   },
   "devDependencies": {
-    "@ionic/angular-toolkit": "2.3.3"
+    "@ionic/angular-toolkit": "3.0.0"
   }
 }
