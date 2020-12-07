@@ -136,7 +136,7 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['changeDetection', 'OnPush']]);
 
-            assert.strictEqual(`ng g component hello --changeDetection OnPush`, cliCommand.getCommand());
+            assert.strictEqual(`ng g component hello --change-detection OnPush`, cliCommand.getCommand());
 
         });
 
@@ -178,7 +178,7 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions([['export', 'true'], ['changeDetection', 'OnPush']]);
 
-            assert.strictEqual(`ng g component hello --export --changeDetection OnPush`, cliCommand.getCommand());
+            assert.strictEqual(`ng g component hello --export --change-detection OnPush`, cliCommand.getCommand());
 
         });
 
@@ -230,7 +230,7 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.PAGE)!.options);
 
-            assert.strictEqual(`ng g component hello --skipSelector`, cliCommand.getCommand());
+            assert.strictEqual(`ng g component hello --skip-selector`, cliCommand.getCommand());
 
         });
 
@@ -246,7 +246,7 @@ describe('Cli command', () => {
             const typesCustomized = workspaceFolderCustomized.getComponentTypes(rootProjectName);
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
-            assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skipSelector`, cliCommand.getCommand());
+            assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skip-selector`, cliCommand.getCommand());
             assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
@@ -261,7 +261,7 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.PURE)!.options);
             
-            assert.strictEqual(`ng g component hello --changeDetection OnPush`, cliCommand.getCommand());
+            assert.strictEqual(`ng g component hello --change-detection OnPush`, cliCommand.getCommand());
 
         });
 
@@ -275,7 +275,7 @@ describe('Cli command', () => {
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.EXPORTED)!.options);
             
-            assert.strictEqual(`ng g component hello --export --changeDetection OnPush`, cliCommand.getCommand());
+            assert.strictEqual(`ng g component hello --export --change-detection OnPush`, cliCommand.getCommand());
 
         });
 
@@ -292,7 +292,7 @@ describe('Cli command', () => {
             assert.strictEqual(true, typesCustomized.has(userComponentTypeLabel));
 
             cliCommand.addOptions(typesCustomized.get(userComponentTypeLabel)!.options);
-            assert.strictEqual(`ng g ${angularCollectionName}:component hello --skipSelector --entryComponent`, cliCommand.getCommand());
+            assert.strictEqual(`ng g ${angularCollectionName}:component hello --skip-selector --entry-component`, cliCommand.getCommand());
 
         });
 
@@ -309,7 +309,7 @@ describe('Cli command', () => {
             assert.strictEqual(true, typesCustomized.has(defaultComponentTypes[0]!.label));
 
             cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0]!.label)!.options);
-            assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skipSelector`, cliCommand.getCommand());
+            assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skip-selector`, cliCommand.getCommand());
             assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
 
         });

@@ -226,7 +226,7 @@ export class CliCommand {
 
         Output.logInfo(`Launching this command: ${this.getCommand()}`);
 
-        const command = `${this.getCommand()}${dryRun ? ` --dryRun` : ''}`;
+        const command = `${this.getCommand()}${dryRun ? ` --dry-run` : ''}`;
 
         Terminal.send(this.workspaceFolder, command);
     

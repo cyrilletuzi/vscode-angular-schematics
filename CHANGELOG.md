@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.7.0] - 2020-12-07
+
+[Angular 11.1 deprecates camelCased options in Angular CLI commands.](https://github.com/angular/angular-cli/pull/19530)
+
+So this release dasherizes them.
+
 ## [4.6.1] - 2020-11-13
 
 No change, just a released to update links in marketplace documentation.
@@ -22,7 +28,7 @@ Better support for projects having nested Angular projects (for example because 
 
 ### Feature
 
-When adding options, add a new choice on final confirmation to test the command with `--dryRun`.
+When adding options, add a new choice on final confirmation to test the command with `--dry-run`.
 
 ## [4.2.0] - 2020-06-12
 
