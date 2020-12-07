@@ -7,7 +7,7 @@ import { Collection, Schematic } from '../workspace/schematics';
 import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
 
 import { CliCommand } from './cli-command';
-import { CliCommandOptions, formatCliCommandOptions } from './cli-options';
+import { CliCommandOptions, dasherize, formatCliCommandOptions } from './cli-options';
 
 export class UserJourney {
 
@@ -559,7 +559,7 @@ export class UserJourney {
     private async askOptionText(optionName: string, prompt: string): Promise<string | undefined> {
 
         return vscode.window.showInputBox({
-            prompt: `--${optionName}: ${prompt}`,
+            prompt: `--${dasherize(optionName)}: ${prompt}`,
             ignoreFocusOut: true,
         });
 
@@ -568,7 +568,7 @@ export class UserJourney {
     private async askOptionEnum(optionName: string, choices: string[], placeholder: string): Promise<string | undefined> {
 
         return vscode.window.showQuickPick(choices, {
-            placeHolder: `--${optionName}: ${placeholder}`,
+            placeHolder: `--${dasherize(optionName)}: ${placeholder}`,
             ignoreFocusOut: true,
         });
 
@@ -577,7 +577,7 @@ export class UserJourney {
     private async askOptionMultiselect(optionName: string, choices: string[], placeholder: string): Promise<string[] | undefined> {
 
         return vscode.window.showQuickPick(choices, {
-            placeHolder: `--${optionName}: ${placeholder}`,
+            placeHolder: `--${dasherize(optionName)}: ${placeholder}`,
             canPickMany: true,
             ignoreFocusOut: true,
         });
@@ -594,7 +594,7 @@ export class UserJourney {
             description: `Pro-tip: take a minute to check the command above is really what you want`,
         }, {
             label: testLabel,
-            description: `Simulate the command with --dryRun`,
+            description: `Simulate the command with --dry-run`,
         }, {
             label: `$(close) Cancel`,
         }];

@@ -22,7 +22,7 @@ Better support for projects having nested Angular projects (for example because 
 
 ### Feature
 
-When adding options, add a new choice on final confirmation to test the command with `--dryRun`.
+When adding options, add a new choice on final confirmation to test the command with `--dry-run`.
 
 ## [4.2.0] - 2020-06-12
 
