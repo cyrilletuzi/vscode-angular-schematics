@@ -209,6 +209,33 @@ describe('Lint config', () => {
 
         });
 
+        it('with string override', () => {
+
+            const config = lintConfig['validateEslintConfig']({
+                overrides: [
+                    {
+                        files: '*.ts',
+                        rules: {
+                            '@angular-eslint/component-class-suffix': [
+                                'error',
+                                {
+                                    suffixes: [
+                                        'Component',
+                                        'Page'
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            });
+            lintConfig['initComponentSuffixes'](config);
+
+            assert.strictEqual(true, lintConfig.hasComponentSuffix('page'));
+            assert.strictEqual(true, lintConfig.hasComponentSuffix('Page'));
+
+        });
+
     });
 
     describe('TSLint component suffixes', () => {
