@@ -39,8 +39,8 @@ export interface AngularJsonSchema {
     projects: Map<string, AngularJsonProjectSchema>;
 }
 
-export interface TslintJsonSchema {
+export interface LintJsonSchema {
     rules: {
-        'component-class-suffix'?: string[];
+        componentClassSuffixes?: string[];
     };
 }

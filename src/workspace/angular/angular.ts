@@ -17,7 +17,7 @@ export class AngularConfig {
     defaultCollections: string[] = [];
     /** Root project name */
     rootProjectName = '';
-    
+
     /**
      * Initializes `angular.json` configuration.
      * **Must** be called after each `new Angular()`
@@ -42,7 +42,7 @@ export class AngularConfig {
         watchers.push(vscode.workspace.createFileSystemWatcher(fsPath));
 
         return watchers;
-        
+
     }
 
     /**
@@ -73,7 +73,7 @@ export class AngularConfig {
             /* Old Angular projects may have their e2e config set as a separate project */
             .filter(([name]) => !name.endsWith('-e2e'))
             .map(([name, rawOptions]) => {
-                
+
                 const options = JsonValidator.object(rawOptions) ?? {};
 
                 const projectTypeRaw = JsonValidator.string(options.projectType) ?? '';
@@ -81,7 +81,7 @@ export class AngularConfig {
 
                 /* `projectType` is supposed to be required, but default to `application` for safety */
                 if ((possibleProjectTypes as string[]).includes(projectTypeRaw)) {
-                    projectType = projectTypeRaw  as AngularProjectType;
+                    projectType = projectTypeRaw as AngularProjectType;
                 } else {
                     Output.logWarning(`Your Angular configuration file should contain a "projectType" property with "application" or "library" for your "${name}" project. Default to "application".`);
                 }
@@ -161,7 +161,10 @@ export class AngularConfig {
         for (const [name, projectConfig] of angularConfig.projects) {
 
             const project = new AngularProject(name, projectConfig);
-            watchers.push(await project.init(workspaceFolder));
+            const watcher = await project.init(workspaceFolder);
+            if (watcher) {
+                watchers.push(watcher);
+            }
 
             this.projects.set(name, project);
 
