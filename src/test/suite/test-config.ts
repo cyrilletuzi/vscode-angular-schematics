@@ -8,3 +8,4 @@ export const materialCollectionName = '@angular/material';
 export const userComponentTypeLabel = `Custom component type`;
 export const defaultsWorkspaceFolderFsPath = path.join(__dirname, '../../../test-workspaces/defaults');
 export const customizedWorkspaceFolderFsPath = path.join(__dirname, '../../../test-workspaces/customized');
+export const angularEslintWorkspaceFolderFsPath = path.join(__dirname, '../../../test-workspaces/angulareslint');

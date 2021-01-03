@@ -5,7 +5,7 @@ import { Output } from '../../utils';
 import { ComponentShortcut } from '../shortcuts';
 
 import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
-import { TslintConfig } from './tslint';
+import { LintConfig } from './lint';
 
 export class AngularProject {
 
@@ -17,7 +17,7 @@ export class AngularProject {
     private rootPath: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
     private sourcePath: string;
-    /** 
+    /**
      * Main application: `src/app`.
      * Sub-application: `<projects-root>/hello/src/app`
      * Library: `<projects-root>/hello/src/lib`
@@ -25,7 +25,7 @@ export class AngularProject {
     private appOrLibPath: string;
     /** Default values for schematics options */
     private schematicsDefaults: AngularJsonSchematicsSchema | undefined;
-    tslintConfig!: TslintConfig;
+    lintConfig!: LintConfig;
 
     constructor(name: string, config: AngularJsonProjectSchema) {
 
@@ -70,15 +70,15 @@ export class AngularProject {
 
     }
 
-    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher> {
+    async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher | undefined> {
 
-        Output.logInfo(`Loading "${this.name}" Angular project's TSLint configuration.`);
+        Output.logInfo(`Loading "${this.name}" Angular project's lint configuration.`);
 
         const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
 
-        const tslintConfig = new TslintConfig();
-        const watcher = await tslintConfig.init(projectFsPath, { silent: true });
-        this.tslintConfig = tslintConfig;
+        const lintConfig = new LintConfig();
+        const watcher = await lintConfig.init(projectFsPath, { silent: true });
+        this.lintConfig = lintConfig;
 
         const componentShortcut = new ComponentShortcut();
         await componentShortcut.init(workspaceFolder);
@@ -115,10 +115,10 @@ export class AngularProject {
     }
 
     /**
-     * Get authotorized component suffixes in Angular project's tslint.json
+     * Get authotorized component suffixes in Angular project's lint configuration
      */
     getComponentSuffixes(): string[] {
-        return this.tslintConfig.componentSuffixes;
+        return this.lintConfig.componentSuffixes;
     }
 
     /**
@@ -129,10 +129,10 @@ export class AngularProject {
     }
 
     /**
-     * Tells if a suffix is authorized in Angular project's tslint.json
+     * Tells if a suffix is authorized in Angular project's lint configuration
      */
     hasComponentSuffix(suffix: string): boolean {
-        return this.tslintConfig.hasComponentSuffix(suffix);
+        return this.lintConfig.hasComponentSuffix(suffix);
     }
 
     /**

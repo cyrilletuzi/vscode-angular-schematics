@@ -1,5 +1,12 @@
 # Change Log
 
+## [4.8.0] - 2021-01-03
+
+### Feature
+
+Support detecting custom component suffixes with
+[Angular ESLint](https://github.com/angular-eslint/angular-eslint).
+
 ## [4.7.0] - 2020-12-07
 
 [Angular 11.1 deprecates camelCased options in Angular CLI commands.](https://github.com/angular/angular-cli/pull/19530)

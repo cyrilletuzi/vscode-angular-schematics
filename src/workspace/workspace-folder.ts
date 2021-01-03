@@ -6,8 +6,9 @@ import { Output } from '../utils';
 import { formatCliCommandOptions } from '../generation';
 
 import { Collections } from './schematics';
-import { AngularConfig, AngularProject, AngularJsonSchematicsOptionsSchema, TslintConfig } from './angular';
+import { AngularConfig, AngularProject, AngularJsonSchematicsOptionsSchema } from './angular';
 import { ModuleShortcut, ComponentShortcut, ShortcutsTypes } from './shortcuts';
+import { LintConfig } from './angular/lint';
 
 export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
@@ -16,7 +17,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     index: number;
 
     collections!: Collections;
-    private tslintConfig!: TslintConfig;
+    private lintConfig!: LintConfig;
     private angularConfig!: AngularConfig;
     private componentShortcut!: ComponentShortcut;
     private moduleShorcut!: ModuleShortcut;
@@ -66,12 +67,12 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             index: this.index,
         }, angularConfigFsPath)));
         this.angularConfig = angularConfig;
-        
-        Output.logInfo(`Loading global TSLint configuration.`);
 
-        const tslintConfig = new TslintConfig();
-        const tslintWatcher = await tslintConfig.init(this.uri.fsPath);
-        this.tslintConfig = tslintConfig;
+        Output.logInfo(`Loading global lint configuration.`);
+
+        const lintConfig = new LintConfig();
+        const lintWatcher = await lintConfig.init(this.uri.fsPath);
+        this.lintConfig = lintConfig;
 
         Output.logInfo(`Loading schematics configuration.`);
 
@@ -102,20 +103,22 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         /* Watch config files */
         this.fileWatchers.push(
             ...angularWatchers,
-            tslintWatcher,
             ...collectionsWatchers,
         );
+        if (lintWatcher) {
+            this.fileWatchers.push(lintWatcher);
+        }
         for (const watcher of this.fileWatchers) {
             watcher.onDidChange(() => {
                 Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-                this.init().catch(() => {});
+                this.init().catch(() => { });
             });
         }
 
         /* Watch Code preferences */
         this.preferencesWatcher = vscode.workspace.onDidChangeConfiguration(() => {
             Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-            this.init().catch(() => {});
+            this.init().catch(() => { });
         });
 
     }
@@ -173,7 +176,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
                 const suffix = config.options.get('type') as string;
 
-                /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
+                /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in lint configuration */
                 if (!hasTypeOption || !this.hasComponentSuffix(projectName, suffix)) {
                     config.options.delete('type');
                     config.choice.description = formatCliCommandOptions(config.options);
@@ -223,7 +226,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
-     * Tells if a component suffix is authorized in tslint.json
+     * Tells if a component suffix is authorized in lint configuration
      */
     hasComponentSuffix(angularProjectName: string, suffix: string): boolean {
 
@@ -233,8 +236,8 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
          * 1. project level
          * 2. workspace folder level */
         return (angularProject && (angularProject.getComponentSuffixes().length ?? 0) > 0) ?
-                angularProject.hasComponentSuffix(suffix) :
-                this.tslintConfig.hasComponentSuffix(suffix);
+            angularProject.hasComponentSuffix(suffix) :
+            this.lintConfig.hasComponentSuffix(suffix);
 
     }
 
@@ -294,11 +297,11 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
                     if (action === docLabel) {
 
-                        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/docs/editor/multi-root-workspaces')).then(() => {}, () => {});
+                        vscode.env.openExternal(vscode.Uri.parse('https://code.visualstudio.com/docs/editor/multi-root-workspaces')).then(() => { }, () => { });
 
                     }
 
-                }).then(() => {}, () => {});
+                }).then(() => { }, () => { });
 
                 /* Unfortunately the results' order from VS Code search is inconsistent from one time to another,
                  * so we sort based on paths' nesting length to keep the directory closest to the root folder */

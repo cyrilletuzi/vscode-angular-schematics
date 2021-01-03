@@ -8,13 +8,14 @@ import { angularCollectionName, defaultComponentTypes } from '../../defaults';
 import { WorkspaceFolderConfig } from '../../workspace';
 import { CliCommand } from '../../generation/cli-command';
 
-import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath } from './test-config';
+import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath } from './test-config';
 import { COMPONENT_TYPE, ShortcutsTypes, MODULE_TYPE } from '../../workspace/shortcuts';
 
 describe('Cli command', () => {
 
     let workspaceFolderDefaults: WorkspaceFolderConfig;
     let workspaceFolderCustomized: WorkspaceFolderConfig;
+    let workspaceFolderAngularESLint: WorkspaceFolderConfig;
 
     before(async () => {
 
@@ -23,6 +24,9 @@ describe('Cli command', () => {
 
         workspaceFolderCustomized = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![1]!);
         await workspaceFolderCustomized.init();
+
+        workspaceFolderAngularESLint = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![2]!);
+        await workspaceFolderAngularESLint.init();
 
     });
 
@@ -234,7 +238,7 @@ describe('Cli command', () => {
 
         });
 
-        it('Page with type', async () => {
+        it('Page with type from TSLint suffixes', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderCustomized);
             cliCommand.setProjectName(rootProjectName);
@@ -251,6 +255,23 @@ describe('Cli command', () => {
 
         });
 
+        it('Page with type from ESLint suffixes', async () => {
+
+            const cliCommand = new CliCommand(workspaceFolderAngularESLint);
+            cliCommand.setProjectName(rootProjectName);
+            cliCommand.setCollectionName(angularCollectionName);
+            cliCommand.setSchematic(workspaceFolderAngularESLint.collections.getCollection(angularCollectionName)!.getSchematic('component')!);
+            await cliCommand.validateProject();
+            cliCommand.setNameAsFirstArg('hello');
+
+            const typesCustomized = workspaceFolderAngularESLint.getComponentTypes(rootProjectName);
+            cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
+
+            assert.strictEqual(`ng g component hello --type page --skip-selector`, cliCommand.getCommand());
+            assert.strictEqual(path.join(angularEslintWorkspaceFolderFsPath, 'src/app/hello/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+
+        });
+
         it('Pure', async () => {
 
             const cliCommand = new CliCommand(workspaceFolderDefaults);
@@ -260,7 +281,7 @@ describe('Cli command', () => {
             await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.PURE)!.options);
-            
+
             assert.strictEqual(`ng g component hello --change-detection OnPush`, cliCommand.getCommand());
 
         });
@@ -274,7 +295,7 @@ describe('Cli command', () => {
             await cliCommand.validateProject();
             cliCommand.setNameAsFirstArg('hello');
             cliCommand.addOptions(types.get(COMPONENT_TYPE.EXPORTED)!.options);
-            
+
             assert.strictEqual(`ng g component hello --export --change-detection OnPush`, cliCommand.getCommand());
 
         });
@@ -526,7 +547,7 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
-        
+
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
             assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
@@ -543,7 +564,7 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
-        
+
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
             assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);

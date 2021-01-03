@@ -26,7 +26,7 @@ describe('Workspace folder config', () => {
         it('Angular default collections', () => {
 
             assert.strictEqual(angularCollectionName, workspaceFolder.getDefaultUserCollection());
-            assert.deepEqual([angularCollectionName], workspaceFolder.getDefaultCollections());
+            assert.deepStrictEqual([angularCollectionName], workspaceFolder.getDefaultCollections());
 
         });
 
@@ -73,7 +73,7 @@ describe('Workspace folder config', () => {
 
         it('Collections', () => {
 
-            assert.deepEqual([angularCollectionName], workspaceFolder.collections.getCollectionsNames());
+            assert.deepStrictEqual([angularCollectionName], workspaceFolder.collections.getCollectionsNames());
 
             const angularCollection = workspaceFolder.collections.getCollection(angularCollectionName);
             assert.strictEqual(angularCollectionName, angularCollection?.getName());
@@ -111,7 +111,7 @@ describe('Workspace folder config', () => {
         it('Angular default collections', () => {
 
             assert.strictEqual(ionicCollectionName, workspaceFolder.getDefaultUserCollection());
-            assert.deepEqual([ionicCollectionName, angularCollectionName], workspaceFolder.getDefaultCollections());
+            assert.deepStrictEqual([ionicCollectionName, angularCollectionName], workspaceFolder.getDefaultCollections());
 
         });
 
@@ -194,7 +194,7 @@ describe('Workspace folder config', () => {
 
         it('Collections', () => {
 
-            assert.deepEqual([ionicCollectionName, angularCollectionName, materialCollectionName], workspaceFolder.collections.getCollectionsNames());
+            assert.deepStrictEqual([ionicCollectionName, angularCollectionName, materialCollectionName], workspaceFolder.collections.getCollectionsNames());
 
             const angularCollection = workspaceFolder.collections.getCollection(angularCollectionName);
             assert.strictEqual(angularCollectionName, angularCollection?.getName());
@@ -228,6 +228,28 @@ describe('Workspace folder config', () => {
 
         });
 
-    }); 
+    });
+
+    describe('Angular ESLint', () => {
+
+        let workspaceFolder: WorkspaceFolderConfig;
+
+        before(async () => {
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![2]!);
+
+            await workspaceFolder.init();
+
+        });
+
+        it('ESLint component suffixes', () => {
+
+            assert.strictEqual(true, workspaceFolder.hasComponentSuffix(rootProjectName, 'Component'));
+            assert.strictEqual(true, workspaceFolder.hasComponentSuffix(rootProjectName, 'Page'));
+
+        });
+
+    });
 
 });
