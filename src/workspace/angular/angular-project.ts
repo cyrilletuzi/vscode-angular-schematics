@@ -72,7 +72,7 @@ export class AngularProject {
 
     async init(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.FileSystemWatcher | undefined> {
 
-        Output.logInfo(`Loading "${this.name}" Angular project's TSLint configuration.`);
+        Output.logInfo(`Loading "${this.name}" Angular project's lint configuration.`);
 
         const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
 
@@ -115,7 +115,7 @@ export class AngularProject {
     }
 
     /**
-     * Get authotorized component suffixes in Angular project's tslint.json
+     * Get authotorized component suffixes in Angular project's lint configuration
      */
     getComponentSuffixes(): string[] {
         return this.lintConfig.componentSuffixes;
@@ -129,7 +129,7 @@ export class AngularProject {
     }
 
     /**
-     * Tells if a suffix is authorized in Angular project's tslint.json
+     * Tells if a suffix is authorized in Angular project's lint configuration
      */
     hasComponentSuffix(suffix: string): boolean {
         return this.lintConfig.hasComponentSuffix(suffix);

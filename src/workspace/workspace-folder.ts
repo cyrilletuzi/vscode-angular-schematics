@@ -176,7 +176,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
                 const suffix = config.options.get('type') as string;
 
-                /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in tslint.json */
+                /* `--type` is only supported in Angular >= 9 and the component suffix must be authorized in lint configuration */
                 if (!hasTypeOption || !this.hasComponentSuffix(projectName, suffix)) {
                     config.options.delete('type');
                     config.choice.description = formatCliCommandOptions(config.options);
@@ -226,7 +226,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     }
 
     /**
-     * Tells if a component suffix is authorized in tslint.json
+     * Tells if a component suffix is authorized in lint configuration
      */
     hasComponentSuffix(angularProjectName: string, suffix: string): boolean {
 

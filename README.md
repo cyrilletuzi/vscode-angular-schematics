@@ -130,7 +130,35 @@ For example, `ng g hello --type page` will generate the `hello.page.ts` file wit
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
 
 The extension will add `--type page` automatically for Pages if
-you **change the authorized suffixes in your tslint.json**:
+you **change the authorized suffixes in your lint config**:
+
+- `.eslintrc.json`:
+
+```json
+{
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "rules": {
+        "@angular-eslint/component-class-suffix": [
+          "error",
+          {
+            "suffixes": [
+              "Component",
+              "Page"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+
+```
+
+- `tslint.json`:
 
 ```json
 {
@@ -151,7 +179,7 @@ The extension suggests these additional component types if the related libraries
 - PrimeNG dynamic dialog
 
 As for Pages, a custom `--type`/suffix will be automatically added
-if your `tslint.json` is configured accordingly.
+if your linter is configured accordingly.
 
 Library authors are encouraged to create a Pull Request to
 easily add defaults components types in

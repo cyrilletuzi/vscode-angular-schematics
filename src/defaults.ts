@@ -29,7 +29,7 @@ export interface ComponentType {
 /**
  * Default custom component types.
  * Each type will only be enabled if its `package` is installed.
- * `type` option will only be enabled if the value is authorized as a component suffix in `tslint.json`
+ * `type` option will only be enabled if the value is authorized as a component suffix in lint configuration
  */
 export const defaultComponentTypes: ComponentType[] = [
     {
