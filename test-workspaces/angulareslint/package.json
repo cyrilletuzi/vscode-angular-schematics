@@ -6,7 +6,7 @@
   "devDependencies": {
     "eslint": "7.17.0",
     "eslint-plugin-import": "2.22.1",
-    "eslint-plugin-jsdoc": "30.7.11",
+    "eslint-plugin-jsdoc": "30.7.13",
     "eslint-plugin-prefer-arrow": "1.2.2",
     "@angular-eslint/builder": "1.0.0",
     "@angular-eslint/eslint-plugin": "1.0.0",
