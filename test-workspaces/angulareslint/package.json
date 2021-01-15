@@ -10,7 +10,7 @@
     "eslint-plugin-prefer-arrow": "1.2.2",
     "@angular-eslint/builder": "1.0.0",
     "@angular-eslint/eslint-plugin": "1.0.0",
-    "@angular-eslint/eslint-plugin-template": "1.0.0",
+    "@angular-eslint/eslint-plugin-template": "1.1.0",
     "@angular-eslint/schematics": "1.0.0",
     "@angular-eslint/template-parser": "1.0.0",
     "@typescript-eslint/eslint-plugin": "4.12.0",
