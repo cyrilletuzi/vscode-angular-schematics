@@ -91,13 +91,13 @@ export class UserJourney {
                 return;
             }
 
-        
+
         }
 
         Output.logInfo(`Collection used: "${collectionName}"`);
 
         this.cliCommand.setCollectionName(collectionName);
-        
+
         const collection = this.workspaceFolder.collections.getCollection(collectionName);
 
         if (!collection) {
@@ -218,7 +218,7 @@ export class UserJourney {
                 Output.logInfo(`You have canceled the generation.`);
                 return;
             }
-            
+
         }
 
         /* Ask for advanced options if user didn't choose a direct confirmation */
@@ -291,7 +291,7 @@ export class UserJourney {
 
             return projectChoice?.label;
 
-        } 
+        }
 
     }
 
@@ -300,7 +300,7 @@ export class UserJourney {
         if  (this.workspaceFolder.collections.getCollectionsNames().length === 0) {
             throw new Error();
         }
-        
+
         else if  (this.workspaceFolder.collections.getCollectionsNames().length === 1) {
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -409,7 +409,7 @@ export class UserJourney {
             lazyModuleType.choice.description = formatCliCommandOptions(lazyModuleType.options);
 
         }
-        
+
         const typesChoices = Array.from(types.values()).map((type) => type.choice);
 
         const typeChoice = await vscode.window.showQuickPick(typesChoices, {
@@ -492,7 +492,7 @@ export class UserJourney {
         if (optionsChoices.length === 0) {
             return [];
         }
-        
+
         const selectedOptions = await vscode.window.showQuickPick(optionsChoices, {
             canPickMany: true,
             placeHolder: `Do you need some options? (if not, just press Enter to skip this step)`,
@@ -509,25 +509,25 @@ export class UserJourney {
         const options = [...this.schematic.getRequiredOptions(), ...this.schematic.getSomeOptions(optionsNames)];
 
         const filledOptions: CliCommandOptions = new Map<string, string | string[]>();
-    
+
         for (const [optionName, option] of options) {
 
             let choice: string | string[] | undefined = '';
 
             /* Some schematics have a prompt message already defined, otherwise we use the description */
             const prompt = option?.['x-prompt'] ?? option.description ?? `What value do you want for this option?`;
-    
+
             if (option.enum !== undefined) {
-    
+
                 choice = await this.askOptionEnum(optionName, option.enum, prompt);
-    
+
             } else if (option.type === 'boolean') {
-    
+
                 /* Put the default value first */
                 const choices = (option.default === false) ? ['false', 'true'] : ['true', 'false'];
-    
+
                 choice = await this.askOptionEnum(optionName, choices, prompt);
-    
+
             }
             /* Only makes sense if the option is an array AND have suggestions,
              * otherwise the user must manually type the value in a classic text input box */
@@ -539,21 +539,21 @@ export class UserJourney {
                 } else {
                     choice = await this.askOptionText(optionName, prompt);
                 }
-    
+
             } else {
-    
+
                 choice = await this.askOptionText(optionName, prompt);
-    
+
             }
-    
+
             if (choice) {
                 filledOptions.set(optionName, choice);
             }
 
         }
-    
+
         return filledOptions;
-    
+
     }
 
     private async askOptionText(optionName: string, prompt: string): Promise<string | undefined> {
@@ -635,6 +635,9 @@ export class UserJourney {
 
             await vscode.window.showTextDocument(document);
 
+            /* Go back to previously active terminal */
+            Terminal.back();
+
             Output.logInfo(`Command has succeeded! Check the Terminal for more details.`);
 
             return;
@@ -678,7 +681,7 @@ export class UserJourney {
             `Command launched, check the Terminal to know its status. You may need to refresh the Explorer to see the generated file(s).`,
             `Refresh Explorer`,
         );
-        
+
         if (action === refreshLabel) {
             /* Refresh Explorer, otherwise you may not see the generated files */
             vscode.commands.executeCommand('workbench.files.action.refreshFilesExplorer').then(() => {}, () => {});

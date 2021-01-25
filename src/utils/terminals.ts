@@ -5,17 +5,31 @@ import { extensionName } from '../defaults';
 export class Terminals {
 
     private static terminals = new Map<string, vscode.Terminal>();
+    private static previousTerminal?: vscode.Terminal;
 
     /**
      * Launch a command in terminal
      */
     static send(workspaceFolder: vscode.WorkspaceFolder, command: string): void {
 
+        /* Memorize current terminal to be able to focus back on it */
+        this.previousTerminal = vscode.window.activeTerminal;
+
         const terminal = this.getTerminal(workspaceFolder);
 
-        terminal.show();
+        /* `true` means the terminal doesn't capture the focus */
+        terminal.show(true);
 
         terminal.sendText(command);
+
+    }
+
+    /**
+     * Go back to the previous terminal, if exists
+     */
+    static back(): void {
+
+        this.previousTerminal?.show();
 
     }
 
