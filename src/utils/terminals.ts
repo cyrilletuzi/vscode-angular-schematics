@@ -12,6 +12,8 @@ export class Terminals {
      */
     static send(workspaceFolder: vscode.WorkspaceFolder, command: string): void {
 
+        console.log(vscode.window.activeTerminal);
+
         /* Memorize current terminal to be able to focus back on it */
         this.previousTerminal = vscode.window.activeTerminal;
 
@@ -25,11 +27,21 @@ export class Terminals {
     }
 
     /**
-     * Go back to the previous terminal, if exists
+     * Go back to the previous terminal, if exists, or hide the one used by the extension
      */
-    static back(): void {
+    static back(workspaceFolder: vscode.WorkspaceFolder): void {
 
-        this.previousTerminal?.show();
+        if (this.previousTerminal) {
+
+            this.previousTerminal.show();
+
+        } else {
+
+            const terminal = this.getTerminal(workspaceFolder);
+
+            terminal.hide();
+
+        }
 
     }
 
