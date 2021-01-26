@@ -635,9 +635,6 @@ export class UserJourney {
 
             await vscode.window.showTextDocument(document);
 
-            /* Go back to previously active terminal */
-            Terminal.back();
-
             Output.logInfo(`Command has succeeded! Check the Terminal for more details.`);
 
             return;
