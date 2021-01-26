@@ -9,7 +9,6 @@
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
-			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
@@ -22,7 +21,6 @@
 			"name": "Extension Tests",
 			"type": "extensionHost",
 			"request": "launch",
-			"runtimeExecutable": "${execPath}",
 			"args": [
 				"${workspaceFolder}/test-workspaces/test.code-workspace",
 			  	"--disable-extensions",
