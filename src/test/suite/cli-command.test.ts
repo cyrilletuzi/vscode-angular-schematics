@@ -40,7 +40,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -54,7 +54,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g service hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.service.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.service.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -68,7 +68,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g module hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.module.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.module.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -82,7 +82,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g interface hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -96,7 +96,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${angularCollectionName}:component hello --project ${libProjectName}`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -110,7 +110,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${materialCollectionName}:table hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(customizedWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -124,7 +124,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello/world');
 
         assert.strictEqual(`ng g component hello/world`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world/world.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.posix.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world/world.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -251,7 +251,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.posix.join(customizedWorkspaceFolderFsPath, 'src/app/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -268,7 +268,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(angularEslintWorkspaceFolderFsPath, 'src/app/hello/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.posix.join(angularEslintWorkspaceFolderFsPath, 'src/app/hello/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -331,7 +331,7 @@ describe('Cli command', () => {
 
             cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0]!.label)!.options);
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.posix.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
