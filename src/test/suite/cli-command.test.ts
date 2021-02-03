@@ -457,7 +457,7 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('src', 'app'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
@@ -472,7 +472,7 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app/hello', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('src', 'app', 'hello'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
@@ -487,8 +487,8 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -502,8 +502,8 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app/hello/world.ts', cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world.ts', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('src', 'app', 'hello', 'world.ts'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world.ts'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -517,8 +517,8 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(`projects/${libProjectName}/src/lib/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('projects', libProjectName, 'src', 'lib', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(libProjectName, cliCommand.getProjectName());
 
@@ -532,8 +532,8 @@ describe('Cli command', () => {
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(`projects/${subAppProjectName}/src/app/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('projects', subAppProjectName, 'src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(subAppProjectName, cliCommand.getProjectName());
 
@@ -549,8 +549,8 @@ describe('Cli command', () => {
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -566,8 +566,8 @@ describe('Cli command', () => {
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
