@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import * as assert from 'assert';
 import { describe, before, it } from 'mocha';
 
@@ -39,7 +40,7 @@ describe('Workspace folder config', () => {
             assert.strictEqual('application', rootProject?.getType());
             assert.strictEqual('', rootProject?.getRootPath());
             assert.strictEqual('src', rootProject?.getSourcePath());
-            assert.strictEqual('src/app', rootProject?.getAppOrLibPath());
+            assert.strictEqual(path.join('src', 'app'), rootProject?.getAppOrLibPath());
             assert.strictEqual(true, workspaceFolder.isRootAngularProject(rootProjectName));
 
         });
@@ -124,23 +125,23 @@ describe('Workspace folder config', () => {
             assert.strictEqual('application', rootProject?.getType());
             assert.strictEqual('', rootProject?.getRootPath());
             assert.strictEqual('src', rootProject?.getSourcePath());
-            assert.strictEqual('src/app', rootProject?.getAppOrLibPath());
+            assert.strictEqual(path.join('src', 'app'), rootProject?.getAppOrLibPath());
             assert.strictEqual(true, workspaceFolder.isRootAngularProject(rootProjectName));
 
             const libProject = workspaceFolder.getAngularProject(libProjectName);
 
             assert.strictEqual('library', libProject?.getType());
-            assert.strictEqual('projects/my-lib', libProject?.getRootPath());
-            assert.strictEqual('projects/my-lib/src', libProject?.getSourcePath());
-            assert.strictEqual('projects/my-lib/src/lib', libProject?.getAppOrLibPath());
+            assert.strictEqual(path.join('projects', 'my-lib'), libProject?.getRootPath());
+            assert.strictEqual(path.join('projects', 'my-lib', 'src'), libProject?.getSourcePath());
+            assert.strictEqual(path.join('projects', 'my-lib', 'src', 'lib'), libProject?.getAppOrLibPath());
             assert.strictEqual(false, workspaceFolder.isRootAngularProject(libProjectName));
 
             const subAppProject = workspaceFolder.getAngularProject(subAppProjectName);
 
             assert.strictEqual('application', subAppProject?.getType());
-            assert.strictEqual('projects/other-app', subAppProject?.getRootPath());
-            assert.strictEqual('projects/other-app/src', subAppProject?.getSourcePath());
-            assert.strictEqual('projects/other-app/src/app', subAppProject?.getAppOrLibPath());
+            assert.strictEqual(path.join('projects', 'other-app'), subAppProject?.getRootPath());
+            assert.strictEqual(path.join('projects', 'other-app', 'src'), subAppProject?.getSourcePath());
+            assert.strictEqual(path.join('projects', 'other-app', 'src', 'app'), subAppProject?.getAppOrLibPath());
             assert.strictEqual(false, workspaceFolder.isRootAngularProject(subAppProjectName));
 
         });
