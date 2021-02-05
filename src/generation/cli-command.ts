@@ -83,7 +83,7 @@ export class CliCommand {
         return this.projectName;
     }
 
-    /** 
+    /**
      * Get project's source path, or defaut to `src/app`
      */
     getProjectSourcePath(): string {
@@ -131,7 +131,7 @@ export class CliCommand {
             if (appModulePossibleFsPaths.length > 0) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const pathRelativeToWorkspace = appModulePossibleFsPaths[0]!.fsPath.substr(this.workspaceFolder.uri.fsPath.length + 1);
+                const pathRelativeToWorkspace = path.relative(this.workspaceFolder.uri.fsPath, appModulePossibleFsPaths[0]!.fsPath);
 
                 /* Path must be in Linux format */
                 const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace).replace(/\\/g, '/'));
@@ -229,10 +229,10 @@ export class CliCommand {
         const command = `${this.getCommand()}${dryRun ? ` --dry-run` : ''}`;
 
         Terminal.send(this.workspaceFolder, command);
-    
+
     }
 
-    /** 
+    /**
      * Try to resolve the generated file fs path
      */
     guessGereratedFileFsPath(): string {
@@ -331,7 +331,7 @@ export class CliCommand {
             const generatedFolderFsPath = isFlat ?
                 path.join(projectSourcePath, folderName) :
                 path.join(projectSourcePath, folderName, fileName);
-            
+
             possibleFsPath = path.join(generatedFolderFsPath, fileWithSuffixName);
 
         }
@@ -377,7 +377,7 @@ export class CliCommand {
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspaceFolder = this.contextPath.full.substr(this.workspaceFolder.uri.path.length + 1);
+        this.contextPath.relativeToWorkspaceFolder = path.relative(this.workspaceFolder.uri.path, this.contextPath.full);
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
@@ -391,7 +391,7 @@ export class CliCommand {
 
                 /* Remove source path from workspace folder relative path,
                  * eg. `src/app/some-module` => `some-module` */
-                this.contextPath.relativeToProjectFolder = this.contextPath.relativeToWorkspaceFolder.substr(projectConfig.getAppOrLibPath().length + 1);
+                this.contextPath.relativeToProjectFolder = path.relative(projectConfig.getAppOrLibPath(), this.contextPath.relativeToWorkspaceFolder);
 
                 break;
 
