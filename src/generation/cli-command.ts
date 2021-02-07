@@ -88,13 +88,18 @@ export class CliCommand {
      */
     getProjectSourcePath(): string {
 
-        const project = this.workspaceFolder.getAngularProject(this.projectName);
+        return path.posix.join(this.workspaceFolder.uri.path, this.getRelativeProjectSourcePath());
 
-        const projectSourcePath = (this.projectName && project) ?
-            project.getAppOrLibPath() :
-            (this.options.get('path') as string | undefined) ?? 'src/app';
+    }
 
-        return path.join(this.workspaceFolder.uri.fsPath, projectSourcePath);
+    /**
+     * Get project's source fsPath, or defaut to `src/app`
+     */
+    getProjectSourceFsPath(): string {
+
+        const projectSourceFsPath = FileSystem.convertRelativePathToRelativeFsPath(this.getRelativeProjectSourcePath());
+
+        return path.join(this.workspaceFolder.uri.fsPath, projectSourceFsPath);
 
     }
 
@@ -131,10 +136,9 @@ export class CliCommand {
             if (appModulePossibleFsPaths.length > 0) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const pathRelativeToWorkspace = path.relative(this.workspaceFolder.uri.fsPath, appModulePossibleFsPaths[0]!.fsPath);
+                const pathRelativeToWorkspace = path.posix.relative(this.workspaceFolder.uri.path, appModulePossibleFsPaths[0]!.path);
 
-                /* Path must be in Linux format */
-                const commandPath = path.posix.normalize(path.dirname(pathRelativeToWorkspace).replace(/\\/g, '/'));
+                const commandPath = path.posix.dirname(pathRelativeToWorkspace);
 
                 this.options.set('path', commandPath);
 
@@ -244,7 +248,7 @@ export class CliCommand {
         if (this.nameAsFirstArg) {
 
             /* Get the project path, or defaut to `src/app` */
-            const projectSourcePath = this.getProjectSourcePath();
+            const projectSourceFsPath = this.getProjectSourceFsPath();
 
             /* Default file's suffix is the schematic name (eg. `service`) */
             let suffix = `.${this.schematicName}`;
@@ -285,6 +289,8 @@ export class CliCommand {
 
             /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
+            /* Convert from Posix format to OS-specific fsPath */
+            const folderFsPath = FileSystem.convertRelativePathToRelativeFsPath(folderName);
             const fileName = path.posix.basename(this.nameAsFirstArg);
             const fileWithSuffixName = `${fileName}${suffix}.ts`;
 
@@ -329,8 +335,8 @@ export class CliCommand {
 
             /* If not flat, add a intermediate folder, which name is the same as the generated file */
             const generatedFolderFsPath = isFlat ?
-                path.join(projectSourcePath, folderName) :
-                path.join(projectSourcePath, folderName, fileName);
+                path.join(projectSourceFsPath, folderFsPath) :
+                path.join(projectSourceFsPath, folderFsPath, fileName);
 
             possibleFsPath = path.join(generatedFolderFsPath, fileWithSuffixName);
 
@@ -339,6 +345,19 @@ export class CliCommand {
         Output.logInfo(`Guessed generated file path: ${possibleFsPath}`);
 
         return possibleFsPath;
+
+    }
+
+    /**
+     * Get project's relative source path, or defaut to `src/app`
+     */
+    private getRelativeProjectSourcePath(): string {
+
+        const project = this.workspaceFolder.getAngularProject(this.projectName);
+
+        return (this.projectName && project) ?
+            project.getAppOrLibPath() :
+            (this.options.get('path') as string | undefined) ?? 'src/app';
 
     }
 
@@ -377,21 +396,23 @@ export class CliCommand {
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspaceFolder = path.relative(this.workspaceFolder.uri.path, this.contextPath.full);
+        this.contextPath.relativeToWorkspaceFolder = path.posix.relative(this.workspaceFolder.uri.path, this.contextPath.full);
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
         /* First try by matching projects *source* path */
         for (const [projectName, projectConfig] of this.workspaceFolder.getAngularProjects()) {
 
+            const appOrLibPath = projectConfig.getAppOrLibPath();
+
             /* If the relative path starts with the project path */
-            if (this.contextPath.relativeToWorkspaceFolder.startsWith(projectConfig.getAppOrLibPath())) {
+            if (this.contextPath.relativeToWorkspaceFolder.startsWith(appOrLibPath)) {
 
                 this.projectName = projectName;
 
                 /* Remove source path from workspace folder relative path,
                  * eg. `src/app/some-module` => `some-module` */
-                this.contextPath.relativeToProjectFolder = path.relative(projectConfig.getAppOrLibPath(), this.contextPath.relativeToWorkspaceFolder);
+                this.contextPath.relativeToProjectFolder = path.posix.relative(appOrLibPath, this.contextPath.relativeToWorkspaceFolder);
 
                 break;
 

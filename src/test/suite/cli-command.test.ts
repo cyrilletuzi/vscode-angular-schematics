@@ -8,7 +8,7 @@ import { angularCollectionName, defaultComponentTypes } from '../../defaults';
 import { WorkspaceFolderConfig } from '../../workspace';
 import { CliCommand } from '../../generation/cli-command';
 
-import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath } from './test-config';
+import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath, defaultsWorkspaceFolderPath, customizedWorkspaceFolderPath } from './test-config';
 import { COMPONENT_TYPE, ShortcutsTypes, MODULE_TYPE } from '../../workspace/shortcuts';
 
 describe('Cli command', () => {
@@ -424,9 +424,9 @@ describe('Cli command', () => {
 
         it('workspace folder', () => {
 
-            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderFsPath);
+            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderPath);
 
-            assert.strictEqual(defaultsWorkspaceFolderFsPath, cliCommand['contextPath'].full);
+            assert.strictEqual(defaultsWorkspaceFolderPath, cliCommand['contextPath'].full);
             assert.strictEqual('', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
 
@@ -438,7 +438,7 @@ describe('Cli command', () => {
 
         it('src folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -453,11 +453,11 @@ describe('Cli command', () => {
 
         it('src/app folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('src/app', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
@@ -468,11 +468,11 @@ describe('Cli command', () => {
 
         it('folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app', 'hello'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('src/app/hello', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
@@ -483,12 +483,12 @@ describe('Cli command', () => {
 
         it('subfolder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -498,12 +498,12 @@ describe('Cli command', () => {
 
         it('file', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world.ts');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world.ts');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app', 'hello', 'world.ts'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world.ts'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual('src/app/hello/world.ts', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world.ts', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -513,12 +513,12 @@ describe('Cli command', () => {
 
         it('lib', () => {
 
-            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello/world');
+            const contextPath = path.posix.join(customizedWorkspaceFolderPath, 'projects', libProjectName, 'src/lib/hello/world');
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('projects', libProjectName, 'src', 'lib', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.posix.join('projects', libProjectName, 'src/lib/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(libProjectName, cliCommand.getProjectName());
 
@@ -528,12 +528,12 @@ describe('Cli command', () => {
 
         it('subapp', () => {
 
-            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', subAppProjectName, 'src/app/hello/world');
+            const contextPath = path.posix.join(customizedWorkspaceFolderPath, 'projects', subAppProjectName, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('projects', subAppProjectName, 'src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual(path.posix.join('projects', subAppProjectName, 'src/app/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(subAppProjectName, cliCommand.getProjectName());
 
@@ -543,14 +543,14 @@ describe('Cli command', () => {
 
         it('@schematics/angular:library', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
@@ -560,14 +560,14 @@ describe('Cli command', () => {
 
         it('@schematics/angular:application', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(path.join('src', 'app', 'hello', 'world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
-            assert.strictEqual(path.join('hello', 'world'), cliCommand['contextPath'].relativeToProjectFolder);
+            assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(rootProjectName, cliCommand.getProjectName());
 
