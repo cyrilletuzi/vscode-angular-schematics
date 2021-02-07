@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-import { Output } from '../../utils';
+import { FileSystem, Output } from '../../utils';
 import { ComponentShortcut } from '../shortcuts';
 
 import { AngularJsonProjectSchema, AngularProjectType, AngularJsonSchematicsSchema, AngularJsonSchematicsOptionsSchema } from './json-schema';
@@ -74,7 +74,10 @@ export class AngularProject {
 
         Output.logInfo(`Loading "${this.name}" Angular project's lint configuration.`);
 
-        const projectFsPath = path.join(workspaceFolder.uri.fsPath, this.rootPath);
+        /** `rootPath` is in Posix format, but here we need an OS-specific fsPath */
+        const rootFsPath = FileSystem.convertRelativePathToRelativeFsPath(this.rootPath);
+
+        const projectFsPath = path.join(workspaceFolder.uri.fsPath, rootFsPath);
 
         const lintConfig = new LintConfig();
         const watcher = await lintConfig.init(projectFsPath, { silent: true });

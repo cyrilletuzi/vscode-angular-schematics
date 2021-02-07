@@ -9,7 +9,7 @@ export class FileSystem {
 
     // TODO: [feature] handle custom node_modules folder
     private static readonly defaultNodeModulesPath = 'node_modules';
-    /** 
+    /**
      * Cache for already found packages.
      * Key: `workspace-name:package-name`.
      * Value: package's fs path.
@@ -81,7 +81,7 @@ export class FileSystem {
             if (!silent) {
                 this.logError(fsPath, ((typeof error === 'object') && ((error as { [key: string]: unknown })?.code === 'ENOENT')) ? `found` : `read`);
             }
-            
+
             return false;
 
         }
@@ -102,13 +102,13 @@ export class FileSystem {
         if (await this.isReadable(fsPath, { silent })) {
 
             let json;
-    
+
             try {
-                
+
                 const data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
-        
+
                 json = parse(data) as unknown;
-        
+
             } catch {
 
                 if (!silent) {
@@ -120,13 +120,13 @@ export class FileSystem {
                 return undefined;
 
             }
-        
+
             return json;
 
         }
 
         return undefined;
-    
+
     }
 
     /**
@@ -142,6 +142,17 @@ export class FileSystem {
 
         /* If a file: remove the file name, otherwise it is a directory so keep it */
         return basename.includes('.') ? path.posix.dirname(partialPath) : partialPath;
+
+    }
+
+    /**
+     * Convert a relative Posix path to an OS-specific fsPath.
+     * Do *not* use this on absolute paths, as it would require other steps (like removing the leading slash on Windows)
+     * @param pathValue Path to convert
+     */
+    static convertRelativePathToRelativeFsPath(pathValue: string): string {
+
+        return (path.sep !== path.posix.sep) ? pathValue.split(path.posix.sep).join(path.sep) : pathValue;
 
     }
 

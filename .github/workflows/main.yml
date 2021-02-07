@@ -13,7 +13,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: 12
+        node-version: 14
     - name: Install npm@7
       run: npm i npm -g
     - name: Install dependencies
@@ -30,7 +30,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: 12
+        node-version: 14
     - name: Install npm@7
       run: npm i npm -g
     - name: Install dependencies
@@ -47,7 +47,7 @@ jobs:
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: 12
+        node-version: 14
     - name: Install npm@7
       run: npm i npm -g
     - name: Install dependencies
@@ -55,21 +55,90 @@ jobs:
     - name: Size check
       run: npm run vscode:prepublish
 
-  test:
-    name: Test check
-    runs-on: ubuntu-latest
+  test-stable:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    name: Test with VS Code stable on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
       uses: actions/setup-node@v2
       with:
-        node-version: 12
+        node-version: 14
     - name: Install npm@7
       run: npm i npm -g
     - name: Install dependencies
       run: npm ci && cd test-workspaces && npm ci && cd customized && npm ci
-    - name: Required for Code display
-      run: sudo apt-get install xvfb
     - name: Test check
-      run: xvfb-run --auto-servernum npm test
+      run: npm run ci:stable
+      if: matrix.os != 'ubuntu-latest'
+    - name: Required for Code display on Linux
+      run: sudo apt-get install xvfb
+      if: matrix.os == 'ubuntu-latest'
+    - name: Test check
+      run: xvfb-run --auto-servernum npm run ci:stable
+      if: matrix.os == 'ubuntu-latest'
+
+  test-minimal:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    name: Test with VS Code 1.41 on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 3
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+    - name: Install npm@7
+      run: npm i npm -g
+    - name: Install dependencies
+      run: npm ci && cd test-workspaces && npm ci && cd customized && npm ci
+    - name: Test check
+      run: npm run ci:minimal
+      if: matrix.os != 'ubuntu-latest'
+    - name: Required for Code display on Linux
+      run: sudo apt-get install xvfb
+      if: matrix.os == 'ubuntu-latest'
+    - name: Test check
+      run: xvfb-run --auto-servernum npm run ci:minimal
+      if: matrix.os == 'ubuntu-latest'
+
+  test-insiders:
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    name: Test with VS Code insiders on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    timeout-minutes: 3
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+    - name: Install npm@7
+      run: npm i npm -g
+    - name: Install dependencies
+      run: npm ci && cd test-workspaces && npm ci && cd customized && npm ci
+    - name: Test check
+      run: npm run ci:insiders
+      if: matrix.os != 'ubuntu-latest'
+    - name: Required for Code display on Linux
+      run: sudo apt-get install xvfb
+      if: matrix.os == 'ubuntu-latest'
+    - name: Test check
+      run: xvfb-run --auto-servernum npm run ci:insiders
+      if: matrix.os == 'ubuntu-latest'
