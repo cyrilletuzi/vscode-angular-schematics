@@ -48,7 +48,7 @@ export class Terminals {
 
         if (this.previousTerminal && (vscode.window.terminals.length > this.terminals.size)) {
 
-            this.previousTerminal.show();
+            this.previousTerminal.show(true);
 
         } else {
 

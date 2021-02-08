@@ -1,5 +1,29 @@
 # Change Log
 
+## [4.10.0] - 2021-02-08
+
+### Feature
+
+When the extension is able to detect the success of an Angular CLI command,
+and thus auto-opening the generated file, the extension will now:
+- hide the terminal used for the Angular CLI command if it was the only opened terminal,
+- display back the previously active terminal is there was another one.
+
+Also, the terminals used by the extension will not capture focus anymore.
+
+Indeed, while they are kept opened for performance reasons and to be able to check
+the detailed results of the Angular CLI commands,
+these terminals are not supposed to be used by the user directly.
+
+Also, in a classic Angular development environment, you will already have a terminal running
+`npm start` (ie. `ng serve`), which is good to keep an eye on (to see compilation errors),
+so the extension will now go back to it automatically.
+
+Note that in the cases where the Angular CLI command fails,
+or when the extension is not able to detect the success
+(which can happen with some third-party schematics or if the command takes too long),
+the terminal used by the extension will be showed as before so you can see what happens.
+
 ## [4.9.0] - 2021-02-07
 
 ### Internal
