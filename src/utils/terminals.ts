@@ -12,8 +12,6 @@ export class Terminals {
      */
     static send(workspaceFolder: vscode.WorkspaceFolder, command: string): void {
 
-        console.log(vscode.window.activeTerminal);
-
         /* Memorize current terminal to be able to focus back on it */
         this.previousTerminal = vscode.window.activeTerminal;
 
@@ -31,7 +29,7 @@ export class Terminals {
      */
     static back(workspaceFolder: vscode.WorkspaceFolder): void {
 
-        if (this.previousTerminal) {
+        if (this.previousTerminal && (vscode.window.terminals.length > this.terminals.size)) {
 
             this.previousTerminal.show();
 
