@@ -1,5 +1,16 @@
 # Change Log
 
+## [4.9.0] - 2021-02-07
+
+### Internal
+
+Added CI tests for all OS.
+
+### Fix
+
+Doing the above revealed some issues in some path management.
+They seemed to only affect CI, but fixing them may have also fixed some corner-case issues for Windows users.
+
 ## [4.8.0] - 2021-01-03
 
 ### Feature

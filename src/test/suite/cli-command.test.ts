@@ -8,7 +8,7 @@ import { angularCollectionName, defaultComponentTypes } from '../../defaults';
 import { WorkspaceFolderConfig } from '../../workspace';
 import { CliCommand } from '../../generation/cli-command';
 
-import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath } from './test-config';
+import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath, defaultsWorkspaceFolderPath, customizedWorkspaceFolderPath } from './test-config';
 import { COMPONENT_TYPE, ShortcutsTypes, MODULE_TYPE } from '../../workspace/shortcuts';
 
 describe('Cli command', () => {
@@ -40,7 +40,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -54,7 +54,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g service hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.service.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello.service.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -68,7 +68,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g module hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/hello.module.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.module.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -82,7 +82,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g interface hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -96,7 +96,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${angularCollectionName}:component hello --project ${libProjectName}`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src', 'lib', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -110,7 +110,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${materialCollectionName}:table hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello/hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -124,7 +124,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello/world');
 
         assert.strictEqual(`ng g component hello/world`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world/world.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world', 'world.component.ts'), cliCommand.guessGereratedFileFsPath());
 
     });
 
@@ -251,7 +251,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -268,7 +268,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(angularEslintWorkspaceFolderFsPath, 'src/app/hello/hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.join(angularEslintWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.page.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -331,7 +331,7 @@ describe('Cli command', () => {
 
             cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0]!.label)!.options);
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src/app/hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
 
         });
 
@@ -424,9 +424,9 @@ describe('Cli command', () => {
 
         it('workspace folder', () => {
 
-            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderFsPath);
+            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderPath);
 
-            assert.strictEqual(defaultsWorkspaceFolderFsPath, cliCommand['contextPath'].full);
+            assert.strictEqual(defaultsWorkspaceFolderPath, cliCommand['contextPath'].full);
             assert.strictEqual('', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
 
@@ -438,7 +438,7 @@ describe('Cli command', () => {
 
         it('src folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -453,7 +453,7 @@ describe('Cli command', () => {
 
         it('src/app folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -468,7 +468,7 @@ describe('Cli command', () => {
 
         it('folder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -483,7 +483,7 @@ describe('Cli command', () => {
 
         it('subfolder', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -498,7 +498,7 @@ describe('Cli command', () => {
 
         it('file', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world.ts');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world.ts');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
@@ -513,11 +513,11 @@ describe('Cli command', () => {
 
         it('lib', () => {
 
-            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src/lib/hello/world');
+            const contextPath = path.posix.join(customizedWorkspaceFolderPath, 'projects', libProjectName, 'src/lib/hello/world');
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(`projects/${libProjectName}/src/lib/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.posix.join('projects', libProjectName, 'src/lib/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(libProjectName, cliCommand.getProjectName());
@@ -528,11 +528,11 @@ describe('Cli command', () => {
 
         it('subapp', () => {
 
-            const contextPath = path.join(customizedWorkspaceFolderFsPath, 'projects', subAppProjectName, 'src/app/hello/world');
+            const contextPath = path.posix.join(customizedWorkspaceFolderPath, 'projects', subAppProjectName, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderCustomized, contextPath);
 
             assert.strictEqual(contextPath, cliCommand['contextPath'].full);
-            assert.strictEqual(`projects/${subAppProjectName}/src/app/hello/world`, cliCommand['contextPath'].relativeToWorkspaceFolder);
+            assert.strictEqual(path.posix.join('projects', subAppProjectName, 'src/app/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
 
             assert.strictEqual(subAppProjectName, cliCommand.getProjectName());
@@ -543,7 +543,7 @@ describe('Cli command', () => {
 
         it('@schematics/angular:library', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
@@ -560,7 +560,7 @@ describe('Cli command', () => {
 
         it('@schematics/angular:application', () => {
 
-            const contextPath = path.join(defaultsWorkspaceFolderFsPath, 'src/app/hello/world');
+            const contextPath = path.posix.join(defaultsWorkspaceFolderPath, 'src/app/hello/world');
             const cliCommand = new CliCommand(workspaceFolderDefaults, contextPath);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
