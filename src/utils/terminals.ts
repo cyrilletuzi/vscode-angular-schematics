@@ -6,6 +6,18 @@ export class Terminals {
 
     private static terminals = new Map<string, vscode.Terminal>();
     private static previousTerminal?: vscode.Terminal;
+    private static closeEvent?: vscode.Disposable;
+
+    /**
+     * Listen to closing of terminals to keep our list in sync
+     */
+    static init(): void {
+
+        this.closeEvent = vscode.window.onDidCloseTerminal((terminal) => {
+            this.terminals.delete(terminal.name);
+        });
+
+    }
 
     /**
      * Launch a command in terminal
@@ -48,6 +60,8 @@ export class Terminals {
      */
     static disposeAll(): void {
 
+        this.closeEvent?.dispose();
+
         for (const terminal of this.terminals.values()) {
             terminal.dispose();
         }
@@ -63,10 +77,12 @@ export class Terminals {
 
         /* Create the terminal just once */
         if (!this.terminals.has(workspaceFolder.name) || !this.isTerminalExisting(name)) {
+
             this.terminals.set(workspaceFolder.name, vscode.window.createTerminal({
                 name,
                 cwd: workspaceFolder.uri.fsPath,
             }));
+
         }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

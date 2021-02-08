@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { angularCollectionName, extensionName } from '../defaults';
-import { Output, FileSystem, Terminal } from '../utils';
+import { Output, FileSystem, Terminals } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collection, Schematic } from '../workspace/schematics';
 import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
@@ -641,7 +641,7 @@ export class UserJourney {
             await vscode.window.showTextDocument(document);
 
             /* Go back to previously active terminal */
-            Terminal.back(this.workspaceFolder);
+            Terminals.back(this.workspaceFolder);
 
             Output.logInfo(`Command has succeeded! Check the Terminal for more details.`);
 
@@ -710,7 +710,7 @@ export class UserJourney {
 
             Output.logInfo(`Trying to npm install ${collectionName}`);
 
-            Terminal.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
+            Terminals.send(this.workspaceFolder, `npm install ${collectionName} --save-dev`);
 
             const reloadLabel = `Reload window`;
 

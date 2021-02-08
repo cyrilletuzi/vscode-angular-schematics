@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { angularCollectionName, extensionName } from './defaults';
-import { Output, Terminal } from './utils';
+import { Output, Terminals } from './utils';
 import { Workspace } from './workspace';
 import { UserJourney } from './generation';
 import { SchematicsTreeDataProvider } from './view';
@@ -34,14 +34,16 @@ export function activate(context: vscode.ExtensionContext): void {
         as then the extension will infer the workspace folder, the path and the project.`;
 
     }).catch(() => {});
-    
-    /* 
+
+    Terminals.init();
+
+    /*
      * Register new commands. Important things:
      * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
      * - the callback parameters' values depends on how the command is trigerred:
      *   - with a right click in Explorer: will a `Uri` object of the file or folder clicked
      *   - with the Command Palette or the dedicated extension panel: `undefined`
-     *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name 
+     *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name
      */
     context.subscriptions.push(
         vscode.commands.registerCommand('ngschematics.generateComponent', (contextUri?: vscode.Uri) => {
@@ -52,7 +54,7 @@ export function activate(context: vscode.ExtensionContext): void {
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'component').catch(() => {});
-    
+
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (contextUri?: vscode.Uri) => {
 
@@ -62,7 +64,7 @@ export function activate(context: vscode.ExtensionContext): void {
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'service').catch(() => {});
-    
+
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (contextUri?: vscode.Uri) => {
 
@@ -72,20 +74,20 @@ export function activate(context: vscode.ExtensionContext): void {
              * (default user collection can be set to something else,
              * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'module').catch(() => {});
-    
+
         }),
         vscode.commands.registerCommand('ngschematics.generate', (contextUri?: vscode.Uri, options?: { collectionName?: string, schematicName?: string }) => {
 
             Output.logInfo(`Starting journey to generate a schematics.`);
 
             (new UserJourney()).start(contextUri, options?.collectionName, options?.schematicName).catch(() => {});
-    
+
         }),
     );
 
 }
 
-/** 
+/**
  * Function called when the extension is deactivated, to do cleaning.
  */
 export function deactivate(): void {
@@ -94,7 +96,7 @@ export function deactivate(): void {
         workspaceFolder.disposeWatchers();
     }
 
-    Terminal.disposeAll();
+    Terminals.disposeAll();
 
     Output.dispose();
 

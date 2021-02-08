@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { angularCollectionName } from '../defaults';
-import { FileSystem, Output, Terminal } from '../utils';
+import { FileSystem, Output, Terminals } from '../utils';
 import { WorkspaceFolderConfig } from '../workspace';
 import { Schematic } from '../workspace/schematics';
 
@@ -232,7 +232,7 @@ export class CliCommand {
 
         const command = `${this.getCommand()}${dryRun ? ` --dry-run` : ''}`;
 
-        Terminal.send(this.workspaceFolder, command);
+        Terminals.send(this.workspaceFolder, command);
 
     }
 
