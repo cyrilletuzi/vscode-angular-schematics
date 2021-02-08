@@ -14,7 +14,12 @@ export class Terminals {
     static init(): void {
 
         this.closeEvent = vscode.window.onDidCloseTerminal((terminal) => {
-            this.terminals.delete(terminal.name);
+
+            if (terminal.name.startsWith(extensionName)) {
+                const key = terminal.name.substr(terminal.name.indexOf('-') + 2);
+                this.terminals.delete(key);
+            }
+
         });
 
     }
