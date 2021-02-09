@@ -53,7 +53,7 @@ export class UserJourney {
 
         Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
 
-        this.cliCommand = new CliCommand(workspaceFolder, contextUri);
+        this.cliCommand = new CliCommand(workspaceFolder, contextUri?.fsPath);
 
         /* If the project has not been already resolved via context path (in `CliCommand` constructor)
          * and if the Angular projects have been correctly resolved from config */

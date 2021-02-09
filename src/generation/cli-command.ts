@@ -32,10 +32,10 @@ export class CliCommand {
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
-        contextUri?: vscode.Uri,
+        contextFsPath?: string,
     ) {
 
-        this.setContextPathAndProject(contextUri);
+        this.setContextPathAndProject(contextFsPath);
 
     }
 
@@ -380,18 +380,18 @@ export class CliCommand {
     /**
      * Set context path and prject.
      */
-    private setContextPathAndProject(contextUri?: vscode.Uri): void {
+    private setContextPathAndProject(contextFsPath?: string): void {
 
-        if (!contextUri) {
+        if (!contextFsPath) {
             Output.logInfo(`No context path detected.`);
             return;
         }
 
-        Output.logInfo(`Full context fsPath detected: ${contextUri.fsPath}`);
+        Output.logInfo(`Full context fsPath detected: ${contextFsPath}`);
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextUri.fsPath));
+        this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextFsPath));
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
