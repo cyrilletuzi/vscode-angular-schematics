@@ -29,7 +29,7 @@ by improving component generation with the suggestion of different component typ
 
 I started this project to help my students learning Angular.
 Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-**this extension helps more than 350 000 developers** like you to be more productive.
+**this extension helps more than 400 000 developers** like you to be more productive.
 
 It's a lot of *free* work.
 So if your company earns money with projects using this extension,
