@@ -124,7 +124,7 @@ So if you want to use a component in another module (for example if you are doin
 
 ### Component suffixes
 
-Angular CLI >= 9 introduces a new `--type` option for component generation, to change the component's suffix.
+Angular CLI has a `--type` option for component generation, to change the component's suffix.
 
 For example, `ng g hello --type page` will generate the `hello.page.ts` file with a `HelloPage` class
 (instead of the `hello.component.ts` file with a `HelloComponent` class).
@@ -190,15 +190,13 @@ easily add defaults components types in
 You can add custom component types in your VS Code preferences
 (preferably your *workspace* preferences, so all your team can benefit).
 
-For example, non-[Ivy](https://angular.io/guide/ivy) projects
-(ie. Angular <= 8 or Angular >= 9 with Ivy manually disabled)
-can add this deprecated component type for modals/dialogs:
+For example:
 
 ```json
 {
   "ngschematics.componentTypes": [{
-    "label": "Entry component",
-    "options": [["entryComponent", "true"], ["skipSelector", "true"]],
+    "label": "Element",
+    "options": [["changeDetection", "OnPush"], ["viewEncapsulation", "ShadowDom"]],
     "detail": "Component instanciated at runtime, like a dialog or modal",
   }]
 }

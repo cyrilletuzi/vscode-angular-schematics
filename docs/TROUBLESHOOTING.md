@@ -1,6 +1,8 @@
 # Troubleshooting
 
-A correctly installed Angular CLI project should meet the following requirements automatically.
+A correctly installed Angular CLI project,
+in a [LTS supported version](https://angular.io/guide/releases#support-policy-and-schedule),
+should meet the following requirements automatically.
 
 If you do not use the official Angular CLI project structure and configuration,
 the extension may still work, with limited features,
