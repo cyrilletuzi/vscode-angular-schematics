@@ -157,6 +157,17 @@ export class FileSystem {
     }
 
     /**
+     * Convert an OS-specific fsPath to a relative Posix path.
+     * Do *not* use this on absolute paths, as it would require other steps (like adding a leading slash on Windows)
+     * @param pathValue Path to convert
+     */
+    static convertRelativeFsPathToRelativePath(pathValue: string): string {
+
+        return (path.sep !== path.posix.sep) ? pathValue.split(path.sep).join(path.posix.sep) : pathValue;
+
+    }
+
+    /**
      * Display an error message to the user.
      * @param actionFailed Past form of a verb about what fails (eg. `found`)
      */

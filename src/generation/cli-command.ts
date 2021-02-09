@@ -9,8 +9,6 @@ import { Schematic } from '../workspace/schematics';
 import { CliCommandOptions, formatCliCommandOptions } from './cli-options';
 
 interface ContextPath {
-    /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
-    full: string;
     /** Eg. `src/app/some-module` */
     relativeToWorkspaceFolder: string;
     /** Eg. `some-module` */
@@ -21,7 +19,6 @@ export class CliCommand {
 
     /* Path details of the right-clicked file or directory */
     private contextPath: ContextPath = {
-        full: '',
         relativeToWorkspaceFolder: '',
         relativeToProjectFolder: '',
     };
@@ -35,10 +32,10 @@ export class CliCommand {
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
-        contextPath?: string,
+        contextUri?: vscode.Uri,
     ) {
 
-        this.setContextPathAndProject(contextPath);
+        this.setContextPathAndProject(contextUri);
 
     }
 
@@ -383,25 +380,18 @@ export class CliCommand {
     /**
      * Set context path and prject.
      */
-    private setContextPathAndProject(contextPath?: string): void {
+    private setContextPathAndProject(contextUri?: vscode.Uri): void {
 
-        if (!contextPath) {
+        if (!contextUri) {
             Output.logInfo(`No context path detected.`);
             return;
         }
 
-        /* Temporarily fixes a VS Code issue on Windows,
-         * where context path is reported normally in single workspace setup (`/c:/` in lower case)
-         * but wrongly reported in multi-workspaces setup (`/C:/` in upper case) */
-        this.contextPath.full = (path.sep === path.win32.sep) ?
-            `${contextPath.substring(0, contextPath.indexOf(':')).toLowerCase()}${contextPath.substr(contextPath.indexOf(':'))}`
-            : contextPath;
-
-        Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
+        Output.logInfo(`Full context fsPath detected: ${contextUri.fsPath}`);
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspaceFolder = path.posix.relative(this.workspaceFolder.uri.path, this.contextPath.full);
+        this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextUri.fsPath));
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
