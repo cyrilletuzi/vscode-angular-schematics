@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.10.1] - 2021-02-09
+
+### Fix
+
+Changes in v4.9 brought into motion a VS Code issue in path management on Windows in some scenarios,
+resulting in the right-clicked folder path sometimes not being prefilled in command path/name input.
+The issue is now fixed.
+
 ## [4.10.0] - 2021-02-08
 
 ### Feature

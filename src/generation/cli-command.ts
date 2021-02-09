@@ -9,8 +9,6 @@ import { Schematic } from '../workspace/schematics';
 import { CliCommandOptions, formatCliCommandOptions } from './cli-options';
 
 interface ContextPath {
-    /** Eg. `/Users/Elmo/angular-project/src/app/some-module` */
-    full: string;
     /** Eg. `src/app/some-module` */
     relativeToWorkspaceFolder: string;
     /** Eg. `some-module` */
@@ -21,7 +19,6 @@ export class CliCommand {
 
     /* Path details of the right-clicked file or directory */
     private contextPath: ContextPath = {
-        full: '',
         relativeToWorkspaceFolder: '',
         relativeToProjectFolder: '',
     };
@@ -35,10 +32,10 @@ export class CliCommand {
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
-        contextPath?: string,
+        contextFsPath?: string,
     ) {
 
-        this.setContextPathAndProject(contextPath);
+        this.setContextPathAndProject(contextFsPath);
 
     }
 
@@ -383,20 +380,18 @@ export class CliCommand {
     /**
      * Set context path and prject.
      */
-    private setContextPathAndProject(contextPath?: string): void {
+    private setContextPathAndProject(contextFsPath?: string): void {
 
-        if (!contextPath) {
+        if (!contextFsPath) {
             Output.logInfo(`No context path detected.`);
             return;
         }
 
-        this.contextPath.full = contextPath;
-
-        Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
+        Output.logInfo(`Full context fsPath detected: ${contextFsPath}`);
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
-        this.contextPath.relativeToWorkspaceFolder = path.posix.relative(this.workspaceFolder.uri.path, this.contextPath.full);
+        this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextFsPath));
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
