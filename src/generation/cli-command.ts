@@ -390,7 +390,12 @@ export class CliCommand {
             return;
         }
 
-        this.contextPath.full = contextPath;
+        /* Temporarily fixes a VS Code issue on Windows,
+         * where context path is reported normally in single workspace setup (`/c:/` in lower case)
+         * but wrongly reported in multi-workspaces setup (`/C:/` in upper case) */
+        this.contextPath.full = (path.sep === path.win32.sep) ?
+            `${contextPath.substring(0, contextPath.indexOf(':')).toLowerCase()}${contextPath.substr(contextPath.indexOf(':'))}`
+            : contextPath;
 
         Output.logInfo(`Full context path detected: ${this.contextPath.full}`);
 
