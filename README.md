@@ -238,7 +238,7 @@ It can be interesting for the following options:
   - `prefix`
   - `changeDetection`
   - `viewEncapsulation`
-  - `displayBlock` (Angular CLI >= 9.1)
+  - `displayBlock`
 - all schematics
   - `flat`
   - `skipTests`
