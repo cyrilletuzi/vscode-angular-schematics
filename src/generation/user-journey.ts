@@ -53,6 +53,8 @@ export class UserJourney {
 
         Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
 
+        console.log(contextUri?.path);
+
         this.cliCommand = new CliCommand(workspaceFolder, contextUri?.fsPath);
 
         /* If the project has not been already resolved via context path (in `CliCommand` constructor)
