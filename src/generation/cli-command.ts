@@ -390,7 +390,9 @@ export class CliCommand {
         Output.logInfo(`Full context fsPath detected: ${contextFsPath}`);
 
         /* Remove workspace folder path from full path,
-         * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module` */
+         * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`
+         * While we need a Posix path, for now we need to start from OS-specific fsPaths because of
+         * https://github.com/microsoft/vscode/issues/116298 */
         this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextFsPath));
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
