@@ -13,9 +13,13 @@ Hi,
 
 # Checks before posting an issue
 
-- [ ] I have read all the extension's documentation:
+- [ ] I have read _all_ the extension's documentation:
   - [README](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/README.md)
   - [TROUBLESHOOTING](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/docs/TROUBLESHOOTING.md)
+- [ ] I have checked in already:
+  - [opened issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues)
+  - [closed issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues?q=is%3Aissue+is%3Aclosed)
+  - [questions answered](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/
 - [ ] My project meets the requirements indicated in README
 - [ ] I launched `ng g component hello` in the *VS Code* Terminal inside my project, and it works
 - [ ] I looked at the extension's logs ("Angular Schematics" Output channel, second tab left to the Terminal), and tried to fix my project's configuration accordingly
