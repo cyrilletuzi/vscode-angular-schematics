@@ -19,7 +19,7 @@ Hi,
 - [ ] My project meets the requirements indicated in README
 - [ ] I launched `ng g component hello` in the *VS Code* Terminal inside my project, and it works
 - [ ] I looked at the extension's logs ("Angular Schematics" Output channel, second tab left to the Terminal), and tried to fix my project's configuration accordingly
-- [ ] I understand I am writing to a *human being*, doing this open source project on his *free* time
+- [ ] I understand I am writing to a *human being*, doing this open source project *unpaid*
 - [ ] I will be involved in my own issue, by answering questions and informing if the issue is resolved
 
 <!-- Otherwise the issue will be closed. -->
