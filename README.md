@@ -31,9 +31,9 @@ I started this project to help my students learning Angular.
 Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
 **this extension helps more than 400 000 developers** like you to be more productive.
 
-It's a lot of *free* work.
-So if your company earns money with projects using this extension,
-**consider becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**.
+It's a lot of *unpaid* work. So please consider:
+- **becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**, if your company earns money with projects using this extension
+- at least, taking 2 minutes to [show your love](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/categories/wall-of-love)
 
 ## By the same author
 
