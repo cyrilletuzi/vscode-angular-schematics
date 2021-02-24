@@ -79,7 +79,7 @@ export class FileSystem {
         } catch (error: unknown) {
 
             if (!silent) {
-                this.logError(fsPath, ((typeof error === 'object') && ((error as { [key: string]: unknown })?.code === 'ENOENT')) ? `found` : `read`);
+                this.logError(fsPath, ((typeof error === 'object') && ((error as { [key: string]: unknown })?.['code'] === 'ENOENT')) ? `found` : `read`);
             }
 
             return false;

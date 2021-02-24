@@ -60,7 +60,7 @@ export class Collection {
      * Get a schematic from cache, or load it.
      */
     getSchematic(name: string): Schematic | undefined {
-        
+
         return this.schematics.get(name);
 
     }
@@ -77,17 +77,17 @@ export class Collection {
      */
     private validateConfig(config: unknown): CollectionJsonSchema {
 
-        const schematics = new Map(Object.entries(JsonValidator.object(JsonValidator.object(config)?.schematics) ?? {})
+        const schematics = new Map(Object.entries(JsonValidator.object(JsonValidator.object(config)?.['schematics']) ?? {})
             .map(([name, rawConfig]) => {
 
                 const config = JsonValidator.object(rawConfig);
 
                 return [name, {
-                    schema: JsonValidator.string(config?.schema),
-                    description: JsonValidator.string(config?.description),
-                    hidden: JsonValidator.boolean(config?.hidden),
-                    private: JsonValidator.boolean(config?.private),
-                    extends: JsonValidator.string(config?.extends),
+                    schema: JsonValidator.string(config?.['schema']),
+                    description: JsonValidator.string(config?.['description']),
+                    hidden: JsonValidator.boolean(config?.['hidden']),
+                    private: JsonValidator.boolean(config?.['private']),
+                    extends: JsonValidator.string(config?.['extends']),
                 }] as [string, CollectionSchematicJsonSchema];
 
             })

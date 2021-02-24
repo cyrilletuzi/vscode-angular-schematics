@@ -101,7 +101,7 @@ export class ComponentShortcut {
                 customTypes.set(defaultType.label, defaultType);
 
             }
-            
+
         }
 
         /* User custom types */
@@ -130,7 +130,7 @@ export class ComponentShortcut {
 
                     if (customTypes.has(type.label)) {
                         Output.logWarning(`"${type.label}" component type already exists.`);
-                    } 
+                    }
 
                     customTypes.set(type.label, type);
 
@@ -152,12 +152,12 @@ export class ComponentShortcut {
     private validateUserComponentType(userPreference: unknown): ComponentType | undefined {
 
         const type = JsonValidator.object(userPreference);
-        const label = JsonValidator.string(type?.label);
-        const optionsList = JsonValidator.array(type?.options);
+        const label = JsonValidator.string(type?.['label']);
+        const optionsList = JsonValidator.array(type?.['options']);
 
         if (!label || !optionsList) {
             return undefined;
-        } 
+        }
 
         const options: [string, string][] = [];
 
@@ -182,7 +182,7 @@ export class ComponentShortcut {
 
         return {
             label,
-            detail: JsonValidator.string(type?.detail),
+            detail: JsonValidator.string(type?.['detail']),
             options,
             package: '',
         };
