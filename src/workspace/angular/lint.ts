@@ -76,21 +76,21 @@ export class LintConfig {
      */
     private validateEslintConfig(config: unknown): LintJsonSchema {
 
-        const overrides = JsonValidator.array(JsonValidator.object(config)?.overrides) ?? [];
+        const overrides = JsonValidator.array(JsonValidator.object(config)?.['overrides']) ?? [];
 
         for (const override of overrides) {
 
-            const files = JsonValidator.string(JsonValidator.object(override)?.files) ?? JsonValidator.array(JsonValidator.object(override)?.files, 'string') ?? [];
+            const files = JsonValidator.string(JsonValidator.object(override)?.['files']) ?? JsonValidator.array(JsonValidator.object(override)?.['files'], 'string') ?? [];
 
             if (((typeof files === 'string') && files === ('*.ts')) ||
                 (Array.isArray(files) && files.includes('*.ts'))) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const rules = JsonValidator.object(JsonValidator.object(override)!.rules) ?? {};
+                const rules = JsonValidator.object(JsonValidator.object(override)!['rules']) ?? {};
 
                 const suffixesRule = JsonValidator.array(rules?.['@angular-eslint/component-class-suffix']) ?? [];
 
-                const suffixesArray = JsonValidator.array(JsonValidator.object(suffixesRule[1])?.suffixes, 'string') ?? [];
+                const suffixesArray = JsonValidator.array(JsonValidator.object(suffixesRule[1])?.['suffixes'], 'string') ?? [];
 
                 return {
                     rules: {
@@ -113,7 +113,7 @@ export class LintConfig {
      */
     private validateTslintConfig(config: unknown): LintJsonSchema {
 
-        const rules = JsonValidator.object(JsonValidator.object(config)?.rules) ?? {};
+        const rules = JsonValidator.object(JsonValidator.object(config)?.['rules']) ?? {};
 
         /*
           * Can be:

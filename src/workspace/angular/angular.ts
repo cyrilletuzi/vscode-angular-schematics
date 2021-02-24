@@ -60,7 +60,7 @@ export class AngularConfig {
 
         const config = JsonValidator.object(rawConfig) ?? {};
 
-        const version = JsonValidator.number(config.version);
+        const version = JsonValidator.number(config['version']);
 
         if (!version) {
             Output.logError(`Your Angular config file must contain \`"version" : 1\`, please correct it.`);
@@ -69,14 +69,14 @@ export class AngularConfig {
 
         const possibleProjectTypes: AngularProjectType[] = ['application', 'library'];
 
-        const projects = new Map(Object.entries(JsonValidator.object(config.projects) ?? {})
+        const projects = new Map(Object.entries(JsonValidator.object(config['projects']) ?? {})
             /* Old Angular projects may have their e2e config set as a separate project */
             .filter(([name]) => !name.endsWith('-e2e'))
             .map(([name, rawOptions]) => {
 
                 const options = JsonValidator.object(rawOptions) ?? {};
 
-                const projectTypeRaw = JsonValidator.string(options.projectType) ?? '';
+                const projectTypeRaw = JsonValidator.string(options['projectType']) ?? '';
                 let projectType: AngularProjectType = 'application';
 
                 /* `projectType` is supposed to be required, but default to `application` for safety */
@@ -86,7 +86,7 @@ export class AngularConfig {
                     Output.logWarning(`Your Angular configuration file should contain a "projectType" property with "application" or "library" for your "${name}" project. Default to "application".`);
                 }
 
-                let root = JsonValidator.string(options.root);
+                let root = JsonValidator.string(options['root']);
                 if (root === undefined) {
                     root = '';
                     Output.logWarning(`Your Angular configuration file should contain a "root" string property for your "${name}" project. Default to "".`);
@@ -95,8 +95,8 @@ export class AngularConfig {
                 return [name, {
                     projectType,
                     root,
-                    sourceRoot: JsonValidator.string(options.sourceRoot),
-                    schematics: this.validateConfigSchematics(options.schematics),
+                    sourceRoot: JsonValidator.string(options['sourceRoot']),
+                    schematics: this.validateConfigSchematics(options['schematics']),
                 }];
             }));
 
@@ -107,9 +107,9 @@ export class AngularConfig {
         return {
             version,
             cli: {
-                defaultCollection: JsonValidator.string(JsonValidator.object(config.cli)?.defaultCollection),
+                defaultCollection: JsonValidator.string(JsonValidator.object(config['cli'])?.['defaultCollection']),
             },
-            schematics: this.validateConfigSchematics(config.schematics),
+            schematics: this.validateConfigSchematics(config['schematics']),
             projects,
         };
 
@@ -122,7 +122,7 @@ export class AngularConfig {
 
         return new Map(Object.entries(JsonValidator.object(config) ?? {})
             .map(([name, options]) => [name, {
-                flat: JsonValidator.boolean(JsonValidator.object(options)?.flat),
+                flat: JsonValidator.boolean(JsonValidator.object(options)?.['flat']),
             }]));
 
     }

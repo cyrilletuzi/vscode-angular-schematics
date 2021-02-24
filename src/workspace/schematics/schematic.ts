@@ -35,7 +35,7 @@ export class Schematic {
                 throw new Error(`"${this.collectionName}:${this.name}" can not be extended.`);
             }
         }
-        
+
         const unsafeConfig = await FileSystem.parseJsonFile(fsPath);
 
         if (!unsafeConfig) {
@@ -54,7 +54,7 @@ export class Schematic {
         this.requiredOptionsNames = this.initRequiredOptions(config);
 
         Output.logInfo(`${this.requiredOptionsNames.length} required option(s) detected for "${this.name}" schematic${this.requiredOptionsNames.length > 0 ? `: ${this.requiredOptionsNames.join(', ')}` : ``}`);
-        
+
         this.optionsChoices = this.initOptionsChoices(config, this.requiredOptionsNames);
 
     }
@@ -120,7 +120,7 @@ export class Schematic {
         }
 
         return false;
-    
+
     }
 
     /**
@@ -130,7 +130,7 @@ export class Schematic {
 
         const collectionJsonConfig = await FileSystem.parseJsonFile(collectionFsPath);
 
-        const schemaPath = JsonValidator.string(JsonValidator.object(JsonValidator.object(JsonValidator.object(collectionJsonConfig)?.schematics)?.[this.name])?.schema);
+        const schemaPath = JsonValidator.string(JsonValidator.object(JsonValidator.object(JsonValidator.object(collectionJsonConfig)?.['schematics'])?.[this.name])?.['schema']);
 
         /* `package.json` should have a `schematics` property with relative path to `collection.json` */
         if (!schemaPath) {
@@ -148,51 +148,51 @@ export class Schematic {
 
         const config = JsonValidator.object(rawConfig);
 
-        const properties = new Map(Object.entries(JsonValidator.object(config?.properties) ?? {})
+        const properties = new Map(Object.entries(JsonValidator.object(config?.['properties']) ?? {})
             .map(([name, rawConfig]) => {
 
                 const config = JsonValidator.object(rawConfig);
 
-                const $default = JsonValidator.object(config?.$default);
+                const $default = JsonValidator.object(config?.['$default']);
                 if ($default) {
-                    $default.$source = JsonValidator.string($default.$source);
-                    $default.index = JsonValidator.number($default.index);
+                    $default['$source'] = JsonValidator.string($default['$source']);
+                    $default['index'] = JsonValidator.number($default['index']);
                 }
 
-                let items = JsonValidator.object(config?.items);
+                let items = JsonValidator.object(config?.['items']);
 
                 const xPromptString = JsonValidator.string(config?.['x-prompt']);
                 const xPromptObject = JsonValidator.object(config?.['x-prompt']);
 
                 if (items) {
-                    items.enum = this.validateConfigArrayChoices(JsonValidator.array(items.enum));
+                    items['enum'] = this.validateConfigArrayChoices(JsonValidator.array(items['enum']));
                 }
                 /** Deprecated, Angular >= 8.3 uses `items.enum` instead */
                 else if (xPromptObject) {
-                    const multiselect = JsonValidator.boolean(xPromptObject.multiselect);
+                    const multiselect = JsonValidator.boolean(xPromptObject['multiselect']);
                     if (multiselect === true) {
                         items = {};
-                        items.enum = this.validateConfigArrayChoices(JsonValidator.array(xPromptObject.items));
+                        items['enum'] = this.validateConfigArrayChoices(JsonValidator.array(xPromptObject['items']));
                     }
                 }
 
                 return [name, {
-                    type: JsonValidator.string(config?.type),
-                    description: JsonValidator.string(config?.description),
-                    visible: JsonValidator.boolean(config?.visible),
-                    default: config?.default,
+                    type: JsonValidator.string(config?.['type']),
+                    description: JsonValidator.string(config?.['description']),
+                    visible: JsonValidator.boolean(config?.['visible']),
+                    default: config?.['default'],
                     $default,
-                    enum: this.validateConfigArrayChoices(JsonValidator.array(config?.enum)),
+                    enum: this.validateConfigArrayChoices(JsonValidator.array(config?.['enum'])),
                     items,
                     ['x-deprecated']: JsonValidator.string(config?.['x-deprecated']),
-                    ['x-prompt']: xPromptString ?? JsonValidator.string(xPromptObject?.message),
+                    ['x-prompt']: xPromptString ?? JsonValidator.string(xPromptObject?.['message']),
                 }] as [string, SchematicOptionJsonSchema];
 
             }));
 
         return {
             properties,
-            required: JsonValidator.array(config?.required, 'string'), 
+            required: JsonValidator.array(config?.['required'], 'string'),
         };
 
     }
@@ -226,7 +226,7 @@ export class Schematic {
 
     }
 
-    /** 
+    /**
      * Initialize required options' names
      */
     private initRequiredOptions(config: Pick<SchematicJsonSchema, 'required' | 'properties'>): string[] {
@@ -298,6 +298,6 @@ export class Schematic {
         /* Required and suggested options first */
         return [...sortedPickedChoices, ...sortedOptionalChoices];
 
-    } 
+    }
 
 }

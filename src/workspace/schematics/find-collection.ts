@@ -31,7 +31,7 @@ export async function findCollectionFsPath(workspaceFolder: vscode.WorkspaceFold
 
         const packageJsonConfig = await FileSystem.parseJsonFile(packageJsonFsPath);
 
-        const schematicsPath = JsonValidator.string(JsonValidator.object(packageJsonConfig)?.schematics);
+        const schematicsPath = JsonValidator.string(JsonValidator.object(packageJsonConfig)?.['schematics']);
 
         /* `package.json` should have a `schematics` property with relative path to `collection.json` */
         if (!schematicsPath) {
