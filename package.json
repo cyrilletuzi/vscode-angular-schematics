@@ -180,7 +180,7 @@
         "@types/vscode": "1.41.0",
         "@typescript-eslint/eslint-plugin": "4.15.2",
         "@typescript-eslint/parser": "4.15.2",
-        "eslint": "7.20.0",
+        "eslint": "7.21.0",
         "glob": "7.1.6",
         "minimist": "1.2.5",
         "mocha": "8.3.0",
