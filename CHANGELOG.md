@@ -4,9 +4,7 @@
 
 ### Feature
 
-Add the following schematics in defaults:
-- `@nrwl/angular`
-- `@nrwl/workspace`
+Add `@nrwl/angular` schematics in defaults.
 
 ## [4.10.1] - 2021-02-09
 
