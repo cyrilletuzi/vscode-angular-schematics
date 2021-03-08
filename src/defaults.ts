@@ -5,6 +5,8 @@ export const defaultCollectionsNames: string[] = [
     '@angular/material',
     '@angular/cdk',
     '@ionic/angular-toolkit',
+    '@nrwl/angular',
+    '@nrwl/workspace',
     '@ngrx/schematics',
     '@ngxs/schematics',
     '@nativescript/schematics',
