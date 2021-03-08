@@ -1,5 +1,13 @@
 # Change Log
 
+## [4.11.0] - 2021-03-08
+
+### Feature
+
+Add the following schematics in defaults:
+- `@nrwl/angular`
+- `@nrwl/workspace`
+
 ## [4.10.1] - 2021-02-09
 
 ### Fix
