@@ -77,7 +77,19 @@ export class Collection {
      */
     private validateConfig(config: unknown): CollectionJsonSchema {
 
-        const schematics = new Map(Object.entries(JsonValidator.object(JsonValidator.object(config)?.['schematics']) ?? {})
+        const configObject = JsonValidator.object(config);
+
+        /* Validate `extends` property */
+        const rootExtendsString = JsonValidator.string(configObject?.['extends']);
+
+        const rootExtends = JsonValidator.array(configObject?.['extends'], 'string')
+                         ?? (rootExtendsString ? [rootExtendsString] : [])
+                         ?? [];
+
+        console.log(rootExtends);
+
+        /* Validate `schematics` property */
+        const schematics = new Map(Object.entries(JsonValidator.object(configObject?.['schematics']) ?? {})
             .map(([name, rawConfig]) => {
 
                 const config = JsonValidator.object(rawConfig);
@@ -104,6 +116,7 @@ export class Collection {
         }
 
         return {
+            extends: rootExtends,
             schematics,
         };
 
@@ -118,11 +131,38 @@ export class Collection {
         this.schematics.clear();
         this.schematicsChoices = [];
 
-        const allSchematics = Array.from(config.schematics);
+        const allSchematics = new Map<string, CollectionSchematicJsonSchema>();
 
-        Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
+        /* A collection can extend other ones */
+        for (const parentCollectionName of config.extends) {
 
-        const schematics = allSchematics
+            /* Avoid infinite recursion */
+            if (parentCollectionName !== this.name) {
+
+                const parentCollection = new Collection(parentCollectionName);
+
+                const watcher = await parentCollection.init(workspaceFolder, fsPath);
+                /* Watcher is not needed here */
+                watcher?.dispose();
+
+                for (const parentSchematicName of parentCollection.getSchematicsNames()) {
+                    allSchematics.set(parentSchematicName, {
+                        extends: `${parentCollectionName}:${parentSchematicName}`
+                    });
+                }
+
+            }
+
+        }
+
+        /* Collection's own schematics */
+        for (const [schematicName, schematicConfig] of config.schematics) {
+            allSchematics.set(schematicName, schematicConfig);
+        }
+
+        Output.logInfo(`${allSchematics.size} schematic(s) detected for "${this.name}" collection: ${Array.from(allSchematics).map(([name]) => name).join(', ')}`);
+
+        const schematics = Array.from(allSchematics)
             /* Remove internal schematics */
             .filter(([, config]) => !config.hidden && !config.private)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
