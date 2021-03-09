@@ -43,6 +43,17 @@ export class Collection {
     }
 
     /**
+     * Only load the collection's schematics' names (used for sub-collections only).
+     */
+    async initSchematicsNames(fsPath: string): Promise<string[]> {
+
+        const rawConfig = await FileSystem.parseJsonFile(fsPath);
+
+        return Object.keys(JsonValidator.object(JsonValidator.object(rawConfig)?.['schematics']) ?? {});
+
+    }
+
+    /**
      * Get collection's name
      */
     getName(): string {
@@ -144,11 +155,9 @@ export class Collection {
                     Output.logWarning(`"${this.name}" collection wants to inherit from "${parentCollectionName}" collection, but the latest cannot be found.`);
                 } else {
 
-                    const watcher = await parentCollection.init(workspaceFolder, parentCollectionFsPath);
-                    /* Watcher is not needed here */
-                    watcher?.dispose();
+                    const parentSchematicsNames = await parentCollection.initSchematicsNames(parentCollectionFsPath);
 
-                    for (const parentSchematicName of parentCollection.getSchematicsNames()) {
+                    for (const parentSchematicName of parentSchematicsNames) {
                         allSchematics.set(parentSchematicName, {
                             extends: `${parentCollectionName}:${parentSchematicName}`,
                             collectionFsPath: parentCollectionFsPath,
