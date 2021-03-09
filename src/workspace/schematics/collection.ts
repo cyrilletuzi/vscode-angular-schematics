@@ -141,6 +141,7 @@ export class Collection {
         this.schematicsChoices = [];
 
         const allSchematics = new Map<string, CollectionSchematicJsonSchema & { collectionFsPath?: string }>();
+        const extendedSchematicDescription = `Schematic inherited from`;
 
         /* A collection can extend other ones */
         for (const parentCollectionName of config.extends) {
@@ -215,7 +216,7 @@ export class Collection {
                         schematicConfig = {
                             name,
                             collectionName: this.name,
-                            description: `Schematic herited from "${collectionName}"`,
+                            description: `${extendedSchematicDescription} "${collectionName}"`,
                             collectionFsPath,
                         };
 
@@ -255,7 +256,18 @@ export class Collection {
 
         }
 
-        this.schematicsChoices = this.schematicsChoices.sort((a, b) => a.label.localeCompare(b.label));
+        this.schematicsChoices.sort((a, b) => {
+            if (a.description && b.description) {
+                // Collection's own schematics first, then extended ones
+                if ((a.description.startsWith(extendedSchematicDescription)) && (!b.description.startsWith(extendedSchematicDescription))) {
+                    return 1;
+                } else if ((!a.description.startsWith(extendedSchematicDescription)) && (b.description.startsWith(extendedSchematicDescription))) {
+                    return -1;
+                }
+            }
+            // Otherwise, alphabetical sort
+            return a.label.localeCompare(b.label);
+        });
 
     }
 
