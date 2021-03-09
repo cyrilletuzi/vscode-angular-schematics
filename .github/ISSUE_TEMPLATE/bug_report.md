@@ -21,7 +21,7 @@ Hi,
   - [closed issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues?q=is%3Aissue+is%3Aclosed)
   - [questions answered](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/categories/q-a) in the new "Discussions" tab
 - [ ] My project meets the requirements indicated in README
-- [ ] I understand this extension is just *using* Angular CLI schematics, it does *not* create files by itself, so any issue with the schematics should be reported in the relevant repository
+- [ ] I understand this extension is just *using* Angular CLI schematics, it does *not* create files by itself, so any issue with the schematics should be reported in the relevant repository:
   - [Angular CLI issue tracker](https://github.com/angular/angular-cli/issues)
 - [ ] I launched `ng g component hello` in the *VS Code* Terminal inside my project, and it works
 - [ ] I looked at the extension's logs ("Angular Schematics" Output channel, second tab left to the Terminal), and tried to fix my project's configuration accordingly
