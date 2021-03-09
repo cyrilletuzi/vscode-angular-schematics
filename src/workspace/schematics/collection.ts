@@ -86,8 +86,6 @@ export class Collection {
                          ?? (rootExtendsString ? [rootExtendsString] : [])
                          ?? [];
 
-        console.log(rootExtends);
-
         /* Validate `schematics` property */
         const schematics = new Map(Object.entries(JsonValidator.object(configObject?.['schematics']) ?? {})
             .map(([name, rawConfig]) => {
@@ -140,15 +138,22 @@ export class Collection {
             if (parentCollectionName !== this.name) {
 
                 const parentCollection = new Collection(parentCollectionName);
+                const parentCollectionFsPath = await findCollectionFsPath(workspaceFolder, parentCollectionName);
 
-                const watcher = await parentCollection.init(workspaceFolder, fsPath);
-                /* Watcher is not needed here */
-                watcher?.dispose();
+                if (!parentCollectionFsPath) {
+                    Output.logWarning(`"${this.name}" collection wants to inherit from "${parentCollectionName}" collection, but the latest cannot be found.`);
+                } else {
 
-                for (const parentSchematicName of parentCollection.getSchematicsNames()) {
-                    allSchematics.set(parentSchematicName, {
-                        extends: `${parentCollectionName}:${parentSchematicName}`
-                    });
+                    const watcher = await parentCollection.init(workspaceFolder, parentCollectionFsPath);
+                    /* Watcher is not needed here */
+                    watcher?.dispose();
+
+                    for (const parentSchematicName of parentCollection.getSchematicsNames()) {
+                        allSchematics.set(parentSchematicName, {
+                            extends: `${parentCollectionName}:${parentSchematicName}`
+                        });
+                    }
+
                 }
 
             }
