@@ -1,5 +1,16 @@
 # Change Log
 
+## [4.12.0] - 2021-03-17
+
+### Feature
+
+Support schematics collections extending a whole other schematics collection (like `@nrwl/angular`).
+
+Also, when a collection contains both its own schematics and inherits schematics from another collection,
+the schematics specific to the collection are sorted first in the user choices.
+It affects the schematics choice order for extended collections already supported previously
+(like `@ionic/angular-toolkit`).
+
 ## [4.11.0] - 2021-03-08
 
 ### Feature

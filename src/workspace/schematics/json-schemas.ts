@@ -11,6 +11,8 @@ export interface CollectionSchematicJsonSchema {
 }
 
 export interface CollectionJsonSchema {
+    /** A collection can extend other ones */
+    extends: string[];
     /** Key is the schematic's name */
     schematics: Map<string, CollectionSchematicJsonSchema>;
 }
@@ -25,7 +27,7 @@ export interface SchematicOptionJsonSchema {
     default?: string | boolean;
     /** Default value calculated by Angular CLI */
     $default?: {
-        /** 
+        /**
          * Can be from the first argument of command line,
          * or some internals like `projectName` which defaults to defaut project
          */

@@ -43,6 +43,17 @@ export class Collection {
     }
 
     /**
+     * Only load the collection's schematics' names (used for sub-collections only).
+     */
+    async initSchematicsNames(fsPath: string): Promise<string[]> {
+
+        const rawConfig = await FileSystem.parseJsonFile(fsPath);
+
+        return Object.keys(JsonValidator.object(JsonValidator.object(rawConfig)?.['schematics']) ?? {});
+
+    }
+
+    /**
      * Get collection's name
      */
     getName(): string {
@@ -77,7 +88,17 @@ export class Collection {
      */
     private validateConfig(config: unknown): CollectionJsonSchema {
 
-        const schematics = new Map(Object.entries(JsonValidator.object(JsonValidator.object(config)?.['schematics']) ?? {})
+        const configObject = JsonValidator.object(config);
+
+        /* Validate `extends` property */
+        const rootExtendsString = JsonValidator.string(configObject?.['extends']);
+
+        const rootExtends = JsonValidator.array(configObject?.['extends'], 'string')
+                         ?? (rootExtendsString ? [rootExtendsString] : [])
+                         ?? [];
+
+        /* Validate `schematics` property */
+        const schematics = new Map(Object.entries(JsonValidator.object(configObject?.['schematics']) ?? {})
             .map(([name, rawConfig]) => {
 
                 const config = JsonValidator.object(rawConfig);
@@ -104,6 +125,7 @@ export class Collection {
         }
 
         return {
+            extends: rootExtends,
             schematics,
         };
 
@@ -118,11 +140,45 @@ export class Collection {
         this.schematics.clear();
         this.schematicsChoices = [];
 
-        const allSchematics = Array.from(config.schematics);
+        const allSchematics = new Map<string, CollectionSchematicJsonSchema & { collectionFsPath?: string }>();
+        const extendedSchematicDescription = `Schematic inherited from`;
 
-        Output.logInfo(`${allSchematics.length} schematic(s) detected for "${this.name}" collection: ${allSchematics.map(([name]) => name).join(', ')}`);
+        /* A collection can extend other ones */
+        for (const parentCollectionName of config.extends) {
 
-        const schematics = allSchematics
+            /* Avoid infinite recursion */
+            if (parentCollectionName !== this.name) {
+
+                const parentCollection = new Collection(parentCollectionName);
+                const parentCollectionFsPath = await findCollectionFsPath(workspaceFolder, parentCollectionName);
+
+                if (!parentCollectionFsPath) {
+                    Output.logWarning(`"${this.name}" collection wants to inherit from "${parentCollectionName}" collection, but the latest cannot be found.`);
+                } else {
+
+                    const parentSchematicsNames = await parentCollection.initSchematicsNames(parentCollectionFsPath);
+
+                    for (const parentSchematicName of parentSchematicsNames) {
+                        allSchematics.set(parentSchematicName, {
+                            extends: `${parentCollectionName}:${parentSchematicName}`,
+                            collectionFsPath: parentCollectionFsPath,
+                        });
+                    }
+
+                }
+
+            }
+
+        }
+
+        /* Collection's own schematics */
+        for (const [schematicName, schematicConfig] of config.schematics) {
+            allSchematics.set(schematicName, schematicConfig);
+        }
+
+        Output.logInfo(`${allSchematics.size} schematic(s) detected for "${this.name}" collection: ${Array.from(allSchematics).map(([name]) => name).join(', ')}`);
+
+        const schematics = Array.from(allSchematics)
             /* Remove internal schematics */
             .filter(([, config]) => !config.hidden && !config.private)
             /* Remove `ng-add` schematics are they are not relevant for the extension */
@@ -151,7 +207,7 @@ export class Collection {
                     Output.logWarning(`"${this.name}" collection's name is invalid.`);
                 } else {
 
-                    const collectionFsPath = await findCollectionFsPath(workspaceFolder, collectionName);
+                    const collectionFsPath = config?.collectionFsPath ?? await findCollectionFsPath(workspaceFolder, collectionName);
 
                     if (!collectionFsPath) {
                         Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
@@ -160,7 +216,7 @@ export class Collection {
                         schematicConfig = {
                             name,
                             collectionName: this.name,
-                            description: `Schematic herited from "${collectionName}"`,
+                            description: `${extendedSchematicDescription} "${collectionName}"`,
                             collectionFsPath,
                         };
 
@@ -200,7 +256,18 @@ export class Collection {
 
         }
 
-        this.schematicsChoices = this.schematicsChoices.sort((a, b) => a.label.localeCompare(b.label));
+        this.schematicsChoices.sort((a, b) => {
+            if (a.description && b.description) {
+                // Collection's own schematics first, then extended ones
+                if ((a.description.startsWith(extendedSchematicDescription)) && (!b.description.startsWith(extendedSchematicDescription))) {
+                    return 1;
+                } else if ((!a.description.startsWith(extendedSchematicDescription)) && (b.description.startsWith(extendedSchematicDescription))) {
+                    return -1;
+                }
+            }
+            // Otherwise, alphabetical sort
+            return a.label.localeCompare(b.label);
+        });
 
     }
 

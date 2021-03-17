@@ -19,7 +19,7 @@ export class Schematic {
 
     /**
      * Load the schematic.
-     * **Must** be called after each `new Collection()`
+     * **Must** be called after each `new Schematic()`
      * (delegated because `async` is not possible on a constructor).
      */
     async init({ fsPath, collectionFsPath }: { fsPath?: string; collectionFsPath?: string; }): Promise<void> {
