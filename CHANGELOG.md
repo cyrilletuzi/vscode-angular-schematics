@@ -1,5 +1,11 @@
 # Change Log
 
+## [4.13.0] - 2021-03-29
+
+### Feature
+
+Add `@ngneat/scam` schematics in defaults.
+
 ## [4.12.0] - 2021-03-17
 
 ### Feature
