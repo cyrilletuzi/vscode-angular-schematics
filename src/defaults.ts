@@ -12,6 +12,7 @@ export const defaultCollectionsNames: string[] = [
     '@ngx-formly/schematics',
     'primeng-schematics',
     '@ngx-kit/collection',
+    '@ngneat/scam',
     'ngx-spec',
     './schematics/collection.json'
 ];
