@@ -181,7 +181,7 @@
         "@typescript-eslint/eslint-plugin": "4.22.1",
         "@typescript-eslint/parser": "4.22.1",
         "eslint": "7.25.0",
-        "glob": "7.1.6",
+        "glob": "7.1.7",
         "minimist": "1.2.5",
         "mocha": "8.3.2",
         "ts-loader": "9.1.2",
