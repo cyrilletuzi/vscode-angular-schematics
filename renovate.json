@@ -9,11 +9,11 @@
   "packageRules": [
     {
       "packageNames": ["@types/vscode"],
-      "allowedVersions": "<1.42"
+      "allowedVersions": "<1.57"
     },
     {
       "packageNames": ["@types/node"],
-      "allowedVersions": "<13"
+      "allowedVersions": "<14.17"
     }
   ],
   "schedule": ["after 1am and before 7am every weekday"],
