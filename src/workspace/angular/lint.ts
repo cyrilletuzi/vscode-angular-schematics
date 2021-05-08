@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { FileSystem, JsonValidator, Output } from '../../utils';
 
@@ -16,26 +15,26 @@ export class LintConfig {
      * **Must** be called after each `new LintConfig()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(contextFsPath: string, { silent = false } = {}): Promise<vscode.FileSystemWatcher | undefined> {
+    async init(contextUri: vscode.Uri, { silent = false } = {}): Promise<vscode.FileSystemWatcher | undefined> {
 
-        const tslintFsPath = path.join(contextFsPath, 'tslint.json');
-        const eslintFsPath = path.join(contextFsPath, '.eslintrc.json');
+        const tslintUri = vscode.Uri.joinPath(contextUri, 'tslint.json');
+        const eslintUri = vscode.Uri.joinPath(contextUri, '.eslintrc.json');
 
         let config: LintJsonSchema = {
             rules: {},
         };
 
-        if (await FileSystem.isReadable(eslintFsPath, { silent: true })) {
+        if (await FileSystem.isReadable(eslintUri, { silent: true })) {
 
-            const unsafeConfig = await FileSystem.parseJsonFile(eslintFsPath, { silent });
+            const unsafeConfig = await FileSystem.parseJsonFile(eslintUri, { silent });
 
             this.linter = 'eslint';
 
             config = this.validateEslintConfig(unsafeConfig);
 
-        } else if (await FileSystem.isReadable(tslintFsPath, { silent: true })) {
+        } else if (await FileSystem.isReadable(tslintUri, { silent: true })) {
 
-            const unsafeConfig = await FileSystem.parseJsonFile(tslintFsPath, { silent });
+            const unsafeConfig = await FileSystem.parseJsonFile(tslintUri, { silent });
 
             this.linter = 'tslint';
 
@@ -49,7 +48,7 @@ export class LintConfig {
 
             Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in ${this.linter} config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
-            return vscode.workspace.createFileSystemWatcher((this.linter === 'eslint') ? eslintFsPath : tslintFsPath);
+            return vscode.workspace.createFileSystemWatcher((this.linter === 'eslint') ? eslintUri.fsPath : tslintUri.fsPath);
 
         } else {
 

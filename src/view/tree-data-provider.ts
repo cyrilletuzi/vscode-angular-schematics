@@ -1,19 +1,18 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { Workspace } from '../workspace';
 import { Collection } from '../workspace/schematics';
 
 export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
 
-    private iconPath = '';
+    private iconPath?: vscode.Uri;
     private collections = new Map<string, Collection>();
 
     constructor() {
 
         const schematicsExtension = vscode.extensions.getExtension('cyrilletuzi.angular-schematics') as vscode.Extension<unknown>;
 
-        this.iconPath = path.join(schematicsExtension.extensionPath, 'angular.svg');
+        this.iconPath = vscode.Uri.joinPath(schematicsExtension.extensionUri, 'angular.svg');
 
     }
 

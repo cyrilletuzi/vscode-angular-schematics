@@ -77,10 +77,10 @@ export class AngularProject {
         /** `rootPath` is in Posix format, but here we need an OS-specific fsPath */
         const rootFsPath = FileSystem.convertRelativePathToRelativeFsPath(this.rootPath);
 
-        const projectFsPath = path.join(workspaceFolder.uri.fsPath, rootFsPath);
+        const projectUri = vscode.Uri.joinPath(workspaceFolder.uri, rootFsPath);
 
         const lintConfig = new LintConfig();
-        const watcher = await lintConfig.init(projectFsPath, { silent: true });
+        const watcher = await lintConfig.init(projectUri, { silent: true });
         this.lintConfig = lintConfig;
 
         const componentShortcut = new ComponentShortcut();

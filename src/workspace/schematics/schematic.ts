@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 import { FileSystem, Output, JsonValidator } from '../../utils';
 import { SchematicJsonSchema, SchematicOptionJsonSchema } from './json-schemas';
@@ -22,21 +21,21 @@ export class Schematic {
      * **Must** be called after each `new Schematic()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init({ fsPath, collectionFsPath }: { fsPath?: string; collectionFsPath?: string; }): Promise<void> {
+    async init({ uri, collectionUri }: { uri?: vscode.Uri; collectionUri?: vscode.Uri; }): Promise<void> {
 
         /* Schematics extended from another collection needs to get back the schema path */
-        if (!fsPath) {
-            if (!collectionFsPath) {
+        if (!uri) {
+            if (!collectionUri) {
                 throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be extended.`);
             }
             try {
-                fsPath = await this.getFsPathFromCollection(collectionFsPath);
+                uri = await this.getUriFromCollection(collectionUri);
             } catch {
                 throw new Error(`"${this.collectionName}:${this.name}" can not be extended.`);
             }
         }
 
-        const unsafeConfig = await FileSystem.parseJsonFile(fsPath);
+        const unsafeConfig = await FileSystem.parseJsonFile(uri);
 
         if (!unsafeConfig) {
             throw new Error(`"${this.collectionName}:${this.name}" schematic cannot be loaded.`);
@@ -126,9 +125,9 @@ export class Schematic {
     /**
      * Get the schema filesystem path.
      */
-    private async getFsPathFromCollection(collectionFsPath: string): Promise<string> {
+    private async getUriFromCollection(collectionUri: vscode.Uri): Promise<vscode.Uri> {
 
-        const collectionJsonConfig = await FileSystem.parseJsonFile(collectionFsPath);
+        const collectionJsonConfig = await FileSystem.parseJsonFile(collectionUri);
 
         const schemaPath = JsonValidator.string(JsonValidator.object(JsonValidator.object(JsonValidator.object(collectionJsonConfig)?.['schematics'])?.[this.name])?.['schema']);
 
@@ -137,7 +136,7 @@ export class Schematic {
             throw new Error();
         }
 
-        return path.join(path.dirname(collectionFsPath), schemaPath);
+        return vscode.Uri.joinPath(FileSystem.uriDirname(collectionUri), schemaPath);
 
     }
 

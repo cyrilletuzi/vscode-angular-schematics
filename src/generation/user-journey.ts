@@ -53,7 +53,7 @@ export class UserJourney {
 
         Output.logInfo(`Workspace folder selected: "${workspaceFolder.name}"`);
 
-        this.cliCommand = new CliCommand(workspaceFolder, contextUri?.fsPath);
+        this.cliCommand = new CliCommand(workspaceFolder, contextUri);
 
         /* If the project has not been already resolved via context path (in `CliCommand` constructor)
          * and if the Angular projects have been correctly resolved from config */
@@ -248,7 +248,7 @@ export class UserJourney {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `${extensionName}: launching the generation, please wait...`,
-            }, () => this.jumpToFile(this.cliCommand.guessGereratedFileFsPath()));
+            }, () => this.jumpToFile(this.cliCommand.guessGereratedFileUri()));
 
         } catch {
 
@@ -624,19 +624,19 @@ export class UserJourney {
     /**
      * Automatically open the generated file
      */
-    private async jumpToFile(possibleFsPath: string, counter = 0): Promise<void> {
+    private async jumpToFile(possibleUri?: vscode.Uri, counter = 0): Promise<void> {
 
         /* If we don't know the generated file path, we can't know if the command succeeded or not,
          * as we can't react on Terminal output */
-        if (possibleFsPath === '') {
+        if (!possibleUri) {
 
             throw new Error();
 
         }
         /* If the file exists, open it */
-        else if (await FileSystem.isReadable(possibleFsPath, { silent: true })) {
+        else if (await FileSystem.isReadable(possibleUri, { silent: true })) {
 
-            const document = await vscode.workspace.openTextDocument(possibleFsPath);
+            const document = await vscode.workspace.openTextDocument(possibleUri);
 
             await vscode.window.showTextDocument(document);
 
@@ -655,7 +655,7 @@ export class UserJourney {
 
             await new Promise<void>((resolve, reject) => {
                 setTimeout(() => {
-                    this.jumpToFile(possibleFsPath, counter).then(() => {
+                    this.jumpToFile(possibleUri, counter).then(() => {
                         resolve();
                     }).catch(() => {
                         reject();

@@ -8,7 +8,7 @@ import { angularCollectionName, defaultComponentTypes } from '../../defaults';
 import { WorkspaceFolderConfig } from '../../workspace';
 import { CliCommand } from '../../generation/cli-command';
 
-import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderFsPath, customizedWorkspaceFolderFsPath, angularEslintWorkspaceFolderFsPath } from './test-config';
+import { rootProjectName, libProjectName, materialCollectionName, userComponentTypeLabel, subAppProjectName, defaultsWorkspaceFolderUri, customizedWorkspaceFolderUri, angularEslintWorkspaceFolderUri } from './test-config';
 import { COMPONENT_TYPE, ShortcutsTypes, MODULE_TYPE } from '../../workspace/shortcuts';
 
 describe('Cli command', () => {
@@ -40,7 +40,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g component hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'hello.component.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -54,7 +54,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g service hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello.service.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello.service.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -68,7 +68,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g module hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.module.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'hello.module.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -82,7 +82,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g interface hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -96,7 +96,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${angularCollectionName}:component hello --project ${libProjectName}`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src', 'lib', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'projects', libProjectName, 'src', 'lib', 'hello.component.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -110,7 +110,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello');
 
         assert.strictEqual(`ng g ${materialCollectionName}:table hello`, cliCommand.getCommand());
-        assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'src', 'app', 'hello', 'hello.component.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -124,7 +124,7 @@ describe('Cli command', () => {
         cliCommand.setNameAsFirstArg('hello/world');
 
         assert.strictEqual(`ng g component hello/world`, cliCommand.getCommand());
-        assert.strictEqual(path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world', 'world.component.ts'), cliCommand.guessGereratedFileFsPath());
+        assert.strictEqual(vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'world', 'world.component.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
     });
 
@@ -251,7 +251,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'src', 'app', 'hello.page.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
         });
 
@@ -268,7 +268,7 @@ describe('Cli command', () => {
             cliCommand.addOptions(typesCustomized.get(COMPONENT_TYPE.PAGE)!.options);
 
             assert.strictEqual(`ng g component hello --type page --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(angularEslintWorkspaceFolderFsPath, 'src', 'app', 'hello', 'hello.page.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(vscode.Uri.joinPath(angularEslintWorkspaceFolderUri, 'src', 'app', 'hello', 'hello.page.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
         });
 
@@ -331,7 +331,7 @@ describe('Cli command', () => {
 
             cliCommand.addOptions(typesCustomized.get(defaultComponentTypes[0]!.label)!.options);
             assert.strictEqual(`ng g ${angularCollectionName}:component hello --type dialog --skip-selector`, cliCommand.getCommand());
-            assert.strictEqual(path.join(customizedWorkspaceFolderFsPath, 'src', 'app', 'hello.dialog.ts'), cliCommand.guessGereratedFileFsPath());
+            assert.strictEqual(vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'src', 'app', 'hello.dialog.ts').path, cliCommand.guessGereratedFileUri()?.path);
 
         });
 
@@ -423,7 +423,7 @@ describe('Cli command', () => {
 
         it('workspace folder', () => {
 
-            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderFsPath);
+            const cliCommand = new CliCommand(workspaceFolderDefaults, defaultsWorkspaceFolderUri);
 
             assert.strictEqual('', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
@@ -436,8 +436,8 @@ describe('Cli command', () => {
 
         it('src folder', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
 
             assert.strictEqual('src', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
@@ -450,8 +450,8 @@ describe('Cli command', () => {
 
         it('src/app folder', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
 
             assert.strictEqual('src/app', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('', cliCommand['contextPath'].relativeToProjectFolder);
@@ -464,8 +464,8 @@ describe('Cli command', () => {
 
         it('folder', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
 
             assert.strictEqual('src/app/hello', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello', cliCommand['contextPath'].relativeToProjectFolder);
@@ -478,8 +478,8 @@ describe('Cli command', () => {
 
         it('subfolder', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
 
             assert.strictEqual('src/app/hello/world', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
@@ -492,8 +492,8 @@ describe('Cli command', () => {
 
         it('file', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world.ts');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'world.ts');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
 
             assert.strictEqual('src/app/hello/world.ts', cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world.ts', cliCommand['contextPath'].relativeToProjectFolder);
@@ -506,8 +506,8 @@ describe('Cli command', () => {
 
         it('lib', () => {
 
-            const contextFsPath = path.join(customizedWorkspaceFolderFsPath, 'projects', libProjectName, 'src', 'lib', 'hello', 'world');
-            const cliCommand = new CliCommand(workspaceFolderCustomized, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'projects', libProjectName, 'src', 'lib', 'hello', 'world');
+            const cliCommand = new CliCommand(workspaceFolderCustomized, contextUri);
 
             assert.strictEqual(path.posix.join('projects', libProjectName, 'src/lib/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
@@ -520,8 +520,8 @@ describe('Cli command', () => {
 
         it('subapp', () => {
 
-            const contextFsPath = path.join(customizedWorkspaceFolderFsPath, 'projects', subAppProjectName, 'src', 'app', 'hello', 'world');
-            const cliCommand = new CliCommand(workspaceFolderCustomized, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(customizedWorkspaceFolderUri, 'projects', subAppProjectName, 'src', 'app', 'hello', 'world');
+            const cliCommand = new CliCommand(workspaceFolderCustomized, contextUri);
 
             assert.strictEqual(path.posix.join('projects', subAppProjectName, 'src/app/hello/world'), cliCommand['contextPath'].relativeToWorkspaceFolder);
             assert.strictEqual('hello/world', cliCommand['contextPath'].relativeToProjectFolder);
@@ -534,8 +534,8 @@ describe('Cli command', () => {
 
         it('@schematics/angular:library', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('library')!);
 
@@ -550,8 +550,8 @@ describe('Cli command', () => {
 
         it('@schematics/angular:application', () => {
 
-            const contextFsPath = path.join(defaultsWorkspaceFolderFsPath, 'src', 'app', 'hello', 'world');
-            const cliCommand = new CliCommand(workspaceFolderDefaults, contextFsPath);
+            const contextUri = vscode.Uri.joinPath(defaultsWorkspaceFolderUri, 'src', 'app', 'hello', 'world');
+            const cliCommand = new CliCommand(workspaceFolderDefaults, contextUri);
             cliCommand.setCollectionName(angularCollectionName);
             cliCommand.setSchematic(workspaceFolderDefaults.collections.getCollection(angularCollectionName)!.getSchematic('application')!);
 
