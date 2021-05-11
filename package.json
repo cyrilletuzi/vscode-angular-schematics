@@ -40,9 +40,7 @@
     },
     "activationEvents": [
         "workspaceContains:**/angular.json",
-        "workspaceContains:**/.angular.json",
-        "workspaceContains:**/angular-cli.json",
-        "workspaceContains:**/.angular-cli.json"
+        "workspaceContains:**/.angular.json"
     ],
     "main": "./dist/extension.js",
     "contributes": {
