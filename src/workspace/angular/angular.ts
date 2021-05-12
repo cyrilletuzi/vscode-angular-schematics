@@ -39,7 +39,11 @@ export class AngularConfig {
 
         const watchers = await this.setProjects(workspaceFolder, config);
 
-        watchers.push(vscode.workspace.createFileSystemWatcher(uri.fsPath));
+        if (uri.scheme === 'file') {
+
+            watchers.push(vscode.workspace.createFileSystemWatcher(uri.fsPath));
+
+        }
 
         return watchers;
 

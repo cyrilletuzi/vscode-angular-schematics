@@ -48,7 +48,17 @@ export class LintConfig {
 
             Output.logInfo(`${this.componentSuffixes.length} custom component suffixe(s) detected in ${this.linter} config${this.componentSuffixes.length > 0 ? `: ${this.componentSuffixes.join(', ')}` : ''}`);
 
-            return vscode.workspace.createFileSystemWatcher((this.linter === 'eslint') ? eslintUri.fsPath : tslintUri.fsPath);
+            if ((this.linter === 'eslint') && (eslintUri.scheme === 'file')) {
+
+                return vscode.workspace.createFileSystemWatcher(eslintUri.fsPath);
+
+            } else if ((this.linter === 'tslint') && (tslintUri.scheme === 'file')) {
+
+                return vscode.workspace.createFileSystemWatcher(tslintUri.fsPath);
+
+            }
+
+            return undefined;
 
         } else {
 
