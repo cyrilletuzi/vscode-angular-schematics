@@ -376,14 +376,22 @@ export class CliCommand {
 
         Output.logInfo(`Full context fsPath detected: ${contextUri.path}`);
 
-        /* Remove workspace folder path from full path,
-         * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`
-         * While we need a Posix path, for now we need to start from OS-specific fsPaths because of
-         * https://github.com/microsoft/vscode/issues/116298 */
-        const relativeToWorkspacePath = path.relative(this.workspaceFolder.uri.fsPath, contextUri.fsPath);
+        if ((this.workspaceFolder.uri.scheme === 'file') && (contextUri.scheme === 'file')) {
 
-        /* Convert an OS-specific fsPath to a relative Posix path. */
-        this.contextPath.relativeToWorkspaceFolder = (path.sep !== path.posix.sep) ? relativeToWorkspacePath.split(path.sep).join(path.posix.sep) : relativeToWorkspacePath
+            /* Remove workspace folder path from full path,
+            * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`
+            * While we need a Posix path, for now we need to start from OS-specific fsPaths because of
+            * https://github.com/microsoft/vscode/issues/116298 */
+            const relativeToWorkspacePath = path.relative(this.workspaceFolder.uri.fsPath, contextUri.fsPath);
+
+            /* Convert an OS-specific fsPath to a relative Posix path. */
+            this.contextPath.relativeToWorkspaceFolder = (path.sep !== path.posix.sep) ? relativeToWorkspacePath.split(path.sep).join(path.posix.sep) : relativeToWorkspacePath;
+
+        } else {
+
+            this.contextPath.relativeToWorkspaceFolder = path.posix.relative(this.workspaceFolder.uri.path, contextUri.path);
+
+        }
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
