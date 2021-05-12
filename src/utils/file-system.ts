@@ -145,35 +145,12 @@ export class FileSystem {
     }
 
     /**
-     * Convert a relative Posix path to an OS-specific fsPath.
-     * Do *not* use this on absolute paths, as it would require other steps (like removing the leading slash on Windows)
-     * @param pathValue Path to convert
-     */
-    static convertRelativePathToRelativeFsPath(pathValue: string): string {
-
-        return (path.sep !== path.posix.sep) ? pathValue.split(path.posix.sep).join(path.sep) : pathValue;
-
-    }
-
-    /**
-     * Convert an OS-specific fsPath to a relative Posix path.
-     * Do *not* use this on absolute paths, as it would require other steps (like adding a leading slash on Windows)
-     * @param pathValue Path to convert
-     */
-    static convertRelativeFsPathToRelativePath(pathValue: string): string {
-
-        return (path.sep !== path.posix.sep) ? pathValue.split(path.sep).join(path.posix.sep) : pathValue;
-
-    }
-
-    /**
      * Equivalent to Node `path.dirname()` but with a VS Code `Uri`
      */
     static uriDirname(uri: vscode.Uri): vscode.Uri {
 
-        // TODO: check on Windows, not clear if we should pass fsPath or path
-        // TODO: try with strict
-        return vscode.Uri.parse(path.dirname(uri.fsPath));
+        // `true` is for strict, which requires a scheme and is recommended
+        return vscode.Uri.parse(path.posix.dirname(uri.toString()), true);
 
     }
 

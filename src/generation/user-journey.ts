@@ -426,10 +426,10 @@ export class UserJourney {
 
         const nowhereLabel = `Nowhere`;
 
-        const projectSourcePath = this.cliCommand.getProjectSourcePath();
+        const projectSourceUri = this.cliCommand.getProjectSourceUri();
 
         /* Should look only in the current project */
-        const pattern = new vscode.RelativePattern(projectSourcePath, '**/*.module.ts');
+        const pattern = new vscode.RelativePattern(projectSourceUri, '**/*.module.ts');
 
         /* Show progress to the user */
         const existingModulesUris = await vscode.window.withProgress({
@@ -441,7 +441,7 @@ export class UserJourney {
             /* Routing module should not be proposed */
             .filter((uri) => !uri.path.includes('-routing'))
             /* We keep only the relative module path */
-            .map((uri) => path.posix.relative(projectSourcePath, uri.path))
+            .map((uri) => path.posix.relative(projectSourceUri.path, uri.path))
             /* We stop at `-10` to remove `.module.ts` */
             .map((pathValue) => pathValue.substr(0, pathValue.length - 10));
 
