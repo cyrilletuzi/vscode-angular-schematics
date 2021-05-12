@@ -37,7 +37,7 @@ export class Collection {
         await this.setSchematics(workspaceFolder, config, uri);
 
         /* Only watch local schematics */
-        return !uri.fsPath.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(uri.fsPath) : undefined;
+        return !uri.path.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(uri.fsPath) : undefined;
 
     }
 

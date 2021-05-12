@@ -52,8 +52,8 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         /* Keep only the directory part */
         const workspaceFolderUri = FileSystem.uriDirname(angularConfigUri);
 
-        if (workspaceFolderUri.fsPath !== this.uri.fsPath) {
-            Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderUri.fsPath}`);
+        if (workspaceFolderUri.path !== this.uri.path) {
+            Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderUri.path}`);
         }
 
         /* Update the workspace folder URI */
@@ -282,7 +282,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             if (searchMatches.length === 1) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0]!.fsPath}`);
+                Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0]!.path}`);
 
             } else {
 

@@ -324,7 +324,7 @@ export class CliCommand {
 
             possibleUri = vscode.Uri.joinPath(generatedFolderUri, fileWithSuffixName);
 
-            Output.logInfo(`Guessed generated file path: ${possibleUri.fsPath}`);
+            Output.logInfo(`Guessed generated file path: ${possibleUri.path}`);
 
         }
 
@@ -374,7 +374,7 @@ export class CliCommand {
             return;
         }
 
-        Output.logInfo(`Full context fsPath detected: ${contextUri.fsPath}`);
+        Output.logInfo(`Full context fsPath detected: ${contextUri.path}`);
 
         /* Remove workspace folder path from full path,
          * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`

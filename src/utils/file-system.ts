@@ -35,7 +35,7 @@ export class FileSystem {
 
                 const parentUri = vscode.Uri.joinPath(contextUri, '..');
 
-                if (contextUri.fsPath !== parentUri.fsPath) {
+                if (contextUri.path !== parentUri.path) {
 
                     return await this.findPackageUri(workspaceFolder, parentUri, name, { silent });
 
@@ -66,7 +66,7 @@ export class FileSystem {
     static async isReadable(uri: vscode.Uri, { silent = false } = {}): Promise<boolean> {
 
         /* Check in cache */
-        if (this.readableFiles.has(uri.fsPath)) {
+        if (this.readableFiles.has(uri.path)) {
             return true;
         }
 
@@ -78,7 +78,7 @@ export class FileSystem {
         } catch (error: unknown) {
 
             if (!silent) {
-                this.logError(uri.fsPath, 'found');
+                this.logError(uri.path, 'found');
             }
 
             return false;
@@ -86,7 +86,7 @@ export class FileSystem {
         }
 
         /* Save in cache */
-        this.readableFiles.add(uri.fsPath);
+        this.readableFiles.add(uri.path);
 
         return true;
 
@@ -112,7 +112,7 @@ export class FileSystem {
 
                 if (!silent) {
 
-                    this.logError(uri.fsPath, 'parsed');
+                    this.logError(uri.path, 'parsed');
 
                 }
 
