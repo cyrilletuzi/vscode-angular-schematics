@@ -156,9 +156,6 @@
             ]
         }
     },
-    "capabilities": {
-        "virtualWorkspaces": true
-    },
     "scripts": {
         "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
         "compile": "webpack --no-performance",
