@@ -145,16 +145,6 @@ export class FileSystem {
     }
 
     /**
-     * Equivalent to Node `path.dirname()` but with a VS Code `Uri`
-     */
-    static uriDirname(uri: vscode.Uri): vscode.Uri {
-
-        // `true` is for strict, which requires a scheme and is recommended
-        return vscode.Uri.parse(path.posix.dirname(uri.toString()), true);
-
-    }
-
-    /**
      * Display an error message to the user.
      * @param actionFailed Past form of a verb about what fails (eg. `found`)
      */

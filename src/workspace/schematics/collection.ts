@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Utils } from 'vscode-uri';
 
 import { FileSystem, Output, JsonValidator } from '../../utils';
 
@@ -229,7 +230,7 @@ export class Collection {
 
             } else if (config.schema) {
 
-                const schematicUri = vscode.Uri.joinPath(FileSystem.uriDirname(uri), config.schema);
+                const schematicUri = vscode.Uri.joinPath(Utils.dirname(uri), config.schema);
 
                 schematicConfig = {
                     name,

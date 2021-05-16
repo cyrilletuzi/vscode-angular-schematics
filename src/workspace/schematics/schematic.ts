@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Utils } from 'vscode-uri';
 
 import { FileSystem, Output, JsonValidator } from '../../utils';
 import { SchematicJsonSchema, SchematicOptionJsonSchema } from './json-schemas';
@@ -136,7 +137,7 @@ export class Schematic {
             throw new Error();
         }
 
-        return vscode.Uri.joinPath(FileSystem.uriDirname(collectionUri), schemaPath);
+        return vscode.Uri.joinPath(Utils.dirname(collectionUri), schemaPath);
 
     }
 

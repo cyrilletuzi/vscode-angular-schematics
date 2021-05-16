@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Utils } from 'vscode-uri';
 
 import { FileSystem, JsonValidator } from '../../utils';
 
@@ -37,7 +38,7 @@ export async function findCollectionUri(workspaceFolder: vscode.WorkspaceFolder,
             return undefined;
         }
 
-        const uri = vscode.Uri.joinPath(FileSystem.uriDirname(packageJsonUri), schematicsPath);
+        const uri = vscode.Uri.joinPath(Utils.dirname(packageJsonUri), schematicsPath);
 
         if (!await FileSystem.isReadable(uri, { silent })) {
             return undefined;

@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
+import { Utils } from 'vscode-uri';
 
 import { angularCollectionName, angularConfigFileNames } from '../defaults';
-import { FileSystem, Output } from '../utils';
+import { Output } from '../utils';
 import { formatCliCommandOptions } from '../generation';
 
 import { Collections } from './schematics';
@@ -50,7 +51,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const angularWatchers: vscode.FileSystemWatcher[] = [];
 
         /* Keep only the directory part */
-        const workspaceFolderUri = FileSystem.uriDirname(angularConfigUri);
+        const workspaceFolderUri = Utils.dirname(angularConfigUri);
 
         if (workspaceFolderUri.path !== this.uri.path) {
             Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderUri.path}`);
