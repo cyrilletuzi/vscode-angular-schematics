@@ -15,7 +15,8 @@
 		"noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		"noUnusedParameters": true,  /* Report errors on unused parameters. */
 		"noUncheckedIndexedAccess": true,
-        "noPropertyAccessFromIndexSignature": true
+        "noPropertyAccessFromIndexSignature": true,
+        "noImplicitOverride": true
 	},
 	"exclude": [
 		"node_modules",
