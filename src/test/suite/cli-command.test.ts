@@ -313,7 +313,7 @@ describe('Cli command', () => {
             assert.strictEqual(true, typesCustomized.has(userComponentTypeLabel));
 
             cliCommand.addOptions(typesCustomized.get(userComponentTypeLabel)!.options);
-            assert.strictEqual(`ng g ${angularCollectionName}:component hello --skip-selector --entry-component`, cliCommand.getCommand());
+            assert.strictEqual(`ng g ${angularCollectionName}:component hello --skip-selector --prefix custom`, cliCommand.getCommand());
 
         });
 
