@@ -122,7 +122,7 @@ export class CliCommand {
             if (appModulePossibleUris.length > 0) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const pathRelativeToWorkspace = path.posix.relative(this.workspaceFolder.uri.path, appModulePossibleUris[0]!.path);
+                const pathRelativeToWorkspace = FileSystem.relative(this.workspaceFolder.uri, appModulePossibleUris[0]!);
 
                 const commandPath = path.posix.dirname(pathRelativeToWorkspace);
 
@@ -389,7 +389,7 @@ export class CliCommand {
 
         } else {
 
-            this.contextPath.relativeToWorkspaceFolder = path.posix.relative(this.workspaceFolder.uri.path, contextUri.path);
+            this.contextPath.relativeToWorkspaceFolder = FileSystem.relative(this.workspaceFolder.uri, contextUri);
 
         }
 

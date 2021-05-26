@@ -145,6 +145,16 @@ export class FileSystem {
     }
 
     /**
+     * Get the relative path between 2 Uris.
+     * Eg. from `/usr/path/to` to /usr/path/to/sub/file.ts => `sub/file.ts`
+     */
+    static relative(from: vscode.Uri, to: vscode.Uri): string {
+
+        return path.posix.relative(from.path, to.path);
+
+    }
+
+    /**
      * Display an error message to the user.
      * @param actionFailed Past form of a verb about what fails (eg. `found`)
      */
