@@ -27,13 +27,22 @@ by improving component generation with the suggestion of different component typ
 
 ## Sponsorship
 
-I started this project to help my students learning Angular.
-Now, according to [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-**this extension helps more than 400 000 developers** like you to be more productive.
+You like all the time saved by this extension and the increased productivity?
+And your company is using it in projects generating money?
 
-It's a lot of *unpaid* work. So please consider:
-- **becoming [a sponsor](https://github.com/sponsors/cyrilletuzi)**, if your company earns money with projects using this extension
+Well, on my side, it's a lot of *unpaid* work. So please consider:
+- becoming a **[regular sponsor](https://github.com/sponsors/cyrilletuzi)**
+- doing a **[one-time donation](https://github.com/sponsors/cyrilletuzi?frequency=one-time)**
 - at least, taking 2 minutes to [show your love](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/categories/wall-of-love)
+
+Thanks a lot to the current 2 sponsors:
+- Luis Reinoso
+- Miles Alden
+
+That's 0,0004% of the **470 000 developers** using the extension
+[according to Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics). If only half of you were giving just $1,
+I could work full-time on this extension and transform it in a fully automated architecture tool,
+with all the missing schematics and options you dreamed of.
 
 ## By the same author
 
