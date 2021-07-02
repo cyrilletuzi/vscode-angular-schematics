@@ -194,7 +194,7 @@ describe('Workspace folder config', () => {
 
         it('Collections', () => {
 
-            assert.deepStrictEqual([ionicCollectionName, angularCollectionName, materialCollectionName], workspaceFolder.collections.getCollectionsNames());
+            assert.deepStrictEqual([ionicCollectionName, angularCollectionName, materialCollectionName, '@angular/cdk'], workspaceFolder.collections.getCollectionsNames());
 
             const angularCollection = workspaceFolder.collections.getCollection(angularCollectionName);
             assert.strictEqual(angularCollectionName, angularCollection?.getName());
