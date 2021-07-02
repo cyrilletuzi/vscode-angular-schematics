@@ -4,7 +4,7 @@ import { defaultCollectionsNames, angularCollectionName } from '../../defaults';
 import { Output, JsonValidator } from '../../utils';
 
 import { Collection } from './collection';
-import { findCollectionFsPath } from './find-collection';
+import { findCollectionUri } from './find-collection';
 
 export class Collections {
 
@@ -33,7 +33,7 @@ export class Collections {
 
     /**
      * Get collection from cache.
-     * @param name 
+     * @param name
      */
     getCollection(name: string): Collection | undefined {
 
@@ -64,7 +64,7 @@ export class Collections {
          * Default collections are set first as they are the most used */
         const collectionsNames = Array.from(new Set([...userDefaultCollections, ...defaultCollectionsNames, ...userCollectionsNames]));
 
-        const existingCollections: { name: string; fsPath: string; }[] = [];
+        const existingCollections: { name: string; uri: vscode.Uri; }[] = [];
 
         /* Check the collections exist.
          * `.filter()` is not possible here as there is an async operation */
@@ -73,12 +73,12 @@ export class Collections {
             /* Be silent on extension defaults, be not on user defined collections */
             const silent = (userDefaultCollections.includes(name) || userCollectionsNames.includes(name)) ? false : true;
 
-            const fsPath = await findCollectionFsPath(workspaceFolder, name, { silent });
+            const uri = await findCollectionUri(workspaceFolder, name, { silent });
 
-            if (fsPath) {
-                existingCollections.push({ name, fsPath });
+            if (uri) {
+                existingCollections.push({ name, uri });
             }
-    
+
         }
 
         if (existingCollections.length > 0) {
@@ -86,17 +86,17 @@ export class Collections {
         } else {
             Output.logError(`No collection found. "${angularCollectionName}" should be present in a correctly installed Angular CLI project. If you are in a non-Angular CLI project, try to run in the Terminal: "npm install ${angularCollectionName} --save-dev"`);
         }
-        
+
         /* `.filter()` is not possible here as there is an async operation */
         for (const existingCollection of existingCollections) {
 
             Output.logInfo(`Loading "${existingCollection.name}" collection.`);
 
             const collection = new Collection(existingCollection.name);
-                    
+
             try {
 
-                const watcher = await collection.init(workspaceFolder, existingCollection.fsPath);
+                const watcher = await collection.init(workspaceFolder, existingCollection.uri);
                 this.list.set(existingCollection.name, collection);
 
                 if (watcher) {

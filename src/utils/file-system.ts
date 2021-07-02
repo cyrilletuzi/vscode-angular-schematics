@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
 import { parse } from 'jsonc-parser';
 
@@ -14,31 +13,31 @@ export class FileSystem {
      * Key: `workspace-name:package-name`.
      * Value: package's fs path.
      */
-    private static packagesCache = new Map<string, string | null>();
+    private static packagesCache = new Map<string, vscode.Uri | null>();
     /** Cache for already checked files */
     private static readableFiles = new Set<string>();
 
     /**
      * Try to find a package's fs path, or `undefined`
      */
-    static async findPackageFsPath(workspaceFolder: vscode.WorkspaceFolder, contextFsPath: string, name: string, { silent = false } = {}): Promise<string | undefined> {
+    static async findPackageUri(workspaceFolder: vscode.WorkspaceFolder, contextUri: vscode.Uri, name: string, { silent = false } = {}): Promise<vscode.Uri | undefined> {
 
         /* In a classic scenario, `node_modules` is directly in the workspace folder */
-        const fsPath = path.join(contextFsPath, this.defaultNodeModulesPath, name, 'package.json');
+        const uri = vscode.Uri.joinPath(contextUri, this.defaultNodeModulesPath, name, 'package.json');
 
         if (this.packagesCache.get(`${workspaceFolder.name}:${name}`) === undefined) {
 
-            if (await this.isReadable(fsPath, { silent: true })) {
-                this.packagesCache.set(`${workspaceFolder.name}:${name}`, fsPath);
+            if (await this.isReadable(uri, { silent: true })) {
+                this.packagesCache.set(`${workspaceFolder.name}:${name}`, uri);
             }
             /* Try on parent folder */
             else {
 
-                const parentFsPath = path.join(contextFsPath, '..');
+                const parentUri = vscode.Uri.joinPath(contextUri, '..');
 
-                if (contextFsPath !== parentFsPath) {
+                if (contextUri.path !== parentUri.path) {
 
-                    return await this.findPackageFsPath(workspaceFolder, parentFsPath, name, { silent });
+                    return await this.findPackageUri(workspaceFolder, parentUri, name, { silent });
 
                 }
                 /* We arrived at root, so stop */
@@ -64,22 +63,22 @@ export class FileSystem {
      * Check if a file exists and is readable.
      * Otherwise, log an error message in output channel if `silent` is not set to `true`.
      */
-    static async isReadable(fsPath: string, { silent = false } = {}): Promise<boolean> {
+    static async isReadable(uri: vscode.Uri, { silent = false } = {}): Promise<boolean> {
 
         /* Check in cache */
-        if (this.readableFiles.has(fsPath)) {
+        if (this.readableFiles.has(uri.path)) {
             return true;
         }
 
         try {
 
-            /* Check if the file exists (`F_OK`) and is readable (`R_OK`) */
-            await fs.promises.access(fsPath, fs.constants.F_OK | fs.constants.R_OK);
+            /* Check if the file exists */
+            await vscode.workspace.fs.stat(uri);
 
         } catch (error: unknown) {
 
             if (!silent) {
-                this.logError(fsPath, ((typeof error === 'object') && ((error as { [key: string]: unknown })?.['code'] === 'ENOENT')) ? `found` : `read`);
+                this.logError(uri.path, 'found');
             }
 
             return false;
@@ -87,7 +86,7 @@ export class FileSystem {
         }
 
         /* Save in cache */
-        this.readableFiles.add(fsPath);
+        this.readableFiles.add(uri.path);
 
         return true;
 
@@ -97,15 +96,15 @@ export class FileSystem {
      * Check if a JSON file exists and is readable, and if so, parse it.
      * Otherwise, log an error message in output channel.
      */
-    static async parseJsonFile(fsPath: string, { silent = false } = {}): Promise<unknown> {
+    static async parseJsonFile(uri: vscode.Uri, { silent = false } = {}): Promise<unknown> {
 
-        if (await this.isReadable(fsPath, { silent })) {
+        if (await this.isReadable(uri, { silent })) {
 
             let json;
 
             try {
 
-                const data: string = await fs.promises.readFile(fsPath, { encoding: 'utf8' });
+                const data: string =  (await vscode.workspace.fs.readFile(uri)).toString();
 
                 json = parse(data) as unknown;
 
@@ -113,7 +112,7 @@ export class FileSystem {
 
                 if (!silent) {
 
-                    this.logError(fsPath, `parsed`);
+                    this.logError(uri.path, 'parsed');
 
                 }
 
@@ -146,24 +145,12 @@ export class FileSystem {
     }
 
     /**
-     * Convert a relative Posix path to an OS-specific fsPath.
-     * Do *not* use this on absolute paths, as it would require other steps (like removing the leading slash on Windows)
-     * @param pathValue Path to convert
+     * Get the relative path between 2 Uris.
+     * Eg. from `/usr/path/to` to /usr/path/to/sub/file.ts => `sub/file.ts`
      */
-    static convertRelativePathToRelativeFsPath(pathValue: string): string {
+    static relative(from: vscode.Uri, to: vscode.Uri): string {
 
-        return (path.sep !== path.posix.sep) ? pathValue.split(path.posix.sep).join(path.sep) : pathValue;
-
-    }
-
-    /**
-     * Convert an OS-specific fsPath to a relative Posix path.
-     * Do *not* use this on absolute paths, as it would require other steps (like adding a leading slash on Windows)
-     * @param pathValue Path to convert
-     */
-    static convertRelativeFsPathToRelativePath(pathValue: string): string {
-
-        return (path.sep !== path.posix.sep) ? pathValue.split(path.sep).join(path.posix.sep) : pathValue;
+        return path.posix.relative(from.path, to.path);
 
     }
 

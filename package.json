@@ -190,6 +190,7 @@
         "webpack-cli": "4.7.0"
     },
     "dependencies": {
-        "jsonc-parser": "3.0.0"
+        "jsonc-parser": "3.0.0",
+        "vscode-uri": "3.0.2"
     }
 }
