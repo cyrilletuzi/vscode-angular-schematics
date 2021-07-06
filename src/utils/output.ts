@@ -4,7 +4,7 @@ import { extensionName } from '../defaults';
 
 export class Output {
 
-    private static _channel: vscode.OutputChannel | undefined;
+    static #channel: vscode.OutputChannel | undefined;
 
     /**
      * Get the output channel
@@ -12,11 +12,11 @@ export class Output {
     private static get channel(): vscode.OutputChannel {
 
         /* Create the channel just once */
-        if (!this._channel) {
-            this._channel =  vscode.window.createOutputChannel(extensionName);
+        if (!this.#channel) {
+            this.#channel =  vscode.window.createOutputChannel(extensionName);
         }
 
-        return this._channel;
+        return this.#channel;
 
     }
 

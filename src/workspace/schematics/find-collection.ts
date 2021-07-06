@@ -1,35 +1,35 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
+import { Utils } from 'vscode-uri';
 
 import { FileSystem, JsonValidator } from '../../utils';
 
 /**
  * Try to find a collection package's fs path, or `undefined`
  */
-export async function findCollectionFsPath(workspaceFolder: vscode.WorkspaceFolder, name: string, { silent = false } = {}): Promise<string | undefined> {
+export async function findCollectionUri(workspaceFolder: vscode.WorkspaceFolder, name: string, { silent = false } = {}): Promise<vscode.Uri | undefined> {
 
     /* Local schematics */
     if (name.startsWith('.') && name.endsWith('.json')) {
 
-        const fsPath = path.join(workspaceFolder.uri.fsPath, name);
+        const uri = vscode.Uri.joinPath(workspaceFolder.uri, name);
 
-        if (!await FileSystem.isReadable(fsPath, { silent })) {
+        if (!await FileSystem.isReadable(uri, { silent })) {
             return undefined;
         }
 
-        return fsPath;
+        return uri;
 
     }
     /* Package schematics */
     else {
 
-        const packageJsonFsPath = await FileSystem.findPackageFsPath(workspaceFolder, workspaceFolder.uri.fsPath, name, { silent });
+        const packageJsonUri = await FileSystem.findPackageUri(workspaceFolder, workspaceFolder.uri, name, { silent });
 
-        if (!packageJsonFsPath) {
+        if (!packageJsonUri) {
             return undefined;
         }
 
-        const packageJsonConfig = await FileSystem.parseJsonFile(packageJsonFsPath);
+        const packageJsonConfig = await FileSystem.parseJsonFile(packageJsonUri);
 
         const schematicsPath = JsonValidator.string(JsonValidator.object(packageJsonConfig)?.['schematics']);
 
@@ -38,13 +38,13 @@ export async function findCollectionFsPath(workspaceFolder: vscode.WorkspaceFold
             return undefined;
         }
 
-        const fsPath = path.join(path.dirname(packageJsonFsPath), schematicsPath);
+        const uri = vscode.Uri.joinPath(Utils.dirname(packageJsonUri), schematicsPath);
 
-        if (!await FileSystem.isReadable(fsPath, { silent })) {
+        if (!await FileSystem.isReadable(uri, { silent })) {
             return undefined;
         }
 
-        return fsPath;
+        return uri;
 
     }
 

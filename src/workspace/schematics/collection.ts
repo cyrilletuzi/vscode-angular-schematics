@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
+import { Utils } from 'vscode-uri';
 
 import { FileSystem, Output, JsonValidator } from '../../utils';
 
 import { Schematic } from './schematic';
 import { CollectionJsonSchema, CollectionSchematicJsonSchema } from './json-schemas';
-import { findCollectionFsPath } from './find-collection';
+import { findCollectionUri } from './find-collection';
 
 /** Configuration needed to load a schematic */
 interface SchematicConfig {
     name: string;
     collectionName: string;
     description?: string;
-    fsPath?: string;
-    collectionFsPath?: string;
+    uri?: vscode.Uri;
+    collectionUri?: vscode.Uri;
 }
 
 export class Collection {
@@ -31,23 +31,27 @@ export class Collection {
      * **Must** be called after each `new Collection()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init(workspaceFolder: vscode.WorkspaceFolder, fsPath: string): Promise<vscode.FileSystemWatcher | undefined> {
+    async init(workspaceFolder: vscode.WorkspaceFolder, uri: vscode.Uri): Promise<vscode.FileSystemWatcher | undefined> {
 
-        const config = this.validateConfig(await FileSystem.parseJsonFile(fsPath));
+        const config = this.validateConfig(await FileSystem.parseJsonFile(uri));
 
-        await this.setSchematics(workspaceFolder, config, fsPath);
+        await this.setSchematics(workspaceFolder, config, uri);
 
         /* Only watch local schematics */
-        return !fsPath.includes('node_modules') ? vscode.workspace.createFileSystemWatcher(fsPath) : undefined;
+        if (!uri.path.includes('node_modules') && (uri.scheme === 'file')) {
+            return vscode.workspace.createFileSystemWatcher(uri.fsPath);
+        }
+
+        return undefined;
 
     }
 
     /**
      * Only load the collection's schematics' names (used for sub-collections only).
      */
-    async initSchematicsNames(fsPath: string): Promise<string[]> {
+    async initSchematicsNames(uri: vscode.Uri): Promise<string[]> {
 
-        const rawConfig = await FileSystem.parseJsonFile(fsPath);
+        const rawConfig = await FileSystem.parseJsonFile(uri);
 
         return Object.keys(JsonValidator.object(JsonValidator.object(rawConfig)?.['schematics']) ?? {});
 
@@ -134,13 +138,13 @@ export class Collection {
     /**
      * Set all schematics' configuration of the collection.
      */
-    private async setSchematics(workspaceFolder: vscode.WorkspaceFolder, config: CollectionJsonSchema, fsPath: string): Promise<void> {
+    private async setSchematics(workspaceFolder: vscode.WorkspaceFolder, config: CollectionJsonSchema, uri: vscode.Uri): Promise<void> {
 
         /* Start from scratch as the function can be called again via watcher */
         this.schematics.clear();
         this.schematicsChoices = [];
 
-        const allSchematics = new Map<string, CollectionSchematicJsonSchema & { collectionFsPath?: string }>();
+        const allSchematics = new Map<string, CollectionSchematicJsonSchema & { collectionUri?: vscode.Uri }>();
         const extendedSchematicDescription = `Schematic inherited from`;
 
         /* A collection can extend other ones */
@@ -150,18 +154,18 @@ export class Collection {
             if (parentCollectionName !== this.name) {
 
                 const parentCollection = new Collection(parentCollectionName);
-                const parentCollectionFsPath = await findCollectionFsPath(workspaceFolder, parentCollectionName);
+                const parentCollectionUri = await findCollectionUri(workspaceFolder, parentCollectionName);
 
-                if (!parentCollectionFsPath) {
+                if (!parentCollectionUri) {
                     Output.logWarning(`"${this.name}" collection wants to inherit from "${parentCollectionName}" collection, but the latest cannot be found.`);
                 } else {
 
-                    const parentSchematicsNames = await parentCollection.initSchematicsNames(parentCollectionFsPath);
+                    const parentSchematicsNames = await parentCollection.initSchematicsNames(parentCollectionUri);
 
                     for (const parentSchematicName of parentSchematicsNames) {
                         allSchematics.set(parentSchematicName, {
                             extends: `${parentCollectionName}:${parentSchematicName}`,
-                            collectionFsPath: parentCollectionFsPath,
+                            collectionUri: parentCollectionUri,
                         });
                     }
 
@@ -207,9 +211,9 @@ export class Collection {
                     Output.logWarning(`"${this.name}" collection's name is invalid.`);
                 } else {
 
-                    const collectionFsPath = config?.collectionFsPath ?? await findCollectionFsPath(workspaceFolder, collectionName);
+                    const collectionUri = config?.collectionUri ?? await findCollectionUri(workspaceFolder, collectionName);
 
-                    if (!collectionFsPath) {
+                    if (!collectionUri) {
                         Output.logWarning(`"${this.name}" collection wants to inherit "${name}" schematic from "${config.extends}" collection, but the latest cannot be found.`);
                     } else {
 
@@ -217,7 +221,7 @@ export class Collection {
                             name,
                             collectionName: this.name,
                             description: `${extendedSchematicDescription} "${collectionName}"`,
-                            collectionFsPath,
+                            collectionUri: collectionUri,
                         };
 
                     }
@@ -226,13 +230,13 @@ export class Collection {
 
             } else if (config.schema) {
 
-                const schematicFsPath = path.join(path.dirname(fsPath), config.schema);
+                const schematicUri = vscode.Uri.joinPath(Utils.dirname(uri), config.schema);
 
                 schematicConfig = {
                     name,
                     collectionName: this.name,
                     description: config.description,
-                    fsPath: schematicFsPath,
+                    uri: schematicUri,
                 };
 
             }
@@ -243,8 +247,8 @@ export class Collection {
 
                 try {
                     await schematicInstance.init({
-                        fsPath: schematicConfig.fsPath,
-                        collectionFsPath: schematicConfig.collectionFsPath,
+                        uri: schematicConfig.uri,
+                        collectionUri: schematicConfig.collectionUri,
                     });
                     this.schematics.set(name, schematicInstance);
                     this.setSchematicChoice(schematicConfig);

@@ -85,7 +85,7 @@ export class Terminals {
 
             this.terminals.set(workspaceFolder.name, vscode.window.createTerminal({
                 name,
-                cwd: workspaceFolder.uri.fsPath,
+                cwd: workspaceFolder.uri,
             }));
 
         }

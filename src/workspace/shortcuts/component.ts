@@ -96,7 +96,7 @@ export class ComponentShortcut {
         for (const defaultType of defaultComponentTypes) {
 
             /* Enable defaults only if the package exists */
-            if (await FileSystem.findPackageFsPath(workspaceFolder, workspaceFolder.uri.fsPath, defaultType.package, { silent: true })) {
+            if (await FileSystem.findPackageUri(workspaceFolder, workspaceFolder.uri, defaultType.package, { silent: true })) {
 
                 customTypes.set(defaultType.label, defaultType);
 

@@ -68,7 +68,7 @@ export class Workspace {
      * Get a workspace folder based on a file system path, or `undefined`.
      */
     static getFolderFromPath(contextFsPath: string): vscode.WorkspaceFolder | undefined {
-        
+
         const contextPathUri = vscode.Uri.file(contextFsPath);
 
         return vscode.workspace.getWorkspaceFolder(contextPathUri);
@@ -93,7 +93,7 @@ export class Workspace {
         }
 
         if (!folderName) {
-        
+
             if (vscode.workspace.workspaceFolders?.length === 1) {
 
                 Output.logInfo(`There is only one workspace folder opened, default to it.`);
@@ -109,7 +109,7 @@ export class Workspace {
                 const angularWorkspaceFolders: vscode.QuickPickItem[] = Array.from(this.folders)
                     .map(([label, folder]) => ({
                         label,
-                        description: folder.uri.fsPath,
+                        description: folder.uri.path,
                     }));
 
                 if (angularWorkspaceFolders.length > 0) {
@@ -127,7 +127,7 @@ export class Workspace {
                     /* 4. Otherwise ask any workspace */
                     folderName = (await vscode.window.showWorkspaceFolderPick())?.name;
 
-                } 
+                }
 
             }
 

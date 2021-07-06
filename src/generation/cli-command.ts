@@ -32,10 +32,10 @@ export class CliCommand {
 
     constructor(
         private workspaceFolder: WorkspaceFolderConfig,
-        contextFsPath?: string,
+        contextUri?: vscode.Uri,
     ) {
 
-        this.setContextPathAndProject(contextFsPath);
+        this.setContextPathAndProject(contextUri);
 
     }
 
@@ -81,22 +81,11 @@ export class CliCommand {
     }
 
     /**
-     * Get project's source path, or defaut to `src/app`
+     * Get project's source Uri, or defaut to `src/app`
      */
-    getProjectSourcePath(): string {
+    getProjectSourceUri(): vscode.Uri {
 
-        return path.posix.join(this.workspaceFolder.uri.path, this.getRelativeProjectSourcePath());
-
-    }
-
-    /**
-     * Get project's source fsPath, or defaut to `src/app`
-     */
-    getProjectSourceFsPath(): string {
-
-        const projectSourceFsPath = FileSystem.convertRelativePathToRelativeFsPath(this.getRelativeProjectSourcePath());
-
-        return path.join(this.workspaceFolder.uri.fsPath, projectSourceFsPath);
+        return vscode.Uri.joinPath(this.workspaceFolder.uri, this.getRelativeProjectSourcePath());
 
     }
 
@@ -128,12 +117,12 @@ export class CliCommand {
 
             const pattern = new vscode.RelativePattern(this.workspaceFolder, '**/app.module.ts');
 
-            const appModulePossibleFsPaths = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
+            const appModulePossibleUris = await vscode.workspace.findFiles(pattern, '**/node_modules/**', 1);
 
-            if (appModulePossibleFsPaths.length > 0) {
+            if (appModulePossibleUris.length > 0) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                const pathRelativeToWorkspace = path.posix.relative(this.workspaceFolder.uri.path, appModulePossibleFsPaths[0]!.path);
+                const pathRelativeToWorkspace = FileSystem.relative(this.workspaceFolder.uri, appModulePossibleUris[0]!);
 
                 const commandPath = path.posix.dirname(pathRelativeToWorkspace);
 
@@ -236,16 +225,16 @@ export class CliCommand {
     /**
      * Try to resolve the generated file fs path
      */
-    guessGereratedFileFsPath(): string {
+    guessGereratedFileUri(): vscode.Uri | undefined {
 
         /* Try to resolve the path of the generated file */
-        let possibleFsPath = '';
+        let possibleUri: vscode.Uri | undefined = undefined;
 
         /* Without a default argument, we cannot know the possible path */
         if (this.nameAsFirstArg) {
 
             /* Get the project path, or defaut to `src/app` */
-            const projectSourceFsPath = this.getProjectSourceFsPath();
+            const projectSourceUri = this.getProjectSourceUri();
 
             /* Default file's suffix is the schematic name (eg. `service`) */
             let suffix = `.${this.schematicName}`;
@@ -286,8 +275,6 @@ export class CliCommand {
 
             /* `posix` here as it was typed by the user in Linux format (ie. with slashes) */
             const folderName = path.posix.dirname(this.nameAsFirstArg);
-            /* Convert from Posix format to OS-specific fsPath */
-            const folderFsPath = FileSystem.convertRelativePathToRelativeFsPath(folderName);
             const fileName = path.posix.basename(this.nameAsFirstArg);
             const fileWithSuffixName = `${fileName}${suffix}.ts`;
 
@@ -331,17 +318,17 @@ export class CliCommand {
             }
 
             /* If not flat, add a intermediate folder, which name is the same as the generated file */
-            const generatedFolderFsPath = isFlat ?
-                path.join(projectSourceFsPath, folderFsPath) :
-                path.join(projectSourceFsPath, folderFsPath, fileName);
+            const generatedFolderUri = isFlat ?
+                vscode.Uri.joinPath(projectSourceUri, folderName) :
+                vscode.Uri.joinPath(projectSourceUri, folderName, fileName);
 
-            possibleFsPath = path.join(generatedFolderFsPath, fileWithSuffixName);
+            possibleUri = vscode.Uri.joinPath(generatedFolderUri, fileWithSuffixName);
+
+            Output.logInfo(`Guessed generated file path: ${possibleUri.path}`);
 
         }
 
-        Output.logInfo(`Guessed generated file path: ${possibleFsPath}`);
-
-        return possibleFsPath;
+        return possibleUri;
 
     }
 
@@ -380,20 +367,31 @@ export class CliCommand {
     /**
      * Set context path and prject.
      */
-    private setContextPathAndProject(contextFsPath?: string): void {
+    private setContextPathAndProject(contextUri?: vscode.Uri): void {
 
-        if (!contextFsPath) {
+        if (!contextUri) {
             Output.logInfo(`No context path detected.`);
             return;
         }
 
-        Output.logInfo(`Full context fsPath detected: ${contextFsPath}`);
+        Output.logInfo(`Full context fsPath detected: ${contextUri.path}`);
 
-        /* Remove workspace folder path from full path,
-         * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`
-         * While we need a Posix path, for now we need to start from OS-specific fsPaths because of
-         * https://github.com/microsoft/vscode/issues/116298 */
-        this.contextPath.relativeToWorkspaceFolder = FileSystem.convertRelativeFsPathToRelativePath(path.relative(this.workspaceFolder.uri.fsPath, contextFsPath));
+        if ((this.workspaceFolder.uri.scheme === 'file') && (contextUri.scheme === 'file')) {
+
+            /* Remove workspace folder path from full path,
+            * eg. `/Users/Elmo/angular-project/src/app/some-module` => `src/app/some-module`
+            * While we need a Posix path, for now we need to start from OS-specific fsPaths because of
+            * https://github.com/microsoft/vscode/issues/116298 */
+            const relativeToWorkspacePath = path.relative(this.workspaceFolder.uri.fsPath, contextUri.fsPath);
+
+            /* Convert an OS-specific fsPath to a relative Posix path. */
+            this.contextPath.relativeToWorkspaceFolder = (path.sep !== path.posix.sep) ? relativeToWorkspacePath.split(path.sep).join(path.posix.sep) : relativeToWorkspacePath;
+
+        } else {
+
+            this.contextPath.relativeToWorkspaceFolder = FileSystem.relative(this.workspaceFolder.uri, contextUri);
+
+        }
 
         Output.logInfo(`Workspace folder-relative context path detected: ${this.contextPath.relativeToWorkspaceFolder}`);
 
