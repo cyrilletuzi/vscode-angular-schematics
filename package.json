@@ -174,7 +174,7 @@
     },
     "devDependencies": {
         "@types/glob": "7.1.4",
-        "@types/minimist": "1.2.1",
+        "@types/minimist": "1.2.2",
         "@types/mocha": "8.2.2",
         "@types/node": "12.20.15",
         "@types/vscode": "1.41.0",
