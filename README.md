@@ -39,7 +39,7 @@ Thanks a lot to the current 2 sponsors:
 - Luis Reinoso
 - Miles Alden
 
-That's 0,0004% of the **470 000 developers** using the extension
+That's 0,0004% of the **500 000 developers** using the extension
 [according to Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics). If only half of you were giving just $1,
 I could work full-time on this extension and transform it in a fully automated architecture tool,
 with all the missing schematics and options you dreamed of.
@@ -71,7 +71,7 @@ the path where you want to generate the schematic.
 
 ## Requirements
 
-This extension requires Visual Studio Code version >= 1.41.
+This extension requires Visual Studio Code version >= 1.56.
 
 Basically, in your project, if `ng g component hello` works
 in the *VS Code* Terminal, the extension should work.
@@ -83,9 +83,8 @@ See the [troubleshooting guide](./docs/TROUBLESHOOTING.md) for help.
 
 ### Compact folders setting
 
-Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
-a new default behavior combines single folders together.
-
+A VS Code default behavior
+[combines single folders together](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer).
 While it might be a good idea in general, it is annoying with this extension,
 as clicking on the right directory where you want to generate something becomes more confusing.
 

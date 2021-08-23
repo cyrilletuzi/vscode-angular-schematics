@@ -1,5 +1,23 @@
 # Change Log
 
+## [5.0.0] - 2021-08-23
+
+### Breaking changes
+
+- The extension now requires VS Code version >= 1.56.
+- `.angular-cli.json` and `angular-cli.json` support has been removed,
+as it was removed from Angular CLI itself a long time ago.
+Although unlikely, just rename your config file to `angular.json` if needed.
+
+### Internal changes
+
+This release is mostly internal changes to align with lastest VS Code features
+and subsequent recommendations for extensions.
+
+Nothing should have changed for users, but there was a lot of internal changes
+about paths management. Please file an issue if needed,
+especially on Windows where path management is always a huge pain.
+
 ## [4.13.0] - 2021-03-29
 
 ### Feature

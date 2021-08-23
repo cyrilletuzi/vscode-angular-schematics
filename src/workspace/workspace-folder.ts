@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
+import { Utils } from 'vscode-uri';
 
 import { angularCollectionName, angularConfigFileNames } from '../defaults';
 import { Output } from '../utils';
@@ -42,7 +42,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
 
         Output.logInfo(`Loading Angular configuration.`);
 
-        const angularConfigFsPath = await this.findAngularConfigFsPath({
+        const angularConfigUri = await this.findAngularConfigUri({
             uri: this.uri,
             name: this.name,
             index: this.index,
@@ -51,27 +51,27 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         const angularWatchers: vscode.FileSystemWatcher[] = [];
 
         /* Keep only the directory part */
-        const workspaceFolderFsPath = path.dirname(angularConfigFsPath);
+        const workspaceFolderUri = Utils.dirname(angularConfigUri);
 
-        if (workspaceFolderFsPath !== this.uri.fsPath) {
-            Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderFsPath}`);
+        if (workspaceFolderUri.path !== this.uri.path) {
+            Output.logInfo(`Your Angular project is not at the root of your "${this.name}" workspace folder. Real path: ${workspaceFolderUri.path}`);
         }
 
         /* Update the workspace folder URI */
-        this.uri = vscode.Uri.file(workspaceFolderFsPath);
+        this.uri = workspaceFolderUri;
 
         const angularConfig = new AngularConfig();
         angularWatchers.push(...(await angularConfig.init({
             uri: this.uri,
             name: this.name,
             index: this.index,
-        }, angularConfigFsPath)));
+        }, angularConfigUri)));
         this.angularConfig = angularConfig;
 
         Output.logInfo(`Loading global lint configuration.`);
 
         const lintConfig = new LintConfig();
-        const lintWatcher = await lintConfig.init(this.uri.fsPath);
+        const lintWatcher = await lintConfig.init(this.uri);
         this.lintConfig = lintConfig;
 
         Output.logInfo(`Loading schematics configuration.`);
@@ -258,7 +258,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
     /**
      * Try to find the Angular config file's fs path, or `undefined`
      */
-    private async findAngularConfigFsPath(workspaceFolder: vscode.WorkspaceFolder): Promise<string> {
+    private async findAngularConfigUri(workspaceFolder: vscode.WorkspaceFolder): Promise<vscode.Uri> {
 
         /* Search in root folder only first for performance */
 
@@ -283,7 +283,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             if (searchMatches.length === 1) {
 
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0]!.fsPath}`);
+                Output.logInfo(`Angular config file for "${this.name}" workspace folder found at: ${searchMatches[0]!.path}`);
 
             } else {
 
@@ -310,7 +310,7 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
             }
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return searchMatches[0]!.fsPath;
+            return searchMatches[0]!;
 
         }
 

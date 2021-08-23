@@ -36,13 +36,11 @@
     },
     "qna": false,
     "engines": {
-        "vscode": "^1.41.0"
+        "vscode": "^1.56.0"
     },
     "activationEvents": [
         "workspaceContains:**/angular.json",
-        "workspaceContains:**/.angular.json",
-        "workspaceContains:**/angular-cli.json",
-        "workspaceContains:**/.angular-cli.json"
+        "workspaceContains:**/.angular.json"
     ],
     "main": "./dist/extension.js",
     "contributes": {
@@ -165,7 +163,7 @@
         "test": "tsc -p ./ && node ./out/test/runTest.js",
         "ci:stable": "npm run test",
         "ci:insiders": "tsc -p ./ && node ./out/test/runTest.js --version insiders",
-        "ci:minimal": "tsc -p ./ && node ./out/test/runTest.js --version 1.41.0",
+        "ci:minimal": "tsc -p ./ && node ./out/test/runTest.js --version 1.56.0",
         "lint": "eslint src --ext ts",
         "release:patch": "npm run vscode:prepublish && vsce publish patch && git push && git push --tags && vsce package && npm run githubrelease",
         "release:minor": "npm run vscode:prepublish && vsce publish minor && git push && git push --tags && vsce package && npm run githubrelease",
@@ -177,7 +175,7 @@
         "@types/minimist": "1.2.2",
         "@types/mocha": "9.0.0",
         "@types/node": "12.20.20",
-        "@types/vscode": "1.41.0",
+        "@types/vscode": "1.56.0",
         "@typescript-eslint/eslint-plugin": "4.29.2",
         "@typescript-eslint/parser": "4.29.2",
         "eslint": "7.32.0",
@@ -192,6 +190,7 @@
         "webpack-cli": "4.8.0"
     },
     "dependencies": {
-        "jsonc-parser": "3.0.0"
+        "jsonc-parser": "3.0.0",
+        "vscode-uri": "3.0.2"
     }
 }
