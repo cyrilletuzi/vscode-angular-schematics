@@ -39,7 +39,7 @@ Thanks a lot to the current 2 sponsors:
 - Luis Reinoso
 - Miles Alden
 
-That's 0,0004% of the **470 000 developers** using the extension
+That's 0,0004% of the **500 000 developers** using the extension
 [according to Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics). If only half of you were giving just $1,
 I could work full-time on this extension and transform it in a fully automated architecture tool,
 with all the missing schematics and options you dreamed of.
