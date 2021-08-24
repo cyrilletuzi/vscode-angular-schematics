@@ -165,9 +165,9 @@
         "ci:insiders": "tsc -p ./ && node ./out/test/runTest.js --version insiders",
         "ci:minimal": "tsc -p ./ && node ./out/test/runTest.js --version 1.56.0",
         "lint": "eslint src --ext ts",
-        "release:patch": "npm run vscode:prepublish && vsce publish patch && git push && git push --tags && vsce package && npm run githubrelease",
-        "release:minor": "npm run vscode:prepublish && vsce publish minor && git push && git push --tags && vsce package && npm run githubrelease",
-        "release:major": "npm run vscode:prepublish && vsce publish major && git push && git push --tags && vsce package && npm run githubrelease",
+        "release:patch": "npm run vscode:prepublish && vsce publish patch && git push && git push --tags && vsce package && npm run githubrelease && npm run openvsix",
+        "release:minor": "npm run vscode:prepublish && vsce publish minor && git push && git push --tags && vsce package && npm run githubrelease && npm run openvsix",
+        "release:major": "npm run vscode:prepublish && vsce publish major && git push && git push --tags && vsce package && npm run githubrelease && npm run openvsix",
         "githubrelease": "CHANGELOG=$(sed -n \"/^## \\[$npm_package_version\\]/,/^## /p\" CHANGELOG.md | sed '1d;$d') && gh release create v$npm_package_version angular-schematics-$npm_package_version.vsix --title v$npm_package_version --notes \"$CHANGELOG\"",
         "openvsix": "ovsx publish angular-schematics-$npm_package_version.vsix -p $OPENVSIX_TOKEN"
     },
