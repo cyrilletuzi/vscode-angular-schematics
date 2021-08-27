@@ -2,7 +2,7 @@ export type AngularProjectType = 'application' | 'library';
 
 export interface AngularJsonSchematicsOptionsSchema {
     /** Tells if the file be generated in a subfolder (not flat) or not (flat) */
-    flat?: boolean;
+    flat?: boolean | undefined;
 }
 
 /** Key will be the full schematics name (eg.: "@schematics/angular") */
@@ -14,7 +14,7 @@ export interface AngularJsonProjectSchema {
     /** Required. Main application: empty. Sub-applications/libraries: `<projects-root>/hello` */
     root: string;
     /** Main application: `src`. Sub-applications/libraries: `<projects-root>/hello/src` */
-    sourceRoot?: string;
+    sourceRoot?: string | undefined;
     /** Default values for schematics options */
     schematics?: AngularJsonSchematicsSchema;
 }
@@ -28,7 +28,7 @@ export interface AngularJsonSchema {
          * If set, Angular CLI will use this collection by default instead of the official one.
          * For example, it is set to `@ionic/angular-toolkit` in Ionic projects.
          */
-        defaultCollection?: string;
+        defaultCollection?: string | undefined;
     };
     /** Default values for schematics options */
     schematics: AngularJsonSchematicsSchema;
@@ -41,6 +41,6 @@ export interface AngularJsonSchema {
 
 export interface LintJsonSchema {
     rules: {
-        componentClassSuffixes?: string[];
+        componentClassSuffixes?: string[] | undefined;
     };
 }

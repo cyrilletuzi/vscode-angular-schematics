@@ -5,7 +5,7 @@ import { extensionName } from '../defaults';
 export class Terminals {
 
     private static terminals = new Map<string, vscode.Terminal>();
-    private static previousTerminal?: vscode.Terminal;
+    private static previousTerminal: vscode.Terminal | undefined;
     private static closeEvent?: vscode.Disposable;
 
     /**

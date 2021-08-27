@@ -5,7 +5,7 @@ import { Collection } from '../workspace/schematics';
 
 export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
 
-    private iconPath?: vscode.Uri;
+    private iconPath: vscode.Uri;
     private collections = new Map<string, Collection>();
 
     constructor() {

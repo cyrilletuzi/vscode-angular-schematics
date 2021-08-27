@@ -25,7 +25,7 @@ export interface ComponentType {
     /** Required package name of the library which uses this component type */
     package: string;
     /** Optional human description of this component type */
-    detail?: string;
+    detail?: string | undefined;
 }
 
 /**
