@@ -16,7 +16,8 @@
 		"noUnusedParameters": true,  /* Report errors on unused parameters. */
 		"noUncheckedIndexedAccess": true,
         "noPropertyAccessFromIndexSignature": true,
-        "noImplicitOverride": true
+        "noImplicitOverride": true,
+        "exactOptionalPropertyTypes": true
 	},
 	"exclude": [
 		"node_modules",

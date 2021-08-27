@@ -67,9 +67,11 @@ export class ComponentShortcut {
         for (const customType of await this.getCustomComponentTypes(workspaceFolder)) {
 
             this.types.set(customType.label, {
-                choice: {
+                choice: (customType.detail !== undefined) ? {
                     label: customType.label,
                     detail: customType.detail,
+                } : {
+                    label: customType.label,
                 },
                 options: new Map(customType.options),
             });

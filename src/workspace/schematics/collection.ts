@@ -11,7 +11,7 @@ import { findCollectionUri } from './find-collection';
 interface SchematicConfig {
     name: string;
     collectionName: string;
-    description?: string;
+    description?: string | undefined;
     uri?: vscode.Uri;
     collectionUri?: vscode.Uri;
 }
@@ -280,9 +280,11 @@ export class Collection {
      */
     private setSchematicChoice(schematicConfig: SchematicConfig): void {
 
-        this.schematicsChoices.push({
+        this.schematicsChoices.push((schematicConfig.description !== undefined) ? {
             label: schematicConfig.name,
             description: schematicConfig.description,
+        } : {
+            label: schematicConfig.name,
         });
 
     }

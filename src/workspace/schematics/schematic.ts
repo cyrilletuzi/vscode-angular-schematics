@@ -22,7 +22,7 @@ export class Schematic {
      * **Must** be called after each `new Schematic()`
      * (delegated because `async` is not possible on a constructor).
      */
-    async init({ uri, collectionUri }: { uri?: vscode.Uri; collectionUri?: vscode.Uri; }): Promise<void> {
+    async init({ uri, collectionUri }: { uri?: vscode.Uri | undefined; collectionUri?: vscode.Uri | undefined; }): Promise<void> {
 
         /* Schematics extended from another collection needs to get back the schema path */
         if (!uri) {

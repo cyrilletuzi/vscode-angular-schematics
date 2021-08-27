@@ -47,6 +47,6 @@ export interface SchematicJsonSchema {
     /** Key is the option's name */
     properties: Map<string, SchematicOptionJsonSchema>;
     /** Some options may be required */
-    required?: string[];
+    required?: string[] | undefined;
 }
 
