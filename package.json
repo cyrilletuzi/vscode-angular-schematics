@@ -160,7 +160,7 @@
         "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",
         "compile": "webpack --no-performance",
         "watch": "webpack --watch --no-performance",
-        "test": "tsc -p ./ && node ./out/test/runTest.js",
+        "test": "tsc -p ./ --exactOptionalPropertyTypes false && node ./out/test/runTest.js",
         "ci:stable": "npm run test",
         "ci:insiders": "tsc -p ./ && node ./out/test/runTest.js --version insiders",
         "ci:minimal": "tsc -p ./ && node ./out/test/runTest.js --version 1.56.0",
