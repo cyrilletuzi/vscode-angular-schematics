@@ -47,19 +47,23 @@
         "commands": [
             {
                 "command": "ngschematics.generateComponent",
-                "title": "Angular: Generate a component"
+                "title": "Angular: Generate a component",
+                "enablement": "inAngularProject && !schematicspro"
             },
             {
                 "command": "ngschematics.generateService",
-                "title": "Angular: Generate a service"
+                "title": "Angular: Generate a service",
+                "enablement": "inAngularProject && !schematicspro"
             },
             {
                 "command": "ngschematics.generateModule",
-                "title": "Angular: Generate a module"
+                "title": "Angular: Generate a module",
+                "enablement": "inAngularProject && !schematicspro"
             },
             {
                 "command": "ngschematics.generate",
-                "title": "Angular: Generate another schematic"
+                "title": "Angular: Generate another schematic",
+                "enablement": "inAngularProject && !schematicspro"
             }
         ],
         "menus": {
@@ -67,22 +71,22 @@
                 {
                     "command": "ngschematics.generateComponent",
                     "group": "angularschematics@1",
-                    "when": "inAngularProject"
+                    "when": "inAngularProject && !schematicspro"
                 },
                 {
                     "command": "ngschematics.generateService",
                     "group": "angularschematics@2",
-                    "when": "inAngularProject"
+                    "when": "inAngularProject && !schematicspro"
                 },
                 {
                     "command": "ngschematics.generateModule",
                     "group": "angularschematics@3",
-                    "when": "inAngularProject"
+                    "when": "inAngularProject && !schematicspro"
                 },
                 {
                     "command": "ngschematics.generate",
                     "group": "angularschematics@4",
-                    "when": "inAngularProject"
+                    "when": "inAngularProject && !schematicspro"
                 }
             ]
         },
@@ -151,7 +155,7 @@
                 {
                     "id": "angular-schematics",
                     "name": "Schematics",
-                    "when": "inAngularProject"
+                    "when": "inAngularProject && !schematicspro"
                 }
             ]
         }
