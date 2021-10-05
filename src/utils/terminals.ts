@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { extensionName } from '../defaults';
+import { isSchematicsProActive } from './schematicspro';
 
 export class Terminals {
 
@@ -15,9 +16,17 @@ export class Terminals {
 
         this.closeEvent = vscode.window.onDidCloseTerminal((terminal) => {
 
-            if (terminal.name.startsWith(extensionName)) {
-                const key = terminal.name.substr(terminal.name.indexOf('-') + 2);
-                this.terminals.delete(key);
+            if (!isSchematicsProActive()) {
+
+                if (terminal.name.startsWith(extensionName)) {
+                    const key = terminal.name.substr(terminal.name.indexOf('-') + 2);
+                    this.terminals.delete(key);
+                }
+
+            } else {
+
+                this.closeEvent?.dispose();
+
             }
 
         });

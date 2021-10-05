@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { angularCollectionName, extensionName } from './defaults';
-import { Output, Terminals } from './utils';
+import { isSchematicsProActive, Output, Terminals } from './utils';
 import { Workspace } from './workspace';
 import { UserJourney } from './generation';
 import { SchematicsTreeDataProvider } from './view';
@@ -14,17 +14,33 @@ let treeDataProvider: vscode.TreeView<vscode.TreeItem> | undefined;
  */
 export function activate(context: vscode.ExtensionContext): void {
 
+    if (isSchematicsProActive()) {
+        return;
+    }
+
     Output.logInfo(`${extensionName} extension has been activated.`);
 
     /* Enable context menus */
     vscode.commands.executeCommand('setContext', 'inAngularProject', true).then(() => {}, () => {});
 
+    if (isSchematicsProActive()) {
+        return;
+    }
+
     /* Initialize all configurations */
     Workspace.init().catch(() => {});
 
+    if (isSchematicsProActive()) {
+        return;
+    }
+
     /* Add a new View with the list of all Angular schematics.
-     * Collections must be loaded to be able to load the view */
+    * Collections must be loaded to be able to load the view */
     Workspace.whenStable().then(() => {
+
+        if (isSchematicsProActive()) {
+            return;
+        }
 
         treeDataProvider = vscode.window.createTreeView('angular-schematics', {
             treeDataProvider: new SchematicsTreeDataProvider(),
@@ -35,24 +51,32 @@ export function activate(context: vscode.ExtensionContext): void {
 
     }).catch(() => {});
 
+    if (isSchematicsProActive()) {
+        return;
+    }
+
     Terminals.init();
 
+    if (isSchematicsProActive()) {
+        return;
+    }
+
     /*
-     * Register new commands. Important things:
-     * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
-     * - the callback parameters' values depends on how the command is trigerred:
-     *   - with a right click in Explorer: will a `Uri` object of the file or folder clicked
-     *   - with the Command Palette or the dedicated extension panel: `undefined`
-     *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name
-     */
+    * Register new commands. Important things:
+    * - each id (first parameter of `registerCommand()`) must be configured in `package.json`
+    * - the callback parameters' values depends on how the command is trigerred:
+    *   - with a right click in Explorer: will a `Uri` object of the file or folder clicked
+    *   - with the Command Palette or the dedicated extension panel: `undefined`
+    *   - from the dedicated extension panel: `undefined`, clicked schema's name, clicked collection's name
+    */
     context.subscriptions.push(
         vscode.commands.registerCommand('ngschematics.generateComponent', (contextUri?: vscode.Uri) => {
 
             Output.logInfo(`Starting journey to generate a component.`);
 
             /* For shortcuts, always use default official collection
-             * (default user collection can be set to something else,
-             * and this can be an issue when they are buggy like the Ionic ones) */
+            * (default user collection can be set to something else,
+            * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'component').catch(() => {});
 
         }),
@@ -61,8 +85,8 @@ export function activate(context: vscode.ExtensionContext): void {
             Output.logInfo(`Starting journey to generate a service.`);
 
             /* For shortcuts, always use default official collection
-             * (default user collection can be set to something else,
-             * and this can be an issue when they are buggy like the Ionic ones) */
+            * (default user collection can be set to something else,
+            * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'service').catch(() => {});
 
         }),
@@ -71,8 +95,8 @@ export function activate(context: vscode.ExtensionContext): void {
             Output.logInfo(`Starting journey to generate a module.`);
 
             /* For shortcuts, always use default official collection
-             * (default user collection can be set to something else,
-             * and this can be an issue when they are buggy like the Ionic ones) */
+            * (default user collection can be set to something else,
+            * and this can be an issue when they are buggy like the Ionic ones) */
             (new UserJourney()).start(contextUri, angularCollectionName, 'module').catch(() => {});
 
         }),

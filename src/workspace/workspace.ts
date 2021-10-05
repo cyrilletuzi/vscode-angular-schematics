@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { Output } from '../utils';
+import { isSchematicsProActive, Output } from '../utils';
 
 import { WorkspaceFolderConfig } from './workspace-folder';
 
@@ -49,15 +49,21 @@ export class Workspace {
         /* Listen if a workspace folder is added or removed */
         this.watcher = vscode.workspace.onDidChangeWorkspaceFolders((event) => {
 
-            for (const folder of event.added) {
-                Output.logInfo(`Loading configuration of new "${folder.name}" workspace folder.`);
-                this.add(folder).catch(() => {});
-            }
+            if (!isSchematicsProActive()) {
 
-            for (const folder of event.removed) {
-                Output.logInfo(`Unloading configuration of removed "${folder.name}" workspace folder.`);
-                this.folders.get(folder.name)?.disposeWatchers();
-                this.folders.delete(folder.name);
+                for (const folder of event.added) {
+                    Output.logInfo(`Loading configuration of new "${folder.name}" workspace folder.`);
+                    this.add(folder).catch(() => {});
+                }
+
+                for (const folder of event.removed) {
+                    Output.logInfo(`Unloading configuration of removed "${folder.name}" workspace folder.`);
+                    this.folders.get(folder.name)?.disposeWatchers();
+                    this.folders.delete(folder.name);
+                }
+
+            } else {
+                this.watcher.dispose();
             }
 
         });

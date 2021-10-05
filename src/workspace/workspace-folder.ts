@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Utils } from 'vscode-uri';
 
 import { angularCollectionName, angularConfigFileNames } from '../defaults';
-import { Output } from '../utils';
+import { isSchematicsProActive, Output } from '../utils';
 import { formatCliCommandOptions } from '../generation';
 
 import { Collections } from './schematics';
@@ -110,15 +110,23 @@ export class WorkspaceFolderConfig implements vscode.WorkspaceFolder {
         }
         for (const watcher of this.fileWatchers) {
             watcher.onDidChange(() => {
-                Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-                this.init().catch(() => { });
+                if (!isSchematicsProActive()) {
+                    Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
+                    this.init().catch(() => { });
+                } else {
+                    watcher.dispose();
+                }
             });
         }
 
         /* Watch Code preferences */
         this.preferencesWatcher = vscode.workspace.onDidChangeConfiguration(() => {
-            Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
-            this.init().catch(() => { });
+            if (!isSchematicsProActive()) {
+                Output.logInfo(`Reloading "${this.name}" workspace folder configuration.`);
+                this.init().catch(() => { });
+            } else {
+                this.preferencesWatcher?.dispose();
+            }
         });
 
     }
