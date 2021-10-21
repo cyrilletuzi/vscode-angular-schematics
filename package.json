@@ -176,7 +176,7 @@
         "openvsix": "ovsx publish angular-schematics-$npm_package_version.vsix -p $OPENVSIX_TOKEN"
     },
     "devDependencies": {
-        "@types/glob": "7.1.4",
+        "@types/glob": "7.2.0",
         "@types/minimist": "1.2.2",
         "@types/mocha": "9.0.0",
         "@types/node": "12.20.33",
