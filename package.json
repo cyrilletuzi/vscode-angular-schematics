@@ -186,7 +186,7 @@
         "eslint": "8.0.1",
         "glob": "7.2.0",
         "minimist": "1.2.5",
-        "mocha": "9.1.2",
+        "mocha": "9.1.3",
         "ovsx": "0.2.1",
         "ts-loader": "9.2.6",
         "typescript": "4.4.4",
