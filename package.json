@@ -189,7 +189,7 @@
         "mocha": "9.1.3",
         "ovsx": "0.2.1",
         "ts-loader": "9.2.6",
-        "typescript": "4.4.4",
+        "typescript": "4.5.2",
         "vsce": "2.3.0",
         "vscode-test": "1.6.1",
         "webpack": "5.64.1",
