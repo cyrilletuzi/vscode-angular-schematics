@@ -1,5 +1,13 @@
 # Change Log
 
+## [5.1.0] - 2021-11-18
+
+The documentation is now directly included in the extension via the VS Code walkthrough feature. You can access it at any time from the VS Code menu:
+1. View
+2. Command Palette
+3. search "Documentation"
+4. choose "Angular Schematics: Documentation and tutorial"
+
 ## [5.0.1] - 2021-10-05
 
 Internal changes only.

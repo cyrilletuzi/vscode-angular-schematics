@@ -13,9 +13,7 @@ Hi,
 
 # Checks before posting an issue
 
-- [ ] I have read _all_ the extension's documentation:
-  - [README](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/README.md)
-  - [TROUBLESHOOTING](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/docs/TROUBLESHOOTING.md)
+- [ ] I have read _all_ the documentation included in the extension itself as a walkthrough, including the troubleshooting guide (from the VS Code menu: View > Command Palette >search "Documentation" > choose "Angular Schematics: Documentation and tutorial")
 - [ ] I have checked in already:
   - [opened issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues)
   - [closed issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues?q=is%3Aissue+is%3Aclosed)

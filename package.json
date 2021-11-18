@@ -64,6 +64,11 @@
                 "command": "ngschematics.generate",
                 "title": "Angular: Generate another schematic",
                 "enablement": "inAngularProject && !schematicspro"
+            },
+            {
+                "command": "ngschematics.documentation",
+                "title": "Angular Schematics: Documentation and tutorial",
+                "enablement": "!schematicspro"
             }
         ],
         "menus": {
@@ -158,7 +163,93 @@
                     "when": "inAngularProject && !schematicspro"
                 }
             ]
-        }
+        },
+        "walkthroughs": [
+            {
+                "id": "angularschematics",
+                "title": "Angular Schematics documentation",
+                "description": "Learn how to use Angular Schematics.",
+                "steps": [
+                    {
+                        "id": "documentation",
+                        "title": "Documentation",
+                        "description": "Know how to find the documentation.",
+                        "media": {
+                            "markdown": "walkthroughs/documentation.md"
+                        }
+                    },
+                    {
+                        "id": "openfolder",
+                        "title": "Open Angular folder",
+                        "description": "Open an Angular project.\n[Open folder](command:vscode.openFolder)",
+                        "media": {
+                            "markdown": "walkthroughs/open-folder.md"
+                        },
+                        "completionEvents": [
+                            "onCommand:vscode.openFolder",
+                            "onContext:inAngularProject"
+                        ]
+                    },
+                    {
+                        "id": "scmclean",
+                        "title": "Check Git status",
+                        "description": "Be sure the Git status is clean.\n[Go to SCM view](command:workbench.view.scm)",
+                        "media": {
+                            "markdown": "walkthroughs/scm-clean.md"
+                        },
+                        "completionEvents": [
+                            "onCommand:workbench.view.scm"
+                        ]
+                    },
+                    {
+                        "id": "firstgeneration",
+                        "title": "First generation",
+                        "description": "Right-click on a folder and generate an Angular service.\n[Go to Explorer view](command:workbench.view.explorer)",
+                        "media": {
+                            "markdown": "walkthroughs/first-generation.md"
+                        },
+                        "completionEvents": [
+                            "onCommand:ngschematics.generateService"
+                        ]
+                    },
+                    {
+                        "id": "troubleshooting",
+                        "title": "Troubleshooting",
+                        "description": "A list of common configuration issues.",
+                        "media": {
+                            "markdown": "walkthroughs/troubleshooting.md"
+                        }
+                    },
+                    {
+                        "id": "generatecomponent",
+                        "title": "Generate a pure view component",
+                        "description": "Right-click on a folder and generate a pure view component.\n[Go to Explorer view](command:workbench.view.explorer)",
+                        "media": {
+                            "markdown": "walkthroughs/generate-component.md"
+                        },
+                        "completionEvents": [
+                            "onCommand:ngschematics.generateComponent"
+                        ]
+                    },
+                    {
+                        "id": "advanced",
+                        "title": "Advanced options",
+                        "description": "Learn about more advanced stuff.",
+                        "media": {
+                            "markdown": "walkthroughs/advanced.md"
+                        }
+                    },
+                    {
+                        "id": "schematicspro",
+                        "title": "Become a Pro",
+                        "description": "Get the Schematics Pro experience.\n[Learn more](https://www.schematicspro.dev)",
+                        "media": {
+                            "markdown": "walkthroughs/schematicspro.md"
+                        }
+                    }
+                ]
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "webpack --mode production --devtool hidden-source-map",

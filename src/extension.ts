@@ -107,6 +107,13 @@ export function activate(context: vscode.ExtensionContext): void {
             (new UserJourney()).start(contextUri, options?.collectionName, options?.schematicName).catch(() => {});
 
         }),
+        vscode.commands.registerCommand(`ngschematics.documentation`, () => {
+
+            vscode.commands.executeCommand('workbench.action.openWalkthrough', `cyrilletuzi.angular-schematics#angularschematics`).then(() => {
+                vscode.commands.executeCommand('walkthroughs.selectStep', `documentation`).then(() => {}, () => {});
+            }, () => {});
+
+        }),
     );
 
 }
