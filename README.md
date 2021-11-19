@@ -54,7 +54,7 @@ in the *VS Code* Terminal, the extension should work.
 
 **If the Angular CLI is not working in the *VS Code* Terminal, please correct that first *before* opening a GitHub issue.**
 
-The walkthrough includes a full troubleshooting guide to help you, be sure to read it in case of problem.
+The walkthrough includes a full [troubleshooting guide](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/walkthroughs/troubleshooting.md) to help you, be sure to read it in case of problem.
 
 ## Become a Pro!
 
