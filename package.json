@@ -222,8 +222,8 @@
                     },
                     {
                         "id": "generatecomponent",
-                        "title": "Generate a pure view component",
-                        "description": "Right-click on a folder and generate a pure view component.\n[Go to Explorer view](command:workbench.view.explorer)",
+                        "title": "Generate a component",
+                        "description": "Right-click on a folder and generate a component.\n[Go to Explorer view](command:workbench.view.explorer)",
                         "media": {
                             "markdown": "walkthroughs/generate-component.md"
                         },
