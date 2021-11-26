@@ -17,7 +17,9 @@ describe('Cli command', () => {
     let workspaceFolderCustomized: WorkspaceFolderConfig;
     let workspaceFolderAngularESLint: WorkspaceFolderConfig;
 
-    before(async () => {
+    before(async function () {
+
+        this.timeout(5000);
 
         workspaceFolderDefaults = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
         await workspaceFolderDefaults.init();
