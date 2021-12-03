@@ -1,5 +1,9 @@
 # Change Log
 
+## [5.1.1] - 2021-12-03
+
+Just updates to documentation.
+
 ## [5.1.0] - 2021-11-18
 
 The documentation is now directly included in the extension via the VS Code walkthrough feature. You can access it at any time from the VS Code menu:
