@@ -4,7 +4,7 @@
   "description": "",
   "license": "MIT",
   "devDependencies": {
-    "@angular/cli": "13.0.4",
-    "@schematics/angular": "13.0.4"
+    "@angular/cli": "13.1.0",
+    "@schematics/angular": "13.1.0"
   }
 }
