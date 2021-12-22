@@ -288,6 +288,6 @@
     },
     "dependencies": {
         "jsonc-parser": "3.0.0",
-        "vscode-uri": "3.0.2"
+        "vscode-uri": "3.0.3"
     }
 }
