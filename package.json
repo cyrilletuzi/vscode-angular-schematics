@@ -274,7 +274,7 @@
         "@types/vscode": "1.56.0",
         "@typescript-eslint/eslint-plugin": "5.8.1",
         "@typescript-eslint/parser": "5.8.1",
-        "eslint": "8.5.0",
+        "eslint": "8.6.0",
         "glob": "7.2.0",
         "minimist": "1.2.5",
         "mocha": "9.1.3",
