@@ -57,7 +57,7 @@ jobs:
 
     name: Test with VS Code stable on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 7
+    timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
@@ -84,7 +84,7 @@ jobs:
 
     name: Test with VS Code 1.56 on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 7
+    timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
@@ -112,7 +112,7 @@ jobs:
     name: Test with VS Code insiders on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: true
-    timeout-minutes: 7
+    timeout-minutes: 10
     steps:
     - uses: actions/checkout@v2
     - name: Setup Node
