@@ -19,7 +19,7 @@ describe('Cli command', () => {
 
     before(async function () {
 
-        this.timeout(5000);
+        this.timeout(10000);
 
         workspaceFolderDefaults = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
         await workspaceFolderDefaults.init();

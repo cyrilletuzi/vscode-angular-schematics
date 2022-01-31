@@ -16,7 +16,7 @@ describe('Workspace folder config', () => {
 
         before(async function () {
 
-            this.timeout(5000);
+            this.timeout(10000);
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             workspaceFolder = new WorkspaceFolderConfig(vscode.workspace.workspaceFolders![0]!);
