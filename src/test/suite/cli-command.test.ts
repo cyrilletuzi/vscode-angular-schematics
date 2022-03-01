@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as vscode from 'vscode';
 import * as path from 'path';
@@ -32,7 +33,7 @@ describe('Cli command', () => {
 
     });
 
-    it('Basic component', async () => {
+    it('Basic component', async (): Promise<void> => {
 
         const cliCommand = new CliCommand(workspaceFolderDefaults);
         cliCommand.setProjectName(rootProjectName);
