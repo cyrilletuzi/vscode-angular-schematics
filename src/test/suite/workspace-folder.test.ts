@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 import { describe, before, it } from 'mocha';
