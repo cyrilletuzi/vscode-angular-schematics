@@ -279,7 +279,7 @@
         "minimist": "1.2.5",
         "mocha": "9.2.1",
         "ovsx": "0.3.0",
-        "ts-loader": "9.2.6",
+        "ts-loader": "9.2.7",
         "typescript": "4.6.2",
         "vsce": "2.6.7",
         "vscode-test": "1.6.1",
