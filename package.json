@@ -63,7 +63,7 @@
             {
                 "command": "ngschematics.generate",
                 "title": "Angular: Generate another schematic",
-                "enablement": "inAngularProject && !schematicspro"
+                "enablement": "inAngularProject && !schematicspronocompatibility"
             },
             {
                 "command": "ngschematics.documentation",
@@ -91,7 +91,7 @@
                 {
                     "command": "ngschematics.generate",
                     "group": "angularschematics@4",
-                    "when": "inAngularProject && !schematicspro"
+                    "when": "inAngularProject && !schematicspronocompatibility"
                 }
             ]
         },
