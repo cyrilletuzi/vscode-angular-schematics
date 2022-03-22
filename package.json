@@ -276,7 +276,7 @@
         "@typescript-eslint/parser": "5.16.0",
         "eslint": "8.11.0",
         "glob": "7.2.0",
-        "minimist": "1.2.5",
+        "minimist": "1.2.6",
         "mocha": "9.2.2",
         "ovsx": "0.3.0",
         "ts-loader": "9.2.8",
