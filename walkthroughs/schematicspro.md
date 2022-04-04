@@ -10,6 +10,7 @@ So instead of throwing in the bin all my ideas that could greatly enhance the ev
 - more advanced features for Angular
 - schematics for other frameworks too: React, Vue, Ionic, Svelte, Stencil, Lit and more
 - easy and fast custom schematics creation
+- architecture automation
 
 **[Learn more about Schematics Pro](https://www.schematicspro.dev)**
 
