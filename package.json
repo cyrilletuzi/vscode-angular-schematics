@@ -69,6 +69,11 @@
                 "command": "ngschematics.documentation",
                 "title": "Angular Schematics: Documentation and tutorial",
                 "enablement": "!schematicspro"
+            },
+            {
+                "command": "ngschematics.showtree",
+                "title": "Angular Schematics: Show schematics list (internal command)",
+                "enablement": "!schematicspro"
             }
         ],
         "menus": {
@@ -164,6 +169,12 @@
                 }
             ]
         },
+        "viewsWelcome": [
+            {
+                "view": "angular-schematics",
+                "contents": "Thanks for using Angular Schematics.\nThis open source extension, used by 600 000 developers, is the result of months of unpaid work. Wanna help the author AND get more features?\nSchematics Pro is an improved version of this extension with:\n- more Angular features\n- support for React, Vue and more\n- easy and fast custom schematics creation\n- architecture automation\n[Learn about Schematics Pro](https://www.schematicspro.dev/)\n[Not now, show schematics list](command:ngschematics.showtree)"
+            }
+        ],
         "walkthroughs": [
             {
                 "id": "angularschematics",

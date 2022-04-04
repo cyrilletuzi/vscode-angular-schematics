@@ -1,1 +1,1 @@
-export { SchematicsTreeDataProvider } from './tree-data-provider';
+export { SchematicsTreeDataProvider, SchematicsTreeDataProviderEmpty } from './tree-data-provider';

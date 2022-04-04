@@ -4,7 +4,7 @@ import { angularCollectionName, extensionName } from './defaults';
 import { isSchematicsProActive, Output, Terminals } from './utils';
 import { Workspace } from './workspace';
 import { UserJourney } from './generation';
-import { SchematicsTreeDataProvider } from './view';
+import { SchematicsTreeDataProvider, SchematicsTreeDataProviderEmpty } from './view';
 
 let treeDataProvider: vscode.TreeView<vscode.TreeItem> | undefined;
 
@@ -43,11 +43,8 @@ export function activate(context: vscode.ExtensionContext): void {
         }
 
         treeDataProvider = vscode.window.createTreeView('angular-schematics', {
-            treeDataProvider: new SchematicsTreeDataProvider(),
+            treeDataProvider: new SchematicsTreeDataProviderEmpty(),
         });
-        treeDataProvider.message = `Hello! While this list is useful to see all the schematics available,
-        it is easier to launch a generation with a right-click on a folder in the Explorer,
-        as then the extension will infer the workspace folder, the path and the project.`;
 
     }).catch(() => {});
 
@@ -112,6 +109,16 @@ export function activate(context: vscode.ExtensionContext): void {
             vscode.commands.executeCommand('workbench.action.openWalkthrough', `cyrilletuzi.angular-schematics#angularschematics`).then(() => {
                 vscode.commands.executeCommand('walkthroughs.selectStep', `documentation`).then(() => {}, () => {});
             }, () => {});
+
+        }),
+        vscode.commands.registerCommand(`ngschematics.showtree`, () => {
+
+            treeDataProvider = vscode.window.createTreeView('angular-schematics', {
+                treeDataProvider: new SchematicsTreeDataProvider(),
+            });
+            treeDataProvider.message = `Below is a list of available schematics. Note
+            it's easier to launch a generation with a right-click on a folder in the Explorer,
+            as then the extension will infer the workspace folder, path and project.`;
 
         }),
     );

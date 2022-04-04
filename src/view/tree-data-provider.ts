@@ -3,10 +3,10 @@ import * as vscode from 'vscode';
 import { Workspace } from '../workspace';
 import { Collection } from '../workspace/schematics';
 
-export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+export class SchematicsTreeDataProviderEmpty implements vscode.TreeDataProvider<vscode.TreeItem> {
 
-    private iconPath: vscode.Uri;
-    private collections = new Map<string, Collection>();
+    iconPath: vscode.Uri;
+    collections = new Map<string, Collection>();
 
     constructor() {
 
@@ -20,7 +20,17 @@ export class SchematicsTreeDataProvider implements vscode.TreeDataProvider<vscod
         return element;
     }
 
-    getChildren(element?: vscode.TreeItem | undefined): vscode.TreeItem[] {
+    getChildren(): vscode.TreeItem[] {
+
+        return [];
+
+    }
+
+}
+
+export class SchematicsTreeDataProvider extends SchematicsTreeDataProviderEmpty {
+
+    override getChildren(element?: vscode.TreeItem | undefined): vscode.TreeItem[] {
 
         /* Primary level: collection's name */
         if (!element) {
