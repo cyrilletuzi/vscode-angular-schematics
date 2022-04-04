@@ -10,7 +10,7 @@ const informationMessages = [
     `This open source extension is the result of months of unpaid work. Wanna help AND get more features?`,
     `Ever dreamed to be able to generate files for React, Vue and other frameworks like you do for Angular?`,
     `Do you want to create your own advanced schematics in a just a few minutes?`,
-    `Tired of this dozen of messy imports in each file? What about entry files automation?`,
+    `Tired of this dozen messy imports in each file? What about entry files automation?`,
 ];
 
 function getRandomIntInclusive(min: number, max: number): number {
