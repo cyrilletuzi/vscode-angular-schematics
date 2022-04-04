@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { angularCollectionName, extensionName } from '../defaults';
-import { Output, FileSystem, Terminals } from '../utils';
+import { Output, FileSystem, Terminals, schematicsProInfo } from '../utils';
 import { Workspace, WorkspaceFolderConfig } from '../workspace';
 import { Collection, Schematic } from '../workspace/schematics';
 import { shortcutsConfirmationChoices, SHORTCUTS_CONFIRMATION_LABEL, MODULE_TYPE } from '../workspace/shortcuts';
@@ -11,6 +11,7 @@ import { CliCommandOptions, dasherize, formatCliCommandOptions } from './cli-opt
 
 export class UserJourney {
 
+    private extensionContext!: vscode.ExtensionContext;
     private static shortcutSchematics = ['component', 'service', 'module'];
     private workspaceFolder!: WorkspaceFolderConfig;
     private cliCommand!: CliCommand;
@@ -18,7 +19,9 @@ export class UserJourney {
     private collection!: Collection;
     private schematic!: Schematic;
 
-    async start(contextUri?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
+    async start(extensionContext: vscode.ExtensionContext, contextUri?: vscode.Uri, collectionName?: string, schematicName?: string): Promise<void> {
+
+        this.extensionContext = extensionContext;
 
         /* As the configurations are loaded in an async way, they may not be ready */
         try {
@@ -643,6 +646,8 @@ export class UserJourney {
             Terminals.back(this.workspaceFolder);
 
             Output.logInfo(`Command has succeeded! Check the Terminal for more details.`);
+
+            schematicsProInfo(this.extensionContext).catch(() => {});
 
             return;
 

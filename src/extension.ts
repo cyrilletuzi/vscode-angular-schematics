@@ -77,7 +77,7 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
             * (default user collection can be set to something else,
             * and this can be an issue when they are buggy like the Ionic ones) */
-            (new UserJourney()).start(contextUri, angularCollectionName, 'component').catch(() => {});
+            (new UserJourney()).start(context, contextUri, angularCollectionName, 'component').catch(() => {});
 
         }),
         vscode.commands.registerCommand('ngschematics.generateService', (contextUri?: vscode.Uri) => {
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
             * (default user collection can be set to something else,
             * and this can be an issue when they are buggy like the Ionic ones) */
-            (new UserJourney()).start(contextUri, angularCollectionName, 'service').catch(() => {});
+            (new UserJourney()).start(context, contextUri, angularCollectionName, 'service').catch(() => {});
 
         }),
         vscode.commands.registerCommand('ngschematics.generateModule', (contextUri?: vscode.Uri) => {
@@ -97,14 +97,14 @@ export function activate(context: vscode.ExtensionContext): void {
             /* For shortcuts, always use default official collection
             * (default user collection can be set to something else,
             * and this can be an issue when they are buggy like the Ionic ones) */
-            (new UserJourney()).start(contextUri, angularCollectionName, 'module').catch(() => {});
+            (new UserJourney()).start(context, contextUri, angularCollectionName, 'module').catch(() => {});
 
         }),
         vscode.commands.registerCommand('ngschematics.generate', (contextUri?: vscode.Uri, options?: { collectionName?: string, schematicName?: string }) => {
 
             Output.logInfo(`Starting journey to generate a schematics.`);
 
-            (new UserJourney()).start(contextUri, options?.collectionName, options?.schematicName).catch(() => {});
+            (new UserJourney()).start(context, contextUri, options?.collectionName, options?.schematicName).catch(() => {});
 
         }),
         vscode.commands.registerCommand(`ngschematics.documentation`, () => {

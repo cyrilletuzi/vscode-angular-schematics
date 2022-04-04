@@ -1,5 +1,9 @@
 # Change Log
 
+## [5.1.3] - 2022-04-04
+
+Interoperability with [Schematics Pro](https://www.schematicspro.dev/).
+
 ## [5.1.2] - 2022-03-14
 
 Interoperability with [Schematics Pro](https://www.schematicspro.dev/).
