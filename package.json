@@ -285,7 +285,7 @@
         "@typescript-eslint/eslint-plugin": "5.18.0",
         "@typescript-eslint/parser": "5.18.0",
         "eslint": "8.13.0",
-        "glob": "7.2.0",
+        "glob": "8.0.1",
         "minimist": "1.2.6",
         "mocha": "9.2.2",
         "ovsx": "0.3.0",
