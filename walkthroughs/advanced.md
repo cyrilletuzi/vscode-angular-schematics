@@ -66,10 +66,5 @@ By default, this extension detects the following schematics:
 - `primeng-schematics`
 - `@ngx-kit/collection`
 - `ngx-spec`
-- `./schematics/collection.json`
-
-Scanning all packages to find all potential schematics would be too slow.
-If you are a library author, you can open a Pull Request to easily add your schematics package in the
-[`src/defaults.ts`](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/src/defaults.ts).
 
 <br>
