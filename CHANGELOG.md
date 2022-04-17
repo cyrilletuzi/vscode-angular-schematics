@@ -1,9 +1,5 @@
 # Change Log
 
-## [5.1.4] - 2022-04-04
-
-Interoperability with [Schematics Pro](https://www.schematicspro.dev/).
-
 ## [5.1.0] - 2021-11-18
 
 The documentation is now directly included in the extension via the VS Code walkthrough feature. You can access it at any time from the VS Code menu:
@@ -34,28 +30,15 @@ Nothing should have changed for users, but there was a lot of internal changes
 about paths management. Please file an issue if needed,
 especially on Windows where path management is always a huge pain.
 
-## [4.13.0] - 2021-03-29
-
-### Feature
-
-Add `@ngneat/scam` schematics in defaults.
-
 ## [4.12.0] - 2021-03-17
 
 ### Feature
 
-Support schematics collections extending a whole other schematics collection (like `@nrwl/angular`).
+Support schematics collections extending a whole other schematics collection.
 
 Also, when a collection contains both its own schematics and inherits schematics from another collection,
 the schematics specific to the collection are sorted first in the user choices.
-It affects the schematics choice order for extended collections already supported previously
-(like `@ionic/angular-toolkit`).
-
-## [4.11.0] - 2021-03-08
-
-### Feature
-
-Add `@nrwl/angular` schematics in defaults.
+It affects the schematics choice order for extended collections already supported previously.
 
 ## [4.10.1] - 2021-02-09
 
@@ -250,57 +233,11 @@ And Angular projects can have different configurations
 Now every detail of the extension should be **aware of the Angular project** you are working in.
 This is especially good news for users doing an **Angular monorepo**.
 
-### Component types
-
-#### Fully customizable component types
-
-Default component types proposed when doing "Generate a component" are now fully customizable.
-
-For example, in your VS Code preferences
-(preferably your *workspace* preferences, so all your team can benefit):
-
-```json
-{
-  "ngschematics.componentTypes": [{
-    "label": "Angular Element",
-    "options": [["viewEncapsulation", "ShadowDom"], ["export", "true"]],
-    "detail": "Optional human description",
-  }]
-}
-```
-
-**Breaking change**: it means the previous `ngschematics.componentTypes`
-setting's format is not supported anymore.
-
-#### Library specific component types
-
-It was already partially done before, but the extension will now detect
-and propose these additional component types if the related libraries are installed:
-- Angular Material dialog
-- Angular Material snackbar
-- Angular Material bottomsheet
-- Ionic modal
-- Ionic popover
-- PrimeNG dynamic dialog
-
 #### Removed entry component type
 
 Previously, default suggested component types had an "Entry component" type.
 It has been removed as it is now officially deprecated in Angular CLI >= 9,
 and because detecting if your project has an old configuration was (really) too complicated and messy.
-
-Fortunately, with customizable component types explained above, you can still add it back
-(only needed if you have an Angular < 9 project or an Angular >= 9 project with Ivy manually disabled):
-
-```json
-{
-  "ngschematics.componentTypes": [{
-    "label": "Entry component",
-    "options": [["entryComponent", "true"], ["skipSelector", "true"]],
-    "detail": "Component instanciated at runtime, like a dialog or modal",
-  }]
-}
-```
 
 ### node_modules location
 
@@ -583,11 +520,7 @@ If you use on an older version of VS Code and run into issues, you can still ins
 ### Feature
 
 - Default support for these schematics:
-  - `@ngxs/schematics`
-  - `@nativescript/schematics`
   - `@ngx-formly/schematics`
-  - `primeng-schematics`
-  - `@ngx-kit/collection`
   - `ngx-spec`
 
 ## [1.18.0] - 2019-02-23
@@ -627,13 +560,6 @@ If you use on an older version of VS Code and run into issues, you can still ins
 ### Bug fix
 
 - Add `./schematics/collection.json` to the default auto-loaded collections
-
-## [1.12.0] - 2019-01-16
-
-### Feature
-
-- Local schematics are now supported, by adding a *relative* path in VS Code preferences
-(e.g.: `"ngschematics.schematics": ["./schematics/collection.json"]`)
 
 ## [1.11.4] - 2019-01-12
 
@@ -755,11 +681,6 @@ provided that your VS Code settings are configured accordingly
 
 ### Feature
 - Support `@angular/material` and `@ngrx/schematics` by default.
-
-## [0.3.0] - 2018-06-17
-
-### Feature
-- Support all other schematics via `ngschematics.schematics` setting.
 
 ## [0.1.0] - 2018-06-16
 
