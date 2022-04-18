@@ -1,5 +1,9 @@
 # Change Log
 
+## [5.1.6] - 2022-04-18
+
+Housekeeping.
+
 ## [5.1.0] - 2021-11-18
 
 The documentation is now directly included in the extension via the VS Code walkthrough feature. You can access it at any time from the VS Code menu:
@@ -268,8 +272,6 @@ While a today's Angular CLI project should have a `angular.json` file,
 the CLI still support other legacy file names. The extension now supports all of them, ie.:
 - `angular.json`
 - `.angular.json`
-- `angular-cli.json`
-- `.angular-cli.json`
 
 ### Support for non-Angular CLI projects
 
@@ -279,15 +281,6 @@ now the extension may still work, with limited features, if you met these minima
 - Angular CLI installed globally: `npm install @angular/cli -g`
 - Angular Schematics installed locally: `npm install @schematics/angular --save-dev`
 - Add an `angular.json` in your project with at least `{ "version": 1 }`
-
-### Easier contribution
-
-With time, the extension's code became quite messy.
-The code has been fully rewritten, reorganized and above all fully *documented*.
-
-Also, there are now tests, automatically launched by Github Actions.
-
-This is especially good news for **contributors**, which can now help more easily.
 
 ### UX
 
@@ -304,7 +297,7 @@ User experience has been improved everywhere it was possible. Non-exhaustive lis
 
 ### UX
 
-Fix mingled description for page / modals / dialogs component type
+Fix mingled description for page component type
 when `Page` suffix is used.
 
 ## [3.3.0] - 2020-02-20
@@ -334,32 +327,6 @@ to take advantage of the official and up to date Angular CLI schematics instead:
 { "cli": { "defaultCollection": "@ionic/angular-toolkit" } }
 ```
 
-## [3.2.1] - 2020-02-19
-
-### VS Code compact folders
-
-Revert automatic change of `compactFolders` setting introduced in 3.2.0,
-as some users reported it as invasive.
-
-You should consider disabling this setting by yourself in your VS Code *workspace* preferences:
-`"explorer.compactFolders": false`
-
-## [3.2.0] - 2020-02-15
-
-### VS Code compact folders
-
-Since [VS Code 1.41](https://code.visualstudio.com/updates/v1_41#_compact-folders-in-explorer),
-a new default behavior combines single folders together.
-
-While it might be a good idea in general, it is annoying with this extension,
-as clicking on the right directory where you want to generate something becomes more confusing.
-
-So the extension will disable this setting for you in `.vscode/settings.json`
-(only in Angular projects).
-
-If you want to keep the default VS Code behavior, just revert it:
-`"explorer.compactFolders": true`
-
 ## [3.1.0] - 2020-02-15
 
 ### UX improvements
@@ -385,10 +352,6 @@ while still being able to choose custom advanced options.
   in your `AppModule` but in each feature module where you need them
   (a feature to select the modules may come later).
 
-## [3.0.1] - 2020-01-13
-
-Just a documentation change, with info about [sponsorship](https://github.com/sponsors/cyrilletuzi/).
-
 ## [3.0.0] - 2020-01-02
 
 ### Breaking changes
@@ -401,11 +364,6 @@ As for now, there is no code change in the extension, so it will still work
 in older versions of VS Code and/or Angular,
 but it may break at any time in future 3.x releases.
 
-If you use an older version of VS Code and run into issues, you can still install
-([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)):
-- v2 of the extension for VS Code 1.39 & 1.40,
-- v1 of the extension for VS Code < 1.39.
-
 ## [2.3.2] - 2019-12-23
 
 ### Bug fix
@@ -417,13 +375,6 @@ If you use an older version of VS Code and run into issues, you can still instal
 ### Bug fix
 
 - Make guard type choice work with new Angular 9 schema
-
-## [2.3.0] - 2019-12-16
-
-### Feature
-
-- Auto-opening the component created now works with custom component types
-(introduced in Angular 9 and v2.1 of this extension)
 
 ## [2.2.2] - 2019-12-10
 
@@ -481,9 +432,6 @@ The extension will now correct this error automatically.
 
 As a consequence, this version now officially requires Visual Studio Code version >= 1.39.
 But it may work on some older VS Code versions too.
-
-If you use on an older version of VS Code and run into issues, you can still install v1 of the extension 
-([official instructions here](https://github.com/Microsoft/vscode/issues/12764#issuecomment-442370545)).
 
 ## [1.27.0] - 2019-09-08
 
@@ -574,37 +522,6 @@ If you use on an older version of VS Code and run into issues, you can still ins
 
 - Internal update of *dev* dependencies to fix a security issue reported by npm (does *not* concern you).
 
-## [1.11.2] - 2018-12-27
-
-### Bug fix
-
-- Make local CLI introduced by 1.11 work.
-
-## [1.11.1] - 2018-12-07
-
-### Bug fix
-
-- Make local CLI introduced by 1.11 work on Windows.
-
-## [1.11.0] - 2018-12-06
-
-### Feature
-
-- A global installation of Angular CLI is no longer needed,
-the extension will use the project's local CLI (if installed in the default directory, ie. `node_modules`).
-
-## [1.10.0] - 2018-10-29
-
-### Feature
-
-- Update Ionic schematics to the new package (thanks to @mhartington from Ionic team)
-
-## [1.9.0] - 2018-10-13
-
-### Feature
-
-- New component type for Angular 7: Element (see README for more info)
-
 ## [1.8.1] - 2018-09-25
 
 ### Feature
@@ -638,7 +555,6 @@ provided that your VS Code settings are configured accordingly
 ### Features
 - Support extended schematics.
 - If a `defaultCollection` is set in `angular.json`, it's now the first choice for quicker use.
-- Support `@ionic/angular-schematics` by default.
 
 ## [1.4.0] - 2018-07-25
 
