@@ -1,8 +1,8 @@
 # Change Log
 
-## [5.1.6] - 2022-04-18
+## [5.2.0] - 2022-05-03
 
-Housekeeping.
+Disable persistence for the terminal used by the extension, as it is useless and can lead to a misuse of the terminal (it must not be used by the user for other tasks, like `ng serve`, otherwise the extension cannot use it anymore).
 
 ## [5.1.0] - 2021-11-18
 
