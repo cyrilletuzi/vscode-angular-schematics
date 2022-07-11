@@ -53,18 +53,4 @@ It can be interesting for the following options:
   - `flat`
   - `skipTests`
 
-## Libraries schematics
-
-By default, this extension detects the following schematics:
-- `@schematics/angular` (official Angular CLI commands)
-- `@angular/material`
-- `@ionic/angular-toolkit`
-- `@ngrx/schematics`
-- `@ngxs/schematics`
-- `@nativescript/schematics`
-- `@ngx-formly/schematics`
-- `primeng-schematics`
-- `@ngx-kit/collection`
-- `ngx-spec`
-
 <br>

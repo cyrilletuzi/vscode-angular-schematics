@@ -158,13 +158,6 @@ when the target module is not in a parent folder of the new module.
 Some modules may not be imported immediately,
 so add a "Nowhere" choice when asking where to import a module of components.
 
-## [4.0.2] - 2020-04-15
-
-### Fix
-
-Angular Material has additional schematics in `@angular/cdk` package,
-so it has been added in the defaults detected schematics.
-
 ## [4.0.1] - 2020-04-14
 
 ### Fix
@@ -457,20 +450,6 @@ But it may work on some older VS Code versions too.
 
 - Ensure refresh of files explorer
 
-## [1.20.0] - 2019-03-01
-
-### Feature
-
-- Better pathname inference for `ngx-spec` schematics special case
-
-## [1.19.0] - 2019-03-01
-
-### Feature
-
-- Default support for these schematics:
-  - `@ngx-formly/schematics`
-  - `ngx-spec`
-
 ## [1.18.0] - 2019-02-23
 
 ### Feature
@@ -592,11 +571,6 @@ provided that your VS Code settings are configured accordingly
 
 ### Feature
 - Support multi-workspaces projects.
-
-## [0.4.0] - 2018-06-17
-
-### Feature
-- Support `@angular/material` and `@ngrx/schematics` by default.
 
 ## [0.1.0] - 2018-06-16
 
