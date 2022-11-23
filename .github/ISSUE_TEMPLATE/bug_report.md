@@ -40,7 +40,7 @@ Copy the result here
 
 # Description of the issue
 
-<!-- Be precise, a vague description will not allow to find the problem.. -->
+<!-- Be precise, a vague description will not allow to find the problem. Additionnaly, if there is an error (in terminal or "Angular Schematics" Output channel or else), please copy/paste it. -->
 
 # How to reproduce the issue
 
