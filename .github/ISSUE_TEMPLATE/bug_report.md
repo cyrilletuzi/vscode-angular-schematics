@@ -32,6 +32,7 @@ Hi,
 # Configuration
 
 - VS Code version: 
+- Extension version: 
 - OS: 
 - Are you using VS Code in normal mode or in a special mode (web version, WSL, SSH/remote, etc.): 
 - Angular version (`ng version`):
