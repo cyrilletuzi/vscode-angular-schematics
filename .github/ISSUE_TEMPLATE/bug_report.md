@@ -31,11 +31,11 @@ Hi,
 
 # Configuration
 
-- VS Code version: 
+- VS Code version (only the last version is supported): 
 - Extension version: 
 - OS: 
 - Are you using VS Code in normal mode or in a special mode (web version, WSL, SSH/remote, etc.): 
-- Angular version (`ng version`):
+- Angular version (`ng version`, only LTS versions are supported):
 ```
 Copy the result here
 ```

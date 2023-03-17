@@ -40,9 +40,9 @@ Note that after changing the default shell, you need to kill the "Angular Schema
 ### Requirements
 
 Using outdated versions of tools can cause issues, the minimal requirements are:
-- Node >= 12.20
-- VS Code >= 1.56
-- *all* Angular packages >= 10
+- Node >= 16.13
+- VS Code >= 1.71
+- *all* Angular packages >= 14
 
 <br>
 

@@ -47,7 +47,7 @@ or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Cod
 
 ## Requirements and troubleshooting
 
-This extension requires Visual Studio Code version >= 1.56.
+This extension requires the last version of Visual Studio Code.
 
 Basically, in your project, if `ng g component hello` works
 in the *VS Code* Terminal, the extension should work.
@@ -58,7 +58,7 @@ The walkthrough includes a full [troubleshooting guide](https://github.com/cyril
 
 ## Become a Pro!
 
-The Angular Schematics extension for Visual Studio Code started as a tool to help my trainees during the Angular courses I teach. It is now **used by 600 000 developers**.
+The Angular Schematics extension for Visual Studio Code started as a tool to help my trainees during the Angular courses I teach. It is now **used by 780 000 developers**.
 
 While still having a ton of automation ideas to increase productivity, good practices, optimization and architecture in Angular (and Ionic) projects, I have reached the limit of work I can do voluntarily (we are talking of *months* of full time *unpaid* work).
 
