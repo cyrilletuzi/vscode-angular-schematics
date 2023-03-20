@@ -1,5 +1,11 @@
 # Change Log
 
+## [5.3.0] - 2023-03-20
+
+- Dependencies update
+- Requires VS Code >= 1.71
+- Angular < 9 not supported
+
 ## [5.2.0] - 2022-05-03
 
 Disable persistence for the terminal used by the extension, as it is useless and can lead to a misuse of the terminal (it must not be used by the user for other tasks, like `ng serve`, otherwise the extension cannot use it anymore).
