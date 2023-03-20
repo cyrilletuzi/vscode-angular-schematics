@@ -44,6 +44,15 @@ Copy the result here
 
 <!-- Be precise, a vague description will not allow to find the problem. Additionnaly, if there is an error (in terminal or "Angular Schematics" Output channel or else), please copy/paste it. -->
 
+# Extension logs
+
+<!-- Any errors and warnings reported by the "Angular Schematics" Output channel, second tab left to the Terminal
+(or if no errors, the last operations reported) -->
+
+```
+Copy the result here
+```
+
 # How to reproduce the issue
 
 <!-- Most common scenarios have already been tested, so without reproduction steps I will not be able to help. -->
