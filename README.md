@@ -3,7 +3,7 @@
 ## Why this extension?
 
 Angular and Ionic are frameworks to build applications: it is a lot more work than just a few bits of jQuery.
-You have to create hundred of modules, components and services. There are 4 ways to do this
+You have to create hundred of components and services. There are 4 ways to do this
 (from the slowest to the quickest):
 - manually from scratch, rewriting all the boilerplate code everytime
 - via snippets: as they are static, there is still a lot to do manually

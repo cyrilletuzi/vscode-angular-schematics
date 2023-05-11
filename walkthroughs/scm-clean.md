@@ -4,7 +4,7 @@
 
 ## Check your Git status
 
-This extension uses Angular CLI to generate new components, services, modules, etc.
+This extension uses Angular CLI to generate new components, services, etc.
 
 While a generation mainly *add* new files, it can also *modify* existing files. For example, when generating a component, the nearest module file will be updated to add the component declaration in the `NgModule`.
 
