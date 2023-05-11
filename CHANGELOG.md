@@ -1,6 +1,6 @@
 # Change Log
 
-## [5.4.0] - 2023-08-11
+## [5.4.0] - 2023-05-11
 
 Shortcut for module generation has been removed.
 
