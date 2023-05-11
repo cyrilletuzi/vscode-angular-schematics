@@ -1,5 +1,13 @@
 # Change Log
 
+## [5.4.0] - 2023-08-11
+
+Shortcut for module generation has been removed.
+
+Standalone components are now supported in all LTS versions of Angular, Angular 16 has formalized the new standalone project structure (`ng new --standalone`), and standalone APIs have been promoted by the Angular team as the way forward.
+
+Note that if you still use NgModules, only the shortcut has been removed. You can still achieved module generation via "Generate another schematic".
+
 ## [5.3.0] - 2023-03-20
 
 - Dependencies update
