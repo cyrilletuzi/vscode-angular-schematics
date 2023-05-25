@@ -347,7 +347,7 @@ while still being able to choose custom advanced options.
 - Components types have been updated to match current simpler usages in last Angular versions:
   - Note that `--entry-component` is not required anymore for dialogs/modals since Angular 9.
   Dialogs/modals should now be generated as pages.
-  - Angular Element choice has been removed for now, as it's still experimental and
+  - Angular Element choice has been removed for now, as it is still experimental and
   not a common scenario currently. If you have a project for your Angular Elements,
   just set `viewEncapsulation` schematics default to `ShadowDom` in your `angular.json`.
 
@@ -408,12 +408,12 @@ Thanks to @kvetis for the report and debug.
 
 ### New powerful and customizable component types management
 
-In Angular, it's all about components, but there are very different kinds of components,
+In Angular, it is all about components, but there are very different kinds of components,
 and distinguishing the different behaviors is a good practice.
 
 This extension already promoted components good practices,
 but Angular CLI >= 9 adds a new `--type` option, and so we redesigned component types choice.
-Now it goes even further, it's customizable and you can even take advantage of it in previous Angular versions.
+Now it goes even further, it is customizable and you can even take advantage of it in previous Angular versions.
 
 As a consequence, the UI changed a little:
 **the order of suggested component types has changed, so be sure to not select the wrong type by error**.
@@ -547,7 +547,7 @@ provided that your VS Code settings are configured accordingly
 
 ### Features
 - Support extended schematics.
-- If a `defaultCollection` is set in `angular.json`, it's now the first choice for quicker use.
+- If a `defaultCollection` is set in `angular.json`, it is now the first choice for quicker use.
 
 ## [1.4.0] - 2018-07-25
 
@@ -557,7 +557,7 @@ provided that your VS Code settings are configured accordingly
 ## [1.3.1] - 2018-07-20
 
 ### Bug fix
-- Only activate the extension when `angular.json` or `.angular-cli.json` are in the root directory (as it's a requirement of the CLI itself).
+- Only activate the extension when `angular.json` or `.angular-cli.json` are in the root directory (as it is a requirement of the CLI itself).
 
 ## [1.3.0] - 2018-06-29
 

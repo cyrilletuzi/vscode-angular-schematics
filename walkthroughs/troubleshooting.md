@@ -29,7 +29,7 @@ Another solution: you can reinstall Angular CLI in the *VS Code* terminal direct
 
 ### Permission error on Windows
 
-By default on Windows, VS Code Terminal uses PowerShell, because it's better than the old cmd.exe. But in companies enforcing some security settings, PowerShell can be restricted.
+By default on Windows, VS Code Terminal uses PowerShell, because it is better than the old cmd.exe. But in companies enforcing some security settings, PowerShell can be restricted.
 
 While the ideal solution is to ask your administrator to configure the security settings correctly (a developer cannot work correctly without the right permissions), you can also [change the shell](command:workbench.action.terminal.selectDefaultShell) used by the VS Code Terminal (try cmd.exe for example, which is generally less restricted).
 
