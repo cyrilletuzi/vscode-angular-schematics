@@ -2,9 +2,7 @@
 
 ## Why this extension?
 
-Angular and Ionic are frameworks to build applications: it is a lot more work than just a few bits of jQuery.
-You have to create hundred of components and services. There are 4 ways to do this
-(from the slowest to the quickest):
+Angular and Ionic are frameworks to build applications: it is a lot more work than just a few bits of jQuery. You have to create hundred of components and services. There are 4 ways to do this (from the slowest to the quickest):
 - manually from scratch, rewriting all the boilerplate code everytime
 - via snippets: as they are static, there is still a lot to do manually
 - via Angular CLI: more powerful, but still tedious: you have to type a long and error-prone command line
@@ -22,18 +20,9 @@ So this extension will save you time:
 - No more typo errors
 - No more search in documentation: all options available are described
 
-### Good practices
-
-This extension also promotes **Angular good practices**,
-by improving component generation with the suggestion of different component types.
-To separate component types is good for:
-- the **architecture** of your project, ie. **maintainability** and **scalability**,
-- **performances**: pure components are optimized.
-
 ## Getting started
 
-Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics),
-or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code Extensions view.
+Follow instructions on [Visual Studio Code marketplace](https://marketplace.visualstudio.com/items?itemName=cyrilletuzi.angular-schematics), or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Code Extensions view.
 
 ## Documentation
 
@@ -49,8 +38,7 @@ or just search for "Angular schematics" by "Cyrille Tuzi" directly inside VS Cod
 
 This extension requires the last version of Visual Studio Code.
 
-Basically, in your project, if `ng g component hello` works
-in the *VS Code* Terminal, the extension should work.
+Basically, in your project, if `ng g component hello` works in the *VS Code* Terminal, the extension should work.
 
 **If the Angular CLI is not working in the *VS Code* Terminal, please correct that first *before* opening a GitHub issue.**
 
