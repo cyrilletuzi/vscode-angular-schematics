@@ -4,7 +4,7 @@
 
 ### Productivity!
 
-Angular and Ionic are frameworks to build applications: it is a lot more work than just a few bits of jQuery. You have to create hundred of components and services. There are 4 ways to do this (from the slowest to the quickest):
+Angular is a framework to build applications: it is a lot more work than just a few bits of jQuery. You have to create hundred of components and services. There are 4 ways to do this (from the slowest to the quickest):
 - manually from scratch, rewriting all the boilerplate code everytime
 - via snippets: as they are static, there is still a lot to do manually
 - via Angular CLI: more powerful, but still tedious: you have to type a long and error-prone command line
@@ -16,7 +16,7 @@ Angular and Ionic are frameworks to build applications: it is a lot more work th
 
 Also, inside a team, you can either decide that:
 - everyone do things the way they want, resulting in a big mess over time
-- decide the better way to do things, and share the same practices accross the team
+- decide the better way to do things, and share the same good practices accross the team
 
 ## Getting started
 
