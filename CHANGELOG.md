@@ -45,13 +45,14 @@ A lot of effort has also been put in a whole new documentation, accessible direc
 
 ### 💎 Pro edition
 
-While this extension is very popular, with nearly 1 million installations, it is not a tool developed by the Angular team or affiliated to Google in any way.
+While this extension is very popular, with nearly 1 million installations, it is *not* a tool developed by the Angular team or affiliated to Google in any way.
 
 It is months of *unpaid* work by a single contributor.
 
 So you will see some new features marked with a diamond 💎. It means they are only available in the new Pro edition, which requires a paid subscription, so I could continue my contributions.
 
 Enjoy advanced features and support a contributor at the same time! 💖
+
 - additional schematics (page, reactive services, unit tests,...)
 - advanced options (imports for standalone components, entry files exports,...)
 - legacy schematics (components with NgModules, class guards,...)
