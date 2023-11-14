@@ -1,21 +1,14 @@
-The MIT License
+Copyright (c) 2021-2023 Cyrille Tuzi
 
-Copyright (c) 2018-2023 Cyrille Tuzi
+This software (the "Software") contains 2 parts:
+- a free one
+- a paid one, called the "Pro Edition"
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The usage of the Pro edition and associated documentation files is granted on the basis of a paid subscription, in the conditions mentioned on the website:
+https://cyrilletuzi.gumroad.com/l/schematicspro
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The usage of the Pro edition of the Software is limited to the duration of the subscription.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+Permission to copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software (both the free part and the Pro edition part) is DENIED.
+
+THE SOFTWARE (BOTH THE FREE PART AND THE PRO EDITION PART) IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

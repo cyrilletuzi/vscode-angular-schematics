@@ -37,7 +37,7 @@ Also, for its own sake, the extension now uses its own configuration. But you ca
 
 ### Documentation
 
-A lot of effort has also been put in a whole new documentation, accessible directly inside Visual Studio Code. You can access it at any time from the Angular logo on the left sidebar, or in the VS Code menu:
+A lot of effort has also been put in a whole new documentation, accessible directly inside Visual Studio Code. Please take a few minutes to read it. You can access it at any time from the Angular logo on the left sidebar, or in the VS Code menu:
 1. View
 2. Command Palette
 3. search "Documentation"
