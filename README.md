@@ -1,4 +1,4 @@
-# Angular schematics extension for Visual Studio Code
+# Angular Schematics extension for Visual Studio Code
 
 ## Why this extension?
 
