@@ -45,9 +45,9 @@ While this extension is very popular, with nearly **1 million installations**, i
 
 It is months of *unpaid* work by a single contributor.
 
-So you will see some new features marked with a diamond 💎. It means they are only available in the new Pro edition, which requires a paid subscription, so I could continue my contributions.
+So you will see some new features marked with a diamond 💎. It means they are only available in the Pro edition.
 
-Enjoy advanced features and support a contributor at the same time! 💖
+Feel free to enjoy advanced features and support a contributor at the same time! 💖
 
 - additional schematics (page, reactive services, unit tests,...)
 - advanced options (imports for standalone components, entry files exports,...)
@@ -57,7 +57,9 @@ Enjoy advanced features and support a contributor at the same time! 💖
 
 You will find details about all these features directly in the extension documention.
 
-💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro)** 💎
+💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/angular-renaissance)** 💎
+
+And to celebrate the Angular renaissance, price is currently 50% off. 🎉
 
 ## Release Notes
 
