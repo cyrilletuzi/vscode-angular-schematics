@@ -1,8 +1,8 @@
 ---
-name: Pro edition - New standalone import
+name: New standalone import
 about: Ask a new import to be added in the list for standalone components
-title: ''
-labels: 'pro-edition-imports'
+title: 'New standalone import: '
+labels: ["pro-edition", "standalone-import"]
 assignees: ''
 
 ---
