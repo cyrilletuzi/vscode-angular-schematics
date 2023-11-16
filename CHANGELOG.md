@@ -1,6 +1,6 @@
 # Change Log
 
-## [6.0.0] - 2023-11-14
+## [6.0.0] - 2023-11-16
 
 Last week was the Angular renaissance, what about a renaissance of this extension? This is a major update and the beginning of a new journey.
 
