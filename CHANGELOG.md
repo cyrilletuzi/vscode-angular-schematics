@@ -1,8 +1,11 @@
 # Change Log
 
-## [6.0.5] - 2023-11-17
+## [6.0.7] - 2023-11-17
 
-Fixes a VS Code issue where the custom schematic creation command would fail in multi-workspaces projects.
+Fixes:
+- a VS Code issue where the custom schematic creation command would fail in multi-workspaces projects
+- standalone components imports picker not showing in projects without a valid `angular.json`
+- some Pro edition features (like standalone components imports picker) still locked despite having activated a license
 
 ## [6.0.0] - 2023-11-16
 
