@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.0.5] - 2023-11-17
+
+Fixes a VS Code issue where the custom schematic creation command would fail in multi-workspaces projects.
+
 ## [6.0.0] - 2023-11-16
 
 Last week was the Angular renaissance, what about a renaissance of this extension? This is a major update and the beginning of a new journey.
