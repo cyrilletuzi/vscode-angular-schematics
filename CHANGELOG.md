@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.0.8] - 2023-11-19
+
+Better Pro edition onboarding:
+- places with "Try the Pro edition" are cleaned up once your license is activated
+- a "Create a custom schematic" button has been added in the sidebar panel, accessible from the Angular logo in the left sidebar
+
 ## [6.0.7] - 2023-11-17
 
 Fixes:
