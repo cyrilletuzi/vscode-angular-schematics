@@ -1,5 +1,37 @@
 # Change Log
 
+## [6.2.0] - 2023-11-20
+
+In addition to Material, PrimeNg and Ionic, a lot of third-party libraries have been to the standalone components imports picker in the Pro edition:
+- @ngx-translate/core
+- @ng-select/ng-select
+- @ng-bootstrap/ng-bootstrap
+- ngx-bootstrap
+- @asymmetrik/ngx-leaflet
+- @ngxs/form-plugin
+- angular-gridster2
+- highcharts-angular
+- ng-zorro-antd
+- ng2-charts
+- ng2-dragula
+- ng2-file-upload
+- ngx-clipboard
+- ngx-color-picker
+- ngx-countdown
+- ngx-echarts
+- ngx-file-drop
+- ngx-highlightjs
+- ngx-infinite-scroll
+- ngx-pagination
+- ngx-quill
+- ngx-spinner
+
+No preferences here, I just found a list of the most installed Angular libraries, and added the ones that are still maintained and with an understandable documentation. If your favorite library is missing, just ask in [GitHub issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/new/choose), with the "Pro edition - New standalone import" form.
+
+## [6.1.0] - 2023-11-19
+
+In Angular >= 17 projects, components styles have been simplified as a string instead of an array. If you want to stick to array styles, a `stylesArray` option has been added to component and page schematics.
+
 ## [6.0.8] - 2023-11-19
 
 Better Pro edition onboarding:
