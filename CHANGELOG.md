@@ -1,5 +1,19 @@
 # Change Log
 
+## [6.3.2] - 2023-12-04
+
+Look for package.json in nested subfolders too. It fixes the "No schematic match this project" error in projects where the front-end app is in a sub-sub-folder, like ASP.NET projects.
+
+## [6.3.0] - 2023-11-29
+
+Added `skipStyle` option for component and page schematics, which can be useful if your project uses Tailwind CSS.
+
+It can be set in a click with the configuration helper, accessible from the Angular logo in the left sidebar.
+
+## [6.2.3] - 2023-11-29
+
+Fixes a bug in component with NgModule schematic where `skipChangeDetectionOnPush` was not honored.
+
 ## [6.2.0] - 2023-11-20
 
 In addition to Material, PrimeNg and Ionic, a lot of third-party libraries have been to the standalone components imports picker in the Pro edition:
