@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.4.0] - 2023-12-05
+
+Added back `sass` and `less` values for `style` option of component and page schematics. It will also be picked when using "Copy settings from angular.json" in the configuration helper.
+
 ## [6.3.2] - 2023-12-04
 
 Look for package.json in nested subfolders too. It fixes the "No schematic match this project" error in projects where the front-end app is in a sub-sub-folder, like ASP.NET projects.
