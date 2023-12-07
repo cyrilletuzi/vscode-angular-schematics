@@ -1,5 +1,15 @@
 # Change Log
 
+## [6.5.0] - 2023-12-07
+
+angular.json configuration management has been enhanced:
+- angular.json in a subfolder is now supported
+- rely on `sourcePath`, as not all projects respect the `app` or `lib` source subfolder
+
+It means:
+- "Copy angular.json settings" in the configuration helper now works in more scenarios
+- "Limited generation" warning should happen less frequently and only when relevant
+
 ## [6.4.0] - 2023-12-05
 
 Added back `sass` and `less` values for `style` option of component and page schematics. It will also be picked when using "Copy settings from angular.json" in the configuration helper.
