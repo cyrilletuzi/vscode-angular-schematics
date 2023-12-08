@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.6.0] - 2023-12-08
+
+"Copy angular.json settings" in the configuration helper now takes into account settings from some alternative schematics (like `@ionic/angular-toolkit`).
+
 ## [6.5.0] - 2023-12-07
 
 angular.json configuration management has been enhanced:
