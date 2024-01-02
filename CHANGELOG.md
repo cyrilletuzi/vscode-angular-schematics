@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.7.0] - 2024-01-02
+
+Add Kendo Angular modules in imports list when generating a standalone component.
+
 ## [6.6.0] - 2023-12-08
 
 "Copy angular.json settings" in the configuration helper now takes into account settings from some alternative schematics (like `@ionic/angular-toolkit`).
