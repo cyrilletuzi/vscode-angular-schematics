@@ -57,9 +57,9 @@ Feel free to enjoy advanced features and support a contributor at the same time!
 
 You will find details about all these features directly in the extension documention.
 
-💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/angular-renaissance)** 💎
+💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/1million)** 💎
 
-And to celebrate the Angular renaissance, price is currently 50% off. 🎉
+⚡️ To celebrate 1 million installations, the Pro edition is currently 50% off for a limited time.
 
 ## Release Notes
 
