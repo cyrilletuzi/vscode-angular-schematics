@@ -49,7 +49,7 @@ So you will see some new features marked with a diamond 💎. It means they are 
 
 Feel free to enjoy advanced features and support a contributor at the same time! 💖
 
-- additional schematics (page, reactive services, unit tests,...)
+- additional schematics (page, reactive services, Material, unit tests,...)
 - advanced options (imports for standalone components, entry files exports,...)
 - legacy schematics (components with NgModules, class guards,...)
 - custom schematics in a much simpler way than with the Angular CLI
