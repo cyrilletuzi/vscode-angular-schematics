@@ -1,5 +1,64 @@
 # Change Log
 
+## [6.16.0] - 2024-10-13
+
+- Alternative way to access the documentation in alternative editors like Cursor which do no support the VS Code "walkthrough" feature.
+
+## [6.15.1] - 2024-09-28
+
+- In the Pro edition, fix a case where prefix is not asked when creating a custom schematic, resulting in an inadequate schematic id like `-component`.
+- In the Pro edition, fix a case where custom schematics' file names were incorrect, like `some-name..component.ts`, when suffix is empty.
+
+## [6.15.0] - 2024-09-27
+
+In the Pro edition, simplify the Angular Material schematic, and promote it to stable.
+
+## [6.14.0] - 2024-09-27
+
+### Features
+
+- Preparation for standalone components being the default in Angular 19.
+- VS Code >= 1.92 is now required. The extension may still work in older versions, but they are not tested anymore.
+
+### Bug fix
+
+- Fixes an issue which was breaking the "Create a custom schematic" button in the Pro edition, and the generation from the Command Palette.
+
+## [6.13.0] - 2024-08-07
+
+New schematics for Angular Material in the Pro edition:
+- type safe dialog,
+- type safe table.
+
+The Angular Material table schematic is in beta for now, because it uses Angular features like input signals which are still in developer preview. Feedback is welcome on GitHub Discussions about this schematic.
+
+## [6.12.0] - 2024-08-05
+
+New schematic for routes in the Pro edition. Note that:
+- they are lazy-loaded by default, but you can use the configuration helper to use eager-loading instead
+- as a consequence, legacy schematic for routes with NgModule has been renamed from `angular-module-routing` to `angular-routes`
+
+## [6.11.2] - 2024-08-03
+
+1 million installations celebration! If you did not try the Pro edition yet, now is the time.
+
+## [6.10.0] - 2024-08-01
+
+VS Code >= 1.90 is now required. The extension may still work in older versions, but they are not tested anymore.
+
+In the Pro edition, default schematics options now support Angular CLI monorepos, they can be configured per-Angular project. As usual, use the configuration helper.
+
+## [6.9.0] - 2024-02-02
+
+When generating a standalone component:
+- imports list now includes Ionic standalone components and directives for projects using Ionic Angular >= 7.5 ([official documentation here](https://ionicframework.com/docs/angular/build-options#standalone))
+
+## [6.8.0] - 2024-02-02
+
+When generating a standalone component:
+- imports list now includes Material standalone components and directives for projects using Material >= 17.1 (note it was a very tedious manual and error-prone work, if you think some component or directive is missing or erroneous, please file an issue on GitHub)
+- imports list is sorted better
+
 ## [6.7.0] - 2024-01-02
 
 Add Kendo Angular modules in imports list when generating a standalone component.
