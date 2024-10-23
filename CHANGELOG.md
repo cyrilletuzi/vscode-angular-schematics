@@ -1,5 +1,9 @@
 # Change Log
 
+## [6.17.0] - 2024-10-23
+
+Preparation for standalone components being the default in Angular 19.
+
 ## [6.16.0] - 2024-10-13
 
 - Alternative way to access the documentation in alternative editors like Cursor which do no support the VS Code "walkthrough" feature.
