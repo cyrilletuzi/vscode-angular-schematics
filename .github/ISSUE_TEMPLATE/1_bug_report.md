@@ -17,7 +17,7 @@ Hi,
 - [ ] I have checked in already:
   - [opened issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues)
   - [closed issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues?q=is%3Aissue+is%3Aclosed)
-  - [questions answered](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/categories/q-a) in the new "Discussions" tab
+  - [questions answered](https://github.com/cyrilletuzi/vscode-angular-schematics/discussions/categories/q-a?discussions_q=category%3AQ%26A+) in the new "Discussions" tab
 - [ ] My project meets the requirements indicated in README
 - [ ] My workspace is in [trusted mode](https://code.visualstudio.com/docs/editor/workspace-trust), not restricted mode
 - [ ] I looked at the extension's logs ("Angular Schematics" Output channel, second tab left to the Terminal), and tried to fix my project's configuration accordingly
