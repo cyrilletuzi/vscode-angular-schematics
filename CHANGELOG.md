@@ -1,5 +1,10 @@
 # Change Log
 
+## [6.18.0] - 2024-11-17
+
+- Support for standalone components being the default in Angular 19.
+- Remove the default `CommonModule` import in standalone components in the free edition.
+
 ## [6.17.0] - 2024-10-23
 
 Preparation for standalone components being the default in Angular 19.
