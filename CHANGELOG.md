@@ -1,5 +1,16 @@
 # Change Log
 
+## [6.19.0] - 2024-12-08
+
+Add the following imports in the Pro edition:
+- Angular Material 19 `MatTimepicker` (and related)
+- Ionic 8 `IonInputPasswordToggle`
+- all PrimeNG 18 standalone components and directives
+- PrimeNG 17.12 `InputOtpModule`, `StepperModule`
+- PrimeNG 17.9 `MeterGroupModule`, `FloatLabelModule`, `InputIconModule`, `IconFieldModule`
+- PrimeNG 17.0 `InputGroupModule`, `InputGroupAddonModule`
+- all NG-Zorro 17.1 standalone components and directives
+
 ## [6.18.0] - 2024-11-17
 
 - Support for standalone components being the default in Angular 19.
