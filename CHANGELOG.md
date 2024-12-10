@@ -1,15 +1,27 @@
 # Change Log
 
+## [6.20.0] - 2024-12-10
+
+Add the following imports in the Pro edition:
+- ngx-translate v16 standalone directive and pipe
+- ng-select v13.7 standalone component
+- all ngx-bootstrap v18.1 standalone components and directives
+- all Kendo v16.6 standalone components and directives
+- ngxs/form-plugin v18 standalone directive
+- ng2-chart v6 standalone directive
+- ngx-highlightjs v10 standalone directives
+- ngx-quill v21 standalone components
+
 ## [6.19.0] - 2024-12-08
 
 Add the following imports in the Pro edition:
-- Angular Material 19 `MatTimepicker` (and related)
-- Ionic 8 `IonInputPasswordToggle`
-- all PrimeNG 18 standalone components and directives
-- PrimeNG 17.12 `InputOtpModule`, `StepperModule`
-- PrimeNG 17.9 `MeterGroupModule`, `FloatLabelModule`, `InputIconModule`, `IconFieldModule`
-- PrimeNG 17.0 `InputGroupModule`, `InputGroupAddonModule`
-- all NG-Zorro 17.1 standalone components and directives
+- Angular Material v19 `MatTimepicker` (and related)
+- Ionic v8 `IonInputPasswordToggle`
+- all PrimeNG v18 standalone components and directives
+- PrimeNG v17.12 `InputOtpModule`, `StepperModule`
+- PrimeNG v17.9 `MeterGroupModule`, `FloatLabelModule`, `InputIconModule`, `IconFieldModule`
+- PrimeNG v17.0 `InputGroupModule`, `InputGroupAddonModule`
+- all NG-Zorro v17.1 standalone components and directives
 
 ## [6.18.0] - 2024-11-17
 

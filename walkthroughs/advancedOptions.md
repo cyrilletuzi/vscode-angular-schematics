@@ -23,20 +23,20 @@ The Pro edition allows you to directly pick the components, directives and pipes
 
 Currently, it supports:
 - Angular (NgIf, NgFor, RouterLink, FormsModule,...)
-- Ionic module and standalone components
-- Material modules and standalone components
-- PrimeNG modules
-- Kendo Angular modules
-- @ngx-translate/core
-- @ng-select/ng-select
+- Ionic (module and standalone)
+- Material (module and standalone)
+- PrimeNG (module and standalone)
+- Kendo Angular (module and standalone)
+- @ngx-translate/core (module and standalone)
+- @ng-select/ng-select (module and standalone)
 - @ng-bootstrap/ng-bootstrap
-- ngx-bootstrap
+- ngx-bootstrap (module and standalone)
 - @asymmetrik/ngx-leaflet
-- @ngxs/form-plugin
+- @ngxs/form-plugin (module and standalone)
 - angular-gridster2
 - highcharts-angular
-- ng-zorro-antd
-- ng2-charts
+- ng-zorro-antd (module and standalone)
+- ng2-charts (module and standalone)
 - ng2-dragula
 - ng2-file-upload
 - ngx-clipboard
@@ -44,10 +44,10 @@ Currently, it supports:
 - ngx-countdown
 - ngx-echarts
 - ngx-file-drop
-- ngx-highlightjs
+- ngx-highlightjs (module and standalone)
 - ngx-infinite-scroll
 - ngx-pagination
-- ngx-quill
+- ngx-quill (module and standalone)
 - ngx-spinner
 
 And if your project uses other Angular libraries you would like to be added, just ask in [GitHub issues](https://github.com/cyrilletuzi/vscode-angular-schematics/issues/new/choose), with the "Pro edition - New standalone import" form!
