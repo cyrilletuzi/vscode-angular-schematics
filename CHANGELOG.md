@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.21.0] - 2024-12-11
+
+Add the following imports in the Pro edition:
+- AG Grid (module and standalone)
+- AG Charts (module and standalone)
+
 ## [6.20.0] - 2024-12-10
 
 Add the following imports in the Pro edition:

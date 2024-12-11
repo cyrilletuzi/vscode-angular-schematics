@@ -21,6 +21,7 @@ Currently, it supports:
 - Kendo Angular (module and standalone)
 - @ngx-translate/core (module and standalone)
 - @ng-select/ng-select (module and standalone)
+- AG Grid and AG Charts (module and standalone)
 - @ng-bootstrap/ng-bootstrap
 - ngx-bootstrap (module and standalone)
 - @asymmetrik/ngx-leaflet
