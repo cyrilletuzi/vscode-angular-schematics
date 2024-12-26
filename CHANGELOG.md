@@ -1,5 +1,15 @@
 # Change Log
 
+## [6.22.0] - 2024-12-26
+
+In the Pro edition, you can now disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
+
+This option allows to partly align with the upcoming [new Angular style guide](https://gist.github.com/jelbourn/0158b02cfb426e69c172db4ec92e3c0c), being discussed in [this RFC](https://github.com/angular/angular/discussions/58412).
+
+It has also been the standard in some design systems libraries since always, like Angular Material itself (it is `MatButton`, not `MatButtonComponent`).
+
+As usual, use the configuration helper to set this option.
+
 ## [6.21.0] - 2024-12-11
 
 Add the following imports in the Pro edition:

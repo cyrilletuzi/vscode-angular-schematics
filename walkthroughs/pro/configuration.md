@@ -13,6 +13,7 @@ Some common options can be customized in a one click with the configuration help
 - Disable block CSS display
 - Enable shadow DOM
 - Set the selector prefix
+- Disable classes suffixes 💎
 - Force NgModules 💎
 - Force class interceptors 💎
 - Force class guards and resolvers 💎
@@ -140,6 +141,16 @@ If you want a different one, this is the only setting for which the extension us
 </details>
 
 But it requires a *valid and official* `angular.json`, which is not the case in all projects. Only such cases, set the selector prefix via the extension configuration helper. It will be global to the workspace.
+
+<br>
+
+## 💎 [Disable classes suffixes](command:angular-schematics.configuration)
+
+In the Pro edition, you can disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
+
+This option allows to partly align with the upcoming [new Angular style guide](https://gist.github.com/jelbourn/0158b02cfb426e69c172db4ec92e3c0c), being discussed in [this RFC](https://github.com/angular/angular/discussions/58412).
+
+It has also been the standard in some design systems libraries since always, like Angular Material itself (it is `MatButton`, not `MatButtonComponent`).
 
 <br>
 
