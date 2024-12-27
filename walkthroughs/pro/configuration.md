@@ -144,9 +144,15 @@ But it requires a *valid and official* `angular.json`, which is not the case in 
 
 <br>
 
-## 💎 [Disable classes suffixes](command:angular-schematics.configuration)
+## 💎 Enable classes prefixes
 
-In the Pro edition, you can disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
+In your Pro edition, you can enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
+
+<br>
+
+## 💎 Disable classes suffixes
+
+In your Pro edition, you can disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
 
 This option allows to partly align with the upcoming [new Angular style guide](https://gist.github.com/jelbourn/0158b02cfb426e69c172db4ec92e3c0c), being discussed in [this RFC](https://github.com/angular/angular/discussions/58412).
 

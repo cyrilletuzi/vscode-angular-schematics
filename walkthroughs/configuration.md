@@ -146,6 +146,12 @@ But it requires a *valid and official* `angular.json`, which is not the case in 
 
 <br>
 
+## 💎 Enable classes prefixes
+
+In the Pro edition, you can enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
+
+<br>
+
 ## 💎 Disable classes suffixes
 
 In the Pro edition, you can disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.

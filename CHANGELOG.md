@@ -1,5 +1,11 @@
 # Change Log
 
+## [6.23.0] - 2024-12-27
+
+In the Pro edition, you can now enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
+
+As usual, use the configuration helper to set this option.
+
 ## [6.22.0] - 2024-12-26
 
 In the Pro edition, you can now disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
