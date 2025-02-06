@@ -37,7 +37,14 @@ Follow instructions on [Visual Studio Code marketplace](https://marketplace.visu
 
 ## Requirements
 
-The extension is tested with the last 2 versions of Visual Studio Code. It may work with previous versions but it is not guaranteed.
+The extension:
+- is tested with the last 2 versions of Visual Studio Code
+- should work in the same versions of editors based on VS Code like VSCodium
+- should work in the last version of Cursor
+
+It may work with previous versions but it is not guaranteed.
+
+Note that alternative editors may not support all the features of VS Code (for example, Cursor does not support walkthroughs, which serve as documentation in this extension).
 
 ### 💎 Pro edition
 
