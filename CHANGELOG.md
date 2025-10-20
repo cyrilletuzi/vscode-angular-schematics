@@ -1,5 +1,43 @@
 # Change Log
 
+## [7.0.0] - 2025-10-20
+
+### New naming conventions
+
+Angular 20 changed the naming conventions for class and file names:
+- no more class and file names suffix for components, directives and services:
+  - `ProductCardComponent` in `product-card.component.ts` => `ProductCard` in `product-card.ts`
+  - `ProductApiService` in `product-api.service.ts` => `ProductApi` in `product-api.ts`
+  - `MissingProductDirective` in `missing-product.directive.ts` => `MissingProduct` in `missing-product.ts`
+- suffix kept for the other concepts, but file name suffix separator changed from `.` to `-`:
+  - `CustomDatePipe` in `custom-date.pipe.ts` => `CustomDatePipe ` in `custom-date-pipe.ts`
+  - `ProductsPage` in `products.page.ts` => `ProductsPage ` in `products-page.ts`
+  - `authInterceptor` in `auth.interceptor.ts` => `authInterceptor ` in `auth-interceptor.ts`
+  - `authGuard` in `auth.guard.ts` => `authGuard ` in `auth-guard.ts`
+  - `dataResolver` in `data.resolver.ts` => `dataResolver ` in `data-resolver.ts`
+
+Angular refers to these 2 different naming conventions as:
+- the former 2016 style guide, up to Angular 19
+- the new 2025 style guide, which is the default since Angular 20
+
+**This extension now follows the new naming conventions by default.** But you can switch back to the legacy naming conventions in one click with the configuration helper (it must be done in each workspace).
+
+**As a reminder, this extension is not developed by the Angular team or affiliated to Google in any way. It is months of unpaid work by a single contributor. So if you do not like this change, I am not responsible for it, and again, you can switch back to the previous behavior.**
+
+"Copy settings from angular.json" will take into account `type` and `typeSeparator` options (which are automatically added when migrating an Angular 19 project to Angular 20 via `ng update`).
+
+Pro edition users can additionnaly:
+- set custom suffixes
+- set a suffix only for the class name but not for the file name
+- set a suffix only for the file name but not for the class name
+
+Also for the Pro edition users having custom schematics with `suffix`, a new `fileNameSuffix` property is introduced for the `schematic.json` configuration. For backward compatibility, it defaults to `.suffix`, but this behavior may be removed in the future. **It is strongly recommended to add an explicit `fileNameSuffix` to all your `schematic.json` using `suffix`.**
+
+### Other changes
+
+- `skipClassSuffix` option for components, directives and services is removed, as it is now the default behavior
+- Angular ESLint suffixes management (both in the configuration helper and the `angularEslintComponentSuffix` feature for custom schematics) is removed as it does not make sense anymore and as `angular-eslint` removed the rule from the recommended set in version 20
+
 ## [6.23.0] - 2024-12-27
 
 In the Pro edition, you can now enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.

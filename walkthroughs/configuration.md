@@ -3,6 +3,7 @@
 Some common options can be customized in a one click with the configuration helper:
 
 - Copy settings from angular.json
+- Use legacy naming conventions ⚙️
 - Enable SCSS, Sass or Less styles ⚙️
 - Disable styles ⚙️
 - Enable external HTML templates ⚙️
@@ -13,7 +14,6 @@ Some common options can be customized in a one click with the configuration help
 - Disable block CSS display ⚙️
 - Enable shadow DOM ⚙️
 - Set the selector prefix ⚙️
-- Disable classes suffixes 💎
 - Force NgModules 💎
 - Force class interceptors 💎
 - Force class guards and resolvers 💎
@@ -41,12 +41,40 @@ This extension stores the configuration in VS Code *workspace* settings. It mean
 ## Copy settings from angular.json
 
 This extension uses its own configuration. But if you have an *official and valid* `angular.json` with some `schematics` settings, the extension can copy them. It should detect the following settings:
+- legacy naming conventions (`type` and `typeSeparator`)
 - SCSS, Sass or Less styles
 - no style
 - external HTML templates
 - single file components (SFC)
 - change detection optimization
 - shadow DOM
+
+<br>
+
+## Use legacy naming conventions
+
+Angular 20 changed the naming conventions for class and file names:
+- no more class and file names suffix for components, directives and services:
+  - `ProductCardComponent` in `product-card.component.ts` => `ProductCard` in `product-card.ts`
+  - `ProductApiService` in `product-api.service.ts` => `ProductApi` in `product-api.ts`
+  - `MissingProductDirective` in `missing-product.directive.ts` => `MissingProduct` in `missing-product.ts`
+- suffix kept for the other concepts, but file name suffix separator changed from `.` to `-`:
+  - `CustomDatePipe` in `custom-date.pipe.ts` => `CustomDatePipe ` in `custom-date-pipe.ts`
+  - `ProductsPage` in `products.page.ts` => `ProductsPage ` in `products-page.ts`
+  - `authInterceptor` in `auth.interceptor.ts` => `authInterceptor ` in `auth-interceptor.ts`
+  - `authGuard` in `auth.guard.ts` => `authGuard ` in `auth-guard.ts`
+  - `dataResolver` in `data.resolver.ts` => `dataResolver ` in `data-resolver.ts`
+
+Angular refers to these 2 different naming conventions as:
+- the former 2016 style guide, up to Angular 19
+- the new 2025 style guide, which is the default since Angular 20
+
+Since its version 7, this extension follows the new naming conventions by default. But you can switch back to the legacy naming conventions.
+
+💎 Pro edition users can additionnaly (manually):
+- set custom suffixes
+- set a suffix only for the class name but not for the file name
+- set a suffix only for the file name but not for the class name
 
 <br>
 
@@ -149,16 +177,6 @@ But it requires a *valid and official* `angular.json`, which is not the case in 
 ## 💎 Enable classes prefixes
 
 In the Pro edition, you can enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
-
-<br>
-
-## 💎 Disable classes suffixes
-
-In the Pro edition, you can disable automatic classes suffixes, for example to generate `SomeButton` instead of `SomeButtonComponent`, or `SomeApiClient` instead of `SomeApiClientService`.
-
-This option allows to partly align with the upcoming [new Angular style guide](https://gist.github.com/jelbourn/0158b02cfb426e69c172db4ec92e3c0c), being discussed in [this RFC](https://github.com/angular/angular/discussions/58412).
-
-It has also been the standard in some design systems libraries since always, like Angular Material itself (it is `MatButton`, not `MatButtonComponent`).
 
 <br>
 

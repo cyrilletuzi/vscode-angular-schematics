@@ -54,7 +54,7 @@ The extension uses Handlebars (`.hbs` files) as the templating syntax, which is 
 
 Available expressions:
 - `{{name}}`               hello-world (raw user input)
-- `{{fileName}}`           hello-world or hello-world.suffix (kebab-cased user input)
+- `{{fileName}}`           hello-world or hello-worldfileNameSuffix (kebab-cased user input)
 - `{{className}}`          HelloWorld or HelloWorldSuffix (PascalCased user input)
 - `{{camelName}}`          helloWorld or helloWorldSuffix (camelCased user input)
 - `{{options.someOption}}` value of an option defined in schematic.json
@@ -100,10 +100,21 @@ Optional properties:
 - `description`: directly visible below the schematic label
 - `tooltipDescription`: displayed when the user click on the "?" icon
 - `pathSubfolder`: should the new files be generated directly inside the destination path (example: /path/to/hello-world.component.ts), which is the default, or inside a subfolder (example: path/to/hello-world/hello-world.component.ts), which is often a better option when multiple files are generated
-- `suffix`: lowercased suffix for file and class names (example: "component" suffix will result in hello-world.component file name and HelloWorldComponent class name)
 - `dependenciesRequired`: dependencies required to enable this schematic (example: ["@angular/core"]), it only makes sense if you share schematics between projects (otherwise if you create a schematic for a specific project, you already know you want to activate it)
 - `features`: list of special features enabled for this schematic, see below
 - `options`: list of options configurable by the user, see below
+
+### Suffixes
+
+2 optional properties allow to configure the suffix:
+- `suffix`: lowercased suffix for the entity (class or else) name (example: "component" will result in HelloWorldComponent `className` or "guard" will result in helloWorldGuard `camelName`)
+- `fileNameSuffix`: full suffix for the file name, including the separator (example: ".component" or "-component")
+
+While it is recommended to be consistent with the same suffix for the class and file names, there are 2 different options to allow to define only one of them (for example, add a suffix to the file name but not to the class).
+
+Note that for backward compatibility, if `suffix` is defined and `fileNameSuffix` is not defined, the later will default to `.suffix`:
+- but do not rely on this implicit behavior which may be deleted in the future, set an explicit `fileNameSuffix`
+- if you want a `suffix` but no `fileNameSuffix`, set the later to an empty string
 
 <br>
 
@@ -237,11 +248,6 @@ Options reserved: `export`
 <summary>angular</summary>
 
 Should be enabled for all Angular schematics. Activates low-level Angular features, like checking the generation is done in a project configured in `angular.json`.
-</details>
-<details>
-<summary>angularEslintComponentSuffix</summary>
-
-Should be enabled for Angular component schematics using a `suffix` different from "component" (example: "page"). If Angular ESLint is installed, it will automatically configure it to allow this suffix.
 </details>
 <details>
 <summary>angularAddComponentRoute</summary>
