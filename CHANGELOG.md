@@ -1,5 +1,9 @@
 # Change Log
 
+## [7.1.0] - 2025-12-11
+
+VS Code >= 1.105 is now required (and thus Cursor >= 2.1.32). The extension may still work in older versions, but they are not tested anymore.
+
 ## [7.0.0] - 2025-10-20
 
 ### New naming conventions
