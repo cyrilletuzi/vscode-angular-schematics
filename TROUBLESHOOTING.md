@@ -23,8 +23,7 @@ The first time you open a new folder in VS Code, you are asked if you trust the 
 This extension will only display the schematics and options relevant to your project. It does so by detecting the dependencies (for example `@angular/core`) in `package.json`. It will look into:
 - `package.json` at the root of the opened folder
 - `package.json` in parent folders of the opened folder (monorepo case)
-
-So your project should be opened at the right level, meaning the root of the opened folder should be where `package.json` and other configuration files are located.
+- `package.json` in nested subfolders (like .NET or Java projects)
 
 Only if you have a special configuration and nothing else is possible, you can use the configuration helper to force the dependencies detected.
 
