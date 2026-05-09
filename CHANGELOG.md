@@ -1,5 +1,78 @@
 # Change Log
 
+## [8.0.3] - 2026-05-09
+
+### New Angular 22 `@Service` decorator
+
+Angular 22 introduces a new `@Service()` decorator, aimed at replacing most of `@Injectable()`. The `angular-service` schematic will now use it when available (it requires Angular >= 22 stable to be installed and detected).
+
+If you prefer to still use `@Injectable()`, use the new `angular-injectable` schematic.
+
+### Change detection OnPush by default in Angular 22
+
+OnPush change detection is now the default in Angular 22. The extension was already setting OnPush by default from quite some time now. So no change from the user side for this extension, but you will notice things when generating components in Angular >= 22 projects:
+- no more `changeDetection: ChangeDetectionStrategy.OnPush`, as it is already the default
+- if you enabled the `skipChangeDetectionOnPush` option, it will now generate `changeDetection: ChangeDetectionStrategy.Eager`
+
+### Signal forms
+
+`FormRoot` and `FormField` have been added to the imports choices (it requires Angular >= 22 stable to be installed and detected).
+
+### ngOnInit()
+
+Angular is now zoneless by default, enforcing signals, so `ngOnInit()` is not required anymore, even in pages. So the `angular-page` schematic does not include `ngOnInit()` by default anymore, and the `skipNgOnInit` option has been removed in favor of `ngOnInit`, to be consistent with other schematics.
+
+You can enable back `ngOnInit` in pages in just a few clicks with the configuration helper.
+
+### Lazy-loading
+
+First, the routes schematic is fixed when lazy-loading.
+
+Second, previously, both pages and routes were generated with lazy-loading by default (with options to disable it). It was due to historical reasons (the routes schematics did not exist at first).
+
+But while lazy-loading is a good practice, too much lazy-loading becomes a bad one. It must be done either at routes level, or at page level, but probably not at both levels.
+
+So now it is still done at routes level, but not at page level anymore by default (the `eagerLoading` option is true by default). You can use the configuration helper to switch to page level lazy-loading if your prefer, or disable lazy-loading.
+
+### Unit test
+
+The `angular-unit-test` schematic has been updated to align with current Angular practices, and will now be displayed in projects using `vitest`.
+
+### Selector for pages and dialogs
+
+It was initially considered a good practice to omit the selector for pages and dialogs, because these components are not meant to be called as HTML tags.
+
+But since some versions of Angular, in some cases, not having a unique selector can result in the [NG0912](https://angular.dev/errors/NG0912) error (which, most of the times, have no actual consequence).
+
+So the extension will continue to not generate a selector by default for pages and dialogs, but introduces a new `selectorPrefix` for the `angular-page` and `angular-material-dialog` schematics. When set, a selector will be generated.
+
+Note that while it is the same option name as for components, directives and pipes, the one for pages and dialogs is _not_ shared with other schematics. It allows to set a different prefix. For example, choose `private` or `page` (instead of the default `app`), and then you get the best of both worlds:
+- the NG0912 error is avoided
+- but it is explicit they are special components that should not be used as HTML tags
+
+As always, use the configuration helper to configure that in a few clicks.
+
+Also note that if the project uses Angular ESLint, it requires configuration to allow it:
+```json
+{
+  "@angular-eslint/component-selector": ["error", {
+    "type": "element",
+    "prefix": ["app", "private"],
+    "style": "kebab-case"
+  }]
+}
+```
+
+### Angular ARIA
+
+The new Angular ARIA directives have been added to the imports choices (when `@angular/aria` is installed and detected).
+
+### Formatting
+
+It is just about spaces, but since Angular 20, Prettier is installed and configured in new projects, which comes with some formatting defaults. The extension is now aligned.
+
+Also, formatting settings should be respected in more cases (but note that due to VS Code and TypeScript APIs limitations, it is not possible to be reliable at 100% in this domain; the formatter of the project should do its job after the files generation).
+
 ## [7.1.0] - 2025-12-11
 
 VS Code >= 1.105 is now required (and thus Cursor >= 2.1.32). The extension may still work in older versions, but they are not tested anymore.
