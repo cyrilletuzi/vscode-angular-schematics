@@ -109,6 +109,7 @@ Be careful to not to define overlapping paths, otherwise the first match will be
 The list of schematics ids will be suggested on autocomplete, but here is a full list:
 
 - angular-service
+- angular-injectable
 - angular-component
 - angular-page
 - angular-directive

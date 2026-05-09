@@ -31,7 +31,7 @@ OTo activate these schematics, force class interceptors in the configuration hel
 
 ## Class guards and resolvers
 
-If your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet. Note [class guards and resolvers are officially deprecated](https://angular.io/guide/deprecations#router-class-and-injection-token-guards) by Angular and planned for removal.
+If your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet.
 
 To activate these schematics, force class guards and resolvers in the configuration helper.
 

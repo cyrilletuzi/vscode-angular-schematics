@@ -8,12 +8,13 @@ Some common options can be customized in a one click with the configuration help
 - Disable styles
 - Enable external HTML templates
 - Enable single file components (SFC)
-- Enable or disable ngOnInit
+- Enable ngOnInit
 - Disable change detection optimization
-- Disable lazy loading
+- Lazy-loading mode
 - Disable block CSS display
 - Enable shadow DOM
-- Set the selector prefix
+- Set the components selector prefix
+- Set the pages and dialogs selector prefix 💎
 - Force NgModules 💎
 - Force class interceptors 💎
 - Force class guards and resolvers 💎
@@ -106,27 +107,25 @@ Some may want to go even further with single file components (inline HTML, inlin
 
 <br>
 
-## Enable or disable ngOnInit
+## Enable ngOnInit
 
-By default in this extension:
-- components does not include `ngOnInit()` (because most pure components should not handle such logic)
-- pages includes `ngOnInit()` (because pages have to handle logic)
+By default in this extension, components do not include `ngOnInit()`, because Angular is now zoneless by default, where `ngOnInit()` is generally not required because of signals.
 
-But you can enable or disable ngOnInit() as you wish.
+But you can enable ngOnInit() as you wish.
 
 <br>
 
 ## Disable change detection optimization
 
-With the introduction of signals in Angular 16, the good practice is to optimize the change detection strategy of all components and pages to `OnPush`.
+With the introduction of signals in Angular 16, the good practice is to optimize the change detection strategy of all components and pages to `OnPush`. And it is now the default in Angular >= 22.
 
 If your project uses Angular <=15, or if you or your team are not yet comfortable with these topics, you can disable the change detection optimization in pages and/or in components.
 
 <br>
 
-## Disable lazy loading
+## Lazy-loading mode
 
-By default, for better application performances, pages are generated as lazy loaded components. But you can disable lazy loading.
+By default, lazy-loading is used at routes level. But you can switch to page level lazy-loading or disable lazy-loading.
 
 <br>
 
@@ -142,7 +141,7 @@ For projects ready to use native shadow DOM view encapsulation.
 
 <br>
 
-## Set the selector prefix
+## Set the components selector prefix
 
 Angular default prefix selector for components, directives and pipes is `app`.
 
@@ -172,9 +171,15 @@ But it requires a *valid and official* `angular.json`, which is not the case in 
 
 <br>
 
+## 💎 Set the pages and dialogs selector prefix
+
+By default, pages and Material dialogs schematics do not generate a selector. To enable it, set a specific selector prefix for pages and/or for dialogs.
+
+<br>
+
 ## 💎 Enable classes prefixes
 
-In your Pro edition, you can enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
+In your Pro edition, you can enable automatic classes prefixes. It is useful when doing a library of components.
 
 <br>
 
@@ -192,7 +197,7 @@ In your Pro edition, if your project uses Angular <=14 or is not ready for funct
 
 ## 💎 Class guards and resolvers
 
-In your Pro edition, if your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet. Note [class guards and resolvers are officially deprecated](https://angular.io/guide/deprecations#router-class-and-injection-token-guards) by Angular and planned for removal.
+In your Pro edition, if your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet.
 
 <br>
 

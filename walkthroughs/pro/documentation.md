@@ -10,6 +10,11 @@ It should be used only in this case. Otherwise, the integrated documentation in 
 3. search "Documentation"
 4. choose "Angular Schematics: Documentation and tutorial"
 
+**Please take a few minutes to follow the basics:**
+- first generation
+- troubleshooting
+- configuration
+
 ## Pro edition 💎
 
 You have subscribed to the Pro edition, thank you! 💖

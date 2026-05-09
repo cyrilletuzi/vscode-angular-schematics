@@ -22,6 +22,7 @@ With the Pro edition, you can **generate spec files only when relevant**: just r
 The current unit test schematic supports:
 - Jasmine
 - Jest
+- Vitest
 
 <br>
 

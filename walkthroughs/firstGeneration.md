@@ -8,7 +8,7 @@ Let us generate a very basic class file.
 
 While this extension mainly *add* new files, it can also *modify* existing files. For example, when generating an Angular page, the nearest routing file will be updated to add the route.
 
-So before launching a new generation, **it is strongly recommended to check that the Git status is clean** (or any other Source Control Manager), which means there is no uncommitted files.
+So before launching a new generation, **it is strongly recommended to check that the Git status, which means there is no uncommitted files.
 
 It will allow you to easily and quickly revert the generation if needed.
 
@@ -66,7 +66,7 @@ You can now try any other schematics:
 - legacy component, directive and pipe with NgModules
 - legacy class guard, resolver and interceptor
 - Material (dialog, table)
-- Jasmine / Jest unit test
+- unit test (jasmine / jest / vitest)
 
 If you do not see some schematics, see the troubleshooting guide in the next walkthrough step.
 

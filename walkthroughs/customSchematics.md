@@ -77,12 +77,10 @@ Template example:
 ```hbs
 import { Injectable } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
-export class {{className}} {
-
-  constructor() {}
-
-}
+@Injectable({
+  providedIn: 'root',
+})
+export class {{className}} {}
 ```
 
 <br>
@@ -253,8 +251,6 @@ Should be enabled for all Angular schematics. Activates low-level Angular featur
 <summary>angularAddComponentRoute</summary>
 
 For Angular page component schematic, will ask and add a route in the closest `.routes.ts` or `-routing.module.ts` file.
-
-By default, the page will be lazy-loaded (`loadComponent`).
 
 Options reserved: `route`, `eagerLoading`
 </details>

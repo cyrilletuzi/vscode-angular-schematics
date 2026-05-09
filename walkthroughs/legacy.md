@@ -41,14 +41,13 @@ Once your Pro edition license is activated, force class interceptors in the conf
 
 ## Class guards and resolvers
 
-If your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet. Note [class guards and resolvers are officially deprecated](https://angular.io/guide/deprecations#router-class-and-injection-token-guards) by Angular and planned for removal.
+If your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet.
 
 Once your Pro edition license is activated, force class guards and resolvers in the configuration helper.
 
 <br>
 
 💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/1million)** 💎
-
 <br>
 
 ## Other guides

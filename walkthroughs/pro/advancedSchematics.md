@@ -10,11 +10,15 @@ Your Pro edition subscription includes the following additional schematics:
 
 ## Page
 
-How often did you forget to associate your page component to a route? It is the most missing schematic of the Angular CLI, and your Pro edition brings it to you.
+How often did you forget to associate your page component to a route? It is the most missing schematic of the Angular CLI, and the Pro edition brings it to you.
 
 The page schematic adds a special `Page` component type, with a `route` option to automatically add the route.
 
-By default, for better application performances, pages are generated as lazy loaded components. But you can disable lazy loading in the configuration helper.
+<br>
+
+## Routes
+
+By default, for better application performances, routes are generated with lazy-loading. But you can disable lazy-loading in the configuration helper, or set it at the page-level instead.
 
 <br>
 

@@ -15,6 +15,7 @@ Your Pro edition allows you to directly pick the components, directives and pipe
 
 Currently, it supports:
 - Angular (NgIf, NgFor, RouterLink, FormsModule,...)
+- Angular ARIA directives
 - Ionic (module and standalone)
 - Material (module and standalone)
 - PrimeNG (module and standalone)

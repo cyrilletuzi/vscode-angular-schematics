@@ -14,6 +14,7 @@ With your Pro edition, you can **generate spec files only when relevant**: just 
 The current unit test schematic supports:
 - Jasmine
 - Jest
+- Vitest
 
 <br>
 
@@ -28,5 +29,6 @@ The current unit test schematic supports:
 - [Legacy features 💎](./legacy.md)
 - [Custom schematics 💎](./customSchematics.md)
 - [Predefined paths 💎](./predefinedPaths.md)
+
 
 <br>
