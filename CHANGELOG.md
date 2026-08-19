@@ -1,5 +1,11 @@
 # Change Log
 
+## [8.1.0] - 2026-08-19
+
+- VS Code >= 1.125 is now required. The extension may still work in older versions, but they are not tested anymore.
+- fix: missing closing tag in material schematic
+- update js-yaml to 5.3.0 to fix vulnerability
+
 ## [8.0.3] - 2026-05-09
 
 ### New Angular 22 `@Service` decorator
