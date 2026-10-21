@@ -3,24 +3,17 @@
 Some common options can be customized in a one click with the configuration helper:
 
 - Copy settings from angular.json
-- Use legacy naming conventions ⚙️
-- Enable SCSS, Sass or Less styles ⚙️
-- Disable styles ⚙️
-- Enable external HTML templates ⚙️
-- Enable single file components (SFC) ⚙️
-- Enable ngOnInit ⚙️
-- Disable change detection optimization ⚙️
-- Lazy-loading mode ⚙️
-- Disable block CSS display ⚙️
-- Enable shadow DOM ⚙️
-- Set the components selector prefix ⚙️
-- Set the pages and dialogs selector prefix 💎
-- Force NgModules 💎
-- Force class interceptors 💎
-- Force class guards and resolvers 💎
-- Disabled predefined schematics 💎
-
-⚙️ = configurable per Angular project in the Pro edition 💎
+- Use legacy naming conventions
+- Enable SCSS, Sass or Less styles
+- Disable styles
+- Enable external HTML templates
+- Enable single file components (SFC)
+- Enable ngOnInit
+- Disable change detection optimization
+- Lazy-loading mode
+- Disable block CSS display
+- Enable shadow DOM
+- Set the components selector prefix
 
 
 **You can access the configuration helper at any time from the Angular logo on the left sidebar**,  or from the VS Code menu:
@@ -72,11 +65,6 @@ Angular refers to these 2 different naming conventions as:
 - the new 2025 style guide, which is the default since Angular 20
 
 Since its version 7, this extension follows the new naming conventions by default. But you can switch back to the legacy naming conventions.
-
-💎 Pro edition users can additionnaly (manually):
-- set custom suffixes
-- set a suffix only for the class name but not for the file name
-- set a suffix only for the file name but not for the class name
 
 <br>
 
@@ -174,56 +162,10 @@ But it requires a *valid and official* `angular.json`, which is not the case in 
 
 <br>
 
-## 💎 Set the pages and dialogs selector prefix
-
-By default, pages and Material dialogs schematics do not generate a selector. To enable it, set a specific selector prefix for pages and/or for dialogs.
-
-<br>
-
-## 💎 Enable classes prefixes
-
-In the Pro edition, you can enable automatic classes prefixes, for example to generate `MatButtonComponent` instead of `ButtonComponent` (given "mat" is set as the selector prefix). It is useful when doing a library of components.
-
-<br>
-
-## 💎 Force NgModules
-
-In the Pro edition, if your project uses Angular <=13 or is not ready for standalone components yet.
-
-<br>
-
-## 💎 Class interceptors
-
-In the Pro edition, if your project uses Angular <=14 or is not ready for functional interceptors yet.
-
-<br>
-
-## 💎 Class guards and resolvers
-
-In the Pro edition, if your project uses Angular <=14.1 or is not ready for functional guards and resolvers yet.
-
-<br>
-
-## 💎 Disable predefined schematics
-
-In the Pro edition, if some of the predefined schematics do not suit your project, you can disable them, and even replace them with your own custom schematics.
-
-<br>
-
-💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/1million)** 💎
-
-<br>
-
 ## Other guides
 
 - [Documentation homepage](./documentation.md)
 - [First generation](./firstGeneration.md)
 - [Troubleshooting](./troubleshooting.md)
-- [Additional schematics 💎](./advancedSchematics.md)
-- [Advanced options 💎](./advancedOptions.md)
-- [Legacy features 💎](./legacy.md)
-- [Custom schematics 💎](./customSchematics.md)
-- [Test schematics 💎](./testing.md)
-- [Predefined paths 💎](./predefinedPaths.md)
 
 <br>

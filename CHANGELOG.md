@@ -1,5 +1,9 @@
 # Change Log
 
+## [8.2.0] - 2026-10-21
+
+Maintenance release, no new feature.
+
 ## [8.1.0] - 2026-08-19
 
 - VS Code >= 1.125 is now required. The extension may still work in older versions, but they are not tested anymore.
@@ -375,10 +379,6 @@ Feel free to enjoy advanced features and support a contributor at the same time!
 - predefined paths to enforce an architecture
 
 You will find details about all these features directly in the extension documention.
-
-💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/angular-renaissance)** 💎
-
-And to celebrate the Angular renaissance, price is currently 50% off. 🎉
 
 ## [5.4.0] - 2023-05-11
 

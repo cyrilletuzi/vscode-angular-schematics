@@ -52,28 +52,6 @@ It may work with previous versions but it is not guaranteed.
 
 Note that alternative editors may not support all the features of VS Code (for example, Cursor does not support walkthroughs, which serve as documentation in this extension).
 
-### 💎 Pro edition
-
-While this extension is very popular, with nearly **1 million installations**, it is *not* a tool developed by the Angular team or affiliated to Google in any way.
-
-It is months of *unpaid* work by a single contributor.
-
-So you will see some new features marked with a diamond 💎. It means they are only available in the Pro edition.
-
-Feel free to enjoy advanced features and support a contributor at the same time! 💖
-
-- additional schematics (page, reactive services, Material, unit tests,...)
-- advanced options (imports for standalone components, entry files exports,...)
-- legacy schematics (components with NgModules, class guards,...)
-- custom schematics in a much simpler way than with the Angular CLI
-- predefined paths to enforce an architecture
-
-You will find details about all these features directly in the extension documention.
-
-💎 **[Try the Pro edition for free](https://cyrilletuzi.gumroad.com/l/schematicspro/1million)** 💎
-
-⚡️ To celebrate 1 million installations, the Pro edition is currently 50% off for a limited time.
-
 ## Release Notes
 
 [Changelog available here](https://github.com/cyrilletuzi/vscode-angular-schematics/blob/main/CHANGELOG.md).

@@ -54,11 +54,5 @@ If it still does not work, you can ask a question on [GitHub discussions](https:
 - [Documentation homepage](./documentation.md)
 - [First generation](./firstGeneration.md)
 - [Configuration](./configuration.md)
-- [Additional schematics 💎](./advancedSchematics.md)
-- [Advanced options 💎](./advancedOptions.md)
-- [Legacy features 💎](./legacy.md)
-- [Custom schematics 💎](./customSchematics.md)
-- [Test schematics 💎](./testing.md)
-- [Predefined paths 💎](./predefinedPaths.md)
 
 <br>

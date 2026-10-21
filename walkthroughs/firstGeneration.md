@@ -46,7 +46,6 @@ If the command failed, see troubleshooting in the next walkthrough step.
 
 You can now try any other schematics:
 
-**Free edition**
 - service
 - standalone component
 - standalone directive
@@ -57,17 +56,6 @@ You can now try any other schematics:
 - interface
 - class
 
-**Pro edition 💎**
-- all schematics from the free edition
-- page
-- routes
-- synchronous reactive service with signal
-- asynchronous reactive service with RxJS
-- legacy component, directive and pipe with NgModules
-- legacy class guard, resolver and interceptor
-- Material (dialog, table)
-- unit test (jasmine / jest / vitest)
-
 If you do not see some schematics, see the troubleshooting guide in the next walkthrough step.
 
 <br>
@@ -77,11 +65,5 @@ If you do not see some schematics, see the troubleshooting guide in the next wal
 - [Documentation homepage](./documentation.md)
 - [Troubleshooting](./troubleshooting.md)
 - [Configuration](./configuration.md)
-- [Additional schematics 💎](./advancedSchematics.md)
-- [Advanced options 💎](./advancedOptions.md)
-- [Legacy features 💎](./legacy.md)
-- [Custom schematics 💎](./customSchematics.md)
-- [Test schematics 💎](./testing.md)
-- [Predefined paths 💎](./predefinedPaths.md)
 
 <br>
