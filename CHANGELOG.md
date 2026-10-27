@@ -1,5 +1,10 @@
 # Change Log
 
+## [8.3.0] - 2026-10-27
+
+- Disallow ".." in user inputs to protect from path traversal (generating outside the workspace).
+- User regexp protection.
+
 ## [8.2.0] - 2026-10-21
 
 Maintenance release, no new feature.
