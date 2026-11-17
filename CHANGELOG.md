@@ -1,5 +1,9 @@
 # Change Log
 
+## [8.3.1] - 2026-11-17
+
+- Update dependencies to fix a security issue in a subdependency (`minimatch`)
+
 ## [8.3.0] - 2026-10-27
 
 - Disallow ".." in user inputs to protect from path traversal (generating outside the workspace).
